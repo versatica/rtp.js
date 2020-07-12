@@ -1,0 +1,44 @@
+{
+  "name": "rtp.js",
+  "version": "0.0.1",
+  "description": "RTP stack in JavaScript",
+  "contributors": [
+    "Iñaki Baz Castillo <ibc@aliax.net> (https://inakibaz.me)",
+    "José Luis Millán <jmillan@aliax.net> (https://github.com/jmillan)"
+  ],
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/versatica/rtp.js.git"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "typescript:build": "node npm-scripts.js typescript:build",
+    "typescript:watch": "node npm-scripts.js typescript:watch",
+    "lint": "node npm-scripts.js lint",
+    "test": "node npm-scripts.js test",
+    "coverage": "node npm-scripts.js coverage"
+  },
+  "dependencies": {
+    "@types/debug": "^4.1.5",
+    "@types/events": "^3.0.0",
+    "debug": "^4.1.1",
+    "events": "^3.1.0",
+    "supports-color": "^7.1.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^3.6.0",
+    "@typescript-eslint/parser": "^3.6.0",
+    "eslint": "^7.4.0",
+    "eslint-plugin-jest": "^23.18.0",
+    "jest": "^26.1.0",
+    "jest-tobetype": "^1.2.3",
+    "open-cli": "^6.0.1",
+    "tsc-watch": "^4.2.9",
+    "typescript": "~3.7.5"
+  }
+}
