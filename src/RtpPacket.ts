@@ -393,14 +393,19 @@ export class RtpPacket
 		// Compute required buffer length.
 		let length = FIXED_HEADER_LENGTH;
 
+		// Add space for CSRC values.
 		length += this.csrc.length * 4;
 
 		if (this.extensions.size > 0)
 		{
+			// Add space for header extension id/length fields.
+			length += 4;
+
 			if (this.HasOneByteExtensions())
 			{
 				for (const value of this.extensions.values())
 				{
+					// Add space for extension id/length fields.
 					length += 1 + value.length;
 				}
 			}
@@ -408,21 +413,26 @@ export class RtpPacket
 			{
 				for (const value of this.extensions.values())
 				{
+					// Add space for extension id/length fields.
 					length += 2 + value.length;
 				}
 			}
 		}
 
+		// Add space for payload.
 		if (this.payload)
 		{
 			length += this.payload.length;
 		}
 
+		// Add space for padding.
 		length += this.padding;
 
+		// Update our buffer.
 		this.buffer = Buffer.alloc(length);
 
-		// TODO: Do everything.
+		// TODO: Serialize everything into the buffer.
+		// TODO: Including the version field.
 
 		// Reset flag.
 		this.serializationNeeded = false;
