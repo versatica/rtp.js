@@ -48,7 +48,6 @@ export class RtpPacket
 
 	dump(): any
 	{
-		const headerExtension = this.getHeaderExtension();
 		const extensions: any = {};
 
 		for (const [ id, value ] of this.extensions)
@@ -64,10 +63,10 @@ export class RtpPacket
 			ssrc            : this.ssrc,
 			csrc            : this.csrc,
 			marker          : this.marker,
-			headerExtension : headerExtension
+			headerExtension : this.headerExtension
 				? {
-					id     : headerExtension.id,
-					length : headerExtension.value.length
+					id     : this.headerExtension.id,
+					length : this.headerExtension.value.length
 				}
 				: undefined,
 			extensions    : extensions,
