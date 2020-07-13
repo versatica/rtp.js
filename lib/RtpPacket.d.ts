@@ -1,23 +1,14 @@
 /// <reference types="node" />
-export declare type RtpHeaderExtension = {
-    id: number;
-    value: Buffer;
-};
+export declare function isRtp(buffer: Buffer): boolean;
 export declare class RtpPacket {
     private buffer;
-    private serializationNeeded;
-    private readonly version;
-    private payloadType;
-    private sequenceNumber;
-    private timestamp;
-    private ssrc;
     private csrc;
-    private marker;
     private headerExtension?;
     private extensions;
     private payload?;
     private padding;
-    constructor(buffer: Buffer);
+    private serializationNeeded;
+    constructor(buffer?: Buffer);
     dump(): any;
     getBuffer(): Buffer;
     getVersion(): number;
@@ -33,8 +24,6 @@ export declare class RtpPacket {
     setCsrc(csrc: number[]): void;
     getMarker(): boolean;
     setMarker(marker: boolean): void;
-    getHeaderExtension(): RtpHeaderExtension | undefined;
-    setHeaderExtension(headerExtension?: RtpHeaderExtension): void;
     HasOneByteExtensions(): boolean;
     HasTwoBytesExtensions(): boolean;
     getExtensionById(id: number): Buffer | undefined;
@@ -45,10 +34,8 @@ export declare class RtpPacket {
     setPayload(payload?: Buffer): void;
     getPadding(): number;
     setPadding(padding: number): void;
-    parseExtensions(): void;
+    isSerializationNeeded(): boolean;
     serialize(): void;
     clone(): RtpPacket;
 }
-export declare function isRtp(buffer: Buffer): boolean;
-export declare function parseRtp(buffer: Buffer): RtpPacket;
 //# sourceMappingURL=RtpPacket.d.ts.map

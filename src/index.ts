@@ -1,13 +1,3 @@
-import {
-	RtpPacket,
-	RtpHeaderExtension,
-	isRtp,
-	parseRtp
-} from './RtpPacket';
+import { isRtp, RtpPacket } from './RtpPacket';
 
-export {
-	RtpPacket,
-	RtpHeaderExtension,
-	isRtp,
-	parseRtp
-};
+export { isRtp, RtpPacket };

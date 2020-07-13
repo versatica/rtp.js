@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { RtpPacket, isRtp, parseRtp } from '../RtpPacket';
+import { isRtp, RtpPacket } from '../RtpPacket';
 
 describe('RTP packet 1', () =>
 {
@@ -12,9 +12,9 @@ describe('RTP packet 1', () =>
 		expect(isRtp(buffer)).toBe(true);
 	});
 
-	test('parseRtp() succeeds', () =>
+	test('new RtpPacket() succeeds', () =>
 	{
-		packet = parseRtp(buffer);
+		packet = new RtpPacket(buffer);
 
 		expect(packet).toBeDefined();
 		expect(packet.getVersion()).toBe(2);
@@ -25,20 +25,8 @@ describe('RTP packet 1', () =>
 		expect(packet.getCsrc()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
-
-		const headerExtension = packet.getHeaderExtension()!;
-
-		expect(headerExtension).toBeDefined();
-		expect(headerExtension.id).toBe(0xBEDE);
-		expect(headerExtension.value.length).toBe(4);
 		expect(packet.HasOneByteExtensions()).toBe(true);
 		expect(packet.HasTwoBytesExtensions()).toBe(false);
-	});
-
-	test('packet.parseExtensions() succeeds', () =>
-	{
-		packet.parseExtensions();
-
 		expect(packet.getExtensionById(1)).toEqual(Buffer.from([ 255 ]));
 
 		packet.setExtensionById(1, Buffer.from('foo'));
@@ -56,9 +44,9 @@ describe('RTP packet 2', () =>
 		expect(isRtp(buffer)).toBe(true);
 	});
 
-	test('parseRtp() succeeds', () =>
+	test('new RtpPacket() succeeds', () =>
 	{
-		packet = parseRtp(buffer);
+		packet = new RtpPacket(buffer);
 
 		expect(packet).toBeDefined();
 		expect(packet.getVersion()).toBe(2);
@@ -69,20 +57,8 @@ describe('RTP packet 2', () =>
 		expect(packet.getCsrc()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
-
-		const headerExtension = packet.getHeaderExtension()!;
-
-		expect(headerExtension).toBeDefined();
-		expect(headerExtension.id).toBe(0xBEDE);
-		expect(headerExtension.value.length).toBe(8);
 		expect(packet.HasOneByteExtensions()).toBe(true);
 		expect(packet.HasTwoBytesExtensions()).toBe(false);
-	});
-
-	test('packet.parseExtensions() succeeds', () =>
-	{
-		packet.parseExtensions();
-
 		expect(packet.getExtensionById(3)).toEqual(Buffer.from([ 0x65, 0x34, 0x1E ]));
 	});
 });
@@ -106,9 +82,9 @@ describe('RTP packet 3', () =>
 		expect(isRtp(buffer)).toBe(true);
 	});
 
-	test('parseRtp() succeeds', () =>
+	test('new RtpPacket() succeeds', () =>
 	{
-		packet = parseRtp(buffer);
+		packet = new RtpPacket(buffer);
 
 		expect(packet).toBeDefined();
 		expect(packet.getVersion()).toBe(2);
@@ -119,12 +95,6 @@ describe('RTP packet 3', () =>
 		expect(packet.getCsrc()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
-
-		const headerExtension = packet.getHeaderExtension()!;
-
-		expect(headerExtension).toBeDefined();
-		expect(headerExtension.id).toBe(0xBEDE);
-		expect(headerExtension.value.length).toBe(12);
 		expect(packet.HasOneByteExtensions()).toBe(true);
 		expect(packet.HasTwoBytesExtensions()).toBe(false);
 	});
@@ -150,9 +120,9 @@ describe('RTP packet 4', () =>
 		expect(isRtp(buffer)).toBe(true);
 	});
 
-	test('parseRtp() succeeds', () =>
+	test('new RtpPacket() succeeds', () =>
 	{
-		packet = parseRtp(buffer);
+		packet = new RtpPacket(buffer);
 
 		expect(packet).toBeDefined();
 		expect(packet.getVersion()).toBe(2);
@@ -163,19 +133,8 @@ describe('RTP packet 4', () =>
 		expect(packet.getCsrc()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
-
-		const headerExtension = packet.getHeaderExtension()!;
-
-		expect(headerExtension).toBeDefined();
-		expect(headerExtension.value.length).toBe(16);
 		expect(packet.HasOneByteExtensions()).toBe(false);
 		expect(packet.HasTwoBytesExtensions()).toBe(true);
-	});
-
-	test('packet.parseExtensions() succeeds', () =>
-	{
-		packet.parseExtensions();
-
 		expect(packet.getExtensionById(1)).toEqual(Buffer.alloc(0));
 		expect(packet.getExtensionById(2)).toEqual(Buffer.from([ 0x42 ]));
 		expect(packet.getExtensionById(3)).toEqual(Buffer.from([ 0x11, 0x22 ]));
@@ -184,5 +143,26 @@ describe('RTP packet 4', () =>
 
 		packet.deleteExtensionById(2);
 		expect(packet.getExtensionById(2)).toBeUndefined();
+	});
+});
+
+describe('empty RTP packet from scratch', () =>
+{
+	test('new RtpPacket() succeeds', () =>
+	{
+		const packet = new RtpPacket();
+
+		expect(packet).toBeDefined();
+		// expect(packet.getVersion()).toBe(2);
+		expect(packet.getPayloadType()).toBe(0);
+		expect(packet.getSequenceNumber()).toBe(0);
+		expect(packet.getTimestamp()).toBe(0);
+		expect(packet.getSsrc()).toBe(0);
+		expect(packet.getCsrc()).toEqual([]);
+		expect(packet.getMarker()).toBe(false);
+		expect(packet.getPayload()).toBeUndefined();
+		expect(packet.getPadding()).toBe(0);
+		expect(packet.HasOneByteExtensions()).toBe(false);
+		expect(packet.HasTwoBytesExtensions()).toBe(false);
 	});
 });
