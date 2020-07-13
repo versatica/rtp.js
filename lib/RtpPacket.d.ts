@@ -3,7 +3,7 @@ export declare function isRtp(buffer: Buffer): boolean;
 export declare class RtpPacket {
     private buffer;
     private csrc;
-    private headerExtension?;
+    private headerExtensionId?;
     private extensions;
     private payload?;
     private padding;
@@ -33,10 +33,12 @@ export declare class RtpPacket {
     setExtension(id: number, value: Buffer): void;
     deleteExtension(id: number): void;
     clearExtensions(): void;
+    private setHeaderExtensionBit;
     getPayload(): Buffer | undefined;
     setPayload(payload?: Buffer): void;
     getPadding(): number;
     setPadding(padding: number): void;
+    private setPaddingBit;
     isSerializationNeeded(): boolean;
     serialize(): void;
     clone(): RtpPacket;
