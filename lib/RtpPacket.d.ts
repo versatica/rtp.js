@@ -4,8 +4,8 @@ export declare class RtpPacket {
     private buffer;
     private csrc;
     private headerExtensionId?;
-    private extensions;
-    private payload?;
+    private readonly extensions;
+    private payload;
     private padding;
     private serializationNeeded;
     constructor(buffer?: Buffer);
@@ -33,14 +33,16 @@ export declare class RtpPacket {
     setExtension(id: number, value: Buffer): void;
     deleteExtension(id: number): void;
     clearExtensions(): void;
-    private setHeaderExtensionBit;
-    getPayload(): Buffer | undefined;
-    setPayload(payload?: Buffer): void;
+    getPayload(): Buffer;
+    setPayload(payload: Buffer): void;
     getPadding(): number;
     setPadding(padding: number): void;
-    private setPaddingBit;
     isSerializationNeeded(): boolean;
     serialize(): void;
     clone(): RtpPacket;
+    rtxEncode(payloadType: number, ssrc: number, sequenceNumber: number): void;
+    rtxDecode(payloadType: number, ssrc: number): void;
+    private setHeaderExtensionBit;
+    private setPaddingBit;
 }
 //# sourceMappingURL=RtpPacket.d.ts.map

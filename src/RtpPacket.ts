@@ -26,9 +26,9 @@ export class RtpPacket
 	// Header extension id.
 	private headerExtensionId?: number;
 	// One-Byte or Two-Bytes extensions.
-	private extensions: Map<number, Buffer> = new Map();
+	private readonly extensions: Map<number, Buffer> = new Map();
 	// Payload.
-	private payload?: Buffer;
+	private payload: Buffer;
 	// Number of bytes of padding.
 	private padding: number = 0;
 	// Whether serialization is needed due to modifications.
@@ -43,6 +43,9 @@ export class RtpPacket
 
 			// Set version.
 			this.setVersion();
+
+			// Set empty payload.
+			this.payload = Buffer.alloc(0);
 
 			return;
 		}
@@ -211,11 +214,11 @@ export class RtpPacket
 
 	dump(): any
 	{
-		const extensions: { [key: number]: Buffer } = {};
+		const extensions: { [key: number]: { length: number } } = {};
 
 		for (const [ id, value ] of this.extensions)
 		{
-			extensions[id] = value;
+			extensions[id] = { length: value.length };
 		}
 
 		return {
@@ -228,7 +231,7 @@ export class RtpPacket
 			marker            : this.getMarker(),
 			headerExtensionId : this.headerExtensionId,
 			extensions        : extensions,
-			payloadLength     : this.payload ? this.payload.length : 0,
+			payloadLength     : this.payload.length,
 			padding           : this.padding
 		};
 	}
@@ -255,7 +258,8 @@ export class RtpPacket
 
 	setPayloadType(payloadType: number): void
 	{
-		this.buffer.writeUInt8(this.buffer.readUInt8(1) | (payloadType & 0x7F), 1);
+		this.buffer.writeUInt8(
+			(this.buffer.readUInt8(1) & 0x80) | (payloadType & 0x7F), 1);
 	}
 
 	getSequenceNumber(): number
@@ -302,7 +306,8 @@ export class RtpPacket
 		// Update CSRC count.
 		const count = this.csrc.length;
 
-		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (count & 0x0F), 0);
+		this.buffer.writeUInt8(
+			(this.buffer.readUInt8(0) & 0xF0) | (count & 0x0F), 0);
 	}
 
 	getMarker(): boolean
@@ -412,17 +417,12 @@ export class RtpPacket
 		this.extensions.clear();
 	}
 
-	private setHeaderExtensionBit(bit: number)
-	{
-		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 4), 0);
-	}
-
-	getPayload(): Buffer | undefined
+	getPayload(): Buffer
 	{
 		return this.payload;
 	}
 
-	setPayload(payload?: Buffer): void
+	setPayload(payload: Buffer): void
 	{
 		this.serializationNeeded = true;
 
@@ -444,11 +444,6 @@ export class RtpPacket
 		const bit = padding ? 1 : 0;
 
 		this.setPaddingBit(bit);
-	}
-
-	private setPaddingBit(bit: number)
-	{
-		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 5), 0);
 	}
 
 	isSerializationNeeded(): boolean
@@ -498,10 +493,7 @@ export class RtpPacket
 		}
 
 		// Add space for payload.
-		if (this.payload)
-		{
-			length += this.payload.length;
-		}
+		length += this.payload.length;
 
 		// Add space for padding.
 		length += this.padding;
@@ -612,11 +604,8 @@ export class RtpPacket
 		}
 
 		// Write payload.
-		if (this.payload)
-		{
-			this.payload.copy(newBuffer, pos);
-			pos += this.payload.length;
-		}
+		this.payload.copy(newBuffer, pos);
+		pos += this.payload.length;
 
 		// Write padding.
 		if (this.padding > 0)
@@ -656,5 +645,63 @@ export class RtpPacket
 		}
 
 		return new RtpPacket(clone(this.buffer));
+	}
+
+	rtxEncode(payloadType: number, ssrc: number, sequenceNumber: number)
+	{
+		// Rewrite the payload type.
+		this.setPayloadType(payloadType);
+
+		// Rewrite the SSRC.
+		this.setSsrc(ssrc);
+
+		// Write the original sequence number at the begining of the new payload.
+		const seqBuffer = Buffer.allocUnsafe(2);
+
+		seqBuffer.writeUInt16BE(this.getSequenceNumber(), 0);
+		this.setPayload(Buffer.concat([ seqBuffer, this.payload ]));
+
+		// Rewrite the sequence number.
+		this.setSequenceNumber(sequenceNumber);
+
+		// Remove padding.
+		this.setPadding(0);
+	}
+
+	rtxDecode(payloadType: number, ssrc: number)
+	{
+		if (this.payload.length < 2)
+		{
+			throw new RangeError(
+				'payload length must be greater or equal than 2 bytes'
+			);
+		}
+
+		// Rewrite the payload type.
+		this.setPayloadType(payloadType);
+
+		// Rewrite the SSRC.
+		this.setSsrc(ssrc);
+
+		// Rewrite the sequence number.
+		const sequenceNumber = this.payload.readUInt16BE(0);
+
+		this.setSequenceNumber(sequenceNumber);
+
+		// Reduce the payload.
+		this.setPayload(this.payload.slice(2));
+
+		// Remove padding.
+		this.setPadding(0);
+	}
+
+	private setHeaderExtensionBit(bit: number)
+	{
+		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 4), 0);
+	}
+
+	private setPaddingBit(bit: number)
+	{
+		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 5), 0);
 	}
 }
