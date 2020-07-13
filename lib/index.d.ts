@@ -1,3 +1,3 @@
-import { isRtp, parseRtp, RtpHeaderExtension, RtpPacket } from './RtpPacket';
-export { isRtp, parseRtp, RtpHeaderExtension, RtpPacket };
+import { RtpPacket, RtpHeaderExtension, isRtp, parseRtp } from './RtpPacket';
+export { RtpPacket, RtpHeaderExtension, isRtp, parseRtp };
 //# sourceMappingURL=index.d.ts.map

@@ -38,14 +38,14 @@ switch (task)
 
 	case 'test':
 	{
-		execute('jest');
+		execute('jest --colors --verbose');
 
 		break;
 	}
 
 	case 'coverage':
 	{
-		execute('jest --coverage');
+		execute('jest --colors --verbose --coverage');
 		execute('open-cli coverage/lcov-report/index.html');
 
 		break;
