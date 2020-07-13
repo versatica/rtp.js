@@ -46,7 +46,7 @@ switch (task)
 	case 'coverage':
 	{
 		execute('jest --colors --verbose --coverage');
-		execute('open-cli coverage/lcov-report/index.html');
+		execute('open-cli coverage/index.html');
 
 		break;
 	}

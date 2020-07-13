@@ -146,7 +146,7 @@ describe('RTP packet 4', () =>
 	});
 });
 
-describe('empty RTP packet from scratch', () =>
+describe('RTP packet from scratch', () =>
 {
 	let packet: RtpPacket;
 
