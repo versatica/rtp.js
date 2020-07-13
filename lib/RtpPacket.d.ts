@@ -12,6 +12,7 @@ export declare class RtpPacket {
     dump(): any;
     getBuffer(): Buffer;
     getVersion(): number;
+    setVersion(): void;
     getPayloadType(): number;
     setPayloadType(payloadType: number): void;
     getSequenceNumber(): number;
@@ -24,11 +25,13 @@ export declare class RtpPacket {
     setCsrc(csrc: number[]): void;
     getMarker(): boolean;
     setMarker(marker: boolean): void;
-    HasOneByteExtensions(): boolean;
-    HasTwoBytesExtensions(): boolean;
-    getExtensionById(id: number): Buffer | undefined;
-    setExtensionById(id: number, value: Buffer): void;
-    deleteExtensionById(id: number): void;
+    hasOneByteExtensions(): boolean;
+    hasTwoBytesExtensions(): boolean;
+    setOneByteExtensions(): void;
+    setTwoBytesExtensions(): void;
+    getExtension(id: number): Buffer | undefined;
+    setExtension(id: number, value: Buffer): void;
+    deleteExtension(id: number): void;
     clearExtensions(): void;
     getPayload(): Buffer | undefined;
     setPayload(payload?: Buffer): void;

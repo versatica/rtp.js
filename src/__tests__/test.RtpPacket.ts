@@ -25,12 +25,12 @@ describe('RTP packet 1', () =>
 		expect(packet.getCsrc()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
-		expect(packet.HasOneByteExtensions()).toBe(true);
-		expect(packet.HasTwoBytesExtensions()).toBe(false);
-		expect(packet.getExtensionById(1)).toEqual(Buffer.from([ 255 ]));
+		expect(packet.hasOneByteExtensions()).toBe(true);
+		expect(packet.hasTwoBytesExtensions()).toBe(false);
+		expect(packet.getExtension(1)).toEqual(Buffer.from([ 255 ]));
 
-		packet.setExtensionById(1, Buffer.from('foo'));
-		expect(packet.getExtensionById(1)).toEqual(Buffer.from('foo'));
+		packet.setExtension(1, Buffer.from('foo'));
+		expect(packet.getExtension(1)).toEqual(Buffer.from('foo'));
 	});
 });
 
@@ -57,9 +57,9 @@ describe('RTP packet 2', () =>
 		expect(packet.getCsrc()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
-		expect(packet.HasOneByteExtensions()).toBe(true);
-		expect(packet.HasTwoBytesExtensions()).toBe(false);
-		expect(packet.getExtensionById(3)).toEqual(Buffer.from([ 0x65, 0x34, 0x1E ]));
+		expect(packet.hasOneByteExtensions()).toBe(true);
+		expect(packet.hasTwoBytesExtensions()).toBe(false);
+		expect(packet.getExtension(3)).toEqual(Buffer.from([ 0x65, 0x34, 0x1E ]));
 	});
 });
 
@@ -95,8 +95,8 @@ describe('RTP packet 3', () =>
 		expect(packet.getCsrc()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
-		expect(packet.HasOneByteExtensions()).toBe(true);
-		expect(packet.HasTwoBytesExtensions()).toBe(false);
+		expect(packet.hasOneByteExtensions()).toBe(true);
+		expect(packet.hasTwoBytesExtensions()).toBe(false);
 	});
 });
 
@@ -133,16 +133,16 @@ describe('RTP packet 4', () =>
 		expect(packet.getCsrc()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
-		expect(packet.HasOneByteExtensions()).toBe(false);
-		expect(packet.HasTwoBytesExtensions()).toBe(true);
-		expect(packet.getExtensionById(1)).toEqual(Buffer.alloc(0));
-		expect(packet.getExtensionById(2)).toEqual(Buffer.from([ 0x42 ]));
-		expect(packet.getExtensionById(3)).toEqual(Buffer.from([ 0x11, 0x22 ]));
-		expect(packet.getExtensionById(4)).toEqual(Buffer.alloc(0));
-		expect(packet.getExtensionById(5)).toBeUndefined();
+		expect(packet.hasOneByteExtensions()).toBe(false);
+		expect(packet.hasTwoBytesExtensions()).toBe(true);
+		expect(packet.getExtension(1)).toEqual(Buffer.alloc(0));
+		expect(packet.getExtension(2)).toEqual(Buffer.from([ 0x42 ]));
+		expect(packet.getExtension(3)).toEqual(Buffer.from([ 0x11, 0x22 ]));
+		expect(packet.getExtension(4)).toEqual(Buffer.alloc(0));
+		expect(packet.getExtension(5)).toBeUndefined();
 
-		packet.deleteExtensionById(2);
-		expect(packet.getExtensionById(2)).toBeUndefined();
+		packet.deleteExtension(2);
+		expect(packet.getExtension(2)).toBeUndefined();
 	});
 });
 
@@ -153,7 +153,7 @@ describe('empty RTP packet from scratch', () =>
 		const packet = new RtpPacket();
 
 		expect(packet).toBeDefined();
-		// expect(packet.getVersion()).toBe(2);
+		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPayloadType()).toBe(0);
 		expect(packet.getSequenceNumber()).toBe(0);
 		expect(packet.getTimestamp()).toBe(0);
@@ -162,7 +162,64 @@ describe('empty RTP packet from scratch', () =>
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPayload()).toBeUndefined();
 		expect(packet.getPadding()).toBe(0);
-		expect(packet.HasOneByteExtensions()).toBe(false);
-		expect(packet.HasTwoBytesExtensions()).toBe(false);
+		expect(packet.hasOneByteExtensions()).toBe(false);
+		expect(packet.hasTwoBytesExtensions()).toBe(false);
+
+		packet.setPayloadType(3);
+		expect(packet.getPayloadType()).toBe(3);
+		expect(packet.isSerializationNeeded()).toBe(false);
+
+		packet.setPayloadType(127);
+		expect(packet.getPayloadType()).toBe(127);
+		expect(packet.isSerializationNeeded()).toBe(false);
+
+		packet.setSequenceNumber(52345);
+		expect(packet.getSequenceNumber()).toBe(52345);
+		expect(packet.isSerializationNeeded()).toBe(false);
+
+		packet.setTimestamp(1234567890);
+		expect(packet.getTimestamp()).toBe(1234567890);
+		expect(packet.isSerializationNeeded()).toBe(false);
+
+		packet.setSsrc(3294967295);
+		expect(packet.getSsrc()).toBe(3294967295);
+		expect(packet.isSerializationNeeded()).toBe(false);
+
+		packet.setMarker(true);
+		expect(packet.getMarker()).toBe(true);
+		expect(packet.isSerializationNeeded()).toBe(false);
+
+		packet.setCsrc([ 1111, 2222 ]);
+		expect(packet.getCsrc()).toEqual([ 1111, 2222 ]);
+		expect(packet.isSerializationNeeded()).toBe(true);
+
+		packet.setOneByteExtensions();
+		expect(packet.hasOneByteExtensions()).toBe(true);
+		expect(packet.hasTwoBytesExtensions()).toBe(false);
+
+		packet.setTwoBytesExtensions();
+		expect(packet.hasTwoBytesExtensions()).toBe(true);
+		expect(packet.hasOneByteExtensions()).toBe(false);
+
+		packet.setExtension(1, Buffer.from('foo'));
+		expect(packet.getExtension(1)).toEqual(Buffer.from('foo'));
+
+		packet.setExtension(2, Buffer.from([ 1, 2, 3, 4 ]));
+		expect(packet.getExtension(2)).toEqual(Buffer.from([ 1, 2, 3, 4 ]));
+
+		packet.deleteExtension(1);
+		expect(packet.getExtension(1)).toBeUndefined();
+
+		packet.clearExtensions();
+		expect(packet.getExtension(2)).toBeUndefined();
+
+		packet.setExtension(2, Buffer.from([ 1, 2, 3, 4 ]));
+		expect(packet.getExtension(2)).toEqual(Buffer.from([ 1, 2, 3, 4 ]));
+
+		packet.setPayload(Buffer.from('codec'));
+		expect(packet.getPayload()).toEqual(Buffer.from('codec'));
+
+		packet.setPadding(3);
+		expect(packet.getPadding()).toBe(3);
 	});
 });

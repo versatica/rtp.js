@@ -47,7 +47,8 @@ export class RtpPacket
 		{
 			this.buffer = Buffer.alloc(FIXED_HEADER_LENGTH);
 
-			// TODO: Set version.
+			// Set version.
+			this.setVersion();
 
 			return;
 		}
@@ -91,7 +92,7 @@ export class RtpPacket
 		}
 
 		// Parse One-Byte or Two-Bytes extensions.
-		if (this.HasOneByteExtensions())
+		if (this.hasOneByteExtensions())
 		{
 			const extBuffer = this.headerExtension!.value;
 			let extPos: number = 0;
@@ -139,7 +140,7 @@ export class RtpPacket
 				}
 			}
 		}
-		else if (this.HasTwoBytesExtensions())
+		else if (this.hasTwoBytesExtensions())
 		{
 			const extBuffer = this.headerExtension!.value;
 			let extPos: number = 0;
@@ -254,6 +255,11 @@ export class RtpPacket
 		return (this.buffer.readUInt8(0) >> 6);
 	}
 
+	setVersion(): void
+	{
+		this.buffer.writeUInt8(RTP_VERSION << 6, 0);
+	}
+
 	getPayloadType(): number
 	{
 		return (this.buffer.readUInt8(1) & 0x7F);
@@ -261,7 +267,7 @@ export class RtpPacket
 
 	setPayloadType(payloadType: number): void
 	{
-		// TODO
+		this.buffer.writeUInt8(this.buffer.readUInt8(1) | (payloadType & 0x7F), 1);
 	}
 
 	getSequenceNumber(): number
@@ -271,7 +277,7 @@ export class RtpPacket
 
 	setSequenceNumber(sequenceNumber: number): void
 	{
-		// TODO
+		this.buffer.writeUInt16BE(sequenceNumber, 2);
 	}
 
 	getTimestamp(): number
@@ -281,7 +287,7 @@ export class RtpPacket
 
 	setTimestamp(timestamp: number): void
 	{
-		// TODO
+		this.buffer.writeUInt32BE(timestamp, 4);
 	}
 
 	getSsrc(): number
@@ -291,7 +297,7 @@ export class RtpPacket
 
 	setSsrc(ssrc: number): void
 	{
-		// TODO
+		this.buffer.writeUInt32BE(ssrc, 8);
 	}
 
 	getCsrc(): number[]
@@ -312,37 +318,65 @@ export class RtpPacket
 
 	setMarker(marker: boolean): void
 	{
-		// TODO
+		const bit = marker ? 1 : 0;
+
+		this.buffer.writeUInt8(this.buffer.readUInt8(1) | (bit << 7), 1);
 	}
 
-	// API to remove header extension or sete one or two bytes.
-
-	HasOneByteExtensions(): boolean
+	hasOneByteExtensions(): boolean
 	{
 		return this.headerExtension
 			? this.headerExtension.id === 0xBEDE
 			: false;
 	}
 
-	HasTwoBytesExtensions(): boolean
+	hasTwoBytesExtensions(): boolean
 	{
 		return this.headerExtension
 			? (this.headerExtension.id & 0b1111111111110000) === 0b0001000000000000
 			: false;
 	}
 
-	getExtensionById(id: number): Buffer | undefined
+	setOneByteExtensions(): void
+	{
+		if (this.hasOneByteExtensions())
+		{
+			return;
+		}
+
+		this.headerExtension =
+		{
+			id    : 0xBEDE,
+			value : Buffer.alloc(0)
+		};
+	}
+
+	setTwoBytesExtensions(): void
+	{
+		if (this.hasTwoBytesExtensions())
+		{
+			return;
+		}
+
+		this.headerExtension =
+		{
+			id    : 0b0001000000000000,
+			value : Buffer.alloc(0)
+		};
+	}
+
+	getExtension(id: number): Buffer | undefined
 	{
 		return this.extensions.get(id);
 	}
 
-	setExtensionById(id: number, value: Buffer): void
+	setExtension(id: number, value: Buffer): void
 	{
 		this.serializationNeeded = true;
 		this.extensions.set(id, value);
 	}
 
-	deleteExtensionById(id: number): void
+	deleteExtension(id: number): void
 	{
 		if (this.extensions.delete(id))
 		{
@@ -379,8 +413,7 @@ export class RtpPacket
 	setPadding(padding: number): void
 	{
 		this.serializationNeeded = true;
-
-		// TODO: Change last bytes and so on.
+		this.padding = padding;
 	}
 
 	isSerializationNeeded(): boolean
@@ -401,7 +434,7 @@ export class RtpPacket
 			// Add space for header extension id/length fields.
 			length += 4;
 
-			if (this.HasOneByteExtensions())
+			if (this.hasOneByteExtensions())
 			{
 				for (const value of this.extensions.values())
 				{
@@ -409,7 +442,7 @@ export class RtpPacket
 					length += 1 + value.length;
 				}
 			}
-			else if (this.HasTwoBytesExtensions())
+			else if (this.hasTwoBytesExtensions())
 			{
 				for (const value of this.extensions.values())
 				{
