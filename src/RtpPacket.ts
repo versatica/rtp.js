@@ -1,4 +1,5 @@
 import { clone, padTo4Bytes } from './utils';
+import { InvalidStateError } from './errors';
 
 const RTP_VERSION = 2;
 const FIXED_HEADER_LENGTH = 12;
@@ -446,6 +447,25 @@ export class RtpPacket
 		this.setPaddingBit(bit);
 	}
 
+	padTo4Bytes(): void
+	{
+		if (this.serializationNeeded)
+		{
+			throw new InvalidStateError('packet must be serialized');
+		}
+
+		const length = this.buffer.length;
+		const padding = this.padding;
+		const newLength = padTo4Bytes(length - padding);
+
+		if (newLength === length)
+		{
+			return;
+		}
+
+		this.setPadding(padding + newLength - length);
+	}
+
 	isSerializationNeeded(): boolean
 	{
 		return this.serializationNeeded;
@@ -473,18 +493,24 @@ export class RtpPacket
 
 			if (this.hasOneByteExtensions())
 			{
-				for (const value of this.extensions.values())
+				for (const [ id, value ] of this.extensions)
 				{
-					// Add space for extension id/length fields.
-					length += 1 + value.length;
+					if (id % 16 !== 0)
+					{
+						// Add space for extension id/length fields.
+						length += 1 + value.length;
+					}
 				}
 			}
 			else if (this.hasTwoBytesExtensions())
 			{
-				for (const value of this.extensions.values())
+				for (const [ id, value ] of this.extensions)
 				{
-					// Add space for extension id/length fields.
-					length += 2 + value.length;
+					if (id % 256 !== 0)
+					{
+						// Add space for extension id/length fields.
+						length += 2 + value.length;
+					}
 				}
 			}
 
@@ -526,6 +552,13 @@ export class RtpPacket
 
 			for (const [ id, value ] of this.extensions)
 			{
+				if (id % 16 === 0)
+				{
+					this.extensions.delete(id);
+
+					continue;
+				}
+
 				if (value.length === 0)
 				{
 					throw new TypeError(
@@ -569,6 +602,13 @@ export class RtpPacket
 
 			for (const [ id, value ] of this.extensions)
 			{
+				if (id % 256 === 0)
+				{
+					this.extensions.delete(id);
+
+					continue;
+				}
+
 				if (value.length > 255)
 				{
 					throw new RangeError(

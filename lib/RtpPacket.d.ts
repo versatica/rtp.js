@@ -37,6 +37,7 @@ export declare class RtpPacket {
     setPayload(payload: Buffer): void;
     getPadding(): number;
     setPadding(padding: number): void;
+    padTo4Bytes(): void;
     isSerializationNeeded(): boolean;
     serialize(): void;
     clone(): RtpPacket;
