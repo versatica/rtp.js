@@ -54,9 +54,7 @@ switch (task)
 	case 'docs':
 	{
 		// NOTE: typedoc options are given in tsconfig.json.
-		// NOTE: .nojekyll is needed, otherwise files with underscore will be
-		// ignored by GitHub pages.
-		execute('typedoc && touch docs/.nojekyll');
+		execute('typedoc');
 		execute('open-cli docs/index.html');
 
 		break;
