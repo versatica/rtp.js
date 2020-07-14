@@ -53,8 +53,10 @@ switch (task)
 
 	case 'docs':
 	{
-		// Options are given in tsconfig.json.
-		execute('rm -rf docs/ && typedoc');
+		// NOTE: typedoc options are given in tsconfig.json.
+		// NOTE: .nojekyll is needed, otherwise files with underscore will be
+		// ignored by GitHub pages.
+		execute('rm -rf docs/ && typedoc && touch docs/.nojekyll');
 		execute('open-cli docs/index.html');
 
 		break;
