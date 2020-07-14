@@ -1,21 +1,21 @@
-/**
- * RTP classes and utilities.
- *
- * @packageDocumentation
- */
-
 import { clone, padTo4Bytes } from './utils';
 
+/** @ignore */
 const RTP_VERSION = 2;
+/** @ignore */
 const FIXED_HEADER_LENGTH = 12;
 
 /**
+ * ```ts
+ * import { isRtp } from 'rtp.js';
+ * ```
+ *
  * Inspect the given buffer and return a boolean indicating whether it could be
  * a valid RTP packet or not.
  *
  * ```ts
  * if (isRtp(buffer)) {
- *   console.log('it seems a valid RTP packet');
+ *   console.log('it looks like a valid RTP packet');
  * }
  * ```
  */
@@ -34,7 +34,11 @@ export function isRtp(buffer: Buffer): boolean
 }
 
 /**
- * Represents a RTP packet and provides methods to modify its fields.
+ * ```ts
+ * import { RtpPacket } from 'rtp.js';
+ * ```
+ *
+ * Representation of a RTP packet with methods to access and modify its fields.
  */
 export class RtpPacket
 {

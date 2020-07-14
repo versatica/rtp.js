@@ -13,9 +13,10 @@
 	},
 	"include": [ "src" ],
 	"typedocOptions": {
-		"mode": "modules",
+		"mode": "file",
 		"out": "docs",
 		"exclude": [
+			"src/index.ts",
 			"src/errors.ts",
 			"src/utils.ts",
 			"src/Logger.ts",
@@ -26,6 +27,8 @@
 		"excludePrivate": true,
 		"excludeProtected": true,
 		"stripInternal": true,
+		"includeVersion": true,
+		"listInvalidSymbolLinks": true,
 		"theme": "default",
 		"gitRemote": "origin",
 		"hideGenerator": false

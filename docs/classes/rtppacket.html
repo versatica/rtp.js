@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>RtpPacket | rtp.js</title>
-	<meta name="description" content="Documentation for rtp.js">
+	<title>RtpPacket | rtp.js - v0.0.1</title>
+	<meta name="description" content="Documentation for rtp.js - v0.0.1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 </head>
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">rtp.js</a>
+					<a href="../index.html" class="title">rtp.js - v0.0.1</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -54,10 +54,7 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_rtp_.html">&quot;rtp&quot;</a>
-				</li>
-				<li>
-					<a href="_rtp_.rtppacket.html">RtpPacket</a>
+					<a href="rtppacket.html">RtpPacket</a>
 				</li>
 			</ul>
 			<h1>Class RtpPacket</h1>
@@ -70,8 +67,9 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Represents a RTP packet and provides methods to modify its fields.</p>
+						<pre><code class="language-ts"><span class="hljs-keyword">import</span> { RtpPacket } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;rtp.js&#x27;</span>;</code></pre>
 					</div>
+					<p>Representation of a RTP packet with methods to access and modify its fields.</p>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
@@ -89,42 +87,42 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="rtppacket.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#clearextensions" class="tsd-kind-icon">clear<wbr>Extensions</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#clone" class="tsd-kind-icon">clone</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#deleteextension" class="tsd-kind-icon">delete<wbr>Extension</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#enableonebyteextensions" class="tsd-kind-icon">enable<wbr>One<wbr>Byte<wbr>Extensions</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#enabletwobytesextensions" class="tsd-kind-icon">enable<wbr>Two<wbr>Bytes<wbr>Extensions</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getbuffer" class="tsd-kind-icon">get<wbr>Buffer</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getcsrc" class="tsd-kind-icon">get<wbr>Csrc</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getextension" class="tsd-kind-icon">get<wbr>Extension</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getmarker" class="tsd-kind-icon">get<wbr>Marker</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getpadding" class="tsd-kind-icon">get<wbr>Padding</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getpayload" class="tsd-kind-icon">get<wbr>Payload</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getpayloadtype" class="tsd-kind-icon">get<wbr>Payload<wbr>Type</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getsequencenumber" class="tsd-kind-icon">get<wbr>Sequence<wbr>Number</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getssrc" class="tsd-kind-icon">get<wbr>Ssrc</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#gettimestamp" class="tsd-kind-icon">get<wbr>Timestamp</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getversion" class="tsd-kind-icon">get<wbr>Version</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#hasonebyteextensions" class="tsd-kind-icon">has<wbr>One<wbr>Byte<wbr>Extensions</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#hastwobytesextensions" class="tsd-kind-icon">has<wbr>Two<wbr>Bytes<wbr>Extensions</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#padto4bytes" class="tsd-kind-icon">pad<wbr>To4<wbr>Bytes</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#rtxdecode" class="tsd-kind-icon">rtx<wbr>Decode</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#rtxencode" class="tsd-kind-icon">rtx<wbr>Encode</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setcsrc" class="tsd-kind-icon">set<wbr>Csrc</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setextension" class="tsd-kind-icon">set<wbr>Extension</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setmarker" class="tsd-kind-icon">set<wbr>Marker</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setpadding" class="tsd-kind-icon">set<wbr>Padding</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setpayload" class="tsd-kind-icon">set<wbr>Payload</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setpayloadtype" class="tsd-kind-icon">set<wbr>Payload<wbr>Type</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setsequencenumber" class="tsd-kind-icon">set<wbr>Sequence<wbr>Number</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setssrc" class="tsd-kind-icon">set<wbr>Ssrc</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#settimestamp" class="tsd-kind-icon">set<wbr>Timestamp</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#clearextensions" class="tsd-kind-icon">clear<wbr>Extensions</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#clone" class="tsd-kind-icon">clone</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#deleteextension" class="tsd-kind-icon">delete<wbr>Extension</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#enableonebyteextensions" class="tsd-kind-icon">enable<wbr>One<wbr>Byte<wbr>Extensions</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#enabletwobytesextensions" class="tsd-kind-icon">enable<wbr>Two<wbr>Bytes<wbr>Extensions</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#getbuffer" class="tsd-kind-icon">get<wbr>Buffer</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#getcsrc" class="tsd-kind-icon">get<wbr>Csrc</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#getextension" class="tsd-kind-icon">get<wbr>Extension</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#getmarker" class="tsd-kind-icon">get<wbr>Marker</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#getpadding" class="tsd-kind-icon">get<wbr>Padding</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#getpayload" class="tsd-kind-icon">get<wbr>Payload</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#getpayloadtype" class="tsd-kind-icon">get<wbr>Payload<wbr>Type</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#getsequencenumber" class="tsd-kind-icon">get<wbr>Sequence<wbr>Number</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#getssrc" class="tsd-kind-icon">get<wbr>Ssrc</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#gettimestamp" class="tsd-kind-icon">get<wbr>Timestamp</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#getversion" class="tsd-kind-icon">get<wbr>Version</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#hasonebyteextensions" class="tsd-kind-icon">has<wbr>One<wbr>Byte<wbr>Extensions</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#hastwobytesextensions" class="tsd-kind-icon">has<wbr>Two<wbr>Bytes<wbr>Extensions</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#padto4bytes" class="tsd-kind-icon">pad<wbr>To4<wbr>Bytes</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#rtxdecode" class="tsd-kind-icon">rtx<wbr>Decode</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#rtxencode" class="tsd-kind-icon">rtx<wbr>Encode</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#setcsrc" class="tsd-kind-icon">set<wbr>Csrc</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#setextension" class="tsd-kind-icon">set<wbr>Extension</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#setmarker" class="tsd-kind-icon">set<wbr>Marker</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#setpadding" class="tsd-kind-icon">set<wbr>Padding</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#setpayload" class="tsd-kind-icon">set<wbr>Payload</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#setpayloadtype" class="tsd-kind-icon">set<wbr>Payload<wbr>Type</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#setsequencenumber" class="tsd-kind-icon">set<wbr>Sequence<wbr>Number</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#setssrc" class="tsd-kind-icon">set<wbr>Ssrc</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="rtppacket.html#settimestamp" class="tsd-kind-icon">set<wbr>Timestamp</a></li>
 							</ul>
 						</section>
 					</div>
@@ -136,13 +134,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Rtp<wbr>Packet<span class="tsd-signature-symbol">(</span>buffer<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_rtp_.rtppacket.html" class="tsd-signature-type">RtpPacket</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Rtp<wbr>Packet<span class="tsd-signature-symbol">(</span>buffer<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="rtppacket.html" class="tsd-signature-type">RtpPacket</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L54">rtp.ts:54</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L58">rtp.ts:58</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -164,7 +162,7 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_rtp_.rtppacket.html" class="tsd-signature-type">RtpPacket</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="rtppacket.html" class="tsd-signature-type">RtpPacket</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -181,7 +179,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L520">rtp.ts:520</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L524">rtp.ts:524</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -197,13 +195,13 @@
 					<a name="clone" class="tsd-anchor"></a>
 					<h3>clone</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">clone<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_rtp_.rtppacket.html" class="tsd-signature-type">RtpPacket</a></li>
+						<li class="tsd-signature tsd-kind-icon">clone<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="rtppacket.html" class="tsd-signature-type">RtpPacket</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L610">rtp.ts:610</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L614">rtp.ts:614</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -218,7 +216,7 @@
 									</dd>
 								</dl>
 							</div>
-							<h4 class="tsd-returns-title">Returns <a href="_rtp_.rtppacket.html" class="tsd-signature-type">RtpPacket</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="rtppacket.html" class="tsd-signature-type">RtpPacket</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -232,7 +230,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L503">rtp.ts:503</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L507">rtp.ts:507</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -260,7 +258,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L437">rtp.ts:437</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L441">rtp.ts:441</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -282,7 +280,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L451">rtp.ts:451</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L455">rtp.ts:455</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -304,7 +302,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L287">rtp.ts:287</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L291">rtp.ts:291</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -333,7 +331,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L375">rtp.ts:375</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L379">rtp.ts:379</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -355,7 +353,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L465">rtp.ts:465</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L469">rtp.ts:469</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -383,7 +381,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L401">rtp.ts:401</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L405">rtp.ts:405</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -405,7 +403,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L558">rtp.ts:558</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L562">rtp.ts:562</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -427,7 +425,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L537">rtp.ts:537</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L541">rtp.ts:541</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -449,7 +447,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L308">rtp.ts:308</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L312">rtp.ts:312</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -471,7 +469,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L327">rtp.ts:327</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L331">rtp.ts:331</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -493,7 +491,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L359">rtp.ts:359</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L363">rtp.ts:363</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -515,7 +513,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L343">rtp.ts:343</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L347">rtp.ts:347</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -537,7 +535,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L300">rtp.ts:300</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L304">rtp.ts:304</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -559,7 +557,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L419">rtp.ts:419</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L423">rtp.ts:423</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -581,7 +579,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L427">rtp.ts:427</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L431">rtp.ts:431</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -603,7 +601,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L584">rtp.ts:584</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L588">rtp.ts:588</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -632,7 +630,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L656">rtp.ts:656</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L660">rtp.ts:660</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -675,7 +673,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L627">rtp.ts:627</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L631">rtp.ts:631</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -718,7 +716,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L384">rtp.ts:384</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L388">rtp.ts:388</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -747,7 +745,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L481">rtp.ts:481</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L485">rtp.ts:485</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -783,7 +781,7 @@ packet.setExtension(<span class="hljs-number">3</span>, Buffer.from([ <span clas
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L409">rtp.ts:409</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L413">rtp.ts:413</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -811,7 +809,7 @@ packet.setExtension(<span class="hljs-number">3</span>, Buffer.from([ <span clas
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L566">rtp.ts:566</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L570">rtp.ts:570</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -839,7 +837,7 @@ packet.setExtension(<span class="hljs-number">3</span>, Buffer.from([ <span clas
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L549">rtp.ts:549</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L553">rtp.ts:553</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -868,7 +866,7 @@ packet.setExtension(<span class="hljs-number">3</span>, Buffer.from([ <span clas
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L316">rtp.ts:316</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L320">rtp.ts:320</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -896,7 +894,7 @@ packet.setExtension(<span class="hljs-number">3</span>, Buffer.from([ <span clas
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L335">rtp.ts:335</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L339">rtp.ts:339</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -924,7 +922,7 @@ packet.setExtension(<span class="hljs-number">3</span>, Buffer.from([ <span clas
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L367">rtp.ts:367</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L371">rtp.ts:371</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -952,7 +950,7 @@ packet.setExtension(<span class="hljs-number">3</span>, Buffer.from([ <span clas
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/54cde5f/src/rtp.ts#L351">rtp.ts:351</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/1b8400c/src/rtp.ts#L355">rtp.ts:355</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -978,117 +976,114 @@ packet.setExtension(<span class="hljs-number">3</span>, Buffer.from([ <span clas
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
-					<li class="current tsd-kind-module">
-						<a href="../modules/_rtp_.html">&quot;rtp&quot;</a>
-					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-class tsd-parent-kind-module">
-						<a href="_rtp_.rtppacket.html" class="tsd-kind-icon">Rtp<wbr>Packet</a>
+					<li class="current tsd-kind-class">
+						<a href="rtppacket.html" class="tsd-kind-icon">Rtp<wbr>Packet</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="rtppacket.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#clearextensions" class="tsd-kind-icon">clear<wbr>Extensions</a>
+								<a href="rtppacket.html#clearextensions" class="tsd-kind-icon">clear<wbr>Extensions</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#clone" class="tsd-kind-icon">clone</a>
+								<a href="rtppacket.html#clone" class="tsd-kind-icon">clone</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#deleteextension" class="tsd-kind-icon">delete<wbr>Extension</a>
+								<a href="rtppacket.html#deleteextension" class="tsd-kind-icon">delete<wbr>Extension</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#enableonebyteextensions" class="tsd-kind-icon">enable<wbr>One<wbr>Byte<wbr>Extensions</a>
+								<a href="rtppacket.html#enableonebyteextensions" class="tsd-kind-icon">enable<wbr>One<wbr>Byte<wbr>Extensions</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#enabletwobytesextensions" class="tsd-kind-icon">enable<wbr>Two<wbr>Bytes<wbr>Extensions</a>
+								<a href="rtppacket.html#enabletwobytesextensions" class="tsd-kind-icon">enable<wbr>Two<wbr>Bytes<wbr>Extensions</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#getbuffer" class="tsd-kind-icon">get<wbr>Buffer</a>
+								<a href="rtppacket.html#getbuffer" class="tsd-kind-icon">get<wbr>Buffer</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#getcsrc" class="tsd-kind-icon">get<wbr>Csrc</a>
+								<a href="rtppacket.html#getcsrc" class="tsd-kind-icon">get<wbr>Csrc</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#getextension" class="tsd-kind-icon">get<wbr>Extension</a>
+								<a href="rtppacket.html#getextension" class="tsd-kind-icon">get<wbr>Extension</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#getmarker" class="tsd-kind-icon">get<wbr>Marker</a>
+								<a href="rtppacket.html#getmarker" class="tsd-kind-icon">get<wbr>Marker</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#getpadding" class="tsd-kind-icon">get<wbr>Padding</a>
+								<a href="rtppacket.html#getpadding" class="tsd-kind-icon">get<wbr>Padding</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#getpayload" class="tsd-kind-icon">get<wbr>Payload</a>
+								<a href="rtppacket.html#getpayload" class="tsd-kind-icon">get<wbr>Payload</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#getpayloadtype" class="tsd-kind-icon">get<wbr>Payload<wbr>Type</a>
+								<a href="rtppacket.html#getpayloadtype" class="tsd-kind-icon">get<wbr>Payload<wbr>Type</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#getsequencenumber" class="tsd-kind-icon">get<wbr>Sequence<wbr>Number</a>
+								<a href="rtppacket.html#getsequencenumber" class="tsd-kind-icon">get<wbr>Sequence<wbr>Number</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#getssrc" class="tsd-kind-icon">get<wbr>Ssrc</a>
+								<a href="rtppacket.html#getssrc" class="tsd-kind-icon">get<wbr>Ssrc</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#gettimestamp" class="tsd-kind-icon">get<wbr>Timestamp</a>
+								<a href="rtppacket.html#gettimestamp" class="tsd-kind-icon">get<wbr>Timestamp</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#getversion" class="tsd-kind-icon">get<wbr>Version</a>
+								<a href="rtppacket.html#getversion" class="tsd-kind-icon">get<wbr>Version</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#hasonebyteextensions" class="tsd-kind-icon">has<wbr>One<wbr>Byte<wbr>Extensions</a>
+								<a href="rtppacket.html#hasonebyteextensions" class="tsd-kind-icon">has<wbr>One<wbr>Byte<wbr>Extensions</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#hastwobytesextensions" class="tsd-kind-icon">has<wbr>Two<wbr>Bytes<wbr>Extensions</a>
+								<a href="rtppacket.html#hastwobytesextensions" class="tsd-kind-icon">has<wbr>Two<wbr>Bytes<wbr>Extensions</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#padto4bytes" class="tsd-kind-icon">pad<wbr>To4<wbr>Bytes</a>
+								<a href="rtppacket.html#padto4bytes" class="tsd-kind-icon">pad<wbr>To4<wbr>Bytes</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#rtxdecode" class="tsd-kind-icon">rtx<wbr>Decode</a>
+								<a href="rtppacket.html#rtxdecode" class="tsd-kind-icon">rtx<wbr>Decode</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#rtxencode" class="tsd-kind-icon">rtx<wbr>Encode</a>
+								<a href="rtppacket.html#rtxencode" class="tsd-kind-icon">rtx<wbr>Encode</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#setcsrc" class="tsd-kind-icon">set<wbr>Csrc</a>
+								<a href="rtppacket.html#setcsrc" class="tsd-kind-icon">set<wbr>Csrc</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#setextension" class="tsd-kind-icon">set<wbr>Extension</a>
+								<a href="rtppacket.html#setextension" class="tsd-kind-icon">set<wbr>Extension</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#setmarker" class="tsd-kind-icon">set<wbr>Marker</a>
+								<a href="rtppacket.html#setmarker" class="tsd-kind-icon">set<wbr>Marker</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#setpadding" class="tsd-kind-icon">set<wbr>Padding</a>
+								<a href="rtppacket.html#setpadding" class="tsd-kind-icon">set<wbr>Padding</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#setpayload" class="tsd-kind-icon">set<wbr>Payload</a>
+								<a href="rtppacket.html#setpayload" class="tsd-kind-icon">set<wbr>Payload</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#setpayloadtype" class="tsd-kind-icon">set<wbr>Payload<wbr>Type</a>
+								<a href="rtppacket.html#setpayloadtype" class="tsd-kind-icon">set<wbr>Payload<wbr>Type</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#setsequencenumber" class="tsd-kind-icon">set<wbr>Sequence<wbr>Number</a>
+								<a href="rtppacket.html#setsequencenumber" class="tsd-kind-icon">set<wbr>Sequence<wbr>Number</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#setssrc" class="tsd-kind-icon">set<wbr>Ssrc</a>
+								<a href="rtppacket.html#setssrc" class="tsd-kind-icon">set<wbr>Ssrc</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#settimestamp" class="tsd-kind-icon">set<wbr>Timestamp</a>
+								<a href="rtppacket.html#settimestamp" class="tsd-kind-icon">set<wbr>Timestamp</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="../modules/_rtp_.html#isrtp" class="tsd-kind-icon">is<wbr>Rtp</a>
+					<li class=" tsd-kind-function">
+						<a href="../globals.html#isrtp" class="tsd-kind-icon">is<wbr>Rtp</a>
 					</li>
 				</ul>
 			</nav>
@@ -1100,12 +1095,8 @@ packet.setExtension(<span class="hljs-number">3</span>, Buffer.from([ <span clas
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
 				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 			</ul>
 		</div>
 	</div>
