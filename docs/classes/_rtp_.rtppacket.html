@@ -67,6 +67,13 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Represents a RTP packet and provides methods to modify its fields.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -91,6 +98,8 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#clearextensions" class="tsd-kind-icon">clear<wbr>Extensions</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#clone" class="tsd-kind-icon">clone</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#deleteextension" class="tsd-kind-icon">delete<wbr>Extension</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#enableonebyteextensions" class="tsd-kind-icon">enable<wbr>One<wbr>Byte<wbr>Extensions</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#enabletwobytesextensions" class="tsd-kind-icon">enable<wbr>Two<wbr>Bytes<wbr>Extensions</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getbuffer" class="tsd-kind-icon">get<wbr>Buffer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getcsrc" class="tsd-kind-icon">get<wbr>Csrc</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#getextension" class="tsd-kind-icon">get<wbr>Extension</a></li>
@@ -110,14 +119,12 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setcsrc" class="tsd-kind-icon">set<wbr>Csrc</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setextension" class="tsd-kind-icon">set<wbr>Extension</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setmarker" class="tsd-kind-icon">set<wbr>Marker</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setonebyteextensions" class="tsd-kind-icon">set<wbr>One<wbr>Byte<wbr>Extensions</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setpadding" class="tsd-kind-icon">set<wbr>Padding</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setpayload" class="tsd-kind-icon">set<wbr>Payload</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setpayloadtype" class="tsd-kind-icon">set<wbr>Payload<wbr>Type</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setsequencenumber" class="tsd-kind-icon">set<wbr>Sequence<wbr>Number</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#setssrc" class="tsd-kind-icon">set<wbr>Ssrc</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#settimestamp" class="tsd-kind-icon">set<wbr>Timestamp</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_rtp_.rtppacket.html#settwobytesextensions" class="tsd-kind-icon">set<wbr>Two<wbr>Bytes<wbr>Extensions</a></li>
 							</ul>
 						</section>
 					</div>
@@ -135,10 +142,15 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L51">rtp.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L54">rtp.ts:54</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>if <code>buffer</code> is given and it does not contain a valid RTP packet.</p>
+									</dd>
+								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -147,7 +159,7 @@
 									<div class="tsd-comment tsd-typography">
 										<div class="lead">
 											<p>If given if will be parsed. Otherwise an empty RTP packet
-											will be created.</p>
+											(with just the minimal fixed header) will be created.</p>
 										</div>
 									</div>
 								</li>
@@ -169,12 +181,12 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L505">rtp.ts:505</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L520">rtp.ts:520</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Clear all extensions.</p>
+									<p>Clear all extensions (RFC 5285).</p>
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -191,7 +203,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L593">rtp.ts:593</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L610">rtp.ts:610</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -199,6 +211,12 @@
 									<p>Clone the packet. The cloned packet does not share any memory with the
 									original one.</p>
 								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>if buffer serialization is needed and it fails due to invalid
+										fields.</p>
+									</dd>
+								</dl>
 							</div>
 							<h4 class="tsd-returns-title">Returns <a href="_rtp_.rtppacket.html" class="tsd-signature-type">RtpPacket</a></h4>
 						</li>
@@ -214,12 +232,12 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L488">rtp.ts:488</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L503">rtp.ts:503</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Delete the extension with given <code>id</code> (if any).</p>
+									<p>Delete the extension (RFC 5285) with given <code>id</code> (if any).</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -228,6 +246,50 @@
 									<h5>id: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="enableonebyteextensions" class="tsd-anchor"></a>
+					<h3>enable<wbr>One<wbr>Byte<wbr>Extensions</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">enable<wbr>One<wbr>Byte<wbr>Extensions<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L437">rtp.ts:437</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Enable One-Byte extensions (RFC 5285).</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="enabletwobytesextensions" class="tsd-anchor"></a>
+					<h3>enable<wbr>Two<wbr>Bytes<wbr>Extensions</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">enable<wbr>Two<wbr>Bytes<wbr>Extensions<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L451">rtp.ts:451</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Enable Two-Bytes extensions (RFC 5285).</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -242,13 +304,20 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L270">rtp.ts:270</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L287">rtp.ts:287</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Get the internal buffer containing the serialized RTP binary packet.</p>
+									<p>Get the internal buffer containing the serialized RTP binary packet. The
+									buffer is serialized only if needed (to apply packet modifications).</p>
 								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>if buffer serialization is needed and it fails due to invalid
+										fields.</p>
+									</dd>
+								</dl>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
 						</li>
@@ -264,7 +333,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L356">rtp.ts:356</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L375">rtp.ts:375</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -286,12 +355,12 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L458">rtp.ts:458</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L465">rtp.ts:465</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Get the value of the extension with given <code>id</code> (if any).</p>
+									<p>Get the value of the extension (RFC 5285) with given <code>id</code> (if any).</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -314,7 +383,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L380">rtp.ts:380</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L401">rtp.ts:401</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -336,7 +405,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L546">rtp.ts:546</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L558">rtp.ts:558</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -358,7 +427,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L523">rtp.ts:523</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L537">rtp.ts:537</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -380,7 +449,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L291">rtp.ts:291</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L308">rtp.ts:308</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -402,7 +471,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L308">rtp.ts:308</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L327">rtp.ts:327</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -424,7 +493,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L340">rtp.ts:340</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L359">rtp.ts:359</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -446,7 +515,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L324">rtp.ts:324</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L343">rtp.ts:343</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -468,7 +537,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L283">rtp.ts:283</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L300">rtp.ts:300</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -490,7 +559,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L398">rtp.ts:398</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L419">rtp.ts:419</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -512,7 +581,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L406">rtp.ts:406</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L427">rtp.ts:427</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -534,14 +603,20 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L570">rtp.ts:570</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L584">rtp.ts:584</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Pad the packet total legth to 4 bytes. To achieve it, this method may add
+									<p>Pad the packet total length to 4 bytes. To achieve it, this method may add
 									or remove bytes of padding.</p>
 								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>if buffer serialization is needed and it fails due to invalid
+										fields.</p>
+									</dd>
+								</dl>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
@@ -557,13 +632,19 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L642">rtp.ts:642</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L656">rtp.ts:656</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Decode the packet using RTX procedures (as per RFC 4588).</p>
 								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>if payload length is less than 2 bytes, so RTX decode is not
+										possible.</p>
+									</dd>
+								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -594,7 +675,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L610">rtp.ts:610</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L627">rtp.ts:627</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -631,24 +712,25 @@
 					<a name="setcsrc" class="tsd-anchor"></a>
 					<h3>set<wbr>Csrc</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Csrc<span class="tsd-signature-symbol">(</span>csrc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Csrc<span class="tsd-signature-symbol">(</span>csrc<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L364">rtp.ts:364</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L384">rtp.ts:384</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Set the RTP CSRC values.</p>
+									<p>Set the RTP CSRC values. If <code>csrc</code> is not given (or if it&#39;s an empty
+									array) CSRC field will be removed from the RTP packet.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>csrc: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> csrc: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -665,13 +747,18 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L466">rtp.ts:466</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L481">rtp.ts:481</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Set the value of the extension with given <code>id</code>.</p>
+									<p>Set the value of the extension (RFC 5285) with given <code>id</code>.</p>
 								</div>
+								<pre><code class="language-ts"><span class="hljs-comment">// Assuming id 1 corresponds to the RTP MID extension.</span>
+packet.setExtension(<span class="hljs-number">1</span>, Buffer.from(<span class="hljs-string">&#x27;audio&#x27;</span>));
+
+<span class="hljs-comment">// Assuming id 3 corresponds to the RTP ssrc-audio-level extension.</span>
+packet.setExtension(<span class="hljs-number">3</span>, Buffer.from([ <span class="hljs-number">0b10010110</span> ]));</code></pre>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -696,7 +783,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L388">rtp.ts:388</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L409">rtp.ts:409</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -715,28 +802,6 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="setonebyteextensions" class="tsd-anchor"></a>
-					<h3>set<wbr>One<wbr>Byte<wbr>Extensions</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>One<wbr>Byte<wbr>Extensions<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L416">rtp.ts:416</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Enable One-Byte extensions.</p>
-								</div>
-							</div>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="setpadding" class="tsd-anchor"></a>
 					<h3>set<wbr>Padding</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -746,7 +811,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L554">rtp.ts:554</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L566">rtp.ts:566</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -774,13 +839,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L536">rtp.ts:536</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L549">rtp.ts:549</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Set the packet payload.</p>
 								</div>
+								<pre><code class="language-ts">packet.setPayload(Buffer.from([ <span class="hljs-number">0x01</span>, <span class="hljs-number">0x02</span>, <span class="hljs-number">0x03</span>, <span class="hljs-number">0x04</span> ]));</code></pre>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -802,7 +868,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L299">rtp.ts:299</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L316">rtp.ts:316</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -830,7 +896,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L316">rtp.ts:316</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L335">rtp.ts:335</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -858,7 +924,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L348">rtp.ts:348</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L367">rtp.ts:367</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -886,7 +952,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L332">rtp.ts:332</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/33f21bf/src/rtp.ts#L351">rtp.ts:351</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -900,28 +966,6 @@
 									<h5>timestamp: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="settwobytesextensions" class="tsd-anchor"></a>
-					<h3>set<wbr>Two<wbr>Bytes<wbr>Extensions</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Two<wbr>Bytes<wbr>Extensions<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/2f84954/src/rtp.ts#L437">rtp.ts:437</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Enable Two-Bytes extensions.</p>
-								</div>
-							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -957,6 +1001,12 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_rtp_.rtppacket.html#deleteextension" class="tsd-kind-icon">delete<wbr>Extension</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_rtp_.rtppacket.html#enableonebyteextensions" class="tsd-kind-icon">enable<wbr>One<wbr>Byte<wbr>Extensions</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_rtp_.rtppacket.html#enabletwobytesextensions" class="tsd-kind-icon">enable<wbr>Two<wbr>Bytes<wbr>Extensions</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_rtp_.rtppacket.html#getbuffer" class="tsd-kind-icon">get<wbr>Buffer</a>
@@ -1016,9 +1066,6 @@
 								<a href="_rtp_.rtppacket.html#setmarker" class="tsd-kind-icon">set<wbr>Marker</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#setonebyteextensions" class="tsd-kind-icon">set<wbr>One<wbr>Byte<wbr>Extensions</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_rtp_.rtppacket.html#setpadding" class="tsd-kind-icon">set<wbr>Padding</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -1035,9 +1082,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_rtp_.rtppacket.html#settimestamp" class="tsd-kind-icon">set<wbr>Timestamp</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_rtp_.rtppacket.html#settwobytesextensions" class="tsd-kind-icon">set<wbr>Two<wbr>Bytes<wbr>Extensions</a>
 							</li>
 						</ul>
 					</li>

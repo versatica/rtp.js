@@ -31,7 +31,9 @@ switch (task)
 
 	case 'lint':
 	{
-		execute('eslint -c .eslintrc.js --ext=ts src/ --ignore-pattern \'!.eslintrc.js\' .eslintrc.js');
+		execute(
+			'eslint -c .eslintrc.js --ext=ts src/ --ignore-pattern \'!.eslintrc.js\' .eslintrc.js'
+		);
 
 		break;
 	}
@@ -54,7 +56,9 @@ switch (task)
 	case 'docs':
 	{
 		// NOTE: typedoc options are given in tsconfig.json.
-		execute('typedoc');
+		// NOTE: .nojekyll is required, otherwise GitHub pages will ignore
+		// generated HTML files with underscore.
+		execute('typedoc && touch docs/.nojekyll');
 		execute('open-cli docs/index.html');
 
 		break;
@@ -73,7 +77,12 @@ function execute(command)
 
 	try
 	{
-		execSync(command,	{ stdio: [ 'ignore', process.stdout, process.stderr ] });
+		execSync(
+			command,
+			{
+				stdio : [ 'ignore', process.stdout, process.stderr ]
+			}
+		);
 	}
 	catch (error)
 	{

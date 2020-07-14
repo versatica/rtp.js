@@ -33,6 +33,9 @@ export function isRtp(buffer: Buffer): boolean
 	);
 }
 
+/**
+ * Represents a RTP packet and provides methods to modify its fields.
+ */
 export class RtpPacket
 {
 	// Buffer.
@@ -52,7 +55,8 @@ export class RtpPacket
 
 	/**
 	 * @param buffer - If given if will be parsed. Otherwise an empty RTP packet
-	 *   will be created.
+	 *   (with just the minimal fixed header) will be created.
+	 * @throws if `buffer` is given and it does not contain a valid RTP packet.
 	 */
 	constructor(buffer?: Buffer)
 	{
@@ -104,8 +108,11 @@ export class RtpPacket
 
 			const length = buffer.readUInt16BE(pos + 2) * 4;
 
-			extBuffer =
-				Buffer.from(buffer.buffer, buffer.byteOffset + pos + 4, length);
+			extBuffer = Buffer.from(
+				buffer.buffer,
+				buffer.byteOffset + pos + 4,
+				length
+			);
 			pos += (4 + length);
 		}
 
@@ -139,7 +146,11 @@ export class RtpPacket
 					// Store the One-Byte extension element in the map.
 					this.extensions.set(
 						id,
-						Buffer.from(extBuffer.buffer, extBuffer.byteOffset + extPos + 1, length)
+						Buffer.from(
+							extBuffer.buffer,
+							extBuffer.byteOffset + extPos + 1,
+							length
+						)
 					);
 
 					extPos += (length + 1);
@@ -180,7 +191,11 @@ export class RtpPacket
 					// Store the Two-Bytes extension element in the map.
 					this.extensions.set(
 						id,
-						Buffer.from(extBuffer.buffer, extBuffer.byteOffset + extPos + 2, length)
+						Buffer.from(
+							extBuffer.buffer,
+							extBuffer.byteOffset + extPos + 2,
+							length
+						)
 					);
 
 					extPos += (length + 2);
@@ -218,8 +233,11 @@ export class RtpPacket
 			);
 		}
 
-		this.payload =
-			Buffer.from(buffer.buffer, buffer.byteOffset + pos, payloadLength);
+		this.payload = Buffer.from(
+			buffer.buffer,
+			buffer.byteOffset + pos,
+			payloadLength
+		);
 
 		// Ensure that buffer length and parsed length match.
 		pos += (payloadLength + this.padding);
@@ -237,11 +255,6 @@ export class RtpPacket
 	 */
 	dump(): any
 	{
-		if (this.serializationNeeded)
-		{
-			this.serialize();
-		}
-
 		const extensions: { [key: number]: { length: number } } = {};
 
 		for (const [ id, value ] of this.extensions)
@@ -265,7 +278,11 @@ export class RtpPacket
 	}
 
 	/**
-	 * Get the internal buffer containing the serialized RTP binary packet.
+	 * Get the internal buffer containing the serialized RTP binary packet. The
+	 * buffer is serialized only if needed (to apply packet modifications).
+	 *
+	 * @throws if buffer serialization is needed and it fails due to invalid
+	 *   fields.
 	 */
 	getBuffer(): Buffer
 	{
@@ -299,7 +316,9 @@ export class RtpPacket
 	setPayloadType(payloadType: number): void
 	{
 		this.buffer.writeUInt8(
-			(this.buffer.readUInt8(1) & 0x80) | (payloadType & 0x7F), 1);
+			(this.buffer.readUInt8(1) & 0x80) | (payloadType & 0x7F),
+			1
+		);
 	}
 
 	/**
@@ -359,19 +378,21 @@ export class RtpPacket
 	}
 
 	/**
-	 * Set the RTP CSRC values.
+	 * Set the RTP CSRC values. If `csrc` is not given (or if it's an empty
+	 * array) CSRC field will be removed from the RTP packet.
 	 */
-	setCsrc(csrc: number[]): void
+	setCsrc(csrc: number[] = []): void
 	{
 		this.serializationNeeded = true;
-
 		this.csrc = csrc;
 
 		// Update CSRC count.
 		const count = this.csrc.length;
 
 		this.buffer.writeUInt8(
-			(this.buffer.readUInt8(0) & 0xF0) | (count & 0x0F), 0);
+			(this.buffer.readUInt8(0) & 0xF0) | (count & 0x0F),
+			0
+		);
 	}
 
 	/**
@@ -411,9 +432,9 @@ export class RtpPacket
 	}
 
 	/**
-	 * Enable One-Byte extensions.
+	 * Enable One-Byte extensions (RFC 5285).
 	 */
-	setOneByteExtensions(): void
+	enableOneByteExtensions(): void
 	{
 		if (this.hasOneByteExtensions())
 		{
@@ -421,20 +442,13 @@ export class RtpPacket
 		}
 
 		this.serializationNeeded = true;
-
-		// Update header extension bit if required.
-		if (this.extensions.size > 0)
-		{
-			this.setHeaderExtensionBit(1);
-		}
-
 		this.headerExtensionId = 0xBEDE;
 	}
 
 	/**
-	 * Enable Two-Bytes extensions.
+	 * Enable Two-Bytes extensions (RFC 5285).
 	 */
-	setTwoBytesExtensions(): void
+	enableTwoBytesExtensions(): void
 	{
 		if (this.hasTwoBytesExtensions())
 		{
@@ -442,18 +456,11 @@ export class RtpPacket
 		}
 
 		this.serializationNeeded = true;
-
-		// Update header extension bit if required.
-		if (this.extensions.size > 0)
-		{
-			this.setHeaderExtensionBit(1);
-		}
-
 		this.headerExtensionId = 0b0001000000000000;
 	}
 
 	/**
-	 * Get the value of the extension with given `id` (if any).
+	 * Get the value of the extension (RFC 5285) with given `id` (if any).
 	 */
 	getExtension(id: number): Buffer | undefined
 	{
@@ -461,7 +468,15 @@ export class RtpPacket
 	}
 
 	/**
-	 * Set the value of the extension with given `id`.
+	 * Set the value of the extension (RFC 5285) with given `id`.
+	 *
+	 * ```ts
+	 * // Assuming id 1 corresponds to the RTP MID extension.
+	 * packet.setExtension(1, Buffer.from('audio'));
+	 *
+	 * // Assuming id 3 corresponds to the RTP ssrc-audio-level extension.
+	 * packet.setExtension(3, Buffer.from([ 0b10010110 ]));
+	 * ```
 	 */
 	setExtension(id: number, value: Buffer): void
 	{
@@ -475,7 +490,7 @@ export class RtpPacket
 			// If neither One-Byte nor Two-Bytes modes are enabled, force One-Byte.
 			if (!this.hasOneByteExtensions() && !this.hasTwoBytesExtensions())
 			{
-				this.setOneByteExtensions();
+				this.enableOneByteExtensions();
 			}
 		}
 
@@ -483,7 +498,7 @@ export class RtpPacket
 	}
 
 	/**
-	 * Delete the extension with given `id` (if any).
+	 * Delete the extension (RFC 5285) with given `id` (if any).
 	 */
 	deleteExtension(id: number): void
 	{
@@ -500,7 +515,7 @@ export class RtpPacket
 	}
 
 	/**
-	 * Clear all extensions.
+	 * Clear all extensions (RFC 5285).
 	 */
 	clearExtensions(): void
 	{
@@ -510,11 +525,10 @@ export class RtpPacket
 		}
 
 		this.serializationNeeded = true;
+		this.extensions.clear();
 
 		// Update header extension bit.
 		this.setHeaderExtensionBit(0);
-
-		this.extensions.clear();
 	}
 
 	/**
@@ -522,21 +536,19 @@ export class RtpPacket
 	 */
 	getPayload(): Buffer
 	{
-		if (this.serializationNeeded)
-		{
-			this.serialize();
-		}
-
 		return this.payload;
 	}
 
 	/**
 	 * Set the packet payload.
+	 *
+	 * ```ts
+	 * packet.setPayload(Buffer.from([ 0x01, 0x02, 0x03, 0x04 ]));
+	 * ```
 	 */
 	setPayload(payload: Buffer): void
 	{
 		this.serializationNeeded = true;
-
 		this.payload = payload;
 	}
 
@@ -554,7 +566,6 @@ export class RtpPacket
 	setPadding(padding: number): void
 	{
 		this.serializationNeeded = true;
-
 		this.padding = padding;
 
 		// Update padding bit.
@@ -564,8 +575,11 @@ export class RtpPacket
 	}
 
 	/**
-	 * Pad the packet total legth to 4 bytes. To achieve it, this method may add
+	 * Pad the packet total length to 4 bytes. To achieve it, this method may add
 	 * or remove bytes of padding.
+	 *
+	 * @throws if buffer serialization is needed and it fails due to invalid
+	 *   fields.
 	 */
 	padTo4Bytes(): void
 	{
@@ -589,6 +603,9 @@ export class RtpPacket
 	/**
 	 * Clone the packet. The cloned packet does not share any memory with the
 	 * original one.
+	 *
+	 * @throws if buffer serialization is needed and it fails due to invalid
+	 *   fields.
 	 */
 	clone(): RtpPacket
 	{
@@ -609,11 +626,6 @@ export class RtpPacket
 	 */
 	rtxEncode(payloadType: number, ssrc: number, sequenceNumber: number)
 	{
-		if (this.serializationNeeded)
-		{
-			this.serialize();
-		}
-
 		// Rewrite the payload type.
 		this.setPayloadType(payloadType);
 
@@ -638,14 +650,11 @@ export class RtpPacket
 	 *
 	 * @param payloadType - The original payload type.
 	 * @param ssrc - The original SSRC.
+	 * @throws if payload length is less than 2 bytes, so RTX decode is not
+	 *   possible.
 	 */
 	rtxDecode(payloadType: number, ssrc: number)
 	{
-		if (this.serializationNeeded)
-		{
-			this.serialize();
-		}
-
 		if (this.payload.length < 2)
 		{
 			throw new RangeError(

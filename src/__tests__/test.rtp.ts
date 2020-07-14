@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { isRtp, RtpPacket } from '../rtp';
+import { isRtp, RtpPacket } from '../';
 
 describe('parse RTP packet 1', () =>
 {
@@ -189,11 +189,11 @@ describe('create RTP packet 5 from scratch', () =>
 		packet.setCsrc([ 1111, 2222 ]);
 		expect(packet.getCsrc()).toEqual([ 1111, 2222 ]);
 
-		packet.setOneByteExtensions();
+		packet.enableOneByteExtensions();
 		expect(packet.hasOneByteExtensions()).toBe(true);
 		expect(packet.hasTwoBytesExtensions()).toBe(false);
 
-		packet.setTwoBytesExtensions();
+		packet.enableTwoBytesExtensions();
 		expect(packet.hasOneByteExtensions()).toBe(false);
 		expect(packet.hasTwoBytesExtensions()).toBe(true);
 
@@ -302,7 +302,7 @@ describe('create RTP packet 7 from scratch', () =>
 	{
 		packet = new RtpPacket();
 
-		packet.setOneByteExtensions();
+		packet.enableOneByteExtensions();
 		packet.setExtension(0, Buffer.from('ignore me'));
 		packet.setExtension(1, Buffer.from([ 1, 2, 3, 4 ]));
 		packet.setExtension(16, Buffer.from('also ignore me'));
@@ -329,7 +329,7 @@ describe('create RTP packet 8 from scratch', () =>
 	{
 		packet = new RtpPacket();
 
-		packet.setTwoBytesExtensions();
+		packet.enableTwoBytesExtensions();
 		packet.setExtension(0, Buffer.from('ignore me'));
 		packet.setExtension(1, Buffer.from([ 1, 2, 3, 4 ]));
 		packet.setExtension(256, Buffer.from('also ignore me'));

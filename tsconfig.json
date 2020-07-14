@@ -28,19 +28,6 @@
 		"stripInternal": true,
 		"theme": "default",
 		"gitRemote": "origin",
-		"hideGenerator": false,
-		"links": [
-			{
-				"text": "GitHub repository",
-				"href": "https://github.com/versatica/rtp.js/",
-				"normal": true,
-				"target": "_top",
-				"id": "github_link"
-			},
-		],
-		"linkDivider": " | ",
-		"createFile": {
-			".nojekyll": ""
-		}
+		"hideGenerator": false
 	}
 }

@@ -15,6 +15,9 @@
  * ```
  */
 export declare function isRtp(buffer: Buffer): boolean;
+/**
+ * Represents a RTP packet and provides methods to modify its fields.
+ */
 export declare class RtpPacket {
     private buffer;
     private csrc;
@@ -25,7 +28,8 @@ export declare class RtpPacket {
     private serializationNeeded;
     /**
      * @param buffer - If given if will be parsed. Otherwise an empty RTP packet
-     *   will be created.
+     *   (with just the minimal fixed header) will be created.
+     * @throws if `buffer` is given and it does not contain a valid RTP packet.
      */
     constructor(buffer?: Buffer);
     /**
@@ -33,7 +37,11 @@ export declare class RtpPacket {
      */
     dump(): any;
     /**
-     * Get the internal buffer containing the serialized RTP binary packet.
+     * Get the internal buffer containing the serialized RTP binary packet. The
+     * buffer is serialized only if needed (to apply packet modifications).
+     *
+     * @throws if buffer serialization is needed and it fails due to invalid
+     *   fields.
      */
     getBuffer(): Buffer;
     /**
@@ -77,9 +85,10 @@ export declare class RtpPacket {
      */
     getCsrc(): number[];
     /**
-     * Set the RTP CSRC values.
+     * Set the RTP CSRC values. If `csrc` is not given (or if it's an empty
+     * array) CSRC field will be removed from the RTP packet.
      */
-    setCsrc(csrc: number[]): void;
+    setCsrc(csrc?: number[]): void;
     /**
      * Get the RTP marker flag.
      */
@@ -97,27 +106,35 @@ export declare class RtpPacket {
      */
     hasTwoBytesExtensions(): boolean;
     /**
-     * Enable One-Byte extensions.
+     * Enable One-Byte extensions (RFC 5285).
      */
-    setOneByteExtensions(): void;
+    enableOneByteExtensions(): void;
     /**
-     * Enable Two-Bytes extensions.
+     * Enable Two-Bytes extensions (RFC 5285).
      */
-    setTwoBytesExtensions(): void;
+    enableTwoBytesExtensions(): void;
     /**
-     * Get the value of the extension with given `id` (if any).
+     * Get the value of the extension (RFC 5285) with given `id` (if any).
      */
     getExtension(id: number): Buffer | undefined;
     /**
-     * Set the value of the extension with given `id`.
+     * Set the value of the extension (RFC 5285) with given `id`.
+     *
+     * ```ts
+     * // Assuming id 1 corresponds to the RTP MID extension.
+     * packet.setExtension(1, Buffer.from('audio'));
+     *
+     * // Assuming id 3 corresponds to the RTP ssrc-audio-level extension.
+     * packet.setExtension(3, Buffer.from([ 0b10010110 ]));
+     * ```
      */
     setExtension(id: number, value: Buffer): void;
     /**
-     * Delete the extension with given `id` (if any).
+     * Delete the extension (RFC 5285) with given `id` (if any).
      */
     deleteExtension(id: number): void;
     /**
-     * Clear all extensions.
+     * Clear all extensions (RFC 5285).
      */
     clearExtensions(): void;
     /**
@@ -126,6 +143,10 @@ export declare class RtpPacket {
     getPayload(): Buffer;
     /**
      * Set the packet payload.
+     *
+     * ```ts
+     * packet.setPayload(Buffer.from([ 0x01, 0x02, 0x03, 0x04 ]));
+     * ```
      */
     setPayload(payload: Buffer): void;
     /**
@@ -137,13 +158,19 @@ export declare class RtpPacket {
      */
     setPadding(padding: number): void;
     /**
-     * Pad the packet total legth to 4 bytes. To achieve it, this method may add
+     * Pad the packet total length to 4 bytes. To achieve it, this method may add
      * or remove bytes of padding.
+     *
+     * @throws if buffer serialization is needed and it fails due to invalid
+     *   fields.
      */
     padTo4Bytes(): void;
     /**
      * Clone the packet. The cloned packet does not share any memory with the
      * original one.
+     *
+     * @throws if buffer serialization is needed and it fails due to invalid
+     *   fields.
      */
     clone(): RtpPacket;
     /**
@@ -159,6 +186,8 @@ export declare class RtpPacket {
      *
      * @param payloadType - The original payload type.
      * @param ssrc - The original SSRC.
+     * @throws if payload length is less than 2 bytes, so RTX decode is not
+     *   possible.
      */
     rtxDecode(payloadType: number, ssrc: number): void;
     private setVersion;
