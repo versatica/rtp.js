@@ -307,7 +307,7 @@ describe('create RTP packet 7 from scratch', () =>
 		packet.setExtension(1, Buffer.from([ 1, 2, 3, 4 ]));
 		packet.setExtension(16, Buffer.from('also ignore me'));
 		// Force serialization so extension with id 0 must be ignored.
-		packet.getBuffer();
+		packet.serialize();
 		expect(packet.getExtension(0)).toBeUndefined();
 		expect(packet.getExtension(1)).toEqual(Buffer.from([ 1, 2, 3, 4 ]));
 		// Extension with id 16 (so 0 in 4 bits) must be ignored.
@@ -322,7 +322,7 @@ describe('create RTP packet 7 from scratch', () =>
 		// Adding a extension with value longer than 16 bytes is not allowed in
 		// One-Byte extensions, so it must fail when serializing.
 		packet.setExtension(5, Buffer.alloc(17));
-		expect(() => packet.getBuffer()).toThrow(RangeError);
+		expect(() => packet.serialize()).toThrow(RangeError);
 	});
 });
 
@@ -339,7 +339,7 @@ describe('create RTP packet 8 from scratch', () =>
 		packet.setExtension(1, Buffer.from([ 1, 2, 3, 4 ]));
 		packet.setExtension(256, Buffer.from('also ignore me'));
 		// Force serialization so extension with id 0 must be ignored.
-		packet.getBuffer();
+		packet.serialize();
 		expect(packet.getExtension(0)).toBeUndefined();
 		expect(packet.getExtension(1)).toEqual(Buffer.from([ 1, 2, 3, 4 ]));
 		// Extension with id 256 (so 0 in 8 bits) must be ignored.
@@ -354,7 +354,7 @@ describe('create RTP packet 8 from scratch', () =>
 		// Adding a extension with value longer than 255 bytes is not allowed in
 		// Two-Bytes extensions, so it must fail when serializing.
 		packet.setExtension(5, Buffer.alloc(256));
-		expect(() => packet.getBuffer()).toThrow(RangeError);
+		expect(() => packet.serialize()).toThrow(RangeError);
 	});
 });
 

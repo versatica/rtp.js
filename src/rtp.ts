@@ -692,22 +692,19 @@ export class RtpPacket
 		this.setPadding(0);
 	}
 
-	private setVersion(): void
-	{
-		this.buffer.writeUInt8(RTP_VERSION << 6, 0);
-	}
-
-	private setHeaderExtensionBit(bit: number)
-	{
-		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 4), 0);
-	}
-
-	private setPaddingBit(bit: number)
-	{
-		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 5), 0);
-	}
-
-	private serialize(): void
+	/**
+	 * Apply pending changes into the packet and serializes it into a new
+	 * internal buffer (the one that [[getBuffer]] will return).
+	 *
+	 * **NOTE:** Most often there is no need to use this method. It must be
+	 * called only if the application retrieves information from the packet (by
+	 * calling [[getBuffer]], [[getPayload]], [[getExtension]], etc) and modifies
+	 * the obtained buffers in place. However, it's recommended to use the
+	 * existing setter methods instead ([[setPayload]], [[setExtension]], etc).
+	 *
+	 * @throws if invalid fields were previously added to the packet.
+	 */
+	serialize(): void
 	{
 		const previousBuffer = this.buffer;
 
@@ -907,5 +904,20 @@ export class RtpPacket
 
 		// Reset flag.
 		this.serializationNeeded = false;
+	}
+
+	private setVersion(): void
+	{
+		this.buffer.writeUInt8(RTP_VERSION << 6, 0);
+	}
+
+	private setHeaderExtensionBit(bit: number)
+	{
+		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 4), 0);
+	}
+
+	private setPaddingBit(bit: number)
+	{
+		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 5), 0);
 	}
 }
