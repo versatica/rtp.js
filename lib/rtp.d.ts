@@ -198,8 +198,8 @@ export declare class RtpPacket {
      */
     rtxDecode(payloadType: number, ssrc: number): void;
     /**
-     * Apply pending changes into the packet and serializes it into a new
-     * internal buffer (the one that [[getBuffer]] will return).
+     * Apply pending changes into the packet and serialize it into a new internal
+     * buffer (the one that [[getBuffer]] will later return).
      *
      * **NOTE:** Most often there is no need to use this method. It must be
      * called only if the application retrieves information from the packet (by
