@@ -121,6 +121,10 @@ export declare class RtpPacket {
      */
     getExtension(id: number): Buffer | undefined;
     /**
+     * Get an iterator with all the extensions (RFC 5285).
+     */
+    getExtensions(): IterableIterator<[number, Buffer]>;
+    /**
      * Set the value of the extension (RFC 5285) with given `id`.
      *
      * ```ts

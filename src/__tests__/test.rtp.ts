@@ -318,6 +318,11 @@ describe('create RTP packet 7 from scratch', () =>
 		// extension id/length (4) + extension id 1 (5) = 21. Must add padding so
 		// it becomes 24;
 		expect(packet.getBuffer().length).toBe(24);
+
+		// Adding a extension with value longer than 16 bytes is not allowed in
+		// One-Byte extensions, so it must fail when serializing.
+		packet.setExtension(5, Buffer.alloc(17));
+		expect(() => packet.getBuffer()).toThrow(RangeError);
 	});
 });
 
@@ -345,6 +350,11 @@ describe('create RTP packet 8 from scratch', () =>
 		// extension id/length (4) + extension id 1 (6) = 22. Must add padding so
 		// it becomes 24;
 		expect(packet.getBuffer().length).toBe(24);
+
+		// Adding a extension with value longer than 255 bytes is not allowed in
+		// Two-Bytes extensions, so it must fail when serializing.
+		packet.setExtension(5, Buffer.alloc(256));
+		expect(() => packet.getBuffer()).toThrow(RangeError);
 	});
 });
 

@@ -472,6 +472,14 @@ export class RtpPacket
 	}
 
 	/**
+	 * Get an iterator with all the extensions (RFC 5285).
+	 */
+	getExtensions(): IterableIterator<[number, Buffer]>
+	{
+		return this.extensions.entries();
+	}
+
+	/**
 	 * Set the value of the extension (RFC 5285) with given `id`.
 	 *
 	 * ```ts
