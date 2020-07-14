@@ -1,5 +1,8 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
+/**
+ * @internal
+ */
 export declare class EnhancedEventEmitter extends EventEmitter {
     constructor();
     safeEmit(event: string, ...args: any[]): boolean;

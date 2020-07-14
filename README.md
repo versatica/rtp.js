@@ -1,8 +1,6 @@
 # rtp.js
 
-RTP stack written in JavaScript.
-
-*TODO*
+RTP stack written in TypeScript.
 
 
 ## Authors

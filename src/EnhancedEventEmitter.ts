@@ -3,6 +3,9 @@ import { Logger } from './Logger';
 
 const logger = new Logger('EnhancedEventEmitter');
 
+/**
+ * @internal
+ */
 export class EnhancedEventEmitter extends EventEmitter
 {
 	constructor()

@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { isRtp, RtpPacket } from '../RtpPacket';
-import { InvalidStateError } from '../errors';
+import { isRtp, RtpPacket } from '../rtp';
 
 describe('parse RTP packet 1', () =>
 {
@@ -171,31 +170,24 @@ describe('create RTP packet 5 from scratch', () =>
 
 		packet.setPayloadType(3);
 		expect(packet.getPayloadType()).toBe(3);
-		expect(packet.isSerializationNeeded()).toBe(false);
 
 		packet.setPayloadType(127);
 		expect(packet.getPayloadType()).toBe(127);
-		expect(packet.isSerializationNeeded()).toBe(false);
 
 		packet.setSequenceNumber(52345);
 		expect(packet.getSequenceNumber()).toBe(52345);
-		expect(packet.isSerializationNeeded()).toBe(false);
 
 		packet.setTimestamp(1234567890);
 		expect(packet.getTimestamp()).toBe(1234567890);
-		expect(packet.isSerializationNeeded()).toBe(false);
 
 		packet.setSsrc(3294967295);
 		expect(packet.getSsrc()).toBe(3294967295);
-		expect(packet.isSerializationNeeded()).toBe(false);
 
 		packet.setMarker(true);
 		expect(packet.getMarker()).toBe(true);
-		expect(packet.isSerializationNeeded()).toBe(false);
 
 		packet.setCsrc([ 1111, 2222 ]);
 		expect(packet.getCsrc()).toEqual([ 1111, 2222 ]);
-		expect(packet.isSerializationNeeded()).toBe(true);
 
 		packet.setOneByteExtensions();
 		expect(packet.hasOneByteExtensions()).toBe(true);
@@ -229,51 +221,27 @@ describe('create RTP packet 5 from scratch', () =>
 
 	test('packet.clone() succeeds', () =>
 	{
-		const clonnedPacket = packet.clone();
+		const clonedPacket = packet.clone();
 
-		expect(clonnedPacket.getPayloadType()).toBe(127);
-		expect(clonnedPacket.getSequenceNumber()).toBe(52345);
-		expect(clonnedPacket.getTimestamp()).toBe(1234567890);
-		expect(clonnedPacket.getSsrc()).toBe(3294967295);
-		expect(clonnedPacket.getMarker()).toBe(true);
-		expect(clonnedPacket.getCsrc()).toEqual([ 1111, 2222 ]);
-		expect(clonnedPacket.hasOneByteExtensions()).toBe(false);
-		expect(clonnedPacket.hasTwoBytesExtensions()).toBe(true);
-		expect(clonnedPacket.getExtension(2)).toEqual(Buffer.from([ 1, 2, 3, 4 ]));
-		expect(clonnedPacket.getPayload()).toEqual(Buffer.from('codec'));
-		expect(clonnedPacket.getPadding()).toBe(3);
-
+		expect(clonedPacket.getPayloadType()).toBe(127);
+		expect(clonedPacket.getSequenceNumber()).toBe(52345);
+		expect(clonedPacket.getTimestamp()).toBe(1234567890);
+		expect(clonedPacket.getSsrc()).toBe(3294967295);
+		expect(clonedPacket.getMarker()).toBe(true);
+		expect(clonedPacket.getCsrc()).toEqual([ 1111, 2222 ]);
+		expect(clonedPacket.hasOneByteExtensions()).toBe(false);
+		expect(clonedPacket.hasTwoBytesExtensions()).toBe(true);
+		expect(clonedPacket.getExtension(2)).toEqual(Buffer.from([ 1, 2, 3, 4 ]));
+		expect(clonedPacket.getPayload()).toEqual(Buffer.from('codec'));
+		expect(clonedPacket.getPadding()).toBe(3);
 		// Compare buffers.
-		expect(Buffer.compare(clonnedPacket.getBuffer(), packet.getBuffer())).toBe(0);
-	});
-
-	test('packet.serialize() succeeds', () =>
-	{
-		const previousBuffer = packet.getBuffer();
-
-		packet.serialize();
-		expect(packet.isSerializationNeeded()).toBe(false);
-		expect(packet.getPayloadType()).toBe(127);
-		expect(packet.getSequenceNumber()).toBe(52345);
-		expect(packet.getTimestamp()).toBe(1234567890);
-		expect(packet.getSsrc()).toBe(3294967295);
-		expect(packet.getMarker()).toBe(true);
-		expect(packet.getCsrc()).toEqual([ 1111, 2222 ]);
-		expect(packet.hasOneByteExtensions()).toBe(false);
-		expect(packet.hasTwoBytesExtensions()).toBe(true);
-		expect(packet.getExtension(2)).toEqual(Buffer.from([ 1, 2, 3, 4 ]));
-		expect(packet.getPayload()).toEqual(Buffer.from('codec'));
-		expect(packet.getPadding()).toBe(3);
-
-		// Compare buffers.
-		expect(Buffer.compare(packet.getBuffer(), previousBuffer)).toBe(0);
+		expect(Buffer.compare(clonedPacket.getBuffer(), packet.getBuffer())).toBe(0);
 	});
 
 	test('packet.rtxEncode() and packet.rtxDecode() succeed', () =>
 	{
 		// Remove padding so we can later compare buffers.
 		packet.setPadding(0);
-		packet.serialize();
 
 		const payloadType = packet.getPayloadType();
 		const ssrc = packet.getSsrc();
@@ -293,7 +261,6 @@ describe('create RTP packet 5 from scratch', () =>
 		expect(packet.getSequenceNumber()).toBe(sequenceNumber);
 		expect(packet.getSsrc()).toBe(ssrc);
 		expect(packet.getPayload().length).toBe(payloadLength);
-
 		// Compare buffers.
 		expect(Buffer.compare(packet.getBuffer(), previousBuffer)).toBe(0);
 	});
@@ -307,24 +274,40 @@ describe('create RTP packet 6 from scratch', () =>
 	{
 		packet = new RtpPacket();
 
+		// Adding an extension without having One-Byte or Two-Bytes extensions
+		// enabled should force One-Byte.
 		packet.setExtension(1, Buffer.from([ 1, 2, 3, 4 ]));
 		expect(packet.getExtension(1)).toEqual(Buffer.from([ 1, 2, 3, 4 ]));
+		expect(packet.hasOneByteExtensions()).toBe(true);
+		expect(packet.hasTwoBytesExtensions()).toBe(false);
+		// Packet total length must match RTP fixed header length (12) + header
+		// extension id/length (4) + extension id 1 (5) = 21. Must add padding so
+		// it becomes 24;
+		expect(packet.getBuffer().length).toBe(24);
 
-		// Serializing without setting One-Byte or Two-Bytes extensions mode should
-		// ignore extensions.
-		packet.serialize();
+		packet.clearExtensions();
 		expect(packet.getExtension(1)).toBeUndefined();
-		expect(packet.hasOneByteExtensions()).toBe(false);
+		expect(packet.hasOneByteExtensions()).toBe(true);
 		expect(packet.hasTwoBytesExtensions()).toBe(false);
 		// Packet total length must match RTP fixed header length (12).
 		expect(packet.getBuffer().length).toBe(12);
+	});
+});
+
+describe('create RTP packet 7 from scratch', () =>
+{
+	let packet: RtpPacket;
+
+	test('packet processing succeeds', () =>
+	{
+		packet = new RtpPacket();
 
 		packet.setOneByteExtensions();
 		packet.setExtension(0, Buffer.from('ignore me'));
 		packet.setExtension(1, Buffer.from([ 1, 2, 3, 4 ]));
 		packet.setExtension(16, Buffer.from('also ignore me'));
-		packet.serialize();
-		// Extension with id 0 must be ignored.
+		// Force serialization so extension with id 0 must be ignored.
+		packet.getBuffer();
 		expect(packet.getExtension(0)).toBeUndefined();
 		expect(packet.getExtension(1)).toEqual(Buffer.from([ 1, 2, 3, 4 ]));
 		// Extension with id 16 (so 0 in 4 bits) must be ignored.
@@ -338,7 +321,7 @@ describe('create RTP packet 6 from scratch', () =>
 	});
 });
 
-describe('create RTP packet 7 from scratch', () =>
+describe('create RTP packet 8 from scratch', () =>
 {
 	let packet: RtpPacket;
 
@@ -347,17 +330,15 @@ describe('create RTP packet 7 from scratch', () =>
 		packet = new RtpPacket();
 
 		packet.setTwoBytesExtensions();
-		expect(packet.isSerializationNeeded()).toBe(true);
-
 		packet.setExtension(0, Buffer.from('ignore me'));
 		packet.setExtension(1, Buffer.from([ 1, 2, 3, 4 ]));
 		packet.setExtension(256, Buffer.from('also ignore me'));
-		packet.serialize();
-		// Extension with id 0 must be ignored.
+		// Force serialization so extension with id 0 must be ignored.
+		packet.getBuffer();
 		expect(packet.getExtension(0)).toBeUndefined();
 		expect(packet.getExtension(1)).toEqual(Buffer.from([ 1, 2, 3, 4 ]));
-		// Extension with id 16 (so 0 in 4 bits) must be ignored.
-		expect(packet.getExtension(16)).toBeUndefined();
+		// Extension with id 256 (so 0 in 8 bits) must be ignored.
+		expect(packet.getExtension(256)).toBeUndefined();
 		expect(packet.hasOneByteExtensions()).toBe(false);
 		expect(packet.hasTwoBytesExtensions()).toBe(true);
 		// Packet total length must match RTP fixed header length (12) + header
@@ -367,7 +348,7 @@ describe('create RTP packet 7 from scratch', () =>
 	});
 });
 
-describe('create RTP packet 8 from scratch', () =>
+describe('create RTP packet 9 from scratch', () =>
 {
 	let packet: RtpPacket;
 
@@ -376,39 +357,24 @@ describe('create RTP packet 8 from scratch', () =>
 		packet = new RtpPacket();
 
 		packet.setPayload(Buffer.from([ 1, 2, 3, 4 ]));
-		expect(packet.isSerializationNeeded()).toBe(true);
-
-		packet.serialize();
 		// Packet total length must match RTP fixed header length (12) + payload
 		// (4), so 16.
 		expect(packet.getBuffer().length).toBe(16);
 
-		// Nothing to do since already padded to 4.
+		// Nothing to do since already padded to 4 bytes.
 		packet.padTo4Bytes();
-		expect(packet.isSerializationNeeded()).toBe(false);
 		expect(packet.getBuffer().length).toBe(16);
 		expect(packet.getPadding()).toBe(0);
 
 		packet.setPadding(1);
-		// Cannot pad if not serialized.
-		expect(() => packet.padTo4Bytes()).toThrow(InvalidStateError);
-
-		packet.serialize();
 		// Padding a packet of 17 bytes (1 byte of padding) must become 16 bytes.
 		packet.padTo4Bytes();
-		expect(packet.isSerializationNeeded()).toBe(true);
-
-		packet.serialize();
 		expect(packet.getBuffer().length).toBe(16);
 		expect(packet.getPadding()).toBe(0);
 
 		packet.setPayload(Buffer.from([ 1, 2, 3, 4, 5 ]));
-		packet.serialize();
 		// Padding a packet of 17 bytes (0 bytes of padding) must become 20 bytes.
 		packet.padTo4Bytes();
-		expect(packet.isSerializationNeeded()).toBe(true);
-
-		packet.serialize();
 		expect(packet.getBuffer().length).toBe(20);
 		expect(packet.getPadding()).toBe(3);
 	});

@@ -11,5 +11,22 @@
 		"declaration": true,
 		"declarationMap": true
 	},
-	"include": [ "src" ]
+	"include": [ "src" ],
+	"typedocOptions": {
+		"mode": "modules",
+		"out": "docs",
+		"exclude": [
+			"src/errors.ts",
+			"src/utils.ts",
+			"src/Logger.ts",
+			"src/EnhancedEventEmitter.ts",
+			"src/__tests__/**/*.ts"
+		],
+		"excludeNotExported": true,
+		"excludePrivate": true,
+		"excludeProtected": true,
+		"stripInternal": true,
+		"theme": "default",
+		"gitRemote": "origin"
+	}
 }

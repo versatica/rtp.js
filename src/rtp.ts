@@ -1,9 +1,24 @@
+/**
+ * RTP classes and utilities.
+ *
+ * @packageDocumentation
+ */
+
 import { clone, padTo4Bytes } from './utils';
-import { InvalidStateError } from './errors';
 
 const RTP_VERSION = 2;
 const FIXED_HEADER_LENGTH = 12;
 
+/**
+ * Inspect the given buffer and return a boolean indicating whether it could be
+ * a valid RTP packet or not.
+ *
+ * ```ts
+ * if (isRtp(buffer)) {
+ *   console.log('it seems a valid RTP packet');
+ * }
+ * ```
+ */
 export function isRtp(buffer: Buffer): boolean
 {
 	const firstByte = buffer.readUInt8(0);
@@ -35,6 +50,10 @@ export class RtpPacket
 	// Whether serialization is needed due to modifications.
 	private serializationNeeded: boolean = false;
 
+	/**
+	 * @param buffer - If given if will be parsed. Otherwise an empty RTP packet
+	 *   will be created.
+	 */
 	constructor(buffer?: Buffer)
 	{
 		// If no buffer is given, create an empty one with minimum required length.
@@ -213,8 +232,16 @@ export class RtpPacket
 		}
 	}
 
+	/**
+	 * @ignore
+	 */
 	dump(): any
 	{
+		if (this.serializationNeeded)
+		{
+			this.serialize();
+		}
+
 		const extensions: { [key: number]: { length: number } } = {};
 
 		for (const [ id, value ] of this.extensions)
@@ -237,67 +264,103 @@ export class RtpPacket
 		};
 	}
 
+	/**
+	 * Get the internal buffer containing the serialized RTP binary packet.
+	 */
 	getBuffer(): Buffer
 	{
+		if (this.serializationNeeded)
+		{
+			this.serialize();
+		}
+
 		return this.buffer;
 	}
 
+	/**
+	 * Get the RTP version of the packet (always 2).
+	 */
 	getVersion(): number
 	{
 		return (this.buffer.readUInt8(0) >> 6);
 	}
 
-	setVersion(): void
-	{
-		this.buffer.writeUInt8(RTP_VERSION << 6, 0);
-	}
-
+	/**
+	 * Get the RTP payload type.
+	 */
 	getPayloadType(): number
 	{
 		return (this.buffer.readUInt8(1) & 0x7F);
 	}
 
+	/**
+	 * Set the RTP payload type.
+	 */
 	setPayloadType(payloadType: number): void
 	{
 		this.buffer.writeUInt8(
 			(this.buffer.readUInt8(1) & 0x80) | (payloadType & 0x7F), 1);
 	}
 
+	/**
+	 * Get the RTP sequence number.
+	 */
 	getSequenceNumber(): number
 	{
 		return this.buffer.readUInt16BE(2);
 	}
 
+	/**
+	 * Set the RTP sequence number.
+	 */
 	setSequenceNumber(sequenceNumber: number): void
 	{
 		this.buffer.writeUInt16BE(sequenceNumber, 2);
 	}
 
+	/**
+	 * Get the RTP timestamp.
+	 */
 	getTimestamp(): number
 	{
 		return this.buffer.readUInt32BE(4);
 	}
 
+	/**
+	 * Set the RTP timestamp.
+	 */
 	setTimestamp(timestamp: number): void
 	{
 		this.buffer.writeUInt32BE(timestamp, 4);
 	}
 
+	/**
+	 * Get the RTP SSRC.
+	 */
 	getSsrc(): number
 	{
 		return this.buffer.readUInt32BE(8);
 	}
 
+	/**
+	 * Set the RTP SSRC.
+	 */
 	setSsrc(ssrc: number): void
 	{
 		this.buffer.writeUInt32BE(ssrc, 8);
 	}
 
+	/**
+	 * Get the RTP CSRC values.
+	 */
 	getCsrc(): number[]
 	{
 		return this.csrc;
 	}
 
+	/**
+	 * Set the RTP CSRC values.
+	 */
 	setCsrc(csrc: number[]): void
 	{
 		this.serializationNeeded = true;
@@ -311,11 +374,17 @@ export class RtpPacket
 			(this.buffer.readUInt8(0) & 0xF0) | (count & 0x0F), 0);
 	}
 
+	/**
+	 * Get the RTP marker flag.
+	 */
 	getMarker(): boolean
 	{
 		return Boolean(this.buffer.readUInt8(1) >> 7);
 	}
 
+	/**
+	 * Set the RTP marker flag.
+	 */
 	setMarker(marker: boolean): void
 	{
 		const bit = marker ? 1 : 0;
@@ -323,11 +392,17 @@ export class RtpPacket
 		this.buffer.writeUInt8(this.buffer.readUInt8(1) | (bit << 7), 1);
 	}
 
+	/**
+	 * Whether One-Byte extensions (as per RFC 5285) are enabled.
+	 */
 	hasOneByteExtensions(): boolean
 	{
 		return this.headerExtensionId === 0xBEDE;
 	}
 
+	/**
+	 * Whether Two-Bytes extensions (as per RFC 5285) are enabled.
+	 */
 	hasTwoBytesExtensions(): boolean
 	{
 		return this.headerExtensionId
@@ -335,6 +410,9 @@ export class RtpPacket
 			: false;
 	}
 
+	/**
+	 * Enable One-Byte extensions.
+	 */
 	setOneByteExtensions(): void
 	{
 		if (this.hasOneByteExtensions())
@@ -353,6 +431,9 @@ export class RtpPacket
 		this.headerExtensionId = 0xBEDE;
 	}
 
+	/**
+	 * Enable Two-Bytes extensions.
+	 */
 	setTwoBytesExtensions(): void
 	{
 		if (this.hasTwoBytesExtensions())
@@ -371,11 +452,17 @@ export class RtpPacket
 		this.headerExtensionId = 0b0001000000000000;
 	}
 
+	/**
+	 * Get the value of the extension with given `id` (if any).
+	 */
 	getExtension(id: number): Buffer | undefined
 	{
 		return this.extensions.get(id);
 	}
 
+	/**
+	 * Set the value of the extension with given `id`.
+	 */
 	setExtension(id: number, value: Buffer): void
 	{
 		this.serializationNeeded = true;
@@ -384,11 +471,20 @@ export class RtpPacket
 		if (this.extensions.size === 0)
 		{
 			this.setHeaderExtensionBit(1);
+
+			// If neither One-Byte nor Two-Bytes modes are enabled, force One-Byte.
+			if (!this.hasOneByteExtensions() && !this.hasTwoBytesExtensions())
+			{
+				this.setOneByteExtensions();
+			}
 		}
 
 		this.extensions.set(id, value);
 	}
 
+	/**
+	 * Delete the extension with given `id` (if any).
+	 */
 	deleteExtension(id: number): void
 	{
 		if (this.extensions.delete(id))
@@ -403,6 +499,9 @@ export class RtpPacket
 		}
 	}
 
+	/**
+	 * Clear all extensions.
+	 */
 	clearExtensions(): void
 	{
 		if (this.extensions.size === 0)
@@ -418,11 +517,22 @@ export class RtpPacket
 		this.extensions.clear();
 	}
 
+	/**
+	 * Get the packet payload.
+	 */
 	getPayload(): Buffer
 	{
+		if (this.serializationNeeded)
+		{
+			this.serialize();
+		}
+
 		return this.payload;
 	}
 
+	/**
+	 * Set the packet payload.
+	 */
 	setPayload(payload: Buffer): void
 	{
 		this.serializationNeeded = true;
@@ -430,11 +540,17 @@ export class RtpPacket
 		this.payload = payload;
 	}
 
+	/**
+	 * Get the padding (in bytes) after the packet payload.
+	 */
 	getPadding(): number
 	{
 		return this.padding;
 	}
 
+	/**
+	 * Set the padding (in bytes) after the packet payload.
+	 */
 	setPadding(padding: number): void
 	{
 		this.serializationNeeded = true;
@@ -447,11 +563,15 @@ export class RtpPacket
 		this.setPaddingBit(bit);
 	}
 
+	/**
+	 * Pad the packet total legth to 4 bytes. To achieve it, this method may add
+	 * or remove bytes of padding.
+	 */
 	padTo4Bytes(): void
 	{
 		if (this.serializationNeeded)
 		{
-			throw new InvalidStateError('packet must be serialized');
+			this.serialize();
 		}
 
 		const length = this.buffer.length;
@@ -466,12 +586,107 @@ export class RtpPacket
 		this.setPadding(padding + newLength - length);
 	}
 
-	isSerializationNeeded(): boolean
+	/**
+	 * Clone the packet. The cloned packet does not share any memory with the
+	 * original one.
+	 */
+	clone(): RtpPacket
 	{
-		return this.serializationNeeded;
+		if (this.serializationNeeded)
+		{
+			this.serialize();
+		}
+
+		return new RtpPacket(clone(this.buffer));
 	}
 
-	serialize(): void
+	/**
+	 * Encode the packet using RTX procedures (as per RFC 4588).
+	 *
+	 * @param payloadType - The RTX payload type.
+	 * @param ssrc - The RTX SSRC.
+	 * @param sequenceNumber - The RTX sequence number.
+	 */
+	rtxEncode(payloadType: number, ssrc: number, sequenceNumber: number)
+	{
+		if (this.serializationNeeded)
+		{
+			this.serialize();
+		}
+
+		// Rewrite the payload type.
+		this.setPayloadType(payloadType);
+
+		// Rewrite the SSRC.
+		this.setSsrc(ssrc);
+
+		// Write the original sequence number at the begining of the new payload.
+		const seqBuffer = Buffer.allocUnsafe(2);
+
+		seqBuffer.writeUInt16BE(this.getSequenceNumber(), 0);
+		this.setPayload(Buffer.concat([ seqBuffer, this.payload ]));
+
+		// Rewrite the sequence number.
+		this.setSequenceNumber(sequenceNumber);
+
+		// Remove padding.
+		this.setPadding(0);
+	}
+
+	/**
+	 * Decode the packet using RTX procedures (as per RFC 4588).
+	 *
+	 * @param payloadType - The original payload type.
+	 * @param ssrc - The original SSRC.
+	 */
+	rtxDecode(payloadType: number, ssrc: number)
+	{
+		if (this.serializationNeeded)
+		{
+			this.serialize();
+		}
+
+		if (this.payload.length < 2)
+		{
+			throw new RangeError(
+				'payload length must be greater or equal than 2 bytes'
+			);
+		}
+
+		// Rewrite the payload type.
+		this.setPayloadType(payloadType);
+
+		// Rewrite the SSRC.
+		this.setSsrc(ssrc);
+
+		// Rewrite the sequence number.
+		const sequenceNumber = this.payload.readUInt16BE(0);
+
+		this.setSequenceNumber(sequenceNumber);
+
+		// Reduce the payload.
+		this.setPayload(this.payload.slice(2));
+
+		// Remove padding.
+		this.setPadding(0);
+	}
+
+	private setVersion(): void
+	{
+		this.buffer.writeUInt8(RTP_VERSION << 6, 0);
+	}
+
+	private setHeaderExtensionBit(bit: number)
+	{
+		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 4), 0);
+	}
+
+	private setPaddingBit(bit: number)
+	{
+		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 5), 0);
+	}
+
+	private serialize(): void
 	{
 		const previousBuffer = this.buffer;
 
@@ -481,12 +696,8 @@ export class RtpPacket
 		// Add space for CSRC values.
 		length += this.csrc.length * 4;
 
-		// Add space for the headere extension (just if One-Byte or Two-Bytes is
-		// enabled and there are extensions in the packet).
-		if (
-			this.extensions.size > 0 &&
-			(this.hasOneByteExtensions() || this.hasTwoBytesExtensions())
-		)
+		// Add space for the header extension (just if there are extensions).
+		if (this.extensions.size > 0)
 		{
 			// Add space for header extension id/length fields.
 			length += 4;
@@ -675,73 +886,5 @@ export class RtpPacket
 
 		// Reset flag.
 		this.serializationNeeded = false;
-	}
-
-	clone(): RtpPacket
-	{
-		if (this.serializationNeeded)
-		{
-			this.serialize();
-		}
-
-		return new RtpPacket(clone(this.buffer));
-	}
-
-	rtxEncode(payloadType: number, ssrc: number, sequenceNumber: number)
-	{
-		// Rewrite the payload type.
-		this.setPayloadType(payloadType);
-
-		// Rewrite the SSRC.
-		this.setSsrc(ssrc);
-
-		// Write the original sequence number at the begining of the new payload.
-		const seqBuffer = Buffer.allocUnsafe(2);
-
-		seqBuffer.writeUInt16BE(this.getSequenceNumber(), 0);
-		this.setPayload(Buffer.concat([ seqBuffer, this.payload ]));
-
-		// Rewrite the sequence number.
-		this.setSequenceNumber(sequenceNumber);
-
-		// Remove padding.
-		this.setPadding(0);
-	}
-
-	rtxDecode(payloadType: number, ssrc: number)
-	{
-		if (this.payload.length < 2)
-		{
-			throw new RangeError(
-				'payload length must be greater or equal than 2 bytes'
-			);
-		}
-
-		// Rewrite the payload type.
-		this.setPayloadType(payloadType);
-
-		// Rewrite the SSRC.
-		this.setSsrc(ssrc);
-
-		// Rewrite the sequence number.
-		const sequenceNumber = this.payload.readUInt16BE(0);
-
-		this.setSequenceNumber(sequenceNumber);
-
-		// Reduce the payload.
-		this.setPayload(this.payload.slice(2));
-
-		// Remove padding.
-		this.setPadding(0);
-	}
-
-	private setHeaderExtensionBit(bit: number)
-	{
-		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 4), 0);
-	}
-
-	private setPaddingBit(bit: number)
-	{
-		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 5), 0);
 	}
 }

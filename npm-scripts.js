@@ -10,7 +10,7 @@ switch (task)
 {
 	case 'typescript:build':
 	{
-		execute('rm -rf lib');
+		execute('rm -rf lib/');
 		execute('tsc');
 
 		break;
@@ -20,7 +20,7 @@ switch (task)
 	{
 		const TscWatchClient = require('tsc-watch/client');
 
-		execute('rm -rf lib');
+		execute('rm -rf lib/');
 
 		const watch = new TscWatchClient();
 
@@ -47,6 +47,15 @@ switch (task)
 	{
 		execute('jest --colors --verbose --coverage');
 		execute('open-cli coverage/index.html');
+
+		break;
+	}
+
+	case 'docs':
+	{
+		// Options are given in tsconfig.json.
+		execute('rm -rf docs/ && typedoc');
+		execute('open-cli docs/index.html');
 
 		break;
 	}

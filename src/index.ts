@@ -1,3 +1,3 @@
-import { isRtp, RtpPacket } from './RtpPacket';
+import { isRtp, RtpPacket } from './rtp';
 
 export { isRtp, RtpPacket };
