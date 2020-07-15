@@ -66,14 +66,24 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
+							<h3>Enumerations</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-enum"><a href="enums/packettype.html" class="tsd-kind-icon">Packet<wbr>Type</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
 							<h3>Classes</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-class"><a href="classes/receiverreport.html" class="tsd-kind-icon">Receiver<wbr>Report</a></li>
+								<li class="tsd-kind-class"><a href="classes/receiverreportpacket.html" class="tsd-kind-icon">Receiver<wbr>Report<wbr>Packet</a></li>
+								<li class="tsd-kind-class"><a href="classes/rtcppacket.html" class="tsd-kind-icon">Rtcp<wbr>Packet</a></li>
 								<li class="tsd-kind-class"><a href="classes/rtppacket.html" class="tsd-kind-icon">Rtp<wbr>Packet</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-function"><a href="globals.html#isrtcp" class="tsd-kind-icon">is<wbr>Rtcp</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#isrtp" class="tsd-kind-icon">is<wbr>Rtp</a></li>
 							</ul>
 						</section>
@@ -82,6 +92,38 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="isrtcp" class="tsd-anchor"></a>
+					<h3>is<wbr>Rtcp</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Rtcp<span class="tsd-signature-symbol">(</span>buffer<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/422f0c3/src/rtcp/packet.ts#L36">rtcp/packet.ts:36</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Inspect the given buffer and return a boolean indicating whether it could be
+									a valid RTCP packet or not.</p>
+								</div>
+								<pre><code class="language-ts"><span class="hljs-keyword">if</span> (isRtcp(buffer)) {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;it seems a valid RTCP packet&#x27;</span>);
+}</code></pre>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>buffer: <span class="tsd-signature-type">Buffer</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function">
 					<a name="isrtp" class="tsd-anchor"></a>
 					<h3>is<wbr>Rtp</h3>
@@ -92,7 +134,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/8e3f05c/src/rtp.ts#L22">rtp.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/422f0c3/src/rtp.ts#L22">rtp.ts:22</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -127,8 +169,23 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="enums/packettype.html" class="tsd-kind-icon">Packet<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/receiverreport.html" class="tsd-kind-icon">Receiver<wbr>Report</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/receiverreportpacket.html" class="tsd-kind-icon">Receiver<wbr>Report<wbr>Packet</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/rtcppacket.html" class="tsd-kind-icon">Rtcp<wbr>Packet</a>
+					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/rtppacket.html" class="tsd-kind-icon">Rtp<wbr>Packet</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isrtcp" class="tsd-kind-icon">is<wbr>Rtcp</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#isrtp" class="tsd-kind-icon">is<wbr>Rtp</a>
@@ -145,6 +202,12 @@
 			<ul class="tsd-legend">
 				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
 			</ul>
 		</div>
 	</div>
