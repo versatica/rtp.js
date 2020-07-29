@@ -96,7 +96,6 @@ describe('create RTCP Receiver Report packet', () =>
 		const packet = new ReceiverReportPacket();
 
 		expect(packet).toBeDefined();
-
 		expect(isRtcp(packet.getBuffer())).toBe(true);
 	});
 });
