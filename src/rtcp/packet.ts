@@ -102,7 +102,7 @@ export abstract class RtcpPacket
 	 */
 	getVersion(): number
 	{
-		return RTCP_VERSION;
+		return this.buffer.readUInt8(0) >> 6;
 	}
 
 	/**
