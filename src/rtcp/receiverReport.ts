@@ -267,7 +267,8 @@ export class ReceiverReportPacket extends RtcpPacket
 
 		// Store a buffer within the packet boundaries.
 		this.buffer = buffer.slice(
-			undefined, FIXED_HEADER_LENGTH + (this.reports.length * REPORT_LENGTH));
+			undefined, FIXED_HEADER_LENGTH + (this.reports.length * REPORT_LENGTH)
+		);
 	}
 
 	/**
