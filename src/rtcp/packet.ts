@@ -58,6 +58,10 @@ export abstract class RtcpPacket
 	protected buffer: Buffer;
 	// RTCP packet type.
 	private packetType: PacketType;
+	// Number of bytes of padding.
+	protected padding: number = 0;
+	// Whether serialization is needed due to modifications.
+	protected serializationNeeded: boolean = false;
 
 	/**
 	 * @ignore
@@ -67,6 +71,16 @@ export abstract class RtcpPacket
 	static getCount(buffer: Buffer): number
 	{
 		return buffer.readUInt8(0) & 0x1F;
+	}
+
+	/**
+	 * @ignore
+	 *
+	 * @param Buffer.
+	 */
+	static getLength(buffer: Buffer): number
+	{
+		return buffer.readUInt16BE(2);
 	}
 
 	/**
@@ -106,22 +120,25 @@ export abstract class RtcpPacket
 	}
 
 	/**
-	 * Get the padding flag.
+	 * Get the padding (in bytes) after the packet payload.
 	 */
-	getPadding(): boolean
+	getPadding(): number
 	{
-		return Boolean(this.buffer.readUInt8(0) & 0x20);
+		return this.padding;
 	}
 
 	/**
 	 * Set the padding flag.
 	 */
-	setPadding(padding: boolean): void
+	setPadding(padding: number): void
 	{
+		this.serializationNeeded = true;
+		this.padding = padding;
+
 		// Update padding bit.
 		const bit = padding ? 1 : 0;
 
-		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 5), 0);
+		this.setPaddingBit(bit);
 	}
 
 	/**
@@ -161,15 +178,30 @@ export abstract class RtcpPacket
 	 */
 	protected serialize(length: number): void
 	{
+		const padding = this.padding ?? 0;
+
 		// Allocate new buffer.
-		const newBuffer = Buffer.alloc(length);
+		const newBuffer = Buffer.alloc(length + padding);
 
 		this.buffer.copy(newBuffer, 0, 0, COMMON_HEADER_LENGTH);
-
 		this.buffer = newBuffer;
 
 		this.writeCommonHeader();
-		this.setLength((length / 4) - 1);
+		this.setLength(((length + padding) / 4) - 1);
+
+		// Write padding.
+		if (this.padding > 0)
+		{
+			if (this.padding > 255)
+			{
+				throw new TypeError(
+					`padding (${this.padding} bytes) cannot be higher than 255`
+				);
+			}
+
+			this.buffer.fill(0, length, length + padding - 1);
+			this.buffer.writeUInt8(padding, length + this.padding - 1);
+		}
 	}
 
 	protected writeCommonHeader(): void
@@ -200,5 +232,13 @@ export abstract class RtcpPacket
 	private setLength(length: number): void
 	{
 		this.buffer.writeUInt16BE(length, 2);
+	}
+
+	/**
+	 * Set the padding bit.
+	 */
+	private setPaddingBit(bit: number): void
+	{
+		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 5), 0);
 	}
 }

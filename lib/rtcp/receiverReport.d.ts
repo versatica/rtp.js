@@ -32,7 +32,6 @@ export declare class ReceiverReport {
 }
 export declare class ReceiverReportPacket extends RtcpPacket {
     private reports;
-    private serializationNeeded;
     static packetType: PacketType;
     /**
      * @param buffer - If given it will be parsed. Otherwise an empty RTP packet

@@ -18,8 +18,8 @@ const buffer = Buffer.from(
 		0x50, 0x00, 0x00, 0xd8, // Fraction lost: 0, Total lost: 1
 		0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 0
 		0x00, 0x00, 0x00, 0x00, // Jitter: 0
-		0x00, 0x00, 0x20, 0x2a, // Last SR: 0
-		0x00, 0x00, 0x00, 0x05 // DLSR: 0
+		0x00, 0x00, 0x20, 0x2a, // Last SR: 8234
+		0x00, 0x00, 0x00, 0x05 // DLSR: 5
 	]
 );
 
@@ -36,10 +36,41 @@ describe('parse RTCP Receiver Report packet', () =>
 		const report = packet.getReports()[0];
 
 		expect(packet.getVersion()).toBe(2);
-		expect(packet.getPadding()).toBe(false);
+		expect(packet.getPadding()).toBe(0);
 		expect(packet.getPacketType()).toBe(201);
 		expect(packet.getCount()).toBe(1);
 		expect(packet.getSsrc()).toBe(0x5d931534);
+
+		checkReport(report);
+	});
+
+	test('packet processing succeeds for a buffer with padding', () =>
+	{
+		const padding = 4;
+		const bufferWithPadding = Buffer.from(
+			[
+				0xa1, 0xc9, 0x00, 0x08, // Padding, Type: 201, Count: 1, Length: 8
+				0x5d, 0x93, 0x15, 0x34, // Sender SSRC: 0x5d931534
+				// Receiver Report
+				0x01, 0x93, 0x2d, 0xb4, // SSRC. 0x01932db4
+				0x50, 0x00, 0x00, 0xd8, // Fraction lost: 0, Total lost: 1
+				0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 0
+				0x00, 0x00, 0x00, 0x00, // Jitter: 0
+				0x00, 0x00, 0x20, 0x2a, // Last SR: 8234
+				0x00, 0x00, 0x00, 0x05, // DLSR: 5
+				0x00, 0x00, 0x00, 0x04 // Padding (4 bytes)
+			]
+		);
+
+		const packet = new ReceiverReportPacket(bufferWithPadding);
+		const report = packet.getReports()[0];
+
+		expect(packet.getVersion()).toBe(2);
+		expect(packet.getPadding()).toBe(padding);
+		expect(packet.getPacketType()).toBe(201);
+		expect(packet.getCount()).toBe(1);
+		expect(packet.getSsrc()).toBe(0x5d931534);
+		expect(packet.getBuffer().compare(bufferWithPadding)).toBe(0);
 
 		checkReport(report);
 	});
@@ -103,6 +134,31 @@ describe('create RTCP Receiver Report packet', () =>
 
 		expect(packet).toBeDefined();
 		expect(isRtcp(packet.getBuffer())).toBe(true);
+	});
+
+	test('creating a Receiver Report packet with padding succeeds', () =>
+	{
+		const padding = 8;
+		const bufferWithPadding = Buffer.from(
+			[
+				0xa0, 0xc9, 0x00, 0x03, // Padding, Type: 201, Count: 0, Length: 3
+				0x5d, 0x93, 0x15, 0x34, // Sender SSRC: 0x5d931534
+				0x00, 0x00, 0x00, 0x00, // Padding (8 bytes)
+				0x00, 0x00, 0x00, 0x08
+			]
+		);
+
+		const packet = new ReceiverReportPacket();
+
+		expect(packet).toBeDefined();
+		expect(isRtcp(packet.getBuffer())).toBe(true);
+		expect(packet.getPadding()).toBe(0);
+
+		packet.setPadding(padding);
+		packet.setSsrc(0x5d931534);
+
+		expect(packet.getPadding()).toBe(8);
+		expect(packet.getBuffer().compare(bufferWithPadding)).toBe(0);
 	});
 });
 

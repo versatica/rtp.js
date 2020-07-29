@@ -221,8 +221,6 @@ export class ReceiverReportPacket extends RtcpPacket
 {
 	// Receiver Reports.
 	private reports: ReceiverReport[] = [];
-	// Whether serialization is needed due to modifications.
-	private serializationNeeded: boolean = false;
 
 	// Packet Type.
 	static packetType = PacketType.RR;
@@ -247,6 +245,15 @@ export class ReceiverReportPacket extends RtcpPacket
 		if (!isRtcp(buffer))
 		{
 			throw new TypeError('invalid RTCP packet');
+		}
+
+		// Get padding.
+		const paddingFlag = Boolean((buffer.readUInt8() >> 5) & 1);
+
+		if (paddingFlag)
+		{
+			// NOTE: This will throw RangeError if there is no space in the buffer.
+			this.padding = buffer.readUInt8(((RtcpPacket.getLength(buffer) * 4) + 4 - 1));
 		}
 
 		let count = RtcpPacket.getCount(buffer);

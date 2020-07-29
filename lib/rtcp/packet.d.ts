@@ -23,12 +23,20 @@ export declare function isRtcp(buffer: Buffer): boolean;
 export declare abstract class RtcpPacket {
     protected buffer: Buffer;
     private packetType;
+    protected padding: number;
+    protected serializationNeeded: boolean;
     /**
      * @ignore
      *
      * @param Buffer.
      */
     static getCount(buffer: Buffer): number;
+    /**
+     * @ignore
+     *
+     * @param Buffer.
+     */
+    static getLength(buffer: Buffer): number;
     /**
      * @ignore
      *
@@ -48,13 +56,13 @@ export declare abstract class RtcpPacket {
      */
     getVersion(): number;
     /**
-     * Get the padding flag.
+     * Get the padding (in bytes) after the packet payload.
      */
-    getPadding(): boolean;
+    getPadding(): number;
     /**
      * Set the padding flag.
      */
-    setPadding(padding: boolean): void;
+    setPadding(padding: number): void;
     /**
      * Get the RTCP header count value.
      */
@@ -88,5 +96,9 @@ export declare abstract class RtcpPacket {
      * Set the RTCP packet length.
      */
     private setLength;
+    /**
+     * Set the padding bit.
+     */
+    private setPaddingBit;
 }
 //# sourceMappingURL=packet.d.ts.map
