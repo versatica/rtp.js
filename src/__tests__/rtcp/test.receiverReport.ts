@@ -19,7 +19,7 @@ const buffer = Buffer.from(
 		0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 0
 		0x00, 0x00, 0x00, 0x00, // Jitter: 0
 		0x00, 0x00, 0x20, 0x2a, // Last SR: 0
-		0x00, 0x00, 0x00, 0x05  // DLSR: 0
+		0x00, 0x00, 0x00, 0x05 // DLSR: 0
 	]
 );
 
@@ -43,7 +43,8 @@ describe('parse RTCP Receiver Report packet', () =>
 	{
 		// Parse the first 8 bytes of buffer, indicating 1 Receiver Report and
 		// holding no report at all.
-		expect(() => (new ReceiverReportPacket(buffer.slice(undefined, 8)))).toThrowError(TypeError);
+		expect(() => (new ReceiverReportPacket(buffer.slice(undefined, 8))))
+			.toThrowError(TypeError);
 	});
 });
 
