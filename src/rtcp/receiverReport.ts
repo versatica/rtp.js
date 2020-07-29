@@ -340,8 +340,7 @@ export class ReceiverReportPacket extends RtcpPacket
 	 * methods instead ([[addReport]], etc).
 	 *
 	 */
-
-	public serialize(): void
+	serialize(): void
 	{
 		// Compute required buffer length.
 		const length = FIXED_HEADER_LENGTH + (REPORT_LENGTH * this.reports.length);
