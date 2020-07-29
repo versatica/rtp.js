@@ -25,6 +25,11 @@ const buffer = Buffer.from(
 
 describe('parse RTCP Receiver Report packet', () =>
 {
+	test('buffer is RTCP', () =>
+	{
+		expect(isRtcp(buffer)).toBe(true);
+	});
+
 	test('packet processing succeeds', () =>
 	{
 		const packet = new ReceiverReportPacket(buffer);
