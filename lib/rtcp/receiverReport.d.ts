@@ -52,8 +52,16 @@ export declare class ReceiverReportPacket extends RtcpPacket {
     getReports(): ReceiverReport[];
     addReport(report: ReceiverReport): void;
     /**
-     * Serialize RTCP packet into a new buffer.
+     * Apply pending changes into the packet and serialize it into a new internal
+     * buffer (the one that [[getBuffer]] will later return).
+     *
+     * **NOTE:** In most cases there is no need to use this method. It must be
+     * called only if the application retrieves information from the packet (by
+     * calling [[getBuffer]], [[getReports]], etc) and modifies the obtained
+     * buffers in place. However, it's recommended to use the existing setter
+     * methods instead ([[addReport]], etc).
+     *
      */
-    protected serialize(): void;
+    serialize(): void;
 }
 //# sourceMappingURL=receiverReport.d.ts.map
