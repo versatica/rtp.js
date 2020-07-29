@@ -26,6 +26,12 @@ export declare abstract class RtcpPacket {
     /**
      * @ignore
      *
+     * @param Buffer.
+     */
+    static getCount(buffer: Buffer): number;
+    /**
+     * @ignore
+     *
      * @param PacketType.
      */
     protected constructor(packetType: PacketType);

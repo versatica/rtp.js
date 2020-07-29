@@ -51,7 +51,7 @@ export class ReceiverReport
 		}
 		else
 		{
-			this.buffer = buffer;
+			this.buffer = buffer.slice(undefined, REPORT_LENGTH);
 		}
 	}
 
@@ -244,18 +244,20 @@ export class ReceiverReportPacket extends RtcpPacket
 			throw new TypeError('invalid RTCP packet');
 		}
 
-		this.buffer = buffer;
-
-		let count = this.getCount();
+		let count = RtcpPacket.getCount(buffer);
 
 		while (count-- > 0)
 		{
 			const report = new ReceiverReport(
-				this.buffer.slice(FIXED_HEADER_LENGTH + (this.reports.length * REPORT_LENGTH))
+				buffer.slice(FIXED_HEADER_LENGTH + (this.reports.length * REPORT_LENGTH))
 			);
 
 			this.addReport(report);
 		}
+
+		// Store a buffer within the packet boundaries.
+		this.buffer = buffer.slice(
+			undefined, FIXED_HEADER_LENGTH + (this.reports.length * REPORT_LENGTH));
 	}
 
 	/**

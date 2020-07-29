@@ -62,6 +62,16 @@ export abstract class RtcpPacket
 	/**
 	 * @ignore
 	 *
+	 * @param Buffer.
+	 */
+	static getCount(buffer: Buffer): number
+	{
+		return buffer.readUInt8(0) & 0x1F;
+	}
+
+	/**
+	 * @ignore
+	 *
 	 * @param PacketType.
 	 */
 	protected constructor(packetType: PacketType)
