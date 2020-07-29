@@ -64,7 +64,7 @@ export abstract class RtcpPacket
 	 *
 	 * @param PacketType.
 	 */
-	constructor(packetType: PacketType)
+	protected constructor(packetType: PacketType)
 	{
 		this.packetType = packetType;
 	}
