@@ -56,7 +56,7 @@ export abstract class RtcpPacket
 	// Buffer.
 	// @ts-ignore. 'buffer' has not initializer and is not assigned in constructor.
 	protected buffer: Buffer;
-	// RTCP Packet type.
+	// RTCP packet type.
 	private packetType: PacketType;
 
 	/**
