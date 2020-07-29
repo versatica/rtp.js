@@ -39,6 +39,16 @@ describe('parse RTCP Receiver Report packet', () =>
 		checkReport(report);
 	});
 
+	test('parsing a buffer which length does not fit the indicated count throws', () =>
+	{
+		// Parse the first 8 bytes of buffer, indicating 1 Receiver Report and
+		// holding no report at all.
+		expect(() => (new ReceiverReportPacket(buffer.slice(undefined, 8)))).toThrowError(TypeError);
+	});
+});
+
+describe('parse RTCP Receiver Report', () =>
+{
 	test('report processing succeeds', () =>
 	{
 		const report = new ReceiverReport(buffer.slice(8));
@@ -46,6 +56,12 @@ describe('parse RTCP Receiver Report packet', () =>
 		expect(report).toBeDefined();
 
 		checkReport(report);
+	});
+
+	test('parsing a buffer which length does not fit the report size throws', () =>
+	{
+		// Parse a 23 bytes buffer.
+		expect(() => (new ReceiverReport(new Buffer(23)))).toThrowError(TypeError);
 	});
 });
 
@@ -58,6 +74,18 @@ describe('serialize RTCP Receiver Report packet', () =>
 		packet.getBuffer();
 
 		expect(packet.getBuffer().compare(buffer)).toBe(0);
+	});
+});
+
+describe('serialize RTCP Receiver Report', () =>
+{
+	test('serialized buffer equals original one', () =>
+	{
+		const packet = new ReceiverReport(buffer.slice(8));
+
+		packet.getBuffer();
+
+		expect(packet.getBuffer().compare(buffer.slice(8))).toBe(0);
 	});
 });
 

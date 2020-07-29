@@ -48,11 +48,16 @@ export class ReceiverReport
 		if (!buffer)
 		{
 			this.buffer = Buffer.alloc(REPORT_LENGTH);
+
+			return;
 		}
-		else
+
+		if (buffer.length < REPORT_LENGTH)
 		{
-			this.buffer = buffer.slice(undefined, REPORT_LENGTH);
+			throw new TypeError('buffer is too small');
 		}
+
+		this.buffer = buffer.slice(undefined, REPORT_LENGTH);
 	}
 
 	/**
@@ -245,6 +250,11 @@ export class ReceiverReportPacket extends RtcpPacket
 		}
 
 		let count = RtcpPacket.getCount(buffer);
+
+		if (buffer.length < FIXED_HEADER_LENGTH + (count * REPORT_LENGTH))
+		{
+			throw new TypeError('buffer is too small');
+		}
 
 		while (count-- > 0)
 		{
