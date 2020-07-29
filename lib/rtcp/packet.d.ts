@@ -69,6 +69,7 @@ export declare abstract class RtcpPacket {
      * Serialize RTCP packet into a new buffer.
      */
     protected serialize(length: number): void;
+    protected writeCommonHeader(): void;
     /**
      * Set the RTCP version of the packet (always 2).
      */

@@ -158,9 +158,14 @@ export abstract class RtcpPacket
 
 		this.buffer = newBuffer;
 
+		this.writeCommonHeader();
+		this.setLength((length / 4) - 1);
+	}
+
+	protected writeCommonHeader(): void
+	{
 		this.setVersion();
 		this.setPacketType(this.packetType);
-		this.setLength((length / 4) - 1);
 	}
 
 	/**
@@ -186,5 +191,4 @@ export abstract class RtcpPacket
 	{
 		this.buffer.writeUInt16BE(length, 2);
 	}
-
 }

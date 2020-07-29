@@ -1,4 +1,5 @@
 import { ReceiverReport, ReceiverReportPacket } from '../../rtcp/receiverReport';
+import { isRtcp } from '../../rtcp/packet';
 
 const ssrc = 26422708;
 const fractionLost = 80;
@@ -22,7 +23,7 @@ const buffer = Buffer.from(
 	]
 );
 
-describe('parse RTCP Receiver Report', () =>
+describe('parse RTCP Receiver Report packet', () =>
 {
 	test('packet processing succeeds', () =>
 	{
@@ -48,7 +49,7 @@ describe('parse RTCP Receiver Report', () =>
 	});
 });
 
-describe('serialize RTCP Receiver Report', () =>
+describe('serialize RTCP Receiver Report packet', () =>
 {
 	test('serialized buffer equals original one', () =>
 	{
@@ -57,6 +58,18 @@ describe('serialize RTCP Receiver Report', () =>
 		packet.getBuffer();
 
 		expect(packet.getBuffer().compare(buffer)).toBe(0);
+	});
+});
+
+describe('create RTCP Receiver Report packet', () =>
+{
+	test('creating a Receiver Report packet succeeds', () =>
+	{
+		const packet = new ReceiverReportPacket();
+
+		expect(packet).toBeDefined();
+
+		expect(isRtcp(packet.getBuffer())).toBe(true);
 	});
 });
 

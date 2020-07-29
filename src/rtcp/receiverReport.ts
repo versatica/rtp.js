@@ -234,6 +234,7 @@ export class ReceiverReportPacket extends RtcpPacket
 		if (!buffer)
 		{
 			this.buffer = Buffer.alloc(FIXED_HEADER_LENGTH);
+			this.writeCommonHeader();
 
 			return;
 		}
