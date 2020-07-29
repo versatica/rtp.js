@@ -42,10 +42,6 @@ export declare abstract class RtcpPacket {
      */
     getVersion(): number;
     /**
-     * Set the RTCP version of the packet (always 2).
-     */
-    private setVersion;
-    /**
      * Get the padding flag.
      */
     getPadding(): boolean;
@@ -66,20 +62,24 @@ export declare abstract class RtcpPacket {
      */
     getPacketType(): PacketType;
     /**
-     * Set the RTCP packet type.
-     */
-    private setPacketType;
-    /**
      * Get the RTCP packet length.
      */
     getLength(): number;
     /**
-     * Set the RTCP packet length.
-     */
-    private setLength;
-    /**
      * Serialize RTCP packet into a new buffer.
      */
     protected serialize(length: number): void;
+    /**
+     * Set the RTCP version of the packet (always 2).
+     */
+    private setVersion;
+    /**
+     * Set the RTCP packet type.
+     */
+    private setPacketType;
+    /**
+     * Set the RTCP packet length.
+     */
+    private setLength;
 }
 //# sourceMappingURL=packet.d.ts.map

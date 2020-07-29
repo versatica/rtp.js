@@ -96,14 +96,6 @@ export abstract class RtcpPacket
 	}
 
 	/**
-	 * Set the RTCP version of the packet (always 2).
-	 */
-	private setVersion(): void
-	{
-		this.buffer.writeUInt8(this.buffer.readUInt8() | (RTCP_VERSION << 6), 0);
-	}
-
-	/**
 	 * Get the padding flag.
 	 */
 	getPadding(): boolean
@@ -147,27 +139,11 @@ export abstract class RtcpPacket
 	}
 
 	/**
-	 * Set the RTCP packet type.
-	 */
-	private setPacketType(count: PacketType): void
-	{
-		this.buffer.writeUInt8(count, 1);
-	}
-
-	/**
 	 * Get the RTCP packet length.
 	 */
 	getLength(): number
 	{
 		return this.buffer.readUInt16BE(2);
-	}
-
-	/**
-	 * Set the RTCP packet length.
-	 */
-	private setLength(length: number): void
-	{
-		this.buffer.writeUInt16BE(length, 2);
 	}
 
 	/**
@@ -186,4 +162,29 @@ export abstract class RtcpPacket
 		this.setPacketType(this.packetType);
 		this.setLength((length / 4) - 1);
 	}
+
+	/**
+	 * Set the RTCP version of the packet (always 2).
+	 */
+	private setVersion(): void
+	{
+		this.buffer.writeUInt8(this.buffer.readUInt8() | (RTCP_VERSION << 6), 0);
+	}
+
+	/**
+	 * Set the RTCP packet type.
+	 */
+	private setPacketType(count: PacketType): void
+	{
+		this.buffer.writeUInt8(count, 1);
+	}
+
+	/**
+	 * Set the RTCP packet length.
+	 */
+	private setLength(length: number): void
+	{
+		this.buffer.writeUInt16BE(length, 2);
+	}
+
 }
