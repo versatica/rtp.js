@@ -123,14 +123,6 @@ export abstract class RtcpPacket
 	}
 
 	/**
-	 * Set the RTCP header count value.
-	 */
-	protected setCount(count: number): void
-	{
-		this.buffer.writeUInt8(this.buffer.readUInt8() | (count & 0x1F), 0);
-	}
-
-	/**
 	 * Get the RTCP packet type.
 	 */
 	getPacketType(): PacketType
@@ -144,6 +136,14 @@ export abstract class RtcpPacket
 	getLength(): number
 	{
 		return this.buffer.readUInt16BE(2);
+	}
+
+	/**
+	 * Set the RTCP header count value.
+	 */
+	protected setCount(count: number): void
+	{
+		this.buffer.writeUInt8(this.buffer.readUInt8() | (count & 0x1F), 0);
 	}
 
 	/**

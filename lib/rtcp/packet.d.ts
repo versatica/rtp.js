@@ -54,10 +54,6 @@ export declare abstract class RtcpPacket {
      */
     getCount(): number;
     /**
-     * Set the RTCP header count value.
-     */
-    protected setCount(count: number): void;
-    /**
      * Get the RTCP packet type.
      */
     getPacketType(): PacketType;
@@ -65,6 +61,10 @@ export declare abstract class RtcpPacket {
      * Get the RTCP packet length.
      */
     getLength(): number;
+    /**
+     * Set the RTCP header count value.
+     */
+    protected setCount(count: number): void;
     /**
      * Serialize RTCP packet into a new buffer.
      */
