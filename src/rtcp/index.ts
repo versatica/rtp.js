@@ -60,8 +60,7 @@ export function isRtcp(buffer: Buffer): boolean
  * import { RtcpPacket } from 'rtp.js';
  * ```
  *
- * Representation of a base RTCP packet with methods to access and modify its
- * fields.
+ * Representation of a base RTCP packet.
  */
 export abstract class RtcpPacket
 {

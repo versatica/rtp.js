@@ -38,7 +38,7 @@ export function isRtp(buffer: Buffer): boolean
  * import { RtpPacket } from 'rtp.js';
  * ```
  *
- * Representation of a RTP packet with methods to access and modify its fields.
+ * Representation of a RTP packet.
  */
 export class RtpPacket
 {

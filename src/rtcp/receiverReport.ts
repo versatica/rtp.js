@@ -38,7 +38,7 @@ const FIXED_HEADER_LENGTH = 4 + 4; // Common RTCP header length + 4.
  * import { ReceiverReport } from 'rtp.js';
  * ```
  *
- * Representation of a RTCP Receiver Report with methods to access and modify its fields.
+ * Representation of a RTCP Receiver Report.
  */
 export class ReceiverReport
 {
@@ -229,8 +229,8 @@ export class ReceiverReport
  * import { ReceiverReportPacket } from 'rtp.js';
  * ```
  *
- * Representation of a RTCP Receiver Report packet with methods to access and
- * modify its fields.
+ * Representation of a RTCP Receiver Report packet. It may contain various
+ * [[ReceiverReport]] instances into it.
  */
 export class ReceiverReportPacket extends RtcpPacket
 {
