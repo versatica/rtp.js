@@ -32,7 +32,9 @@
       "ts",
       "js"
     ],
-    "testRegex": "/src/__tests__/test\\..+\\.ts$",
+    "testRegex": [
+      "/src/__tests__/(.*/)?test\\..+\\.ts$"
+    ],
     "testPathIgnorePatterns": [
       "<rootDir>/src/__tests__/__mocks__/*",
       "<rootDir>/src/__tests__/utils/*",
