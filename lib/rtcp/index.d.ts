@@ -21,6 +21,10 @@ export declare enum PacketType {
  */
 export declare function isRtcp(buffer: Buffer): boolean;
 /**
+ * ```ts
+ * import { RtcpPacket } from 'rtp.js';
+ * ```
+ *
  * Representation of a base RTCP packet with methods to access and modify its
  * fields.
  */

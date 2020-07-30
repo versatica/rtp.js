@@ -2,7 +2,7 @@
 import { RtcpPacket, PacketType } from './';
 /**
  * ```ts
- * import { ReceiverReport } from 'rtcp/receiverReport.js';
+ * import { ReceiverReport } from 'rtp.js';
  * ```
  *
  * Representation of a RTCP Receiver Report with methods to access and modify its fields.
@@ -39,7 +39,7 @@ export declare class ReceiverReport {
 }
 /**
  * ```ts
- * import { ReceiverReportPacket } from 'rtcp/receiverReport.js';
+ * import { ReceiverReportPacket } from 'rtp.js';
  * ```
  *
  * Representation of a RTCP Receiver Report packet with methods to access and
