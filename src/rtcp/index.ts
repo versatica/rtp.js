@@ -11,7 +11,7 @@ const RTCP_VERSION = 2;
 /** @ignore */
 const COMMON_HEADER_LENGTH = 4;
 
-export enum PacketType
+export enum RtcpPacketType
 {
 	SR = 200,
 	RR = 201,
@@ -69,7 +69,7 @@ export abstract class RtcpPacket
 	// @ts-ignore. 'buffer' has not initializer and is not assigned in constructor.
 	protected buffer: Buffer;
 	// RTCP packet type.
-	private packetType: PacketType;
+	private packetType: RtcpPacketType;
 	// Number of bytes of padding.
 	protected padding: number = 0;
 	// Whether serialization is needed due to modifications.
@@ -100,7 +100,7 @@ export abstract class RtcpPacket
 	 *
 	 * @param PacketType.
 	 */
-	protected constructor(packetType: PacketType)
+	protected constructor(packetType: RtcpPacketType)
 	{
 		this.packetType = packetType;
 	}
@@ -164,7 +164,7 @@ export abstract class RtcpPacket
 	/**
 	 * Get the RTCP packet type.
 	 */
-	getPacketType(): PacketType
+	getPacketType(): RtcpPacketType
 	{
 		return this.buffer.readUInt8(1);
 	}
@@ -233,7 +233,7 @@ export abstract class RtcpPacket
 	/**
 	 * Set the RTCP packet type.
 	 */
-	private setPacketType(count: PacketType): void
+	private setPacketType(count: RtcpPacketType): void
 	{
 		this.buffer.writeUInt8(count, 1);
 	}

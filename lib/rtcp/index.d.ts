@@ -1,5 +1,5 @@
 /// <reference types="node" />
-export declare enum PacketType {
+export declare enum RtcpPacketType {
     SR = 200,
     RR = 201,
     SDES = 202,
@@ -10,6 +10,10 @@ export declare enum PacketType {
     XR = 207
 }
 /**
+ * ```ts
+ * import { isRtcp } from 'rtp.js';
+ * ```
+ *
  * Inspect the given buffer and return a boolean indicating whether it could be
  * a valid RTCP packet or not.
  *
@@ -50,7 +54,7 @@ export declare abstract class RtcpPacket {
      *
      * @param PacketType.
      */
-    protected constructor(packetType: PacketType);
+    protected constructor(packetType: RtcpPacketType);
     /**
      * @ignore
      */
@@ -78,7 +82,7 @@ export declare abstract class RtcpPacket {
     /**
      * Get the RTCP packet type.
      */
-    getPacketType(): PacketType;
+    getPacketType(): RtcpPacketType;
     /**
      * Get the RTCP packet length.
      */
