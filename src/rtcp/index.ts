@@ -140,7 +140,7 @@ export abstract class RtcpPacket
 	}
 
 	/**
-	 * Set the padding flag.
+	 * Set the padding (in bytes) after the packet payload.
 	 */
 	setPadding(padding: number): void
 	{
