@@ -219,11 +219,11 @@ export class ReceiverReport
 
 export class ReceiverReportPacket extends RtcpPacket
 {
-	// Receiver Reports.
-	private reports: ReceiverReport[] = [];
-
 	// Packet Type.
 	static packetType = PacketType.RR;
+
+	// Receiver Reports.
+	private reports: ReceiverReport[] = [];
 
 	/**
 	 * @param buffer - If given it will be parsed. Otherwise an empty RTP packet
