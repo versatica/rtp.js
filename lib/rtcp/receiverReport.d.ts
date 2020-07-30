@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { RtcpPacket, PacketType } from './';
+import { RtcpPacket, RtcpPacketType } from './';
 /**
  * ```ts
  * import { ReceiverReport } from 'rtp.js';
@@ -46,7 +46,7 @@ export declare class ReceiverReport {
  * modify its fields.
  */
 export declare class ReceiverReportPacket extends RtcpPacket {
-    static packetType: PacketType;
+    static packetType: RtcpPacketType;
     private reports;
     /**
      * @param buffer - If given it will be parsed. Otherwise an empty RTP packet

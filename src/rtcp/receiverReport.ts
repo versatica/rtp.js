@@ -1,4 +1,4 @@
-import { isRtcp, RtcpPacket, PacketType } from './';
+import { isRtcp, RtcpPacket, RtcpPacketType } from './';
 
 /**
         0                   1                   2                   3
@@ -235,7 +235,7 @@ export class ReceiverReport
 export class ReceiverReportPacket extends RtcpPacket
 {
 	// Packet Type.
-	static packetType = PacketType.RR;
+	static packetType = RtcpPacketType.RR;
 
 	// Receiver Reports.
 	private reports: ReceiverReport[] = [];
