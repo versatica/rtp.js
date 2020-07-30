@@ -105,4 +105,4 @@ export declare abstract class RtcpPacket {
      */
     private setPaddingBit;
 }
-//# sourceMappingURL=packet.d.ts.map
+//# sourceMappingURL=index.d.ts.map

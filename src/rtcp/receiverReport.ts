@@ -1,4 +1,4 @@
-import { isRtcp, RtcpPacket, PacketType } from './packet';
+import { isRtcp, RtcpPacket, PacketType } from './';
 
 /**
         0                   1                   2                   3

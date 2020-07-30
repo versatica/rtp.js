@@ -1,5 +1,5 @@
 import { ReceiverReport, ReceiverReportPacket } from '../../rtcp/receiverReport';
-import { isRtcp } from '../../rtcp/packet';
+import { isRtcp } from '../../rtcp';
 
 const ssrc = 26422708;
 const fractionLost = 80;

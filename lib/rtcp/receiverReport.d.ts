@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { RtcpPacket, PacketType } from './packet';
+import { RtcpPacket, PacketType } from './';
 /**
  * ```ts
  * import { ReceiverReport } from 'rtcp/receiverReport.js';
