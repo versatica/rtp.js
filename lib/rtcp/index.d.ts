@@ -1,4 +1,9 @@
 /// <reference types="node" />
+/**
+ * ```ts
+ * import { RtcpPacketType } from 'rtp.js';
+ * ```
+ */
 export declare enum RtcpPacketType {
     SR = 200,
     RR = 201,
@@ -29,8 +34,7 @@ export declare function isRtcp(buffer: Buffer): boolean;
  * import { RtcpPacket } from 'rtp.js';
  * ```
  *
- * Representation of a base RTCP packet with methods to access and modify its
- * fields.
+ * Representation of a base RTCP packet.
  */
 export declare abstract class RtcpPacket {
     protected buffer: Buffer;
@@ -72,7 +76,7 @@ export declare abstract class RtcpPacket {
      */
     getPadding(): number;
     /**
-     * Set the padding flag.
+     * Set the padding (in bytes) after the packet payload.
      */
     setPadding(padding: number): void;
     /**

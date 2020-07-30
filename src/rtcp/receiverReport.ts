@@ -91,7 +91,7 @@ export class ReceiverReport
 		return this.buffer;
 	}
 
-	/*
+	/**
 	 * Get receiver SSRC.
 	 */
 	getSsrc(): number
@@ -99,7 +99,7 @@ export class ReceiverReport
 		return this.buffer.readUInt32BE(0);
 	}
 
-	/*
+	/**
 	 * Set receiver SSRC.
 	 */
 	setSsrc(ssrc: number): void
@@ -107,7 +107,7 @@ export class ReceiverReport
 		this.buffer.writeUInt32BE(ssrc, 0);
 	}
 
-	/*
+	/**
 	 * Get fraction lost.
 	 */
 	getFractionLost(): number
@@ -115,7 +115,7 @@ export class ReceiverReport
 		return this.buffer.readUInt8(4);
 	}
 
-	/*
+	/**
 	 * Set fraction lost.
 	 */
 	setFractionLost(fractionLost: number): void
@@ -123,7 +123,7 @@ export class ReceiverReport
 		this.buffer.writeUInt8(fractionLost, 4);
 	}
 
-	/*
+	/**
 	 * Get total lost.
 	 */
 	getTotalLost(): number
@@ -145,7 +145,7 @@ export class ReceiverReport
 		return -value;
 	}
 
-	/*
+	/**
 	 * Set total lost.
 	 */
 	setTotalLost(totalLost: number): void
@@ -159,7 +159,7 @@ export class ReceiverReport
 		this.buffer.writeUIntBE(value, 5, 3);
 	}
 
-	/*
+	/**
 	 * Get highest RTP sequence number.
 	 */
 	getHighestSeqNumber(): number
@@ -167,7 +167,7 @@ export class ReceiverReport
 		return this.buffer.readUIntBE(8, 4);
 	}
 
-	/*
+	/**
 	 * Set highest RTP sequence number.
 	 */
 	setHighestSeqNumber(lastSeq: number): void
@@ -175,7 +175,7 @@ export class ReceiverReport
 		this.buffer.writeUIntBE(lastSeq, 8, 4);
 	}
 
-	/*
+	/**
 	 * Get interarrival jitter.
 	 */
 	getJitter(): number
@@ -183,7 +183,7 @@ export class ReceiverReport
 		return this.buffer.readUIntBE(12, 4);
 	}
 
-	/*
+	/**
 	 * Set interarrival jitter.
 	 */
 	setJitter(jitter: number)
@@ -191,7 +191,7 @@ export class ReceiverReport
 		this.buffer.writeUIntBE(jitter, 12, 4);
 	}
 
-	/*
+	/**
 	 * Set last Sender Report timestamp.
 	 */
 	getLastSRTimestamp(): number
@@ -199,7 +199,7 @@ export class ReceiverReport
 		return this.buffer.readUIntBE(16, 4);
 	}
 
-	/*
+	/**
 	 * Set last Sender Report timestamp.
 	 */
 	setLastSRTimestamp(lsr: number): void
@@ -207,7 +207,7 @@ export class ReceiverReport
 		this.buffer.writeUIntBE(lsr, 16, 4);
 	}
 
-	/*
+	/**
 	 * Get delay since last Sender Report.
 	 */
 	getDelaySinceLastSR(): number
@@ -215,7 +215,7 @@ export class ReceiverReport
 		return this.buffer.readUIntBE(20, 4);
 	}
 
-	/*
+	/**
 	 * Set delay since last Sender Report.
 	 */
 	setDelaySinceLastSR(dlsr: number): void
@@ -318,7 +318,7 @@ export class ReceiverReportPacket extends RtcpPacket
 		return this.buffer;
 	}
 
-	/*
+	/**
 	 * Get sender SSRC.
 	 */
 	getSsrc(): number
@@ -326,7 +326,7 @@ export class ReceiverReportPacket extends RtcpPacket
 		return this.buffer.readUInt32BE(4);
 	}
 
-	/*
+	/**
 	 * Set sender SSRC.
 	 */
 	setSsrc(ssrc: number)
@@ -334,7 +334,7 @@ export class ReceiverReportPacket extends RtcpPacket
 		this.buffer.writeUInt32BE(ssrc, 4);
 	}
 
-	/*
+	/**
 	 * Get Receiver Reports.
 	 */
 	getReports(): ReceiverReport[]
@@ -342,7 +342,7 @@ export class ReceiverReportPacket extends RtcpPacket
 		return this.reports;
 	}
 
-	/*
+	/**
 	 * Add a Receiver Report.
 	 */
 	addReport(report: ReceiverReport): void

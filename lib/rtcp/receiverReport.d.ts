@@ -5,7 +5,7 @@ import { RtcpPacket, RtcpPacketType } from './';
  * import { ReceiverReport } from 'rtp.js';
  * ```
  *
- * Representation of a RTCP Receiver Report with methods to access and modify its fields.
+ * Representation of a RTCP Receiver Report.
  */
 export declare class ReceiverReport {
     private buffer;
@@ -22,19 +22,61 @@ export declare class ReceiverReport {
      * Get the internal buffer containing the RTCP Receiver Report binary.
      */
     getBuffer(): Buffer;
+    /**
+     * Get receiver SSRC.
+     */
     getSsrc(): number;
+    /**
+     * Set receiver SSRC.
+     */
     setSsrc(ssrc: number): void;
+    /**
+     * Get fraction lost.
+     */
     getFractionLost(): number;
+    /**
+     * Set fraction lost.
+     */
     setFractionLost(fractionLost: number): void;
+    /**
+     * Get total lost.
+     */
     getTotalLost(): number;
+    /**
+     * Set total lost.
+     */
     setTotalLost(totalLost: number): void;
+    /**
+     * Get highest RTP sequence number.
+     */
     getHighestSeqNumber(): number;
+    /**
+     * Set highest RTP sequence number.
+     */
     setHighestSeqNumber(lastSeq: number): void;
+    /**
+     * Get interarrival jitter.
+     */
     getJitter(): number;
+    /**
+     * Set interarrival jitter.
+     */
     setJitter(jitter: number): void;
+    /**
+     * Set last Sender Report timestamp.
+     */
     getLastSRTimestamp(): number;
+    /**
+     * Set last Sender Report timestamp.
+     */
     setLastSRTimestamp(lsr: number): void;
+    /**
+     * Get delay since last Sender Report.
+     */
     getDelaySinceLastSR(): number;
+    /**
+     * Set delay since last Sender Report.
+     */
     setDelaySinceLastSR(dlsr: number): void;
 }
 /**
@@ -42,8 +84,8 @@ export declare class ReceiverReport {
  * import { ReceiverReportPacket } from 'rtp.js';
  * ```
  *
- * Representation of a RTCP Receiver Report packet with methods to access and
- * modify its fields.
+ * Representation of a RTCP Receiver Report packet. It may contain various
+ * [[ReceiverReport]] instances.
  */
 export declare class ReceiverReportPacket extends RtcpPacket {
     static packetType: RtcpPacketType;
@@ -61,9 +103,21 @@ export declare class ReceiverReportPacket extends RtcpPacket {
      * Get the internal buffer containing the serialized RTP binary packet.
      */
     getBuffer(): Buffer;
+    /**
+     * Get sender SSRC.
+     */
     getSsrc(): number;
+    /**
+     * Set sender SSRC.
+     */
     setSsrc(ssrc: number): void;
+    /**
+     * Get Receiver Reports.
+     */
     getReports(): ReceiverReport[];
+    /**
+     * Add a Receiver Report.
+     */
     addReport(report: ReceiverReport): void;
     /**
      * Apply pending changes into the packet and serialize it into a new internal
