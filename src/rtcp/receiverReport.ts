@@ -230,7 +230,7 @@ export class ReceiverReport
  * ```
  *
  * Representation of a RTCP Receiver Report packet. It may contain various
- * [[ReceiverReport]] instances into it.
+ * [[ReceiverReport]] instances.
  */
 export class ReceiverReportPacket extends RtcpPacket
 {
