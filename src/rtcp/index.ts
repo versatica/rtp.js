@@ -24,6 +24,10 @@ export enum PacketType
 }
 
 /**
+ * ```ts
+ * import { isRtcp } from 'rtp.js';
+ * ```
+ *
  * Inspect the given buffer and return a boolean indicating whether it could be
  * a valid RTCP packet or not.
  *
