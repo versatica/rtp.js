@@ -51,6 +51,10 @@ export function isRtcp(buffer: Buffer): boolean
 	);
 }
 
+/**
+ * Representation of a base RTCP packet with methods to access and modify its
+ * fields.
+ */
 export abstract class RtcpPacket
 {
 	// Buffer.

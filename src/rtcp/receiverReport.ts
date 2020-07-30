@@ -33,6 +33,13 @@ const REPORT_LENGTH = 24;
 /** @ignore */
 const FIXED_HEADER_LENGTH = 4 + 4; // Common RTCP header length + 4.
 
+/**
+ * ```ts
+ * import { ReceiverReport } from 'rtcp/receiverReport.js';
+ * ```
+ *
+ * Representation of a RTCP Receiver Report with methods to access and modify its fields.
+ */
 export class ReceiverReport
 {
 	// Buffer.
@@ -217,6 +224,14 @@ export class ReceiverReport
 	}
 }
 
+/**
+ * ```ts
+ * import { ReceiverReportPacket } from 'rtcp/receiverReport.js';
+ * ```
+ *
+ * Representation of a RTCP Receiver Report packet with methods to access and
+ * modify its fields.
+ */
 export class ReceiverReportPacket extends RtcpPacket
 {
 	// Packet Type.

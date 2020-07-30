@@ -20,6 +20,10 @@ export declare enum PacketType {
  * ```
  */
 export declare function isRtcp(buffer: Buffer): boolean;
+/**
+ * Representation of a base RTCP packet with methods to access and modify its
+ * fields.
+ */
 export declare abstract class RtcpPacket {
     protected buffer: Buffer;
     private packetType;

@@ -1,5 +1,12 @@
 /// <reference types="node" />
 import { RtcpPacket, PacketType } from './packet';
+/**
+ * ```ts
+ * import { ReceiverReport } from 'rtcp/receiverReport.js';
+ * ```
+ *
+ * Representation of a RTCP Receiver Report with methods to access and modify its fields.
+ */
 export declare class ReceiverReport {
     private buffer;
     /**
@@ -30,9 +37,17 @@ export declare class ReceiverReport {
     getDelaySinceLastSR(): number;
     setDelaySinceLastSR(dlsr: number): void;
 }
+/**
+ * ```ts
+ * import { ReceiverReportPacket } from 'rtcp/receiverReport.js';
+ * ```
+ *
+ * Representation of a RTCP Receiver Report packet with methods to access and
+ * modify its fields.
+ */
 export declare class ReceiverReportPacket extends RtcpPacket {
-    private reports;
     static packetType: PacketType;
+    private reports;
     /**
      * @param buffer - If given it will be parsed. Otherwise an empty RTP packet
      *   will be created.
