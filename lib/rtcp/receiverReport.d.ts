@@ -1,5 +1,7 @@
 /// <reference types="node" />
 import { RtcpPacket, RtcpPacketType } from './';
+/** @ignore */
+export declare const REPORT_LENGTH = 24;
 /**
  * ```ts
  * import { ReceiverReport } from 'rtp.js';
