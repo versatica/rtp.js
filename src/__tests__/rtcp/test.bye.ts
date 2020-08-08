@@ -17,7 +17,7 @@ const buffer = Buffer.from(
 	]
 );
 
-describe('parse RTCP Bye packet', () =>
+describe('parse RTCP BYE packet', () =>
 {
 	test('buffer is RTCP', () =>
 	{
