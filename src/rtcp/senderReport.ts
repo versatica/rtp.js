@@ -270,7 +270,7 @@ export class SenderReportPacket extends RtcpPacket
 		// Compute required buffer length.
 		const length = FIXED_HEADER_LENGTH + (REPORT_LENGTH * this.reports.length);
 		const ssrc = this.getSsrc();
-		const ntpSec = this.getNtpSeconds();
+		const ntpSeconds = this.getNtpSeconds();
 		const ntpFraction = this.getNtpFraction();
 		const rtpTimestamp = this.getRtpTimestamp();
 		const packetCount = this.getPacketCount();
@@ -280,7 +280,7 @@ export class SenderReportPacket extends RtcpPacket
 
 		this.setCount(this.reports.length);
 		this.setSsrc(ssrc);
-		this.setNtpSeconds(ntpSec);
+		this.setNtpSeconds(ntpSeconds);
 		this.setNtpFraction(ntpFraction);
 		this.setRtpTimestamp(rtpTimestamp);
 		this.setPacketCount(packetCount);

@@ -4,7 +4,7 @@ import { isRtcp } from '../../rtcp';
 
 // Sender info.
 const ssrc = 0x5d931534;
-const ntpSec = 3711615412;
+const ntpSeconds = 3711615412;
 const ntpFraction = 1985245553;
 const rtpTimestamp = 577280;
 const packetCount = 3608;
@@ -139,7 +139,7 @@ describe('create RTCP Sender Report packet', () =>
 
 		packet.setPadding(padding);
 		packet.setSsrc(ssrc);
-		packet.setNtpSeconds(ntpSec);
+		packet.setNtpSeconds(ntpSeconds);
 		packet.setNtpFraction(ntpFraction);
 		packet.setRtpTimestamp(rtpTimestamp);
 		packet.setPacketCount(packetCount);
