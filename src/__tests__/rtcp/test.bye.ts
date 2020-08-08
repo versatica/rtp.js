@@ -43,7 +43,7 @@ describe('parse RTCP Bye packet', () =>
 		const padding = 4;
 		const bufferWithPadding = Buffer.from(
 			[
-				0xa2, 0xcb, 0x00, 0x07, // Padding, Type: 203 (Bye), Count: 2, length: 6
+				0xa2, 0xcb, 0x00, 0x07, // Padding, Type: 203 (Bye), Count: 2, length: 7
 				0x62, 0x42, 0x76, 0xe0, // SSRC: 0x624276e0
 				0x26, 0x24, 0x67, 0x0e, // SSRC: 0x2624670e
 				0x0e, 0x48, 0x61, 0x73, // Length: 14, Text: "Hasta la vista"
