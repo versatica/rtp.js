@@ -155,7 +155,7 @@ export class ByePacket extends RtcpPacket
 	/**
 	 * Get reason.
 	 */
-	getReason(): string
+	getReason(): string | undefined
 	{
 		return this.reason;
 	}

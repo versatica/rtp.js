@@ -9,8 +9,8 @@ import { RtcpPacket, RtcpPacketType } from './';
  */
 export declare class ByePacket extends RtcpPacket {
     static packetType: RtcpPacketType;
-    private ssrcs;
-    private reason;
+    private readonly ssrcs;
+    private reason?;
     /**
      * @param buffer - If given it will be parsed. Otherwise an empty RTP packet
      *   will be created.
@@ -35,11 +35,11 @@ export declare class ByePacket extends RtcpPacket {
     /**
      * Get reason.
      */
-    getReason(): string;
+    getReason(): string | undefined;
     /**
      * Set reason.
      */
-    setReason(reason: string): void;
+    setReason(reason?: string): void;
     /**
      * Apply pending changes into the packet and serialize it into a new internal
      * buffer (the one that [[getBuffer]] will later return).
