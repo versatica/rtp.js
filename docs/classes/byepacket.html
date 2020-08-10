@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ReceiverReportPacket | rtp.js - v0.0.1</title>
+	<title>ByePacket | rtp.js - v0.0.1</title>
 	<meta name="description" content="Documentation for rtp.js - v0.0.1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="receiverreportpacket.html">ReceiverReportPacket</a>
+					<a href="byepacket.html">ByePacket</a>
 				</li>
 			</ul>
-			<h1>Class ReceiverReportPacket</h1>
+			<h1>Class ByePacket</h1>
 		</div>
 	</div>
 </header>
@@ -67,10 +67,9 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<pre><code class="language-ts"><span class="hljs-keyword">import</span> { ReceiverReportPacket } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;rtp.js&#x27;</span>;</code></pre>
+						<pre><code class="language-ts"><span class="hljs-keyword">import</span> { ByePacket } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;rtp.js&#x27;</span>;</code></pre>
 					</div>
-					<p>Representation of a RTCP Receiver Report packet. It may contain various
-					<a href="receiverreport.html">ReceiverReport</a> instances.</p>
+					<p>Representation of a RTCP Bye packet.</p>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
@@ -80,7 +79,7 @@
 						<a href="rtcppacket.html" class="tsd-signature-type">RtcpPacket</a>
 						<ul class="tsd-hierarchy">
 							<li>
-								<span class="target">ReceiverReportPacket</span>
+								<span class="target">ByePacket</span>
 							</li>
 						</ul>
 					</li>
@@ -93,30 +92,30 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="receiverreportpacket.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="byepacket.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="receiverreportpacket.html#packettype" class="tsd-kind-icon">packet<wbr>Type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="byepacket.html#packettype" class="tsd-kind-icon">packet<wbr>Type</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="receiverreportpacket.html#addreport" class="tsd-kind-icon">add<wbr>Report</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="receiverreportpacket.html#getbuffer" class="tsd-kind-icon">get<wbr>Buffer</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="receiverreportpacket.html#getcount" class="tsd-kind-icon">get<wbr>Count</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="receiverreportpacket.html#getlength" class="tsd-kind-icon">get<wbr>Length</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="receiverreportpacket.html#getpackettype" class="tsd-kind-icon">get<wbr>Packet<wbr>Type</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="receiverreportpacket.html#getpadding" class="tsd-kind-icon">get<wbr>Padding</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="receiverreportpacket.html#getreports" class="tsd-kind-icon">get<wbr>Reports</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="receiverreportpacket.html#getssrc" class="tsd-kind-icon">get<wbr>Ssrc</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="receiverreportpacket.html#getversion" class="tsd-kind-icon">get<wbr>Version</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="receiverreportpacket.html#serialize" class="tsd-kind-icon">serialize</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="receiverreportpacket.html#setpadding" class="tsd-kind-icon">set<wbr>Padding</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="receiverreportpacket.html#setssrc" class="tsd-kind-icon">set<wbr>Ssrc</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="byepacket.html#addssrc" class="tsd-kind-icon">add<wbr>Ssrc</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="byepacket.html#getbuffer" class="tsd-kind-icon">get<wbr>Buffer</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="byepacket.html#getcount" class="tsd-kind-icon">get<wbr>Count</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="byepacket.html#getlength" class="tsd-kind-icon">get<wbr>Length</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="byepacket.html#getpackettype" class="tsd-kind-icon">get<wbr>Packet<wbr>Type</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="byepacket.html#getpadding" class="tsd-kind-icon">get<wbr>Padding</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="byepacket.html#getreason" class="tsd-kind-icon">get<wbr>Reason</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="byepacket.html#getssrcs" class="tsd-kind-icon">get<wbr>Ssrcs</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="byepacket.html#getversion" class="tsd-kind-icon">get<wbr>Version</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="byepacket.html#serialize" class="tsd-kind-icon">serialize</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="byepacket.html#setpadding" class="tsd-kind-icon">set<wbr>Padding</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="byepacket.html#setreason" class="tsd-kind-icon">set<wbr>Reason</a></li>
 							</ul>
 						</section>
 					</div>
@@ -128,14 +127,14 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Receiver<wbr>Report<wbr>Packet<span class="tsd-signature-symbol">(</span>buffer<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="receiverreportpacket.html" class="tsd-signature-type">ReceiverReportPacket</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Bye<wbr>Packet<span class="tsd-signature-symbol">(</span>buffer<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="byepacket.html" class="tsd-signature-type">ByePacket</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides RtcpPacket.__constructor</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/receiverReport.ts#L242">rtcp/receiverReport.ts:242</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/bye.ts#L39">rtcp/bye.ts:39</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -152,7 +151,7 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="receiverreportpacket.html" class="tsd-signature-type">ReceiverReportPacket</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="byepacket.html" class="tsd-signature-type">ByePacket</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -162,10 +161,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
 					<a name="packettype" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> packet<wbr>Type</h3>
-					<div class="tsd-signature tsd-kind-icon">packet<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="../enums/rtcppackettype.html" class="tsd-signature-type">RtcpPacketType</a><span class="tsd-signature-symbol"> = RtcpPacketType.RR</span></div>
+					<div class="tsd-signature tsd-kind-icon">packet<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="../enums/rtcppackettype.html" class="tsd-signature-type">RtcpPacketType</a><span class="tsd-signature-symbol"> = RtcpPacketType.BYE</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/receiverReport.ts#L239">rtcp/receiverReport.ts:239</a></li>
+							<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/bye.ts#L33">rtcp/bye.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -173,27 +172,27 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="addreport" class="tsd-anchor"></a>
-					<h3>add<wbr>Report</h3>
+					<a name="addssrc" class="tsd-anchor"></a>
+					<h3>add<wbr>Ssrc</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">add<wbr>Report<span class="tsd-signature-symbol">(</span>report<span class="tsd-signature-symbol">: </span><a href="receiverreport.html" class="tsd-signature-type">ReceiverReport</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Ssrc<span class="tsd-signature-symbol">(</span>ssrc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/receiverReport.ts#L350">rtcp/receiverReport.ts:350</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/bye.ts#L149">rtcp/bye.ts:149</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Add a Receiver Report.</p>
+									<p>Add a SSRC.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>report: <a href="receiverreport.html" class="tsd-signature-type">ReceiverReport</a></h5>
+									<h5>ssrc: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -211,7 +210,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="rtcppacket.html">RtcpPacket</a>.<a href="rtcppacket.html#getbuffer">getBuffer</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/receiverReport.ts#L313">rtcp/receiverReport.ts:313</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/bye.ts#L128">rtcp/bye.ts:128</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -316,46 +315,46 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getreports" class="tsd-anchor"></a>
-					<h3>get<wbr>Reports</h3>
+					<a name="getreason" class="tsd-anchor"></a>
+					<h3>get<wbr>Reason</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Reports<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="receiverreport.html" class="tsd-signature-type">ReceiverReport</a><span class="tsd-signature-symbol">[]</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Reason<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/receiverReport.ts#L342">rtcp/receiverReport.ts:342</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/bye.ts#L158">rtcp/bye.ts:158</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Get Receiver Reports.</p>
+									<p>Get reason.</p>
 								</div>
 							</div>
-							<h4 class="tsd-returns-title">Returns <a href="receiverreport.html" class="tsd-signature-type">ReceiverReport</a><span class="tsd-signature-symbol">[]</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getssrc" class="tsd-anchor"></a>
-					<h3>get<wbr>Ssrc</h3>
+					<a name="getssrcs" class="tsd-anchor"></a>
+					<h3>get<wbr>Ssrcs</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Ssrc<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Ssrcs<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/receiverReport.ts#L326">rtcp/receiverReport.ts:326</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/bye.ts#L141">rtcp/bye.ts:141</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Get sender SSRC.</p>
+									<p>Get SSRCs.</p>
 								</div>
 							</div>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -393,19 +392,19 @@
 							<aside class="tsd-sources">
 								<p>Overrides RtcpPacket.serialize</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/receiverReport.ts#L367">rtcp/receiverReport.ts:367</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/bye.ts#L183">rtcp/bye.ts:183</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Apply pending changes into the packet and serialize it into a new internal
-									buffer (the one that <a href="receiverreportpacket.html#getbuffer">getBuffer</a> will later return).</p>
+									buffer (the one that <a href="byepacket.html#getbuffer">getBuffer</a> will later return).</p>
 								</div>
 								<p><strong>NOTE:</strong> In most cases there is no need to use this method. It must be
 									called only if the application retrieves information from the packet (by
-									calling <a href="receiverreportpacket.html#getbuffer">getBuffer</a>, <a href="receiverreportpacket.html#getreports">getReports</a>, etc) and modifies the obtained
+									calling <a href="byepacket.html#getbuffer">getBuffer</a>, <a href="byepacket.html#getssrcs">getSsrcs</a>, etc) and modifies the obtained
 									buffers in place. However, it&#39;s recommended to use the existing setter
-								methods instead (<a href="receiverreportpacket.html#addreport">addReport</a>, etc).</p>
+								methods instead (<a href="byepacket.html#addssrc">addSsrc</a>, etc).</p>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
@@ -441,27 +440,27 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="setssrc" class="tsd-anchor"></a>
-					<h3>set<wbr>Ssrc</h3>
+					<a name="setreason" class="tsd-anchor"></a>
+					<h3>set<wbr>Reason</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Ssrc<span class="tsd-signature-symbol">(</span>ssrc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Reason<span class="tsd-signature-symbol">(</span>reason<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/receiverReport.ts#L334">rtcp/receiverReport.ts:334</a></li>
+									<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/e556b59/src/rtcp/bye.ts#L166">rtcp/bye.ts:166</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Set sender SSRC.</p>
+									<p>Set reason.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>ssrc: <span class="tsd-signature-type">number</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> reason: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -483,63 +482,63 @@
 					<li class=" tsd-kind-enum">
 						<a href="../enums/rtcppackettype.html" class="tsd-kind-icon">Rtcp<wbr>Packet<wbr>Type</a>
 					</li>
-					<li class=" tsd-kind-class">
-						<a href="byepacket.html" class="tsd-kind-icon">Bye<wbr>Packet</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="receiverreport.html" class="tsd-kind-icon">Receiver<wbr>Report</a>
-					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class">
-						<a href="receiverreportpacket.html" class="tsd-kind-icon">Receiver<wbr>Report<wbr>Packet</a>
+						<a href="byepacket.html" class="tsd-kind-icon">Bye<wbr>Packet</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-								<a href="receiverreportpacket.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="byepacket.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
-								<a href="receiverreportpacket.html#packettype" class="tsd-kind-icon">packet<wbr>Type</a>
+								<a href="byepacket.html#packettype" class="tsd-kind-icon">packet<wbr>Type</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="receiverreportpacket.html#addreport" class="tsd-kind-icon">add<wbr>Report</a>
+								<a href="byepacket.html#addssrc" class="tsd-kind-icon">add<wbr>Ssrc</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-								<a href="receiverreportpacket.html#getbuffer" class="tsd-kind-icon">get<wbr>Buffer</a>
+								<a href="byepacket.html#getbuffer" class="tsd-kind-icon">get<wbr>Buffer</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="receiverreportpacket.html#getcount" class="tsd-kind-icon">get<wbr>Count</a>
+								<a href="byepacket.html#getcount" class="tsd-kind-icon">get<wbr>Count</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="receiverreportpacket.html#getlength" class="tsd-kind-icon">get<wbr>Length</a>
+								<a href="byepacket.html#getlength" class="tsd-kind-icon">get<wbr>Length</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="receiverreportpacket.html#getpackettype" class="tsd-kind-icon">get<wbr>Packet<wbr>Type</a>
+								<a href="byepacket.html#getpackettype" class="tsd-kind-icon">get<wbr>Packet<wbr>Type</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="receiverreportpacket.html#getpadding" class="tsd-kind-icon">get<wbr>Padding</a>
+								<a href="byepacket.html#getpadding" class="tsd-kind-icon">get<wbr>Padding</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="receiverreportpacket.html#getreports" class="tsd-kind-icon">get<wbr>Reports</a>
+								<a href="byepacket.html#getreason" class="tsd-kind-icon">get<wbr>Reason</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="receiverreportpacket.html#getssrc" class="tsd-kind-icon">get<wbr>Ssrc</a>
+								<a href="byepacket.html#getssrcs" class="tsd-kind-icon">get<wbr>Ssrcs</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="receiverreportpacket.html#getversion" class="tsd-kind-icon">get<wbr>Version</a>
+								<a href="byepacket.html#getversion" class="tsd-kind-icon">get<wbr>Version</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-								<a href="receiverreportpacket.html#serialize" class="tsd-kind-icon">serialize</a>
+								<a href="byepacket.html#serialize" class="tsd-kind-icon">serialize</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="receiverreportpacket.html#setpadding" class="tsd-kind-icon">set<wbr>Padding</a>
+								<a href="byepacket.html#setpadding" class="tsd-kind-icon">set<wbr>Padding</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="receiverreportpacket.html#setssrc" class="tsd-kind-icon">set<wbr>Ssrc</a>
+								<a href="byepacket.html#setreason" class="tsd-kind-icon">set<wbr>Reason</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-class">
+						<a href="receiverreport.html" class="tsd-kind-icon">Receiver<wbr>Report</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="receiverreportpacket.html" class="tsd-kind-icon">Receiver<wbr>Report<wbr>Packet</a>
+					</li>
 					<li class=" tsd-kind-class">
 						<a href="rtcppacket.html" class="tsd-kind-icon">Rtcp<wbr>Packet</a>
 					</li>
