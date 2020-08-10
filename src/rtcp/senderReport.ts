@@ -56,7 +56,7 @@ export class SenderReportPacket extends RtcpPacket
 	static packetType = RtcpPacketType.SR;
 
 	// Receiver Reports.
-	private reports: ReceiverReport[] = [];
+	private readonly reports: ReceiverReport[] = [];
 
 	/**
 	 * @param buffer - If given it will be parsed. Otherwise an empty RTP packet
