@@ -11,7 +11,7 @@ import { ReceiverReport } from './receiverReport';
  */
 export declare class SenderReportPacket extends RtcpPacket {
     static packetType: RtcpPacketType;
-    private reports;
+    private readonly reports;
     /**
      * @param buffer - If given it will be parsed. Otherwise an empty RTP packet
      *   will be created.
