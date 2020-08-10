@@ -163,7 +163,7 @@ export class ByePacket extends RtcpPacket
 	/**
 	 * Set reason.
 	 */
-	setReason(reason: string): void
+	setReason(reason?: string): void
 	{
 		this.reason = reason;
 		this.serializationNeeded = true;
