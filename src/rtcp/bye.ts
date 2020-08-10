@@ -33,7 +33,7 @@ export class ByePacket extends RtcpPacket
 	static packetType = RtcpPacketType.BYE;
 
 	// SSRC/CSRC array.
-	private ssrcs: number[] = [];
+	private readonly ssrcs: number[] = [];
 
 	// Termination season.
 	private reason: string = '';
