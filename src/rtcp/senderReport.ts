@@ -1,12 +1,23 @@
 import { isRtcp, RtcpPacket, RtcpPacketType } from './';
+import { ReceiverReport, REPORT_LENGTH } from './receiverReport';
 
 /**
         0                   1                   2                   3
         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-header |V=2|P|    RC   |   PT=RR=201   |             length            |
+header |V=2|P|    RC   |   PT=SR=200   |             length            |
        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-       |                     SSRC of packet sender                     |
+       |                         SSRC of sender                        |
+       +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+sender |              NTP timestamp, most significant word             |
+info   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |             NTP timestamp, least significant word             |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |                         RTP timestamp                         |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |                     sender's packet count                     |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |                      sender's octet count                     |
        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 report |                 SSRC_1 (SSRC of first source)                 |
 block  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -29,217 +40,23 @@ block  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
 /** @ignore */
-const FIXED_HEADER_LENGTH = 4 + 4; // Common RTCP header length + 4.
-
-/** @ignore */
-export const REPORT_LENGTH = 24;
+const FIXED_HEADER_LENGTH = 4 + 24; // Common RTCP header length + 24.
 
 /**
  * ```ts
- * import { ReceiverReport } from 'rtp.js';
+ * import { SenderReportPacket } from 'rtp.js';
  * ```
  *
- * Representation of a RTCP Receiver Report.
- */
-export class ReceiverReport
-{
-	// Buffer.
-	private buffer: Buffer;
-
-	/**
-	 * @param buffer - If given it will be parsed. Otherwise an empty RTCP Receiver
-	 *   Report will be created.
-	 */
-	constructor(buffer?: Buffer)
-	{
-		// If no buffer is given, create an empty one.
-		if (!buffer)
-		{
-			this.buffer = Buffer.alloc(REPORT_LENGTH);
-
-			return;
-		}
-
-		if (buffer.length < REPORT_LENGTH)
-		{
-			throw new TypeError('buffer is too small');
-		}
-
-		this.buffer = buffer.slice(undefined, REPORT_LENGTH);
-	}
-
-	/**
-	 * @ignore
-	 */
-	dump(): any
-	{
-		return {
-			ssrc         : this.getSsrc(),
-			fractionLost : this.getFractionLost(),
-			totaLlost    : this.getTotalLost(),
-			lastSeq      : this.getHighestSeqNumber(),
-			jitter       : this.getJitter(),
-			lsr          : this.getLastSRTimestamp(),
-			dlsr         : this.getDelaySinceLastSR()
-		};
-	}
-
-	/**
-	 * Get the internal buffer containing the RTCP Receiver Report binary.
-	 */
-	getBuffer(): Buffer
-	{
-		return this.buffer;
-	}
-
-	/**
-	 * Get receiver SSRC.
-	 */
-	getSsrc(): number
-	{
-		return this.buffer.readUInt32BE(0);
-	}
-
-	/**
-	 * Set receiver SSRC.
-	 */
-	setSsrc(ssrc: number): void
-	{
-		this.buffer.writeUInt32BE(ssrc, 0);
-	}
-
-	/**
-	 * Get fraction lost.
-	 */
-	getFractionLost(): number
-	{
-		return this.buffer.readUInt8(4);
-	}
-
-	/**
-	 * Set fraction lost.
-	 */
-	setFractionLost(fractionLost: number): void
-	{
-		this.buffer.writeUInt8(fractionLost, 4);
-	}
-
-	/**
-	 * Get total lost.
-	 */
-	getTotalLost(): number
-	{
-		let value = this.buffer.readUIntBE(5, 3);
-
-		// Possitive value.
-		if (((value >> 23) & 1) == 0)
-		{
-			return value;
-		}
-
-		// Negative value.
-		if (value != 0x0800000)
-		{
-			value &= ~(1 << 23);
-		}
-
-		return -value;
-	}
-
-	/**
-	 * Set total lost.
-	 */
-	setTotalLost(totalLost: number): void
-	{
-		// Get the limit value for possitive and negative totalLost.
-		const clamp = (totalLost >= 0) ? totalLost > 0x07FFFFF ? 0x07FFFFF : totalLost
-			: -totalLost > 0x0800000 ? 0x0800000 : -totalLost;
-
-		const value = (totalLost >= 0) ? (clamp & 0x07FFFFF) : (clamp | 0x0800000);
-
-		this.buffer.writeUIntBE(value, 5, 3);
-	}
-
-	/**
-	 * Get highest RTP sequence number.
-	 */
-	getHighestSeqNumber(): number
-	{
-		return this.buffer.readUIntBE(8, 4);
-	}
-
-	/**
-	 * Set highest RTP sequence number.
-	 */
-	setHighestSeqNumber(lastSeq: number): void
-	{
-		this.buffer.writeUIntBE(lastSeq, 8, 4);
-	}
-
-	/**
-	 * Get interarrival jitter.
-	 */
-	getJitter(): number
-	{
-		return this.buffer.readUIntBE(12, 4);
-	}
-
-	/**
-	 * Set interarrival jitter.
-	 */
-	setJitter(jitter: number)
-	{
-		this.buffer.writeUIntBE(jitter, 12, 4);
-	}
-
-	/**
-	 * Set last Sender Report timestamp.
-	 */
-	getLastSRTimestamp(): number
-	{
-		return this.buffer.readUIntBE(16, 4);
-	}
-
-	/**
-	 * Set last Sender Report timestamp.
-	 */
-	setLastSRTimestamp(lsr: number): void
-	{
-		this.buffer.writeUIntBE(lsr, 16, 4);
-	}
-
-	/**
-	 * Get delay since last Sender Report.
-	 */
-	getDelaySinceLastSR(): number
-	{
-		return this.buffer.readUIntBE(20, 4);
-	}
-
-	/**
-	 * Set delay since last Sender Report.
-	 */
-	setDelaySinceLastSR(dlsr: number): void
-	{
-		this.buffer.writeUIntBE(dlsr, 20, 4);
-	}
-}
-
-/**
- * ```ts
- * import { ReceiverReportPacket } from 'rtp.js';
- * ```
- *
- * Representation of a RTCP Receiver Report packet. It may contain various
+ * Representation of a RTCP Sender Report packet. It may contain various
  * [[ReceiverReport]] instances.
  */
-export class ReceiverReportPacket extends RtcpPacket
+export class SenderReportPacket extends RtcpPacket
 {
 	// Packet Type.
-	static packetType = RtcpPacketType.RR;
+	static packetType = RtcpPacketType.SR;
 
 	// Receiver Reports.
-	private reports: ReceiverReport[] = [];
+	private readonly reports: ReceiverReport[] = [];
 
 	/**
 	 * @param buffer - If given it will be parsed. Otherwise an empty RTP packet
@@ -247,7 +64,7 @@ export class ReceiverReportPacket extends RtcpPacket
 	 */
 	constructor(buffer?: Buffer)
 	{
-		super(ReceiverReportPacket.packetType);
+		super(SenderReportPacket.packetType);
 
 		// If no buffer is given, create an empty one with minimum required length.
 		if (!buffer)
@@ -302,8 +119,13 @@ export class ReceiverReportPacket extends RtcpPacket
 	{
 		return {
 			... super.dump(),
-			ssrc    : this.getSsrc(),
-			reports : this.reports.map((report) => report.dump())
+			ssrc         : this.getSsrc(),
+			ntpSeq       : this.getNtpSeconds(),
+			ntpFraction  : this.getNtpFraction(),
+			rtpTimestamp : this.getRtpTimestamp(),
+			packetCount  : this.getPacketCount(),
+			octectCount  : this.getOctetCount(),
+			reports      : this.reports.map((report) => report.dump())
 		};
 	}
 
@@ -337,6 +159,85 @@ export class ReceiverReportPacket extends RtcpPacket
 	}
 
 	/**
+	 * Get NTP seconds.
+	 */
+	getNtpSeconds(): number
+	{
+		return this.buffer.readUInt32BE(8);
+	}
+
+	/**
+	 * Set NTP seconds.
+	 */
+	setNtpSeconds(seconds: number): void
+	{
+		this.buffer.writeUInt32BE(seconds, 8);
+	}
+
+	/**
+	 * Get NTP fraction.
+	 */
+	getNtpFraction(): number
+	{
+		return this.buffer.readUInt32BE(12);
+	}
+
+	/**
+	 * Set NTP fraction.
+	 */
+	setNtpFraction(fraction: number): void
+	{
+		this.buffer.writeUInt32BE(fraction, 12);
+	}
+
+	/**
+	 * Get RTP Timestamp.
+	 */
+	getRtpTimestamp(): number
+	{
+		return this.buffer.readUInt32BE(16);
+	}
+
+	/**
+	 * Set RTP Timestamp.
+	 */
+	setRtpTimestamp(timestamp: number): void
+	{
+		this.buffer.writeUInt32BE(timestamp, 16);
+	}
+
+	/**
+	 * Get RTP packet count.
+	 */
+	getPacketCount(): number
+	{
+		return this.buffer.readUInt32BE(20);
+	}
+
+	/**
+	 * Set RTP packet count.
+	 */
+	setPacketCount(timestamp: number): void
+	{
+		this.buffer.writeUInt32BE(timestamp, 20);
+	}
+
+	/**
+	 * Get RTP octect count.
+	 */
+	getOctetCount(): number
+	{
+		return this.buffer.readUInt32BE(24);
+	}
+
+	/**
+	 * Set RTP octect count.
+	 */
+	setOctetCount(timestamp: number): void
+	{
+		this.buffer.writeUInt32BE(timestamp, 24);
+	}
+	/**
 	 * Get Receiver Reports.
 	 */
 	getReports(): ReceiverReport[]
@@ -369,11 +270,21 @@ export class ReceiverReportPacket extends RtcpPacket
 		// Compute required buffer length.
 		const length = FIXED_HEADER_LENGTH + (REPORT_LENGTH * this.reports.length);
 		const ssrc = this.getSsrc();
+		const ntpSeconds = this.getNtpSeconds();
+		const ntpFraction = this.getNtpFraction();
+		const rtpTimestamp = this.getRtpTimestamp();
+		const packetCount = this.getPacketCount();
+		const octetCount = this.getOctetCount();
 
 		super.serialize(length);
 
 		this.setCount(this.reports.length);
 		this.setSsrc(ssrc);
+		this.setNtpSeconds(ntpSeconds);
+		this.setNtpFraction(ntpFraction);
+		this.setRtpTimestamp(rtpTimestamp);
+		this.setPacketCount(packetCount);
+		this.setOctetCount(octetCount);
 
 		for (let i=0; i < this.reports.length; ++i)
 		{
