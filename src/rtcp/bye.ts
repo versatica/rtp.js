@@ -36,7 +36,7 @@ export class ByePacket extends RtcpPacket
 	private readonly ssrcs: number[] = [];
 
 	// Termination season.
-	private reason: string = '';
+	private reason?: string;
 
 	/**
 	 * @param buffer - If given it will be parsed. Otherwise an empty RTP packet
