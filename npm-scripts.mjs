@@ -4,8 +4,8 @@ import os from 'os';
 import { execSync } from 'child_process';
 
 const PKG = JSON.parse(fs.readFileSync('./package.json').toString());
+const RELEASE_BRANCH = 'master';
 const IS_WINDOWS = os.platform() === 'win32';
-const MAYOR_VERSION = PKG.version.split('.')[0];
 
 const task = process.argv.slice(2).join(' ');
 
@@ -92,7 +92,7 @@ async function run()
 
 			executeCmd(`git commit -am '${PKG.version}'`);
 			executeCmd(`git tag -a ${PKG.version} -m '${PKG.version}'`);
-			executeCmd(`git push origin v${MAYOR_VERSION}`);
+			executeCmd(`git push origin ${RELEASE_BRANCH}`);
 			executeCmd(`git push origin '${PKG.version}'`);
 			executeCmd('npm publish');
 
