@@ -16,6 +16,8 @@ const COMMON_HEADER_LENGTH = 4;
  * import { RtcpPacketType } from 'rtp.js';
  * ```
  */
+// ESLint absurdly complains about "already declared".
+// eslint-disable-next-line no-shadow
 export enum RtcpPacketType
 {
 	SR = 200,
@@ -81,8 +83,6 @@ export abstract class RtcpPacket
 
 	/**
 	 * @ignore
-	 *
-	 * @param Buffer.
 	 */
 	static getCount(buffer: Buffer): number
 	{
@@ -91,8 +91,6 @@ export abstract class RtcpPacket
 
 	/**
 	 * @ignore
-	 *
-	 * @param Buffer.
 	 */
 	static getLength(buffer: Buffer): number
 	{
@@ -101,8 +99,6 @@ export abstract class RtcpPacket
 
 	/**
 	 * @ignore
-	 *
-	 * @param PacketType.
 	 */
 	protected constructor(packetType: RtcpPacketType)
 	{

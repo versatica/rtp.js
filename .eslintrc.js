@@ -1,3 +1,7 @@
+const os = require('os');
+
+const isWindows = os.platform() === 'win32';
+
 const eslintConfig =
 {
 	env :
@@ -6,25 +10,19 @@ const eslintConfig =
 		es6     : true,
 		node    : true
 	},
-	plugins       : [ '@typescript-eslint' ],
+	plugins       : [],
 	settings      : {},
-	parser        : '@typescript-eslint/parser',
 	parserOptions :
 	{
-		ecmaVersion  : 2018,
+		ecmaVersion  : 2022,
 		sourceType   : 'module',
 		ecmaFeatures :
 		{
 			impliedStrict : true
-		}
+		},
+		lib     : [ 'es2022', 'dom' ],
+		project : 'tsconfig.json'
 	},
-	extends :
-	[
-		'eslint:recommended',
-		'plugin:jest/recommended',
-		'plugin:@typescript-eslint/eslint-recommended',
-		'plugin:@typescript-eslint/recommended'
-	],
 	rules :
 	{
 		'array-bracket-spacing' : [ 2, 'always',
@@ -43,6 +41,7 @@ const eslintConfig =
 		'comma-style'               : 2,
 		'computed-property-spacing' : 2,
 		'constructor-super'         : 2,
+		'curly'                     : [ 2, 'all' ],
 		'func-call-spacing'         : 2,
 		'generator-star-spacing'    : 2,
 		'guard-for-in'              : 2,
@@ -58,12 +57,13 @@ const eslintConfig =
 				{
 					beforeColon : true,
 					afterColon  : true,
+					mode        : 'minimum',
 					align       : 'colon'
 				}
 			}
 		],
 		'keyword-spacing'      : 2,
-		'linebreak-style'      : [ 2, 'unix' ],
+		'linebreak-style'      : [ 2, isWindows ? 'windows' : 'unix' ],
 		'lines-around-comment' : [ 2,
 			{
 				allowBlockStart    : true,
@@ -75,7 +75,7 @@ const eslintConfig =
 		'max-len' : [ 2, 90,
 			{
 				tabWidth               : 2,
-				comments               : 100,
+				comments               : 90,
 				ignoreUrls             : true,
 				ignoreStrings          : true,
 				ignoreTemplateLiterals : true,
@@ -148,7 +148,8 @@ const eslintConfig =
 		'no-unexpected-multiline'       : 2,
 		'no-unmodified-loop-condition'  : 2,
 		'no-unreachable'                : 2,
-		'no-use-before-define'          : [ 2, { functions: false } ],
+		'no-unused-vars'                : [ 1, { vars: 'all', args: 'after-used' } ],
+		'no-use-before-define'          : 0,
 		'no-useless-call'               : 2,
 		'no-useless-computed-key'       : 2,
 		'no-useless-concat'             : 2,
@@ -173,35 +174,68 @@ const eslintConfig =
 				asyncArrow : 'always'
 			}
 		],
-		'space-in-parens'                                   : [ 2, 'never' ],
-		'spaced-comment'                                    : [ 2, 'always' ],
-		'strict'                                            : 2,
-		'valid-typeof'                                      : 2,
-		'yoda'                                              : 2,
-		'@typescript-eslint/ban-types'                      : 0,
-		'@typescript-eslint/ban-ts-comment'                 : 0,
-		'@typescript-eslint/ban-ts-ignore'                  : 0,
-		'@typescript-eslint/explicit-module-boundary-types' : 0,
-		'@typescript-eslint/member-delimiter-style'         : [ 2,
-
-			{
-				multiline  : { delimiter: 'semi', requireLast: true },
-				singleline : { delimiter: 'semi', requireLast: false }
-			}
-		],
-		'@typescript-eslint/no-explicit-any'     : 0,
-		'@typescript-eslint/no-inferrable-types' : 0,
-		'@typescript-eslint/no-unused-vars'      : [ 2,
-			{
-				vars               : 'all',
-				args               : 'after-used',
-				ignoreRestSiblings : false
-			}
-		],
-		'@typescript-eslint/no-use-before-define'  : 0,
-		'@typescript-eslint/no-empty-function'     : 0,
-		'@typescript-eslint/no-non-null-assertion' : 0
-	}
+		'space-in-parens' : [ 2, 'never' ],
+		'spaced-comment'  : [ 2, 'always' ],
+		'strict'          : 2,
+		'valid-typeof'    : 2,
+		'yoda'            : 2
+	},
+	overrides : []
 };
+
+eslintConfig.overrides.push(
+	{
+		files   : [ '*.ts' ],
+		parser  : '@typescript-eslint/parser',
+		plugins : [
+			...eslintConfig.plugins,
+			'@typescript-eslint'
+		],
+		extends : [
+			'eslint:recommended',
+			'plugin:@typescript-eslint/eslint-recommended',
+			'plugin:@typescript-eslint/recommended'
+		],
+		rules : {
+			...eslintConfig.rules,
+			'no-unused-vars'                                    : 0,
+			'@typescript-eslint/ban-types'                      : 0,
+			'@typescript-eslint/ban-ts-comment'                 : 0,
+			'@typescript-eslint/ban-ts-ignore'                  : 0,
+			'@typescript-eslint/explicit-module-boundary-types' : 0,
+			'@typescript-eslint/semi'                           : 2,
+			'@typescript-eslint/member-delimiter-style'         : [ 2,
+				{
+					multiline  : { delimiter: 'semi', requireLast: true },
+					singleline : { delimiter: 'semi', requireLast: false }
+				}
+			],
+			'@typescript-eslint/no-inferrable-types' : 0,
+			'@typescript-eslint/no-explicit-any'     : 0,
+			'@typescript-eslint/no-unused-vars'      : [ 2,
+				{
+					vars               : 'all',
+					args               : 'after-used',
+					ignoreRestSiblings : false
+				}
+			],
+			'@typescript-eslint/no-use-before-define'  : [ 2, { functions: false } ],
+			'@typescript-eslint/no-empty-function'     : 0,
+			'@typescript-eslint/no-non-null-assertion' : 0
+		}
+	});
+
+eslintConfig.overrides.push(
+	{
+		files : [ '*.ts' ],
+		env   : {
+			...eslintConfig.env,
+			'jest/globals' : true
+		},
+		plugins : [
+			...eslintConfig.plugins,
+			'jest'
+		]
+	});
 
 module.exports = eslintConfig;

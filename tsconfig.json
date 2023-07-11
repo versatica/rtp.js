@@ -2,8 +2,8 @@
 	"compileOnSave": true,
 	"compilerOptions":
 	{
-		"lib": [ "es2018", "dom" ],
-		"target": "es2018",
+		"lib": [ "es2020", "dom" ],
+		"target": "es2020",
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"strict": true,
@@ -13,7 +13,6 @@
 	},
 	"include": [ "src" ],
 	"typedocOptions": {
-		"mode": "file",
 		"out": "docs",
 		"exclude": [
 			"src/index.ts",
@@ -21,14 +20,12 @@
 			"src/utils.ts",
 			"src/Logger.ts",
 			"src/EnhancedEventEmitter.ts",
-			"src/__tests__/**/*.ts"
+			"src/tests/**/*.ts"
 		],
-		"excludeNotExported": true,
 		"excludePrivate": true,
 		"excludeProtected": true,
-		"stripInternal": true,
+		"excludeNotDocumented": true,
 		"includeVersion": true,
-		"listInvalidSymbolLinks": true,
 		"theme": "default",
 		"gitRemote": "origin",
 		"hideGenerator": false
