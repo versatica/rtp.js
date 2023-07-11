@@ -15,6 +15,11 @@ export function clone(data: any): any
 	{
 		return NaN;
 	}
+	else if (typeof structuredClone === 'function')
+	{
+		// Available in Node >= 18.
+		return structuredClone(data);
+	}
 	else
 	{
 		return JSON.parse(JSON.stringify(data));
