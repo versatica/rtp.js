@@ -1,6 +1,6 @@
 # rtp.js
 
-RTP stack written in TypeScript. Why not?
+RTP stack for Node.js. Why not?
 
 _NOTE:_ Work in progress.
 
