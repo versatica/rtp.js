@@ -15,14 +15,7 @@
 	"typedocOptions": {
 		"entryPoints": [ "src/index.ts" ],
 		"out": "docs",
-		"exclude": [
-			"src/index.ts",
-			"src/errors.ts",
-			"src/utils.ts",
-			"src/Logger.ts",
-			"src/EnhancedEventEmitter.ts",
-			"src/tests/**/*.ts"
-		],
+		"exclude": [],
 		"excludePrivate": true,
 		"excludeProtected": true,
 		"excludeNotDocumented": true,
