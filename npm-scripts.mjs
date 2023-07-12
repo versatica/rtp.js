@@ -89,6 +89,7 @@ async function run()
 		case 'release':
 		{
 			checkRelease();
+			executeCmd('git add docs');
 			executeCmd(`git commit -am '${PKG.version}'`);
 			executeCmd(`git tag -a ${PKG.version} -m '${PKG.version}'`);
 			executeCmd(`git push origin ${RELEASE_BRANCH}`);
