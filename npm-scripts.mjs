@@ -101,10 +101,7 @@ async function run()
 
 		case 'docs':
 		{
-			// NOTE: typedoc options are given in tsconfig.json.
-			// NOTE: .nojekyll is required, otherwise GitHub pages will ignore
-			// generated HTML files with underscore.
-			executeCmd('typedoc && touch docs/.nojekyll');
+			generateDocs();
 			executeCmd('open-cli docs/index.html');
 
 			break;
@@ -184,6 +181,17 @@ function checkRelease()
 	buildTypescript(/* force */ true);
 	lint();
 	test();
+	generateDocs();
+}
+
+function generateDocs()
+{
+	logInfo('generateDocs()');
+
+	// NOTE: typedoc options are given in tsconfig.json.
+	// NOTE: .nojekyll is required, otherwise GitHub pages will ignore
+	// generated HTML files with underscore.
+	executeCmd('typedoc && touch docs/.nojekyll');
 }
 
 function executeCmd(command, exitOnError = true)
