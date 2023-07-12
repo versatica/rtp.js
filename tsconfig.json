@@ -13,6 +13,7 @@
 	},
 	"include": [ "src" ],
 	"typedocOptions": {
+		"entryPoints": [ "src/index.ts" ],
 		"out": "docs",
 		"exclude": [
 			"src/index.ts",
