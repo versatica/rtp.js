@@ -11,7 +11,6 @@ export class UnsupportedError extends Error
 
 		if (Error.hasOwnProperty('captureStackTrace')) // Just in V8.
 		{
-			// @ts-ignore
 			Error.captureStackTrace(this, UnsupportedError);
 		}
 		else
@@ -34,7 +33,6 @@ export class InvalidStateError extends Error
 
 		if (Error.hasOwnProperty('captureStackTrace')) // Just in V8.
 		{
-			// @ts-ignore
 			Error.captureStackTrace(this, InvalidStateError);
 		}
 		else

@@ -219,7 +219,13 @@ eslintConfig.overrides.push(
 					ignoreRestSiblings : false
 				}
 			],
-			'@typescript-eslint/no-use-before-define'  : [ 2, { functions: false } ],
+			'@typescript-eslint/no-use-before-define'  : [ 2,
+				{
+					functions         : false,
+					classes           : false,
+					allowNamedExports : true
+				}
+			],
 			'@typescript-eslint/no-empty-function'     : 0,
 			'@typescript-eslint/no-non-null-assertion' : 0
 		}

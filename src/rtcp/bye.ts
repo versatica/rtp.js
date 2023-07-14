@@ -1,4 +1,4 @@
-import { isRtcp, RtcpPacket, RtcpPacketType } from './';
+import { isRtcp, RtcpPacket, RtcpPacketType, RtcpPacketDump } from './';
 
 /**
         0                   1                   2                   3
@@ -14,11 +14,19 @@ header |V=2|P|    SC   |   PT=BYE=203  |             length            |
        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
-/** @ignore */
-const SSRC_LENGTH = 4; // SSRC/CSRC length.
+// SSRC/CSRC length.
+const SSRC_LENGTH = 4;
+// Common RTCP header length.
+const FIXED_HEADER_LENGTH = 4;
 
-/** @ignore */
-const FIXED_HEADER_LENGTH = 4; // Common RTCP header length.
+/**
+ * Bye packet dump.
+ */
+export type ByePacketDump = RtcpPacketDump &
+{
+	ssrcs: number[];
+	reason?: string;
+};
 
 /**
  * ```ts
@@ -111,12 +119,12 @@ export class ByePacket extends RtcpPacket
 	}
 
 	/**
-	 * @ignore
+	 * Dump Bye packet info.
 	 */
-	dump(): any
+	dump(): ByePacketDump
 	{
 		return {
-			... super.dump(),
+			...super.dump(),
 			ssrcs  : this.ssrcs,
 			reason : this.reason
 		};
@@ -224,6 +232,7 @@ export class ByePacket extends RtcpPacket
 			}
 		}
 
+		// Reset flag.
 		this.serializationNeeded = false;
 	}
 }

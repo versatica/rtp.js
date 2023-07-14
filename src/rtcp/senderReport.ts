@@ -1,5 +1,9 @@
-import { isRtcp, RtcpPacket, RtcpPacketType } from './';
-import { ReceiverReport, REPORT_LENGTH } from './receiverReport';
+import { isRtcp, RtcpPacket, RtcpPacketType, RtcpPacketDump } from './';
+import {
+	ReceiverReport,
+	ReceiverReportDump,
+	REPORT_LENGTH
+} from './receiverReport';
 
 /**
         0                   1                   2                   3
@@ -39,8 +43,22 @@ block  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
-/** @ignore */
-const FIXED_HEADER_LENGTH = 4 + 24; // Common RTCP header length + 24.
+// Common RTCP header length + 24.
+const FIXED_HEADER_LENGTH = 4 + 24;
+
+/**
+ * Sender Report packet dump.
+ */
+export type SenderReportPacketDump = RtcpPacketDump &
+{
+	ssrc: number;
+	ntpSeq: number;
+	ntpFraction: number;
+	rtpTimestamp: number;
+	packetCount: number;
+	octectCount: number;
+	reports: ReceiverReportDump[];
+};
 
 /**
  * ```ts
@@ -56,7 +74,7 @@ export class SenderReportPacket extends RtcpPacket
 	static packetType = RtcpPacketType.SR;
 
 	// Receiver Reports.
-	private readonly reports: ReceiverReport[] = [];
+	readonly #reports: ReceiverReport[] = [];
 
 	/**
 	 * @param buffer - If given it will be parsed. Otherwise an empty RTP packet
@@ -99,7 +117,7 @@ export class SenderReportPacket extends RtcpPacket
 		while (count-- > 0)
 		{
 			const report = new ReceiverReport(
-				buffer.slice(FIXED_HEADER_LENGTH + (this.reports.length * REPORT_LENGTH))
+				buffer.slice(FIXED_HEADER_LENGTH + (this.#reports.length * REPORT_LENGTH))
 			);
 
 			this.addReport(report);
@@ -108,24 +126,24 @@ export class SenderReportPacket extends RtcpPacket
 		// Store a buffer within the packet boundaries.
 		this.buffer = buffer.slice(
 			undefined,
-			FIXED_HEADER_LENGTH + (this.reports.length * REPORT_LENGTH) + this.padding
+			FIXED_HEADER_LENGTH + (this.#reports.length * REPORT_LENGTH) + this.padding
 		);
 	}
 
 	/**
-	 * @ignore
+	 * Dump Sender Report packet info.
 	 */
-	dump(): any
+	dump(): SenderReportPacketDump
 	{
 		return {
-			... super.dump(),
+			...super.dump(),
 			ssrc         : this.getSsrc(),
 			ntpSeq       : this.getNtpSeconds(),
 			ntpFraction  : this.getNtpFraction(),
 			rtpTimestamp : this.getRtpTimestamp(),
 			packetCount  : this.getPacketCount(),
 			octectCount  : this.getOctetCount(),
-			reports      : this.reports.map((report) => report.dump())
+			reports      : this.#reports.map((report) => report.dump())
 		};
 	}
 
@@ -242,7 +260,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	getReports(): ReceiverReport[]
 	{
-		return this.reports;
+		return this.#reports;
 	}
 
 	/**
@@ -250,7 +268,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	addReport(report: ReceiverReport): void
 	{
-		this.reports.push(report);
+		this.#reports.push(report);
 		this.serializationNeeded = true;
 	}
 
@@ -268,7 +286,7 @@ export class SenderReportPacket extends RtcpPacket
 	serialize(): void
 	{
 		// Compute required buffer length.
-		const length = FIXED_HEADER_LENGTH + (REPORT_LENGTH * this.reports.length);
+		const length = FIXED_HEADER_LENGTH + (REPORT_LENGTH * this.#reports.length);
 		const ssrc = this.getSsrc();
 		const ntpSeconds = this.getNtpSeconds();
 		const ntpFraction = this.getNtpFraction();
@@ -278,7 +296,7 @@ export class SenderReportPacket extends RtcpPacket
 
 		super.serialize(length);
 
-		this.setCount(this.reports.length);
+		this.setCount(this.#reports.length);
 		this.setSsrc(ssrc);
 		this.setNtpSeconds(ntpSeconds);
 		this.setNtpFraction(ntpFraction);
@@ -286,13 +304,14 @@ export class SenderReportPacket extends RtcpPacket
 		this.setPacketCount(packetCount);
 		this.setOctetCount(octetCount);
 
-		for (let i=0; i < this.reports.length; ++i)
+		for (let i=0; i < this.#reports.length; ++i)
 		{
-			const report = this.reports[i];
+			const report = this.#reports[i];
 
 			report.getBuffer().copy(this.buffer, FIXED_HEADER_LENGTH + (REPORT_LENGTH * i));
 		}
 
+		// Reset flag.
 		this.serializationNeeded = false;
 	}
 }

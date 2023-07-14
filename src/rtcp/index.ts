@@ -1,4 +1,4 @@
-/*
+/**
         0                   1                   2                   3
         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -6,9 +6,7 @@ header |V=2|P|    SC   |      PT       |             length            |
        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  */
 
-/** @ignore */
 const RTCP_VERSION = 2;
-/** @ignore */
 const COMMON_HEADER_LENGTH = 4;
 
 /**
@@ -29,6 +27,17 @@ export enum RtcpPacketType
 	PSFB = 206,
 	XR = 207
 }
+
+/**
+ * RTCP base packet dump.
+ */
+export type RtcpPacketDump =
+{
+	version: number;
+	count: number;
+	length: number;
+	padding: number;
+};
 
 /**
  * ```ts
@@ -75,40 +84,31 @@ export abstract class RtcpPacket
 	// @ts-ignore. 'buffer' has not initializer and is not assigned in constructor.
 	protected buffer: Buffer;
 	// RTCP packet type.
-	private packetType: RtcpPacketType;
+	#packetType: RtcpPacketType;
 	// Number of bytes of padding.
 	protected padding: number = 0;
 	// Whether serialization is needed due to modifications.
 	protected serializationNeeded: boolean = false;
 
-	/**
-	 * @ignore
-	 */
 	static getCount(buffer: Buffer): number
 	{
 		return buffer.readUInt8(0) & 0x1F;
 	}
 
-	/**
-	 * @ignore
-	 */
 	static getLength(buffer: Buffer): number
 	{
 		return buffer.readUInt16BE(2);
 	}
 
-	/**
-	 * @ignore
-	 */
 	protected constructor(packetType: RtcpPacketType)
 	{
-		this.packetType = packetType;
+		this.#packetType = packetType;
 	}
 
 	/**
-	 * @ignore
+	 * RTCP base packet dump.
 	 */
-	dump(): any
+	dump(): RtcpPacketDump
 	{
 		return {
 			version : this.getVersion(),
@@ -144,13 +144,14 @@ export abstract class RtcpPacket
 	 */
 	setPadding(padding: number): void
 	{
-		this.serializationNeeded = true;
 		this.padding = padding;
 
 		// Update padding bit.
 		const bit = padding ? 1 : 0;
 
 		this.setPaddingBit(bit);
+
+		this.serializationNeeded = true;
 	}
 
 	/**
@@ -219,7 +220,7 @@ export abstract class RtcpPacket
 	protected writeCommonHeader(): void
 	{
 		this.setVersion();
-		this.setPacketType(this.packetType);
+		this.setPacketType(this.#packetType);
 	}
 
 	/**

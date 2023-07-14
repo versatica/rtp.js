@@ -1,19 +1,19 @@
 /**
  * Clones the given object/array/Buffer/etc.
  */
-export function clone(data: any): any
+export function clone<T>(data: T): T
 {
 	if (Buffer.isBuffer(data))
 	{
-		return Buffer.from(data);
+		return Buffer.from(data) as T;
 	}
 	else if (data === undefined)
 	{
-		return undefined;
+		return undefined as T;
 	}
 	else if (Number.isNaN(data))
 	{
-		return NaN;
+		return NaN as T;
 	}
 	else if (typeof structuredClone === 'function')
 	{
