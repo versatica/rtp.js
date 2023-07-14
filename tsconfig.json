@@ -19,6 +19,7 @@
 		"excludePrivate": true,
 		"excludeProtected": true,
 		"excludeNotDocumented": true,
+		"excludeInternal": true,
 		"includeVersion": true,
 		"theme": "default",
 		"gitRemote": "origin",

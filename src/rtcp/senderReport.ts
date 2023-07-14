@@ -66,7 +66,7 @@ export type SenderReportPacketDump = RtcpPacketDump &
  * ```
  *
  * Representation of a RTCP Sender Report packet. It may contain various
- * [[ReceiverReport]] instances.
+ * {@link ReceiverReport} instances.
  */
 export class SenderReportPacket extends RtcpPacket
 {
@@ -274,13 +274,13 @@ export class SenderReportPacket extends RtcpPacket
 
 	/**
 	 * Apply pending changes into the packet and serialize it into a new internal
-	 * buffer (the one that [[getBuffer]] will later return).
+	 * buffer (the one that {@link getBuffer} will later return).
 	 *
 	 * **NOTE:** In most cases there is no need to use this method. It must be
 	 * called only if the application retrieves information from the packet (by
-	 * calling [[getBuffer]], [[getReports]], etc) and modifies the obtained
-	 * buffers in place. However, it's recommended to use the existing setter
-	 * methods instead ([[addReport]], etc).
+	 * calling {@link getBuffer}, {@link getReports}, etc) and modifies the
+	 * obtained buffers in place. However, it's recommended to use the existing
+	 * setter methods instead ({@link addReport}, etc).
 	 *
 	 */
 	serialize(): void

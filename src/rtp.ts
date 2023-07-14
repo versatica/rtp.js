@@ -719,13 +719,15 @@ export class RtpPacket
 
 	/**
 	 * Apply pending changes into the packet and serialize it into a new internal
-	 * buffer (the one that [[getBuffer]] will later return).
+	 * buffer (the one that {@link getBuffer} will later return).
 	 *
+	 * @remarks
 	 * **NOTE:** In most cases there is no need to use this method. It must be
 	 * called only if the application retrieves information from the packet (by
-	 * calling [[getBuffer]], [[getPayload]], [[getExtension]], etc) and modifies
-	 * the obtained buffers in place. However, it's recommended to use the
-	 * existing setter methods instead ([[setPayload]], [[setExtension]], etc).
+	 * calling {@link getBuffer}, {@link getPayload}, {@link getExtension}, etc)
+	 * and modifies the obtained buffers in place. However, it's recommended to
+	 * use the existing setter methods instead ({@link setPayload},
+	 * {@link setExtension}, etc).
 	 *
 	 * @throws if invalid fields were previously added to the packet.
 	 */
