@@ -2,7 +2,9 @@
 
 RTP stack for Node.js. Why not?
 
-_NOTE:_ Work in progress.
+**rtp.js** provides with an API to generate, parse, modify, inspect RTP and RTCP packets.
+
+_NOTE:_ Work in progress. Many more RTCP packets will be added along with new features.
 
 
 ## Documentation
