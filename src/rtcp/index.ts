@@ -29,7 +29,7 @@ export enum RtcpPacketType
 }
 
 /**
- * RTCP base packet dump.
+ * Base RTCP packet dump.
  */
 export type RtcpPacketDump =
 {
@@ -106,7 +106,7 @@ export abstract class RtcpPacket
 	}
 
 	/**
-	 * RTCP base packet dump.
+	 * Base RTCP packet dump.
 	 */
 	dump(): RtcpPacketDump
 	{
