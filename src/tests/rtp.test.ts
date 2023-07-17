@@ -234,6 +234,7 @@ describe('create RTP packet 5 from scratch', () =>
 		expect(clonedPacket.getExtension(2)).toEqual(Buffer.from([ 1, 2, 3, 4 ]));
 		expect(clonedPacket.getPayload()).toEqual(Buffer.from('codec'));
 		expect(clonedPacket.getPadding()).toBe(3);
+		expect(clonedPacket.dump()).toEqual(packet.dump());
 		// Compare buffers.
 		expect(Buffer.compare(clonedPacket.getBuffer(), packet.getBuffer())).toBe(0);
 	});

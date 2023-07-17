@@ -148,6 +148,42 @@ describe('create RTCP Sender Report packet', () =>
 		expect(packet.getPadding()).toBe(8);
 		expect(packet.getBuffer().compare(bufferWithPadding)).toBe(0);
 	});
+
+	test('packet.clone() succeeds', () =>
+	{
+		const bufferWithPadding = Buffer.from(
+			[
+				0xa0, 0xc8, 0x00, 0x08, // Padding, Type: 200, Count: 0, Length: 8
+				0x5d, 0x93, 0x15, 0x34, // SSRC: 0x5d931534
+				0xdd, 0x3a, 0xc1, 0xb4, // NTP Sec: 3711615412
+				0x76, 0x54, 0x71, 0x71, // NTP Frac: 1985245553
+				0x00, 0x08, 0xcf, 0x00, // RTP timestamp: 577280
+				0x00, 0x00, 0x0e, 0x18, // Packet count: 3608
+				0x00, 0x08, 0xcf, 0x00, // Octet count: 577280
+				0x00, 0x00, 0x00, 0x00, // Padding (8 bytes)
+				0x00, 0x00, 0x00, 0x08
+			]
+		);
+
+		const packet = new SenderReportPacket(bufferWithPadding);
+		const clonedPacket = packet.clone();
+
+		expect(clonedPacket.getPadding()).toBe(packet.getPadding());
+		expect(clonedPacket.getVersion()).toBe(packet.getVersion());
+		expect(clonedPacket.getPadding()).toBe(packet.getPadding());
+		expect(clonedPacket.getPacketType()).toBe(packet.getPacketType());
+		expect(clonedPacket.getCount()).toBe(packet.getCount());
+		expect(clonedPacket.getSsrc()).toBe(packet.getSsrc());
+		expect(clonedPacket.getNtpSeconds()).toBe(packet.getNtpSeconds());
+		expect(clonedPacket.getNtpFraction()).toBe(packet.getNtpFraction());
+		expect(clonedPacket.getRtpTimestamp()).toBe(packet.getRtpTimestamp());
+		expect(clonedPacket.getPacketCount()).toBe(packet.getPacketCount());
+		expect(clonedPacket.getOctetCount()).toBe(packet.getOctetCount());
+		expect(clonedPacket.getReports()).toEqual(packet.getReports());
+		expect(clonedPacket.dump()).toEqual(packet.dump());
+		// Compare buffers.
+		expect(Buffer.compare(clonedPacket.getBuffer(), packet.getBuffer())).toBe(0);
+	});
 });
 
 function checkReport(report: ReceiverReport)

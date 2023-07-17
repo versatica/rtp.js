@@ -129,4 +129,20 @@ describe('create RTCP BYE packet', () =>
 		expect(packet.getPadding()).toBe(8);
 		expect(packet.getBuffer().compare(bufferWithPadding)).toBe(0);
 	});
+
+	test('packet.clone() succeeds', () =>
+	{
+		const packet = new ByePacket(buffer);
+		const clonedPacket = packet.clone();
+
+		expect(clonedPacket.getVersion()).toBe(packet.getVersion());
+		expect(clonedPacket.getPadding()).toBe(packet.getPadding());
+		expect(clonedPacket.getPacketType()).toBe(packet.getPacketType());
+		expect(clonedPacket.getCount()).toBe(packet.getCount());
+		expect(clonedPacket.getSsrcs()).toEqual(packet.getSsrcs());
+		expect(clonedPacket.getReason()).toBe(packet.getReason());
+		expect(clonedPacket.dump()).toEqual(packet.dump());
+		// Compare buffers.
+		expect(Buffer.compare(clonedPacket.getBuffer(), packet.getBuffer())).toBe(0);
+	});
 });

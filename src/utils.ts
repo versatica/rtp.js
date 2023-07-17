@@ -5,15 +5,15 @@ export function clone<T>(data: T): T
 {
 	if (Buffer.isBuffer(data))
 	{
-		return Buffer.from(data) as T;
+		return Buffer.from(data) as unknown as T;
 	}
 	else if (data === undefined)
 	{
-		return undefined as T;
+		return undefined as unknown as T;
 	}
 	else if (Number.isNaN(data))
 	{
-		return NaN as T;
+		return NaN as unknown as T;
 	}
 	else if (typeof structuredClone === 'function')
 	{

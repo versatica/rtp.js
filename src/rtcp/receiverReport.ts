@@ -1,4 +1,5 @@
 import { isRtcp, RtcpPacket, RtcpPacketType, RtcpPacketDump } from './';
+import { clone } from '../utils';
 
 /**
         0                   1                   2                   3
@@ -172,15 +173,35 @@ export class ReceiverReportPacket extends RtcpPacket
 	}
 
 	/**
+	 * Clone the packet. The cloned packet does not share any memory with the
+	 * original one.
+	 *
+	 * @throws If buffer serialization is needed and it fails due to invalid
+	 *   fields.
+	 */
+	clone(): ReceiverReportPacket
+	{
+		if (this.serializationNeeded)
+		{
+			this.serialize();
+		}
+
+		return new ReceiverReportPacket(clone(this.buffer));
+	}
+
+	/**
 	 * Apply pending changes into the packet and serialize it into a new internal
 	 * buffer (the one that {@link getBuffer} will later return).
 	 *
-	 * **NOTE:** In most cases there is no need to use this method. It must be
+	 * @remarks
+	 * In most cases there is no need to use this method. It must be
 	 * called only if the application retrieves information from the packet (by
 	 * calling {@link getBuffer}, {@link getReports}, etc) and modifies the
 	 * obtained buffers in place. However, it's recommended to use the existing
 	 * setter methods instead ({@link addReport}, etc).
 	 *
+	 * @throws If buffer serialization is needed and it fails due to invalid
+	 *   fields.
 	 */
 	serialize(): void
 	{
@@ -393,5 +414,14 @@ export class ReceiverReport
 	setDelaySinceLastSR(dlsr: number): void
 	{
 		this.#buffer.writeUIntBE(dlsr, 20, 4);
+	}
+
+	/**
+	 * Clone the Receiver Report. The cloned report does not share any memory
+	 * with the original one.
+	 */
+	clone(): ReceiverReport
+	{
+		return new ReceiverReport(clone(this.#buffer));
 	}
 }

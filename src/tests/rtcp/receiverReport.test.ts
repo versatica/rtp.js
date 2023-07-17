@@ -160,6 +160,32 @@ describe('create RTCP Receiver Report packet', () =>
 		expect(packet.getPadding()).toBe(8);
 		expect(packet.getBuffer().compare(bufferWithPadding)).toBe(0);
 	});
+
+	test('packet.clone() succeeds', () =>
+	{
+		const bufferWithPadding = Buffer.from(
+			[
+				0xa0, 0xc9, 0x00, 0x03, // Padding, Type: 201, Count: 0, Length: 3
+				0x5d, 0x93, 0x15, 0x34, // Sender SSRC: 0x5d931534
+				0x00, 0x00, 0x00, 0x00, // Padding (8 bytes)
+				0x00, 0x00, 0x00, 0x08
+			]
+		);
+
+		const packet = new ReceiverReportPacket(bufferWithPadding);
+		const clonedPacket = packet.clone();
+
+		expect(clonedPacket.getPadding()).toBe(packet.getPadding());
+		expect(clonedPacket.getVersion()).toBe(packet.getVersion());
+		expect(clonedPacket.getPadding()).toBe(packet.getPadding());
+		expect(clonedPacket.getPacketType()).toBe(packet.getPacketType());
+		expect(clonedPacket.getCount()).toBe(packet.getCount());
+		expect(clonedPacket.getSsrc()).toBe(packet.getSsrc());
+		expect(clonedPacket.getReports()).toEqual(packet.getReports());
+		expect(clonedPacket.dump()).toEqual(packet.dump());
+		// Compare buffers.
+		expect(Buffer.compare(clonedPacket.getBuffer(), packet.getBuffer())).toBe(0);
+	});
 });
 
 describe('create RTCP Receiver Report', () =>
@@ -179,6 +205,29 @@ describe('create RTCP Receiver Report', () =>
 		report.setDelaySinceLastSR(delaySinceLastSenderReport);
 
 		checkReport(report);
+	});
+
+	test('report.clone() succeeds', () =>
+	{
+		const receiverReport = new ReceiverReport();
+
+		expect(receiverReport).toBeDefined();
+
+		receiverReport.setSsrc(ssrc);
+		receiverReport.setFractionLost(fractionLost);
+		receiverReport.setTotalLost(totalLost);
+		receiverReport.setHighestSeqNumber(highestSeqNumber);
+		receiverReport.setJitter(jitter);
+		receiverReport.setLastSRTimestamp(lastSenderReport);
+		receiverReport.setDelaySinceLastSR(delaySinceLastSenderReport);
+
+		const clonedReceivedReport = receiverReport.clone();
+
+		expect(clonedReceivedReport.dump()).toEqual(receiverReport.dump());
+		// Compare buffers.
+		expect(Buffer.compare(
+			clonedReceivedReport.getBuffer(), receiverReport.getBuffer())
+		).toBe(0);
 	});
 });
 

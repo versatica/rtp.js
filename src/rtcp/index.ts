@@ -201,6 +201,15 @@ export abstract class RtcpPacket
 	abstract serialize(): void;
 
 	/**
+	 * Clone the packet. The cloned packet does not share any memory with the
+	 * original one.
+	 *
+	 * @throws If buffer serialization is needed and it fails due to invalid
+	 *   fields.
+	 */
+	abstract clone(): RtcpPacket;
+
+	/**
 	 * Serialize base RTCP packet into a new buffer.
 	 */
 	protected serializeBase(length: number): void

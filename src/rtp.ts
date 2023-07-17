@@ -76,7 +76,7 @@ export class RtpPacket
 	/**
 	 * @param buffer - If given if will be parsed. Otherwise an empty RTP packet
 	 *   (with just the minimal fixed header) will be created.
-	 * @throws if `buffer` is given and it does not contain a valid RTP packet.
+	 * @throws If `buffer` is given and it does not contain a valid RTP packet.
 	 */
 	constructor(buffer?: Buffer)
 	{
@@ -303,7 +303,7 @@ export class RtpPacket
 	 * Get the internal buffer containing the serialized RTP binary packet. The
 	 * buffer is serialized only if needed (to apply packet modifications).
 	 *
-	 * @throws if buffer serialization is needed and it fails due to invalid
+	 * @throws If buffer serialization is needed and it fails due to invalid
 	 *   fields.
 	 */
 	getBuffer(): Buffer
@@ -611,7 +611,7 @@ export class RtpPacket
 	 * Pad the packet total length to 4 bytes. To achieve it, this method may add
 	 * or remove bytes of padding.
 	 *
-	 * @throws if buffer serialization is needed and it fails due to invalid
+	 * @throws If buffer serialization is needed and it fails due to invalid
 	 *   fields.
 	 */
 	padTo4Bytes(): void
@@ -637,7 +637,7 @@ export class RtpPacket
 	 * Clone the packet. The cloned packet does not share any memory with the
 	 * original one.
 	 *
-	 * @throws if buffer serialization is needed and it fails due to invalid
+	 * @throws If buffer serialization is needed and it fails due to invalid
 	 *   fields.
 	 */
 	clone(): RtpPacket
@@ -685,7 +685,7 @@ export class RtpPacket
 	 *
 	 * @param payloadType - The original payload type.
 	 * @param ssrc - The original SSRC.
-	 * @throws if payload length is less than 2 bytes, so RTX decode is not
+	 * @throws If payload length is less than 2 bytes, so RTX decode is not
 	 *   possible.
 	 */
 	rtxDecode(payloadType: number, ssrc: number)
@@ -722,14 +722,14 @@ export class RtpPacket
 	 * buffer (the one that {@link getBuffer} will later return).
 	 *
 	 * @remarks
-	 * **NOTE:** In most cases there is no need to use this method. It must be
+	 * In most cases there is no need to use this method. It must be
 	 * called only if the application retrieves information from the packet (by
 	 * calling {@link getBuffer}, {@link getPayload}, {@link getExtension}, etc)
 	 * and modifies the obtained buffers in place. However, it's recommended to
 	 * use the existing setter methods instead ({@link setPayload},
 	 * {@link setExtension}, etc).
 	 *
-	 * @throws if invalid fields were previously added to the packet.
+	 * @throws If invalid fields were previously added to the packet.
 	 */
 	serialize(): void
 	{
