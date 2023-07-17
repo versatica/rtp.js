@@ -98,7 +98,7 @@ describe('parse RTCP Receiver Report', () =>
 	test('parsing a buffer which length does not fit the report size throws', () =>
 	{
 		// Parse a 23 bytes buffer.
-		expect(() => (new ReceiverReport(new Buffer(23)))).toThrowError(TypeError);
+		expect(() => (new ReceiverReport(Buffer.from([ 23 ])))).toThrowError(TypeError);
 	});
 });
 
