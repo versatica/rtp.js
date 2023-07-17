@@ -1,6 +1,6 @@
 {
   "name": "rtp.js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "RTP stack for Node.js",
   "contributors": [
     "Iñaki Baz Castillo <ibc@aliax.net> (https://inakibaz.me)",
