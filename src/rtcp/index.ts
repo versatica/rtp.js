@@ -122,7 +122,15 @@ export abstract class RtcpPacket
 	/**
 	 * Get the internal buffer containing the serialized RTCP binary packet.
 	 */
-	abstract getBuffer(): Buffer;
+	getBuffer(): Buffer
+	{
+		if (this.serializationNeeded)
+		{
+			this.serialize();
+		}
+
+		return this.buffer;
+	}
 
 	/**
 	 * Get the RTCP version of the packet (always 2).
@@ -190,7 +198,12 @@ export abstract class RtcpPacket
 	/**
 	 * Serialize RTCP packet into a new buffer.
 	 */
-	protected serialize(length: number): void
+	abstract serialize(): void;
+
+	/**
+	 * Serialize base RTCP packet into a new buffer.
+	 */
+	protected serializeBase(length: number): void
 	{
 		const padding = this.padding ?? 0;
 

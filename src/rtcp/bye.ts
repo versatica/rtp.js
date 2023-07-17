@@ -131,19 +131,6 @@ export class ByePacket extends RtcpPacket
 	}
 
 	/**
-	 * Get the internal buffer containing the serialized RTP binary packet.
-	 */
-	getBuffer(): Buffer
-	{
-		if (this.serializationNeeded)
-		{
-			this.serialize();
-		}
-
-		return this.buffer;
-	}
-
-	/**
 	 * Get SSRCs.
 	 */
 	getSsrcs(): number[]
@@ -198,7 +185,7 @@ export class ByePacket extends RtcpPacket
 			length += this.reason.length + 1 + (-(this.reason.length + 1) & 3);
 		}
 
-		super.serialize(length);
+		super.serializeBase(length);
 
 		this.setCount(this.ssrcs.length);
 

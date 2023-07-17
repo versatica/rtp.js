@@ -148,19 +148,6 @@ export class SenderReportPacket extends RtcpPacket
 	}
 
 	/**
-	 * Get the internal buffer containing the serialized RTP binary packet.
-	 */
-	getBuffer(): Buffer
-	{
-		if (this.serializationNeeded)
-		{
-			this.serialize();
-		}
-
-		return this.buffer;
-	}
-
-	/**
 	 * Get sender SSRC.
 	 */
 	getSsrc(): number
@@ -294,7 +281,7 @@ export class SenderReportPacket extends RtcpPacket
 		const packetCount = this.getPacketCount();
 		const octetCount = this.getOctetCount();
 
-		super.serialize(length);
+		super.serializeBase(length);
 
 		this.setCount(this.#reports.length);
 		this.setSsrc(ssrc);
