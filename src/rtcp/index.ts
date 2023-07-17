@@ -107,6 +107,7 @@ export abstract class RtcpPacket
 
 	/**
 	 * Base RTCP packet dump.
+	 * @private
 	 */
 	dump(): RtcpPacketDump
 	{
