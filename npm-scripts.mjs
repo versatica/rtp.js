@@ -89,6 +89,7 @@ async function run()
 		case 'release':
 		{
 			checkRelease();
+			generateDocs();
 			executeCmd('git add docs');
 			executeCmd(`git commit -am '${PKG.version}'`);
 			executeCmd(`git tag -a ${PKG.version} -m '${PKG.version}'`);
@@ -181,7 +182,6 @@ function checkRelease()
 	buildTypescript(/* force */ true);
 	lint();
 	test();
-	generateDocs();
 }
 
 function generateDocs()
