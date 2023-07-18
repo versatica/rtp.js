@@ -3,9 +3,13 @@
  */
 export function clone<T>(data: T): T
 {
-	if (Buffer.isBuffer(data))
+	if (data instanceof ArrayBuffer)
 	{
-		return Buffer.from(data) as unknown as T;
+		return data.slice(0, data.byteLength) as unknown as T;
+	}
+	else if (data instanceof DataView)
+	{
+		return new DataView(data.buffer) as unknown as T;
 	}
 	else if (data === undefined)
 	{
@@ -40,4 +44,35 @@ export function padTo4Bytes(size: number): number
 	{
 		return size;
 	}
+}
+
+/**
+ * Whether two ArrayBuffers contain the same data.
+ */
+export function areBuffersEqual(buffer1: ArrayBuffer, buffer2: ArrayBuffer)
+{
+	if (buffer1 === buffer2)
+	{
+		return true;
+	}
+
+	if (buffer1.byteLength !== buffer2.byteLength)
+	{
+		return false;
+	}
+
+	const view1 = new DataView(buffer1);
+	const view2 = new DataView(buffer2);
+
+	let i = buffer1.byteLength;
+
+	while (i--)
+	{
+		if (view1.getUint8(i) !== view2.getUint8(i))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }

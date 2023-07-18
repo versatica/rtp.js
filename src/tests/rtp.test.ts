@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { isRtp, RtpPacket } from '../';
+import { areBuffersEqual } from '../utils';
 
 describe('parse RTP packet 1', () =>
 {
@@ -65,7 +66,7 @@ describe('parse RTP packet 2', () =>
 
 describe('parse RTP packet 3', () =>
 {
-	const buffer = Buffer.from(
+	const buffer = new Uint8Array(
 		[
 			0b10010000, 0b00000001, 0, 8,
 			0, 0, 0, 4,
@@ -74,7 +75,9 @@ describe('parse RTP packet 3', () =>
 			0b00010000, 0xFF, 0b00100001, 0xFF,
 			0xFF, 0, 0, 0b00110011,
 			0xFF, 0xFF, 0xFF, 0xFF
-		]);
+		]
+	).buffer;
+
 	let packet: RtpPacket;
 
 	test('isRtp() succeeds', () =>
@@ -102,7 +105,7 @@ describe('parse RTP packet 3', () =>
 
 describe('parse RTP packet 4', () =>
 {
-	const buffer = Buffer.from(
+	const buffer = new Uint8Array(
 		[
 			0b10010000, 0b00000001, 0, 8,
 			0, 0, 0, 4,
@@ -112,7 +115,9 @@ describe('parse RTP packet 4', () =>
 			2, 1, 0x42, 0,
 			3, 2, 0x11, 0x22,
 			0, 0, 4, 0
-		]);
+		]
+	).buffer;
+
 	let packet: RtpPacket;
 
 	test('isRtp() succeeds', () =>
@@ -236,7 +241,7 @@ describe('create RTP packet 5 from scratch', () =>
 		expect(clonedPacket.getPadding()).toBe(3);
 		expect(clonedPacket.dump()).toEqual(packet.dump());
 		// Compare buffers.
-		expect(Buffer.compare(clonedPacket.getBuffer(), packet.getBuffer())).toBe(0);
+		expect(areBuffersEqual(clonedPacket.getBuffer(), packet.getBuffer())).toBe(true);
 	});
 
 	test('packet.rtxEncode() and packet.rtxDecode() succeed', () =>
@@ -263,7 +268,7 @@ describe('create RTP packet 5 from scratch', () =>
 		expect(packet.getSsrc()).toBe(ssrc);
 		expect(packet.getPayload().length).toBe(payloadLength);
 		// Compare buffers.
-		expect(Buffer.compare(packet.getBuffer(), previousBuffer)).toBe(0);
+		expect(areBuffersEqual(packet.getBuffer(), previousBuffer)).toBe(true);
 	});
 });
 
