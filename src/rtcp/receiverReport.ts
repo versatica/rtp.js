@@ -186,7 +186,7 @@ export class ReceiverReportPacket extends RtcpPacket
 			this.serialize();
 		}
 
-		return new ReceiverReportPacket(clone(this.buffer));
+		return new ReceiverReportPacket(clone<Buffer>(this.buffer));
 	}
 
 	/**
@@ -422,6 +422,6 @@ export class ReceiverReport
 	 */
 	clone(): ReceiverReport
 	{
-		return new ReceiverReport(clone(this.#buffer));
+		return new ReceiverReport(clone<Buffer>(this.#buffer));
 	}
 }

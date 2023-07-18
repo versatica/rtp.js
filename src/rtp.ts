@@ -647,7 +647,7 @@ export class RtpPacket
 			this.serialize();
 		}
 
-		return new RtpPacket(clone(this.#buffer));
+		return new RtpPacket(clone<Buffer>(this.#buffer));
 	}
 
 	/**

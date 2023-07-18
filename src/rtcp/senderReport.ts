@@ -274,7 +274,7 @@ export class SenderReportPacket extends RtcpPacket
 			this.serialize();
 		}
 
-		return new SenderReportPacket(clone(this.buffer));
+		return new SenderReportPacket(clone<Buffer>(this.buffer));
 	}
 
 	/**

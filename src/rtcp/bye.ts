@@ -179,7 +179,7 @@ export class ByePacket extends RtcpPacket
 			this.serialize();
 		}
 
-		return new ByePacket(clone(this.buffer));
+		return new ByePacket(clone<Buffer>(this.buffer));
 	}
 
 	/**
