@@ -1,7 +1,4 @@
 import { EventEmitter } from 'events';
-import { Logger } from './Logger';
-
-const logger = new Logger('EnhancedEventEmitter');
 
 type Events = Record<string, any[]>;
 
@@ -31,10 +28,6 @@ export class EnhancedEventEmitter<E extends Events = Events> extends EventEmitte
 		}
 		catch (error)
 		{
-			logger.error(
-				'safeEmit() | event listener threw an error [eventName:%s]:%o',
-				eventName, error);
-
 			return Boolean(numListeners);
 		}
 	}

@@ -27,3 +27,7 @@ export {
 	ByePacket,
 	ByePacketDump
 } from './rtcp/bye';
+
+export {
+	bufferToArrayBuffer
+} from './utils';

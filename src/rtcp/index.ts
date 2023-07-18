@@ -53,13 +53,13 @@ export type RtcpPacketDump =
  * }
  * ```
  */
-export function isRtcp(buffer: Buffer): boolean
+export function isRtcp(buffer: ArrayBuffer): boolean
 {
-	const firstByte = buffer.readUInt8(0);
+	const view = new DataView(buffer);
+	const firstByte = view.getUint8(0);
 
 	return (
-		Buffer.isBuffer(buffer) &&
-		buffer.length >= COMMON_HEADER_LENGTH &&
+		buffer.byteLength >= COMMON_HEADER_LENGTH &&
 		// DOC: https://tools.ietf.org/html/draft-ietf-avtcore-rfc5764-mux-fixes
 		(firstByte > 127 && firstByte < 192) &&
 		// RTCP Version must be 2.
@@ -67,7 +67,7 @@ export function isRtcp(buffer: Buffer): boolean
 		// RTCP packet types defined by IANA:
 		// http://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml#rtp-parameters-4
 		// RFC 5761 (RTCP-mux) states this range for secure RTCP/RTP detection.
-		(buffer.readUInt8(1) >= 192 && buffer.readUInt8(1) <= 223)
+		(view.getUint8(1) >= 192 && view.getUint8(1) <= 223)
 	);
 }
 
@@ -80,9 +80,12 @@ export function isRtcp(buffer: Buffer): boolean
  */
 export abstract class RtcpPacket
 {
-	// Buffer.
+	// ArrayBuffer holding packet binary data.
 	// @ts-ignore. 'buffer' has not initializer and is not assigned in constructor.
-	protected buffer: Buffer;
+	protected buffer: ArrayBuffer;
+	// DataView holding the ArrayBuffer.
+	// @ts-ignore. 'view' has not initializer and is not assigned in constructor.
+	protected view: DataView;
 	// RTCP packet type.
 	#packetType: RtcpPacketType;
 	// Number of bytes of padding.
@@ -90,14 +93,18 @@ export abstract class RtcpPacket
 	// Whether serialization is needed due to modifications.
 	protected serializationNeeded: boolean = false;
 
-	static getCount(buffer: Buffer): number
+	static getCount(buffer: ArrayBuffer): number
 	{
-		return buffer.readUInt8(0) & 0x1F;
+		const view = new DataView(buffer);
+
+		return view.getUint8(0) & 0x1F;
 	}
 
-	static getLength(buffer: Buffer): number
+	static getLength(buffer: ArrayBuffer): number
 	{
-		return buffer.readUInt16BE(2);
+		const view = new DataView(buffer);
+
+		return view.getUint16(2);
 	}
 
 	protected constructor(packetType: RtcpPacketType)
@@ -122,7 +129,7 @@ export abstract class RtcpPacket
 	/**
 	 * Get the internal buffer containing the serialized RTCP binary packet.
 	 */
-	getBuffer(): Buffer
+	getBuffer(): ArrayBuffer
 	{
 		if (this.serializationNeeded)
 		{
@@ -137,7 +144,7 @@ export abstract class RtcpPacket
 	 */
 	getVersion(): number
 	{
-		return this.buffer.readUInt8(0) >> 6;
+		return this.view.getUint8(0) >> 6;
 	}
 
 	/**
@@ -168,7 +175,7 @@ export abstract class RtcpPacket
 	 */
 	getCount(): number
 	{
-		return this.buffer.readUInt8(0) & 0x1F;
+		return this.view.getUint8(0) & 0x1F;
 	}
 
 	/**
@@ -176,7 +183,7 @@ export abstract class RtcpPacket
 	 */
 	getPacketType(): RtcpPacketType
 	{
-		return this.buffer.readUInt8(1);
+		return this.view.getUint8(1);
 	}
 
 	/**
@@ -184,7 +191,7 @@ export abstract class RtcpPacket
 	 */
 	getLength(): number
 	{
-		return this.buffer.readUInt16BE(2);
+		return this.view.getUint16(2);
 	}
 
 	/**
@@ -192,7 +199,7 @@ export abstract class RtcpPacket
 	 */
 	protected setCount(count: number): void
 	{
-		this.buffer.writeUInt8(this.buffer.readUInt8() | (count & 0x1F), 0);
+		this.view.setUint8(0, this.view.getUint8(0) | (count & 0x1F));
 	}
 
 	/**
@@ -217,10 +224,15 @@ export abstract class RtcpPacket
 		const padding = this.padding ?? 0;
 
 		// Allocate new buffer.
-		const newBuffer = Buffer.alloc(length + padding);
+		const newBuffer = new ArrayBuffer(length + padding);
+		const newView = new DataView(newBuffer);
+		const newArray = new Uint8Array(newBuffer);
 
-		this.buffer.copy(newBuffer, 0, 0, COMMON_HEADER_LENGTH);
+		// Copy the fixed header into the new buffer.
+		newArray.set(new Uint8Array(this.buffer, 0, COMMON_HEADER_LENGTH), 0);
+
 		this.buffer = newBuffer;
+		this.view = newView;
 
 		this.writeCommonHeader();
 		this.setLength(((length + padding) / 4) - 1);
@@ -235,8 +247,8 @@ export abstract class RtcpPacket
 				);
 			}
 
-			this.buffer.fill(0, length, length + padding - 1);
-			this.buffer.writeUInt8(padding, length + this.padding - 1);
+			newArray.fill(0, length, length + padding - 1);
+			this.view.setUint8(length + this.padding - 1, padding);
 		}
 	}
 
@@ -251,7 +263,7 @@ export abstract class RtcpPacket
 	 */
 	private setVersion(): void
 	{
-		this.buffer.writeUInt8(this.buffer.readUInt8() | (RTCP_VERSION << 6), 0);
+		this.view.setUint8(0, this.view.getUint8(0) | (RTCP_VERSION << 6));
 	}
 
 	/**
@@ -259,7 +271,7 @@ export abstract class RtcpPacket
 	 */
 	private setPacketType(count: RtcpPacketType): void
 	{
-		this.buffer.writeUInt8(count, 1);
+		this.view.setUint8(1, count);
 	}
 
 	/**
@@ -267,7 +279,7 @@ export abstract class RtcpPacket
 	 */
 	private setLength(length: number): void
 	{
-		this.buffer.writeUInt16BE(length, 2);
+		this.view.setUint16(2, length);
 	}
 
 	/**
@@ -275,6 +287,6 @@ export abstract class RtcpPacket
 	 */
 	private setPaddingBit(bit: number): void
 	{
-		this.buffer.writeUInt8(this.buffer.readUInt8(0) | (bit << 5), 0);
+		this.view.setUint8(0, this.view.getUint8(0) | (bit << 5));
 	}
 }

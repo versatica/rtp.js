@@ -48,6 +48,7 @@ export function padTo4Bytes(size: number): number
 
 /**
  * Whether two ArrayBuffers contain the same data.
+ * NOTE: Only used by tests.
  */
 export function areBuffersEqual(buffer1: ArrayBuffer, buffer2: ArrayBuffer)
 {
@@ -75,4 +76,33 @@ export function areBuffersEqual(buffer1: ArrayBuffer, buffer2: ArrayBuffer)
 	}
 
 	return true;
+}
+
+/**
+ * Convert Node.js Buffer into ArrayBuffer.
+ * NOTE: Just for Node.js.
+ */
+export function bufferToArrayBuffer(buffer: Buffer): ArrayBuffer
+{
+	return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+}
+
+/**
+ * Convert Array into ArrayBuffer.
+ * NOTE: Only used by tests.
+ */
+export function numericArrayToArrayBuffer(array: number[]): ArrayBuffer
+{
+	return (new Uint8Array(array)).buffer;
+}
+
+/**
+ * Convert string into ArrayBuffer.
+ * NOTE: Only used by tests.
+ */
+export function stringToArrayBuffer(string: string): ArrayBuffer
+{
+	const encoder = new TextEncoder();
+
+	return encoder.encode(string).buffer;
 }

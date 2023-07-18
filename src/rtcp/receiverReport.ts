@@ -77,14 +77,16 @@ export class ReceiverReportPacket extends RtcpPacket
 	 * @param buffer - If given it will be parsed. Otherwise an empty RTP packet
 	 *   will be created.
 	 */
-	constructor(buffer?: Buffer)
+	constructor(buffer?: ArrayBuffer)
 	{
 		super(ReceiverReportPacket.packetType);
 
 		// If no buffer is given, create an empty one with minimum required length.
 		if (!buffer)
 		{
-			this.buffer = Buffer.alloc(FIXED_HEADER_LENGTH);
+			this.buffer = new ArrayBuffer(FIXED_HEADER_LENGTH);
+			this.view = new DataView(this.buffer);
+
 			this.writeCommonHeader();
 
 			return;
@@ -96,17 +98,18 @@ export class ReceiverReportPacket extends RtcpPacket
 		}
 
 		// Get padding.
-		const paddingFlag = Boolean((buffer.readUInt8() >> 5) & 1);
+		const paddingFlag = Boolean((this.view.getUint8(0) >> 5) & 1);
 
 		if (paddingFlag)
 		{
 			// NOTE: This will throw RangeError if there is no space in the buffer.
-			this.padding = buffer.readUInt8(((RtcpPacket.getLength(buffer) * 4) + 4 - 1));
+			this.padding =
+				this.view.getUint8(((RtcpPacket.getLength(this.buffer) * 4) + 4 - 1));
 		}
 
-		let count = RtcpPacket.getCount(buffer);
+		let count = RtcpPacket.getCount(this.buffer);
 
-		if (buffer.length < FIXED_HEADER_LENGTH + (count * REPORT_LENGTH))
+		if (this.buffer.byteLength < FIXED_HEADER_LENGTH + (count * REPORT_LENGTH))
 		{
 			throw new TypeError('buffer is too small');
 		}
@@ -114,17 +117,19 @@ export class ReceiverReportPacket extends RtcpPacket
 		while (count-- > 0)
 		{
 			const report = new ReceiverReport(
-				buffer.slice(FIXED_HEADER_LENGTH + (this.#reports.length * REPORT_LENGTH))
+				this.buffer.slice(FIXED_HEADER_LENGTH + (this.#reports.length * REPORT_LENGTH))
 			);
 
 			this.addReport(report);
 		}
 
 		// Store a buffer within the packet boundaries.
-		this.buffer = buffer.slice(
-			undefined,
+		this.buffer = this.buffer.slice(
+			0,
 			FIXED_HEADER_LENGTH + (this.#reports.length * REPORT_LENGTH) + this.padding
 		);
+
+		this.view = new DataView(this.buffer);
 	}
 
 	/**
@@ -144,7 +149,7 @@ export class ReceiverReportPacket extends RtcpPacket
 	 */
 	getSsrc(): number
 	{
-		return this.buffer.readUInt32BE(4);
+		return this.view.getUint32(4);
 	}
 
 	/**
@@ -152,7 +157,7 @@ export class ReceiverReportPacket extends RtcpPacket
 	 */
 	setSsrc(ssrc: number)
 	{
-		this.buffer.writeUInt32BE(ssrc, 4);
+		this.view.setUint32(4, ssrc);
 	}
 
 	/**
@@ -186,7 +191,7 @@ export class ReceiverReportPacket extends RtcpPacket
 			this.serialize();
 		}
 
-		return new ReceiverReportPacket(clone<Buffer>(this.buffer));
+		return new ReceiverReportPacket(clone<ArrayBuffer>(this.buffer));
 	}
 
 	/**
@@ -214,7 +219,7 @@ export class ReceiverReportPacket extends RtcpPacket
 		this.setCount(this.#reports.length);
 		this.setSsrc(ssrc);
 
-		for (let i=0; i < this.#reports.length; ++i)
+		for (let i = 0; i < this.#reports.length; ++i)
 		{
 			const report = this.#reports[i];
 
@@ -235,29 +240,29 @@ export class ReceiverReportPacket extends RtcpPacket
  */
 export class ReceiverReport
 {
-	// Buffer.
-	#buffer: Buffer;
+	// ArrayBuffer holding report binary data.
+	#buffer: ArrayBuffer;
 
 	/**
 	 * @param buffer - If given it will be parsed. Otherwise an empty RTCP Receiver
 	 *   Report will be created.
 	 */
-	constructor(buffer?: Buffer)
+	constructor(buffer?: ArrayBuffer)
 	{
 		// If no buffer is given, create an empty one.
 		if (!buffer)
 		{
-			this.#buffer = Buffer.alloc(REPORT_LENGTH);
+			this.#buffer = new ArrayBuffer(REPORT_LENGTH);
 
 			return;
 		}
 
-		if (buffer.length < REPORT_LENGTH)
+		if (buffer.byteLength < REPORT_LENGTH)
 		{
 			throw new TypeError('buffer is too small');
 		}
 
-		this.#buffer = buffer.slice(undefined, REPORT_LENGTH);
+		this.#buffer = buffer.slice(0, REPORT_LENGTH);
 	}
 
 	/**
