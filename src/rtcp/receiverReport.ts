@@ -219,11 +219,16 @@ export class ReceiverReportPacket extends RtcpPacket
 		this.setCount(this.#reports.length);
 		this.setSsrc(ssrc);
 
+		const newArray = new Uint8Array(this.buffer);
+
 		for (let i = 0; i < this.#reports.length; ++i)
 		{
 			const report = this.#reports[i];
 
-			report.getBuffer().copy(this.buffer, FIXED_HEADER_LENGTH + (REPORT_LENGTH * i));
+			newArray.set(
+				new Uint8Array(report.getBuffer()),
+				FIXED_HEADER_LENGTH + (REPORT_LENGTH * i)
+			);
 		}
 
 		// Reset flag.
@@ -242,6 +247,8 @@ export class ReceiverReport
 {
 	// ArrayBuffer holding report binary data.
 	#buffer: ArrayBuffer;
+	// DataView holding the ArrayBuffer.
+	#view: DataView;
 
 	/**
 	 * @param buffer - If given it will be parsed. Otherwise an empty RTCP Receiver
@@ -253,6 +260,7 @@ export class ReceiverReport
 		if (!buffer)
 		{
 			this.#buffer = new ArrayBuffer(REPORT_LENGTH);
+			this.#view = new DataView(this.#buffer);
 
 			return;
 		}
@@ -261,8 +269,13 @@ export class ReceiverReport
 		{
 			throw new TypeError('buffer is too small');
 		}
+		else if (buffer.byteLength > REPORT_LENGTH)
+		{
+			throw new TypeError('buffer is too big');
+		}
 
 		this.#buffer = buffer.slice(0, REPORT_LENGTH);
+		this.#view = new DataView(this.#buffer);
 	}
 
 	/**
@@ -284,7 +297,7 @@ export class ReceiverReport
 	/**
 	 * Get the internal buffer containing the RTCP Receiver Report binary.
 	 */
-	getBuffer(): Buffer
+	getBuffer(): ArrayBuffer
 	{
 		return this.#buffer;
 	}
@@ -294,7 +307,7 @@ export class ReceiverReport
 	 */
 	getSsrc(): number
 	{
-		return this.#buffer.readUInt32BE(0);
+		return this.#view.getUint32(0);
 	}
 
 	/**
@@ -302,7 +315,7 @@ export class ReceiverReport
 	 */
 	setSsrc(ssrc: number): void
 	{
-		this.#buffer.writeUInt32BE(ssrc, 0);
+		this.#view.setUint32(0, ssrc);
 	}
 
 	/**
@@ -310,7 +323,7 @@ export class ReceiverReport
 	 */
 	getFractionLost(): number
 	{
-		return this.#buffer.readUInt8(4);
+		return this.#view.getUint8(4);
 	}
 
 	/**
@@ -318,7 +331,7 @@ export class ReceiverReport
 	 */
 	setFractionLost(fractionLost: number): void
 	{
-		this.#buffer.writeUInt8(fractionLost, 4);
+		this.#view.setUint8(4, fractionLost);
 	}
 
 	/**
@@ -326,7 +339,9 @@ export class ReceiverReport
 	 */
 	getTotalLost(): number
 	{
-		let value = this.#buffer.readUIntBE(5, 3);
+		// We need to read 3 bytes in Big Endian (network byte order) so must read
+		// 4 and ignore the last one.
+		let value = this.#view.getUint32(5) >> 8;
 
 		// Possitive value.
 		if (((value >> 23) & 1) == 0)
@@ -354,7 +369,14 @@ export class ReceiverReport
 
 		const value = (totalLost >= 0) ? (clamp & 0x07FFFFF) : (clamp | 0x0800000);
 
-		this.#buffer.writeUIntBE(value, 5, 3);
+		// We need to write 3 bytes but we must use setUint32() (there is no
+		// setUint24()). So read the 4th byte after these 3 target bytes in the
+		// buffer, shift them 1 byte to the left and sum the 4th byte. Then write
+		// the 4 bytes in the buffer.
+
+		const byte4 = this.#view.getUint8(8);
+
+		this.#view.setUint32(5, (value << 8) + byte4);
 	}
 
 	/**
@@ -362,7 +384,7 @@ export class ReceiverReport
 	 */
 	getHighestSeqNumber(): number
 	{
-		return this.#buffer.readUIntBE(8, 4);
+		return this.#view.getUint32(8);
 	}
 
 	/**
@@ -370,7 +392,7 @@ export class ReceiverReport
 	 */
 	setHighestSeqNumber(lastSeq: number): void
 	{
-		this.#buffer.writeUIntBE(lastSeq, 8, 4);
+		this.#view.setUint32(8, lastSeq);
 	}
 
 	/**
@@ -378,7 +400,7 @@ export class ReceiverReport
 	 */
 	getJitter(): number
 	{
-		return this.#buffer.readUIntBE(12, 4);
+		return this.#view.getUint32(12);
 	}
 
 	/**
@@ -386,7 +408,7 @@ export class ReceiverReport
 	 */
 	setJitter(jitter: number)
 	{
-		this.#buffer.writeUIntBE(jitter, 12, 4);
+		this.#view.setUint32(12, jitter);
 	}
 
 	/**
@@ -394,7 +416,7 @@ export class ReceiverReport
 	 */
 	getLastSRTimestamp(): number
 	{
-		return this.#buffer.readUIntBE(16, 4);
+		return this.#view.getUint32(16);
 	}
 
 	/**
@@ -402,7 +424,7 @@ export class ReceiverReport
 	 */
 	setLastSRTimestamp(lsr: number): void
 	{
-		this.#buffer.writeUIntBE(lsr, 16, 4);
+		this.#view.setUint32(16, lsr);
 	}
 
 	/**
@@ -410,7 +432,7 @@ export class ReceiverReport
 	 */
 	getDelaySinceLastSR(): number
 	{
-		return this.#buffer.readUIntBE(20, 4);
+		return this.#view.getUint32(20);
 	}
 
 	/**
@@ -418,7 +440,7 @@ export class ReceiverReport
 	 */
 	setDelaySinceLastSR(dlsr: number): void
 	{
-		this.#buffer.writeUIntBE(dlsr, 20, 4);
+		this.#view.setUint32(20, dlsr);
 	}
 
 	/**
@@ -427,6 +449,6 @@ export class ReceiverReport
 	 */
 	clone(): ReceiverReport
 	{
-		return new ReceiverReport(clone<Buffer>(this.#buffer));
+		return new ReceiverReport(clone<ArrayBuffer>(this.#buffer));
 	}
 }
