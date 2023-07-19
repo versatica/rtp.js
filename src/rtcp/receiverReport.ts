@@ -32,7 +32,7 @@ block  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 // Common RTCP header length + 4.
 const FIXED_HEADER_LENGTH = 4 + 4;
 
-export const REPORT_LENGTH = 24;
+export const RECEIVER_REPORT_LENGTH = 24;
 
 /**
  * Receiver Report packet dump.
@@ -97,6 +97,9 @@ export class ReceiverReportPacket extends RtcpPacket
 			throw new TypeError('invalid RTCP packet');
 		}
 
+		this.buffer = buffer;
+		this.view = new DataView(this.buffer);
+
 		// Get padding.
 		const paddingFlag = Boolean((this.view.getUint8(0) >> 5) & 1);
 
@@ -109,15 +112,17 @@ export class ReceiverReportPacket extends RtcpPacket
 
 		let count = RtcpPacket.getCount(this.buffer);
 
-		if (this.buffer.byteLength < FIXED_HEADER_LENGTH + (count * REPORT_LENGTH))
+		if (this.buffer.byteLength < FIXED_HEADER_LENGTH + (count * RECEIVER_REPORT_LENGTH))
 		{
-			throw new TypeError('buffer is too small');
+			throw new TypeError(`buffer is too small (${this.buffer.byteLength} bytes)`);
 		}
 
 		while (count-- > 0)
 		{
+			const pos = FIXED_HEADER_LENGTH + (this.#reports.length * RECEIVER_REPORT_LENGTH);
+
 			const report = new ReceiverReport(
-				this.buffer.slice(FIXED_HEADER_LENGTH + (this.#reports.length * REPORT_LENGTH))
+				this.buffer.slice(pos, pos + RECEIVER_REPORT_LENGTH)
 			);
 
 			this.addReport(report);
@@ -126,9 +131,8 @@ export class ReceiverReportPacket extends RtcpPacket
 		// Store a buffer within the packet boundaries.
 		this.buffer = this.buffer.slice(
 			0,
-			FIXED_HEADER_LENGTH + (this.#reports.length * REPORT_LENGTH) + this.padding
+			FIXED_HEADER_LENGTH + (this.#reports.length * RECEIVER_REPORT_LENGTH) + this.padding
 		);
-
 		this.view = new DataView(this.buffer);
 	}
 
@@ -211,7 +215,7 @@ export class ReceiverReportPacket extends RtcpPacket
 	serialize(): void
 	{
 		// Compute required buffer length.
-		const length = FIXED_HEADER_LENGTH + (REPORT_LENGTH * this.#reports.length);
+		const length = FIXED_HEADER_LENGTH + (RECEIVER_REPORT_LENGTH * this.#reports.length);
 		const ssrc = this.getSsrc();
 
 		super.serializeBase(length);
@@ -227,7 +231,7 @@ export class ReceiverReportPacket extends RtcpPacket
 
 			newArray.set(
 				new Uint8Array(report.getBuffer()),
-				FIXED_HEADER_LENGTH + (REPORT_LENGTH * i)
+				FIXED_HEADER_LENGTH + (RECEIVER_REPORT_LENGTH * i)
 			);
 		}
 
@@ -259,22 +263,20 @@ export class ReceiverReport
 		// If no buffer is given, create an empty one.
 		if (!buffer)
 		{
-			this.#buffer = new ArrayBuffer(REPORT_LENGTH);
+			this.#buffer = new ArrayBuffer(RECEIVER_REPORT_LENGTH);
 			this.#view = new DataView(this.#buffer);
 
 			return;
 		}
 
-		if (buffer.byteLength < REPORT_LENGTH)
+		if (buffer.byteLength !== RECEIVER_REPORT_LENGTH)
 		{
-			throw new TypeError('buffer is too small');
-		}
-		else if (buffer.byteLength > REPORT_LENGTH)
-		{
-			throw new TypeError('buffer is too big');
+			throw new TypeError(
+				`wrong buffer size (${buffer.byteLength} bytes != ${RECEIVER_REPORT_LENGTH} bytes)`
+			);
 		}
 
-		this.#buffer = buffer.slice(0, REPORT_LENGTH);
+		this.#buffer = buffer.slice(0, RECEIVER_REPORT_LENGTH);
 		this.#view = new DataView(this.#buffer);
 	}
 
