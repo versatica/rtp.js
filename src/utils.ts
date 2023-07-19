@@ -97,8 +97,17 @@ export function numericArrayToArrayBuffer(array: number[]): ArrayBuffer
 }
 
 /**
+ * Convert ArrayBuffer into string.
+ */
+export function arrayBufferToString(buffer: ArrayBuffer): string
+{
+	const decoder = new TextDecoder();
+
+	return decoder.decode(buffer);
+}
+
+/**
  * Convert string into ArrayBuffer.
- * NOTE: Only used by tests.
  */
 export function stringToArrayBuffer(string: string): ArrayBuffer
 {
