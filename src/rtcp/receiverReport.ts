@@ -50,8 +50,8 @@ export type ReceiverReportDump =
 {
 	ssrc: number;
 	fractionLost: number;
-	totaLlost: number;
-	lastSeq: number;
+	totalLost: number;
+	highestSeq: number;
 	jitter: number;
 	lsr: number;
 	dlsr: number;
@@ -288,8 +288,8 @@ export class ReceiverReport
 		return {
 			ssrc         : this.getSsrc(),
 			fractionLost : this.getFractionLost(),
-			totaLlost    : this.getTotalLost(),
-			lastSeq      : this.getHighestSeqNumber(),
+			totalLost    : this.getTotalLost(),
+			highestSeq   : this.getHighestSeqNumber(),
 			jitter       : this.getJitter(),
 			lsr          : this.getLastSRTimestamp(),
 			dlsr         : this.getDelaySinceLastSR()
@@ -392,9 +392,9 @@ export class ReceiverReport
 	/**
 	 * Set highest RTP sequence number.
 	 */
-	setHighestSeqNumber(lastSeq: number): void
+	setHighestSeqNumber(seq: number): void
 	{
-		this.#view.setUint32(8, lastSeq);
+		this.#view.setUint32(8, seq);
 	}
 
 	/**

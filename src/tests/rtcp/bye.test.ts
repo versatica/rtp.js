@@ -4,7 +4,8 @@ import { areBuffersEqual } from '../../utils';
 
 const ssrc1 = 0x624276e0;
 const ssrc2 = 0x2624670f;
-const reason = 'Hasta la vista';
+const reason1 = 'Hasta la vista';
+const reason2 = '~æeñ€';
 
 const buffer = new Uint8Array(
 	[
@@ -28,16 +29,14 @@ describe('parse RTCP BYE packet', () =>
 	test('packet processing succeeds', () =>
 	{
 		const packet = new ByePacket(buffer);
-		const ssrcs = packet.getSsrcs();
 
 		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPadding()).toBe(0);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
 		expect(packet.getCount()).toBe(2);
 		expect(packet.getLength()).toBe(6);
-		expect(ssrcs[0]).toBe(ssrc1);
-		expect(ssrcs[1]).toBe(ssrc2);
-		expect(packet.getReason()).toBe(reason);
+		expect(packet.getSsrcs()).toEqual([ ssrc1, ssrc2 ]);
+		expect(packet.getReason()).toBe(reason1);
 	});
 
 	test('packet processing succeeds for a buffer with padding', () =>
@@ -57,16 +56,14 @@ describe('parse RTCP BYE packet', () =>
 		).buffer;
 
 		const packet = new ByePacket(bufferWithPadding);
-		const ssrcs = packet.getSsrcs();
 
 		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPadding()).toBe(padding);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
 		expect(packet.getCount()).toBe(2);
 		expect(packet.getLength()).toBe(7);
-		expect(ssrcs[0]).toBe(ssrc1);
-		expect(ssrcs[1]).toBe(ssrc2);
-		expect(packet.getReason()).toBe(reason);
+		expect(packet.getSsrcs()).toEqual([ ssrc1, ssrc2 ]);
+		expect(packet.getReason()).toBe(reason1);
 		// Compare buffers.
 		expect(areBuffersEqual(packet.getBuffer(), bufferWithPadding)).toBe(true);
 	});
@@ -104,12 +101,18 @@ describe('create RTCP BYE packet', () =>
 
 		expect(packet).toBeDefined();
 		expect(isRtcp(packet.getBuffer())).toBe(true);
+		expect(packet.getVersion()).toBe(2);
+		expect(packet.getPadding()).toBe(0);
+		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
+		expect(packet.getCount()).toBe(0);
+		expect(packet.getLength()).toBe(0);
+		expect(packet.getSsrcs()).toEqual([]);
+		expect(packet.getReason()).toBe(undefined);
 	});
 
 	test('creating a BYE packet with padding succeeds', () =>
 	{
 		const padding = 8;
-		const reason2 = '~æeñ€';
 		const bufferWithPadding = new Uint8Array(
 			[
 				0xa2, 0xcb, 0x00, 0x07, // Type: 203 (Bye), Count: 2, length: 7
@@ -127,7 +130,13 @@ describe('create RTCP BYE packet', () =>
 
 		expect(packet).toBeDefined();
 		expect(isRtcp(packet.getBuffer())).toBe(true);
+		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPadding()).toBe(0);
+		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
+		expect(packet.getCount()).toBe(0);
+		expect(packet.getLength()).toBe(0);
+		expect(packet.getSsrcs()).toEqual([]);
+		expect(packet.getReason()).toBe(undefined);
 
 		packet.addSsrc(ssrc1);
 		packet.addSsrc(ssrc2);
@@ -141,23 +150,40 @@ describe('create RTCP BYE packet', () =>
 		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
 		expect(packet.getCount()).toBe(2);
 		expect(packet.getLength()).toBe(7);
+		expect(packet.getSsrcs()).toEqual([ ssrc1, ssrc2 ]);
+		expect(packet.getReason()).toBe(reason2);
 		// Compare buffers.
 		expect(areBuffersEqual(packet.getBuffer(), bufferWithPadding)).toBe(true);
 	});
 
 	test('packet.clone() succeeds', () =>
 	{
-		const packet = new ByePacket(buffer);
+		const padding = 8;
+		const bufferWithPadding = new Uint8Array(
+			[
+				0xa2, 0xcb, 0x00, 0x07, // Type: 203 (Bye), Count: 2, length: 7
+				0x62, 0x42, 0x76, 0xe0, // SSRC: 0x624276e0
+				0x26, 0x24, 0x67, 0x0f, // SSRC: 0x2624670f
+				0x09, 0x7e, 0xc3, 0xa6, // Length: 9, Text: "~æeñ€"
+				0x65, 0xc3, 0xb1, 0xe2,
+				0x82, 0xac, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x08 // Padding (8 bytes)
+			]
+		).buffer;
+
+		const packet = new ByePacket(bufferWithPadding);
 		const clonedPacket = packet.clone();
 
-		expect(clonedPacket.getVersion()).toBe(packet.getVersion());
-		expect(clonedPacket.getPadding()).toBe(packet.getPadding());
-		expect(clonedPacket.getPacketType()).toBe(packet.getPacketType());
-		expect(clonedPacket.getCount()).toBe(packet.getCount());
-		expect(clonedPacket.getSsrcs()).toEqual(packet.getSsrcs());
-		expect(clonedPacket.getReason()).toBe(packet.getReason());
-		expect(clonedPacket.dump()).toEqual(packet.dump());
+		expect(clonedPacket.getVersion()).toBe(2);
+		expect(clonedPacket.getPadding()).toBe(padding);
+		expect(clonedPacket.getPacketType()).toBe(RtcpPacketType.BYE);
+		expect(clonedPacket.getCount()).toBe(2);
+		expect(clonedPacket.getLength()).toBe(7);
+		expect(clonedPacket.getSsrcs()).toEqual([ ssrc1, ssrc2 ]);
+		expect(clonedPacket.getReason()).toBe(reason2);
 		// Compare buffers.
+		expect(areBuffersEqual(clonedPacket.getBuffer(), bufferWithPadding)).toBe(true);
 		expect(areBuffersEqual(clonedPacket.getBuffer(), packet.getBuffer())).toBe(true);
 	});
 });

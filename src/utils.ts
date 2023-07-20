@@ -1,3 +1,7 @@
+import { Logger } from './Logger';
+
+const logger = new Logger('utils');
+
 /**
  * Clones the given object/array/Buffer/etc.
  */
@@ -54,11 +58,22 @@ export function areBuffersEqual(buffer1: ArrayBuffer, buffer2: ArrayBuffer)
 {
 	if (buffer1 === buffer2)
 	{
+		logger.debug(
+			'areBuffersEqual() | buffer1 and buffer2 are the same ArrayBuffer instance'
+		);
+
 		return true;
 	}
 
 	if (buffer1.byteLength !== buffer2.byteLength)
 	{
+		if (logger.debug.enabled)
+		{
+			logger.debug(
+				`areBuffersEqual() | different buffer length [buffer1.byteLength:${buffer1.byteLength}, buffer2.byteLength:${buffer2.byteLength}]`
+			);
+		}
+
 		return false;
 	}
 
@@ -71,9 +86,15 @@ export function areBuffersEqual(buffer1: ArrayBuffer, buffer2: ArrayBuffer)
 	{
 		if (view1.getUint8(i) !== view2.getUint8(i))
 		{
-			console.log('buffer1:', buffer1);
-			console.log('buffer2:', buffer2);
-			console.log('i:%s, buffer1:0x%s, buffer2:0x%s', i, view1.getUint8(i).toString(16), view2.getUint8(i).toString(16))
+			if (logger.debug.enabled)
+			{
+				logger.debug(
+					`areBuffersEqual() | different byte [idx:${i}, buffer1 byte:${view1.getUint8(i).toString(16)}, buffer2 byte:${view2.getUint8(i).toString(16)}]`
+				);
+				logger.debug('areBuffersEqual() | buffer1:', buffer1);
+				logger.debug('areBuffersEqual() | buffer2:', buffer2);
+			}
+
 			return false;
 		}
 	}

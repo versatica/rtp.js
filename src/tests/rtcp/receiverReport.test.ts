@@ -1,18 +1,11 @@
 import {
 	ReceiverReport,
 	ReceiverReportPacket,
+	ReceiverReportDump,
 	RECEIVER_REPORT_LENGTH
 } from '../../rtcp/receiverReport';
 import { isRtcp, RtcpPacketType } from '../../rtcp';
 import { areBuffersEqual, numericArrayToArrayBuffer } from '../../utils';
-
-const ssrc = 26422708;
-const fractionLost = 80;
-const totalLost = 216;
-const highestSeqNumber = 342342;
-const jitter = 0;
-const lastSenderReport = 8234;
-const delaySinceLastSenderReport = 5;
 
 const buffer = new Uint8Array(
 	[
@@ -20,20 +13,42 @@ const buffer = new Uint8Array(
 		0x5d, 0x93, 0x15, 0x34, // Sender SSRC: 0x5d931534
 		// Receiver Report
 		0x01, 0x93, 0x2d, 0xb4, // SSRC. 0x01932db4
-		0x50, 0x00, 0x00, 0xd8, // Fraction lost: 0, Total lost: 1
-		0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 0
+		0x50, 0x00, 0x00, 0xd8, // Fraction lost: 80, Total lost: 216
+		0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 342342
 		0x00, 0x00, 0x00, 0x00, // Jitter: 0
 		0x00, 0x00, 0x20, 0x2a, // Last SR: 8234
 		0x00, 0x00, 0x00, 0x05, // DLSR: 5
 		// Receiver Report
 		0x02, 0x93, 0x2d, 0xb4, // SSRC. 0x02932db4
-		0x50, 0x00, 0x00, 0xd8, // Fraction lost: 0, Total lost: 1
-		0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 0
-		0x00, 0x00, 0x00, 0x00, // Jitter: 0
-		0x00, 0x00, 0x20, 0x2a, // Last SR: 8234
-		0x00, 0x00, 0x00, 0x05 // DLSR: 5
+		0x51, 0x00, 0x00, 0xd9, // Fraction lost: 81, Total lost: 217
+		0x00, 0x05, 0x39, 0x47, // Extended highest sequence number: 342343
+		0x00, 0x00, 0x00, 0x02, // Jitter: 2
+		0x00, 0x00, 0x20, 0x2b, // Last SR: 8235
+		0x00, 0x00, 0x00, 0x06 // DLSR: 6
 	]
 ).buffer;
+
+const report1data: ReceiverReportDump =
+{
+	ssrc         : 26422708,
+	fractionLost : 80,
+	totalLost    : 216,
+	highestSeq   : 342342,
+	jitter       : 0,
+	lsr          : 8234,
+	dlsr         : 5
+};
+
+const report2data: ReceiverReportDump =
+{
+	ssrc         : 0x02932db4,
+	fractionLost : 81,
+	totalLost    : 217,
+	highestSeq   : 342343,
+	jitter       : 2,
+	lsr          : 8235,
+	dlsr         : 6
+};
 
 describe('parse RTCP Receiver Report packet', () =>
 {
@@ -57,8 +72,8 @@ describe('parse RTCP Receiver Report packet', () =>
 		// Compare buffers.
 		expect(areBuffersEqual(packet.getBuffer(), buffer)).toBe(true);
 
-		checkReport(report1);
-		checkReport(report2, /* customSrrc */ 0x02932db4);
+		checkReport(report1, report1data);
+		checkReport(report2, report2data);
 	});
 
 	test('packet processing succeeds for a buffer with padding', () =>
@@ -70,8 +85,8 @@ describe('parse RTCP Receiver Report packet', () =>
 				0x5d, 0x93, 0x15, 0x34, // Sender SSRC: 0x5d931534
 				// Receiver Report
 				0x01, 0x93, 0x2d, 0xb4, // SSRC. 0x01932db4
-				0x50, 0x00, 0x00, 0xd8, // Fraction lost: 0, Total lost: 1
-				0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 0
+				0x50, 0x00, 0x00, 0xd8, // Fraction lost: 80, Total lost: 216
+				0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 342342
 				0x00, 0x00, 0x00, 0x00, // Jitter: 0
 				0x00, 0x00, 0x20, 0x2a, // Last SR: 8234
 				0x00, 0x00, 0x00, 0x05, // DLSR: 5
@@ -91,7 +106,7 @@ describe('parse RTCP Receiver Report packet', () =>
 		// Compare buffers.
 		expect(areBuffersEqual(packet.getBuffer(), bufferWithPadding)).toBe(true);
 
-		checkReport(report);
+		checkReport(report, report1data);
 	});
 
 	test('parsing a buffer which length does not fit the indicated count throws', () =>
@@ -111,7 +126,7 @@ describe('parse RTCP Receiver Report', () =>
 
 		expect(report).toBeDefined();
 
-		checkReport(report);
+		checkReport(report, report1data);
 	});
 
 	test('parsing a buffer which length does not fit the report size throws', () =>
@@ -230,49 +245,49 @@ describe('create RTCP Receiver Report', () =>
 
 		expect(report).toBeDefined();
 
-		report.setSsrc(ssrc);
-		report.setFractionLost(fractionLost);
-		report.setTotalLost(totalLost);
-		report.setHighestSeqNumber(highestSeqNumber);
-		report.setJitter(jitter);
-		report.setLastSRTimestamp(lastSenderReport);
-		report.setDelaySinceLastSR(delaySinceLastSenderReport);
+		report.setSsrc(report1data.ssrc);
+		report.setFractionLost(report1data.fractionLost);
+		report.setTotalLost(report1data.totalLost);
+		report.setHighestSeqNumber(report1data.highestSeq);
+		report.setJitter(report1data.jitter);
+		report.setLastSRTimestamp(report1data.lsr);
+		report.setDelaySinceLastSR(report1data.dlsr);
 
-		checkReport(report);
+		checkReport(report, report1data);
 	});
 
 	test('report.clone() succeeds', () =>
 	{
-		const receiverReport = new ReceiverReport();
+		const report = new ReceiverReport();
 
-		expect(receiverReport).toBeDefined();
+		expect(report).toBeDefined();
 
-		receiverReport.setSsrc(ssrc);
-		receiverReport.setFractionLost(fractionLost);
-		receiverReport.setTotalLost(totalLost);
-		receiverReport.setHighestSeqNumber(highestSeqNumber);
-		receiverReport.setJitter(jitter);
-		receiverReport.setLastSRTimestamp(lastSenderReport);
-		receiverReport.setDelaySinceLastSR(delaySinceLastSenderReport);
+		report.setSsrc(report2data.ssrc);
+		report.setFractionLost(report2data.fractionLost);
+		report.setTotalLost(report2data.totalLost);
+		report.setHighestSeqNumber(report2data.highestSeq);
+		report.setJitter(report2data.jitter);
+		report.setLastSRTimestamp(report2data.lsr);
+		report.setDelaySinceLastSR(report2data.dlsr);
 
-		const clonedReceivedReport = receiverReport.clone();
+		const clonedReceivedReport = report.clone();
 
-		expect(clonedReceivedReport.dump()).toEqual(receiverReport.dump());
+		expect(clonedReceivedReport.dump()).toEqual(report.dump());
 		// Compare buffers.
 		expect(areBuffersEqual(
 			clonedReceivedReport.getBuffer(),
-			receiverReport.getBuffer())
+			report.getBuffer())
 		).toBe(true);
 	});
 });
 
-function checkReport(report: ReceiverReport, customSsrc?: number)
+function checkReport(report: ReceiverReport, data: ReceiverReportDump)
 {
-	expect(report.getSsrc()).toBe(customSsrc ?? ssrc);
-	expect(report.getFractionLost()).toBe(fractionLost);
-	expect(report.getTotalLost()).toBe(totalLost);
-	expect(report.getHighestSeqNumber()).toBe(highestSeqNumber);
-	expect(report.getJitter()).toBe(jitter);
-	expect(report.getLastSRTimestamp()).toBe(lastSenderReport);
-	expect(report.getDelaySinceLastSR()).toBe(delaySinceLastSenderReport);
+	expect(report.getSsrc()).toBe(data.ssrc);
+	expect(report.getFractionLost()).toBe(data.fractionLost);
+	expect(report.getTotalLost()).toBe(data.totalLost);
+	expect(report.getHighestSeqNumber()).toBe(data.highestSeq);
+	expect(report.getJitter()).toBe(data.jitter);
+	expect(report.getLastSRTimestamp()).toBe(data.lsr);
+	expect(report.getDelaySinceLastSR()).toBe(data.dlsr);
 }
