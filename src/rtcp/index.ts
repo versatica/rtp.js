@@ -87,7 +87,7 @@ export abstract class RtcpPacket
 	// @ts-ignore. 'view' has not initializer and is not assigned in constructor.
 	protected view: DataView;
 	// RTCP packet type.
-	#packetType: RtcpPacketType;
+	readonly #packetType: RtcpPacketType;
 	// Number of bytes of padding.
 	protected padding: number = 0;
 	// Whether serialization is needed due to modifications.

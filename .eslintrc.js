@@ -6,8 +6,9 @@ const eslintConfig =
 {
 	env :
 	{
-		browser : true,
 		es6     : true,
+		// rtp.js runs in browser and Node, so we don't need browser specific types.
+		browser : false,
 		node    : true
 	},
 	plugins       : [],

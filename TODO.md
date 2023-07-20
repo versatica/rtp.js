@@ -13,3 +13,5 @@
 - Maybe we should make the packets emit 'serializationneed' event and expose a `needsSerialization()` public method. Or just the latter.
 
 - And once above bullets are done, make tests use it and also assert whether serialization is needed or not. Same for `RtpPacket`.
+
+- `README` and project description in `package.json`, GitHub, etc: Mention that this is for Node and Browser. And check that this is true.
