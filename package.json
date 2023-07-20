@@ -1,7 +1,7 @@
 {
   "name": "rtp.js",
   "version": "0.3.0",
-  "description": "RTP stack for Node.js",
+  "description": "RTP stack for Node and browser written in TypeScript",
   "contributors": [
     "Iñaki Baz Castillo <ibc@aliax.net> (https://inakibaz.me)",
     "José Luis Millán <jmillan@aliax.net> (https://github.com/jmillan)"

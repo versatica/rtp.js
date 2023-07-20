@@ -3,7 +3,7 @@
 [![][npm-shield-rtp.js]][npm-rtp.js]
 [![][github-actions-shield-rtp.js]][github-actions-rtp.js]
 
-RTP stack for Node.js. Why not?
+RTP stack for Node and browser written in TypeScript.
 
 **rtp.js** provides with an API to generate, parse, modify, inspect RTP and RTCP packets.
 

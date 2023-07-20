@@ -285,15 +285,17 @@ export class RtpPacket
 	}
 
 	/**
-	 * Get the internal buffer containing the serialized RTP binary packet. The
-	 * buffer is serialized only if needed (to apply packet modifications).
+	 * Get the internal buffer containing the serialized RTP binary packet.
+	 *
+	 * @remarks
+	 * The buffer is serialized if needed (to apply packet pending modifications).
 	 *
 	 * @throws If buffer serialization is needed and it fails due to invalid
 	 *   fields.
 	 */
 	getBuffer(): ArrayBuffer
 	{
-		if (this.#serializationNeeded)
+		if (this.needsSerialization())
 		{
 			this.serialize();
 		}
@@ -384,10 +386,12 @@ export class RtpPacket
 	/**
 	 * Set the RTP CSRC values. If `csrc` is not given (or if it's an empty
 	 * array) CSRC field will be removed from the RTP packet.
+	 *
+	 * @remarks
+	 * Serialization is needed after calling this method.
 	 */
 	setCsrc(csrc: number[] = []): void
 	{
-		this.#serializationNeeded = true;
 		this.#csrc = csrc;
 
 		// Update CSRC count.
@@ -397,6 +401,8 @@ export class RtpPacket
 			0,
 			(this.#view.getUint8(0) & 0xF0) | (count & 0x0F)
 		);
+
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -437,6 +443,9 @@ export class RtpPacket
 
 	/**
 	 * Enable One-Byte extensions (RFC 5285).
+	 *
+	 * @remarks
+	 * Serialization maybe needed after calling this method.
 	 */
 	enableOneByteExtensions(): void
 	{
@@ -446,11 +455,15 @@ export class RtpPacket
 		}
 
 		this.#headerExtensionId = 0xBEDE;
-		this.#serializationNeeded = true;
+
+		this.setSerializationNeeded(true);
 	}
 
 	/**
 	 * Enable Two-Bytes extensions (RFC 5285).
+	 *
+	 * @remarks
+	 * Serialization maybe needed after calling this method.
 	 */
 	enableTwoBytesExtensions(): void
 	{
@@ -460,7 +473,8 @@ export class RtpPacket
 		}
 
 		this.#headerExtensionId = 0b0001000000000000;
-		this.#serializationNeeded = true;
+
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -481,6 +495,9 @@ export class RtpPacket
 
 	/**
 	 * Set the value of the extension (RFC 5285) with given `id`.
+	 *
+	 * @remarks
+	 * Serialization is needed after calling this method.
 	 */
 	setExtension(id: number, value: ArrayBuffer): void
 	{
@@ -497,11 +514,15 @@ export class RtpPacket
 		}
 
 		this.#extensions.set(id, value);
-		this.#serializationNeeded = true;
+
+		this.setSerializationNeeded(true);
 	}
 
 	/**
 	 * Delete the extension (RFC 5285) with given `id` (if any).
+	 *
+	 * @remarks
+	 * Serialization maybe needed after calling this method.
 	 */
 	deleteExtension(id: number): void
 	{
@@ -516,11 +537,14 @@ export class RtpPacket
 			this.setHeaderExtensionBit(0);
 		}
 
-		this.#serializationNeeded = true;
+		this.setSerializationNeeded(true);
 	}
 
 	/**
 	 * Clear all extensions (RFC 5285).
+	 *
+	 * @remarks
+	 * Serialization maybe needed after calling this method.
 	 */
 	clearExtensions(): void
 	{
@@ -534,7 +558,7 @@ export class RtpPacket
 		// Update header extension bit.
 		this.setHeaderExtensionBit(0);
 
-		this.#serializationNeeded = true;
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -553,11 +577,15 @@ export class RtpPacket
 	 *
 	 * packet.setPayload(payload.buffer);
 	 * ```
+	 *
+	 * @remarks
+	 * Serialization is needed after calling this method.
 	 */
 	setPayload(payload: ArrayBuffer): void
 	{
 		this.#payload = payload;
-		this.#serializationNeeded = true;
+
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -570,6 +598,9 @@ export class RtpPacket
 
 	/**
 	 * Set the padding (in bytes) after the packet payload.
+	 *
+	 * @remarks
+	 * Serialization is needed after calling this method.
 	 */
 	setPadding(padding: number): void
 	{
@@ -580,7 +611,7 @@ export class RtpPacket
 
 		this.setPaddingBit(bit);
 
-		this.#serializationNeeded = true;
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -592,7 +623,7 @@ export class RtpPacket
 	 */
 	padTo4Bytes(): void
 	{
-		if (this.#serializationNeeded)
+		if (this.needsSerialization())
 		{
 			this.serialize();
 		}
@@ -607,18 +638,23 @@ export class RtpPacket
 		}
 
 		this.setPadding(padding + newLength - length);
+
+		this.setSerializationNeeded(true);
 	}
 
 	/**
 	 * Clone the packet. The cloned packet does not share any memory with the
 	 * original one.
 	 *
+	 * @remarks
+	 * The buffer is serialized if needed (to apply packet pending modifications).
+	 *
 	 * @throws If buffer serialization is needed and it fails due to invalid
 	 *   fields.
 	 */
 	clone(): RtpPacket
 	{
-		if (this.#serializationNeeded)
+		if (this.needsSerialization())
 		{
 			this.serialize();
 		}
@@ -628,6 +664,9 @@ export class RtpPacket
 
 	/**
 	 * Encode the packet using RTX procedures (as per RFC 4588).
+	 *
+	 * @remarks
+	 * Serialization is needed after calling this method.
 	 *
 	 * @param payloadType - The RTX payload type.
 	 * @param ssrc - The RTX SSRC.
@@ -661,11 +700,14 @@ export class RtpPacket
 		// Remove padding.
 		this.setPadding(0);
 
-		this.#serializationNeeded = true;
+		this.setSerializationNeeded(true);
 	}
 
 	/**
 	 * Decode the packet using RTX procedures (as per RFC 4588).
+	 *
+	 * @remarks
+	 * Serialization is needed after calling this method.
 	 *
 	 * @param payloadType - The original payload type.
 	 * @param ssrc - The original SSRC.
@@ -698,7 +740,16 @@ export class RtpPacket
 		// Remove padding.
 		this.setPadding(0);
 
-		this.#serializationNeeded = true;
+		this.setSerializationNeeded(true);
+	}
+
+	/**
+	 * Whether {@link serialize} should be called due to modifications in the
+	 * packet not being yet applied into the buffer.
+	 */
+	needsSerialization(): boolean
+	{
+		return this.#serializationNeeded;
 	}
 
 	/**
@@ -706,12 +757,9 @@ export class RtpPacket
 	 * buffer (the one that {@link getBuffer} will later return).
 	 *
 	 * @remarks
-	 * In most cases there is no need to use this method. It must be
-	 * called only if the application retrieves information from the packet (by
-	 * calling {@link getBuffer}, {@link getPayload}, {@link getExtension}, etc)
-	 * and modifies the obtained buffers in place. However, it's recommended to
-	 * use the existing setter methods instead ({@link setPayload},
-	 * {@link setExtension}, etc).
+	 * In most cases there is no need to use this method since many setter methods
+	 * apply the changes within the current buffer. To be sure, check
+	 * {@link needsSerialization} before.
 	 *
 	 * @throws If invalid fields were previously added to the packet.
 	 */
@@ -915,8 +963,7 @@ export class RtpPacket
 		// Update buffer.
 		this.#buffer = buffer;
 
-		// Reset flag.
-		this.#serializationNeeded = false;
+		this.setSerializationNeeded(false);
 	}
 
 	private setVersion(): void
@@ -932,5 +979,10 @@ export class RtpPacket
 	private setPaddingBit(bit: number)
 	{
 		this.#view.setUint8(0, this.#view.getUint8(0) | (bit << 5));
+	}
+
+	private setSerializationNeeded(flag: boolean): void
+	{
+		this.#serializationNeeded = flag;
 	}
 }
