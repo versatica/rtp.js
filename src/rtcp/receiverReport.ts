@@ -131,6 +131,14 @@ export class ReceiverReportPacket extends RtcpPacket
 			FIXED_HEADER_LENGTH + (this.#reports.length * RECEIVER_REPORT_LENGTH) + this.padding
 		);
 		this.view = new DataView(this.buffer);
+
+		console.log('TODO: yes or not?');
+		// if (offset !== this.buffer.byteLength)
+		// {
+		// 	throw new RangeError(
+		// 		`parsed length (${offset} bytes) does not match buffer length (${this.buffer.byteLength} bytes)`
+		// 	);
+		// }
 	}
 
 	/**
@@ -178,7 +186,7 @@ export class ReceiverReportPacket extends RtcpPacket
 
 		this.setCount(this.#reports.length);
 
-		this.serializationNeeded = true;
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -190,7 +198,7 @@ export class ReceiverReportPacket extends RtcpPacket
 	 */
 	clone(): ReceiverReportPacket
 	{
-		if (this.serializationNeeded)
+		if (this.needsSerialization())
 		{
 			this.serialize();
 		}
@@ -236,7 +244,7 @@ export class ReceiverReportPacket extends RtcpPacket
 		}
 
 		// Reset flag.
-		this.serializationNeeded = false;
+		this.setSerializationNeeded(false);
 	}
 }
 

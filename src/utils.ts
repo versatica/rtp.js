@@ -72,6 +72,8 @@ export function areBuffersEqual(buffer1: ArrayBuffer, buffer2: ArrayBuffer)
 			logger.debug(
 				`areBuffersEqual() | different buffer length [buffer1.byteLength:${buffer1.byteLength}, buffer2.byteLength:${buffer2.byteLength}]`
 			);
+			logger.debug('areBuffersEqual() | buffer1:', buffer1);
+			logger.debug('areBuffersEqual() | buffer2:', buffer2);
 		}
 
 		return false;

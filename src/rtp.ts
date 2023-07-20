@@ -106,7 +106,7 @@ export class RtpPacket
 		this.#view = new DataView(this.#buffer);
 
 		const firstByte = this.#view.getUint8(0);
-		let pos = FIXED_HEADER_LENGTH;
+		let offset = FIXED_HEADER_LENGTH;
 
 		// Parse CSRC.
 		const csrcCount = firstByte & 0x0F;
@@ -116,8 +116,8 @@ export class RtpPacket
 			for (let i = 0; i < csrcCount; ++i)
 			{
 				// NOTE: This will throw RangeError if there is no space in the buffer.
-				this.#csrc.push(this.#view.getUint32(pos));
-				pos += 4;
+				this.#csrc.push(this.#view.getUint32(offset));
+				offset += 4;
 			}
 		}
 
@@ -128,26 +128,26 @@ export class RtpPacket
 		if (extFlag)
 		{
 			// NOTE: This will throw RangeError if there is no space in the buffer.
-			this.#headerExtensionId = this.#view.getUint16(pos);
+			this.#headerExtensionId = this.#view.getUint16(offset);
 
-			const length = this.#view.getUint16(pos + 2) * 4;
+			const length = this.#view.getUint16(offset + 2) * 4;
 
-			extBuffer = this.#buffer.slice(pos + 4, pos + 4 + length);
+			extBuffer = this.#buffer.slice(offset + 4, offset + 4 + length);
 
-			pos += (4 + length);
+			offset += (4 + length);
 		}
 
 		// Parse One-Byte or Two-Bytes extensions.
 		if (extBuffer && this.hasOneByteExtensions())
 		{
 			const extView = new DataView(extBuffer);
-			let extPos = 0;
+			let extOffset = 0;
 
 			// One-Byte extensions cannot have length 0.
-			while (extPos < extBuffer.byteLength)
+			while (extOffset < extBuffer.byteLength)
 			{
-				const id = (extView.getUint8(extPos) & 0xF0) >> 4;
-				const length = (extView.getUint8(extPos) & 0x0F) + 1;
+				const id = (extView.getUint8(extOffset) & 0xF0) >> 4;
+				const length = (extView.getUint8(extOffset) & 0x0F) + 1;
 
 				// id=15 in One-Byte extensions means "stop parsing here".
 				if (id === 15)
@@ -158,7 +158,7 @@ export class RtpPacket
 				// Valid extension id.
 				if (id !== 0)
 				{
-					if (extPos + 1 + length > extBuffer.byteLength)
+					if (extOffset + 1 + length > extBuffer.byteLength)
 					{
 						throw new RangeError(
 							'not enough space for the announced One-Byte extension value'
@@ -166,38 +166,41 @@ export class RtpPacket
 					}
 
 					// Store the One-Byte extension element in the map.
-					this.#extensions.set(id, extBuffer.slice(extPos + 1, extPos + 1 + length));
+					this.#extensions.set(
+						id,
+						extBuffer.slice(extOffset + 1, extOffset + 1 + length)
+					);
 
-					extPos += (length + 1);
+					extOffset += (length + 1);
 				}
 				// id=0 means alignment.
 				else
 				{
-					++extPos;
+					++extOffset;
 				}
 
 				// Counting padding bytes.
-				while (extPos < extBuffer.byteLength && extView.getUint8(extPos) === 0)
+				while (extOffset < extBuffer.byteLength && extView.getUint8(extOffset) === 0)
 				{
-					++extPos;
+					++extOffset;
 				}
 			}
 		}
 		else if (extBuffer && this.hasTwoBytesExtensions())
 		{
 			const extView = new DataView(extBuffer);
-			let extPos = 0;
+			let extOffset = 0;
 
 			// Two-Byte extensions can have length 0.
-			while (extPos + 1 < extBuffer.byteLength)
+			while (extOffset + 1 < extBuffer.byteLength)
 			{
-				const id = extView.getUint8(extPos);
-				const length = extView.getUint8(extPos + 1);
+				const id = extView.getUint8(extOffset);
+				const length = extView.getUint8(extOffset + 1);
 
 				// Valid extension id.
 				if (id !== 0)
 				{
-					if (extPos + 2 + length > extBuffer.byteLength)
+					if (extOffset + 2 + length > extBuffer.byteLength)
 					{
 						throw new RangeError(
 							'not enough space for the announced Two-Bytes extension value'
@@ -205,20 +208,23 @@ export class RtpPacket
 					}
 
 					// Store the Two-Bytes extension element in the map.
-					this.#extensions.set(id, extBuffer.slice(extPos + 2, extPos + 2 + length));
+					this.#extensions.set(
+						id,
+						extBuffer.slice(extOffset + 2, extOffset + 2 + length)
+					);
 
-					extPos += (length + 2);
+					extOffset += (length + 2);
 				}
 				// id=0 means alignment.
 				else
 				{
-					++extPos;
+					++extOffset;
 				}
 
 				// Counting padding bytes.
-				while (extPos < extBuffer.byteLength && extView.getUint8(extPos) === 0)
+				while (extOffset < extBuffer.byteLength && extView.getUint8(extOffset) === 0)
 				{
-					++extPos;
+					++extOffset;
 				}
 			}
 		}
@@ -233,24 +239,24 @@ export class RtpPacket
 		}
 
 		// Get payload.
-		const payloadLength = this.#buffer.byteLength - pos - this.#padding;
+		const payloadLength = this.#buffer.byteLength - offset - this.#padding;
 
 		if (payloadLength < 0)
 		{
 			throw new RangeError(
-				`announced padding (${this.#padding} bytes) is bigger than available space for payload (${this.#buffer.byteLength - pos} bytes)`
+				`announced padding (${this.#padding} bytes) is bigger than available space for payload (${this.#buffer.byteLength - offset} bytes)`
 			);
 		}
 
-		this.#payload = this.#buffer.slice(pos, pos + payloadLength);
+		this.#payload = this.#buffer.slice(offset, offset + payloadLength);
 
 		// Ensure that buffer length and parsed length match.
-		pos += (payloadLength + this.#padding);
+		offset += (payloadLength + this.#padding);
 
-		if (pos !== this.#buffer.byteLength)
+		if (offset !== this.#buffer.byteLength)
 		{
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match buffer length (${this.#buffer.byteLength} bytes)`
+				`parsed length (${offset} bytes) does not match buffer length (${this.#buffer.byteLength} bytes)`
 			);
 		}
 	}

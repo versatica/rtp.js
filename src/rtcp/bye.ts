@@ -97,11 +97,9 @@ export class ByePacket extends RtcpPacket
 			// NOTE: We don't call this.addSsrc() here because we don't want that
 			// serialization is needed when parsing a packet.
 
-			// this.addSsrc(ssrc);
-
 			this.ssrcs.push(ssrc);
+
 			this.setCount(this.ssrcs.length);
-			// this.setSerializationNeeded(true);
 
 			offset += SSRC_LENGTH;
 		}
@@ -125,11 +123,21 @@ export class ByePacket extends RtcpPacket
 			this.reason = arrayBufferToString(reasonBuffer);
 
 			offset += reasonLength;
+			offset += reasonPadding;
 		}
 
 		// Store a buffer within the packet boundaries.
 		this.buffer = buffer.slice(0, offset + this.padding);
 		this.view = new DataView(this.buffer);
+
+		offset += this.padding;
+
+		if (offset !== this.buffer.byteLength)
+		{
+			throw new RangeError(
+				`parsed length (${offset} bytes) does not match buffer length (${this.buffer.byteLength} bytes)`
+			);
+		}
 	}
 
 	/**
