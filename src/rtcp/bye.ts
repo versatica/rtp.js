@@ -94,7 +94,14 @@ export class ByePacket extends RtcpPacket
 		{
 			const ssrc = this.view.getUint32(offset);
 
-			this.addSsrc(ssrc);
+			// NOTE: We don't call this.addSsrc() here because we don't want that
+			// serialization is needed when parsing a packet.
+
+			// this.addSsrc(ssrc);
+
+			this.ssrcs.push(ssrc);
+			this.setCount(this.ssrcs.length);
+			// this.setSerializationNeeded(true);
 
 			offset += SSRC_LENGTH;
 		}
@@ -147,6 +154,9 @@ export class ByePacket extends RtcpPacket
 
 	/**
 	 * Add a SSRC.
+	 *
+	 * @remarks
+	 * Serialization is needed after calling this method.
 	 */
 	addSsrc(ssrc: number): void
 	{
@@ -154,7 +164,7 @@ export class ByePacket extends RtcpPacket
 
 		this.setCount(this.ssrcs.length);
 
-		this.serializationNeeded = true;
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -167,23 +177,30 @@ export class ByePacket extends RtcpPacket
 
 	/**
 	 * Set reason.
+	 *
+	 * @remarks
+	 * Serialization is needed after calling this method.
 	 */
 	setReason(reason?: string): void
 	{
 		this.reason = reason;
-		this.serializationNeeded = true;
+
+		this.setSerializationNeeded(true);
 	}
 
 	/**
 	 * Clone the packet. The cloned packet does not share any memory with the
 	 * original one.
 	 *
+	 * @remarks
+	 * The buffer is serialized if needed (to apply packet pending modifications).
+	 *
 	 * @throws If buffer serialization is needed and it fails due to invalid
 	 *   fields.
 	 */
 	clone(): ByePacket
 	{
-		if (this.serializationNeeded)
+		if (this.needsSerialization())
 		{
 			this.serialize();
 		}
@@ -196,15 +213,11 @@ export class ByePacket extends RtcpPacket
 	 * buffer (the one that {@link getBuffer} will later return).
 	 *
 	 * @remarks
-	 * In most cases there is no need to use this method. It must be
-	 * called only if the application retrieves information from the packet (by
-	 * calling {@link getBuffer}, {@link getSsrcs}, etc) and modifies the
-	 * obtained buffers in place. However, it's recommended to use the existing
-	 * setter methods instead ({@link addSsrc}, etc).
+	 * In most cases there is no need to use this method since many setter methods
+	 * apply the changes within the current buffer. To be sure, check
+	 * {@link needsSerialization} before.
 	 *
-	 * @throws If buffer serialization is needed and it fails due to invalid
-	 *   fields.
-	 *
+	 * @throws If invalid fields were previously added to the packet.
 	 */
 	serialize(): void
 	{
@@ -254,7 +267,6 @@ export class ByePacket extends RtcpPacket
 			}
 		}
 
-		// Reset flag.
-		this.serializationNeeded = false;
+		this.setSerializationNeeded(false);
 	}
 }

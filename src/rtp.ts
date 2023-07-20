@@ -304,6 +304,15 @@ export class RtpPacket
 	}
 
 	/**
+	 * Whether {@link serialize} should be called due to modifications in the
+	 * packet not being yet applied into the buffer.
+	 */
+	needsSerialization(): boolean
+	{
+		return this.#serializationNeeded;
+	}
+
+	/**
 	 * Get the RTP version of the packet (always 2).
 	 */
 	getVersion(): number
@@ -643,26 +652,6 @@ export class RtpPacket
 	}
 
 	/**
-	 * Clone the packet. The cloned packet does not share any memory with the
-	 * original one.
-	 *
-	 * @remarks
-	 * The buffer is serialized if needed (to apply packet pending modifications).
-	 *
-	 * @throws If buffer serialization is needed and it fails due to invalid
-	 *   fields.
-	 */
-	clone(): RtpPacket
-	{
-		if (this.needsSerialization())
-		{
-			this.serialize();
-		}
-
-		return new RtpPacket(clone<ArrayBuffer>(this.#buffer));
-	}
-
-	/**
 	 * Encode the packet using RTX procedures (as per RFC 4588).
 	 *
 	 * @remarks
@@ -744,12 +733,23 @@ export class RtpPacket
 	}
 
 	/**
-	 * Whether {@link serialize} should be called due to modifications in the
-	 * packet not being yet applied into the buffer.
+	 * Clone the packet. The cloned packet does not share any memory with the
+	 * original one.
+	 *
+	 * @remarks
+	 * The buffer is serialized if needed (to apply packet pending modifications).
+	 *
+	 * @throws If buffer serialization is needed and it fails due to invalid
+	 *   fields.
 	 */
-	needsSerialization(): boolean
+	clone(): RtpPacket
 	{
-		return this.#serializationNeeded;
+		if (this.needsSerialization())
+		{
+			this.serialize();
+		}
+
+		return new RtpPacket(clone<ArrayBuffer>(this.#buffer));
 	}
 
 	/**
@@ -966,6 +966,11 @@ export class RtpPacket
 		this.setSerializationNeeded(false);
 	}
 
+	private setSerializationNeeded(flag: boolean): void
+	{
+		this.#serializationNeeded = flag;
+	}
+
 	private setVersion(): void
 	{
 		this.#view.setUint8(0, RTP_VERSION << 6);
@@ -979,10 +984,5 @@ export class RtpPacket
 	private setPaddingBit(bit: number)
 	{
 		this.#view.setUint8(0, this.#view.getUint8(0) | (bit << 5));
-	}
-
-	private setSerializationNeeded(flag: boolean): void
-	{
-		this.#serializationNeeded = flag;
 	}
 }

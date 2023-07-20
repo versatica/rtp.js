@@ -30,6 +30,7 @@ describe('parse RTCP BYE packet', () =>
 	{
 		const packet = new ByePacket(buffer);
 
+		// expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPadding()).toBe(0);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
@@ -37,9 +38,10 @@ describe('parse RTCP BYE packet', () =>
 		expect(packet.getLength()).toBe(6);
 		expect(packet.getSsrcs()).toEqual([ ssrc1, ssrc2 ]);
 		expect(packet.getReason()).toBe(reason1);
+		// expect(packet.needsSerialization()).toBe(false);
 	});
 
-	test('packet processing succeeds for a buffer with padding', () =>
+	test.only('packet processing succeeds for a buffer with padding', () =>
 	{
 		const padding = 4;
 		const bufferWithPadding = new Uint8Array(

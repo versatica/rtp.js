@@ -91,7 +91,7 @@ export abstract class RtcpPacket
 	// Number of bytes of padding.
 	protected padding: number = 0;
 	// Whether serialization is needed due to modifications.
-	protected serializationNeeded: boolean = false;
+	#serializationNeeded: boolean = false;
 
 	static getCount(buffer: ArrayBuffer): number
 	{
@@ -131,12 +131,21 @@ export abstract class RtcpPacket
 	 */
 	getBuffer(): ArrayBuffer
 	{
-		if (this.serializationNeeded)
+		if (this.needsSerialization())
 		{
 			this.serialize();
 		}
 
 		return this.buffer;
+	}
+
+	/**
+	 * Whether {@link serialize} should be called due to modifications in the
+	 * packet not being yet applied into the buffer.
+	 */
+	needsSerialization(): boolean
+	{
+		return this.#serializationNeeded;
 	}
 
 	/**
@@ -157,6 +166,9 @@ export abstract class RtcpPacket
 
 	/**
 	 * Set the padding (in bytes) after the packet payload.
+	 *
+	 * @remarks
+	 * Serialization is needed after calling this method.
 	 */
 	setPadding(padding: number): void
 	{
@@ -165,7 +177,7 @@ export abstract class RtcpPacket
 		// Update padding bit.
 		this.setPaddingBit(Boolean(this.padding));
 
-		this.serializationNeeded = true;
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -193,6 +205,47 @@ export abstract class RtcpPacket
 	}
 
 	/**
+	 * Clone the packet. The cloned packet does not share any memory with the
+	 * original one.
+	 *
+	 * @remarks
+	 * The buffer is serialized if needed (to apply packet pending modifications).
+	 *
+	 * @throws If buffer serialization is needed and it fails due to invalid
+	 *   fields.
+	 */
+	abstract clone(): RtcpPacket;
+
+	/**
+	 * Apply pending changes into the packet and serialize it into a new internal
+	 * buffer (the one that {@link getBuffer} will later return).
+	 *
+	 * @remarks
+	 * In most cases there is no need to use this method since many setter methods
+	 * apply the changes within the current buffer. To be sure, check
+	 * {@link needsSerialization} before.
+	 *
+	 * @throws If invalid fields were previously added to the packet.
+	 */
+	abstract serialize(): void;
+
+	protected setSerializationNeeded(flag: boolean): void
+	{
+		this.#serializationNeeded = flag;
+	}
+
+	protected writeCommonHeader(): void
+	{
+		this.setVersion();
+		this.setPacketType(this.#packetType);
+	}
+
+	protected getPaddingBit(): boolean
+	{
+		return Boolean((this.view.getUint8(0) >> 5) & 1);
+	}
+
+	/**
 	 * Set the RTCP header count value.
 	 */
 	protected setCount(count: number): void
@@ -201,20 +254,6 @@ export abstract class RtcpPacket
 			0, (this.getVersion() << 6) | (Number(this.getPaddingBit()) << 5) | (count & 0x1F)
 		);
 	}
-
-	/**
-	 * Serialize RTCP packet into a new buffer.
-	 */
-	abstract serialize(): void;
-
-	/**
-	 * Clone the packet. The cloned packet does not share any memory with the
-	 * original one.
-	 *
-	 * @throws If buffer serialization is needed and it fails due to invalid
-	 *   fields.
-	 */
-	abstract clone(): RtcpPacket;
 
 	/**
 	 * Serialize base RTCP packet into a new buffer.
@@ -252,12 +291,6 @@ export abstract class RtcpPacket
 		}
 	}
 
-	protected writeCommonHeader(): void
-	{
-		this.setVersion();
-		this.setPacketType(this.#packetType);
-	}
-
 	/**
 	 * Set the RTCP version of the packet (always 2).
 	 */
@@ -280,11 +313,6 @@ export abstract class RtcpPacket
 	private setLength(length: number): void
 	{
 		this.view.setUint16(2, length);
-	}
-
-	protected getPaddingBit(): boolean
-	{
-		return Boolean((this.view.getUint8(0) >> 5) & 1);
 	}
 
 	/**
