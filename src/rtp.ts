@@ -765,26 +765,26 @@ export class RtpPacket
 		length += this.#padding;
 
 		// Allocate new buffer.
-		const newBuffer = new ArrayBuffer(length);
-		const newView = new DataView(newBuffer);
-		const newArray = new Uint8Array(newBuffer);
+		const buffer = new ArrayBuffer(length);
+		const view = new DataView(buffer);
+		const array = new Uint8Array(buffer);
 
 		// Copy the fixed header into the new buffer.
-		newArray.set(new Uint8Array(previousBuffer, 0, FIXED_HEADER_LENGTH), 0);
+		array.set(new Uint8Array(previousBuffer, 0, FIXED_HEADER_LENGTH), 0);
 
 		let pos = FIXED_HEADER_LENGTH;
 
 		// Write CSRC.
 		for (const ssrc of this.#csrc)
 		{
-			newView.setUint32(pos, ssrc);
+			view.setUint32(pos, ssrc);
 			pos += 4;
 		}
 
 		// Write header extension.
 		if (this.#extensions.size > 0 && this.hasOneByteExtensions())
 		{
-			newView.setUint16(pos, this.#headerExtensionId!);
+			view.setUint16(pos, this.#headerExtensionId!);
 
 			const extLengthPos = pos + 2;
 			let extLength = 0;
@@ -816,11 +816,11 @@ export class RtpPacket
 
 				const idLength = (id << 4) & ((value.byteLength - 1) & 0x0F);
 
-				newView.setUint8(pos, idLength);
+				view.setUint8(pos, idLength);
 				pos += 1;
 				extLength += 1;
 
-				newArray.set(new Uint8Array(value), pos);
+				array.set(new Uint8Array(value), pos);
 				pos += value.byteLength;
 				extLength += value.byteLength;
 			}
@@ -830,11 +830,11 @@ export class RtpPacket
 			extLength = padTo4Bytes(extLength);
 
 			// Write header extension length.
-			newView.setUint16(extLengthPos, extLength / 4);
+			view.setUint16(extLengthPos, extLength / 4);
 		}
 		else if (this.#extensions.size > 0 && this.hasTwoBytesExtensions())
 		{
-			newView.setUint16(pos, this.#headerExtensionId!);
+			view.setUint16(pos, this.#headerExtensionId!);
 
 			const extLengthPos = pos + 2;
 			let extLength = 0;
@@ -858,15 +858,15 @@ export class RtpPacket
 					);
 				}
 
-				newView.setUint8(pos, id);
+				view.setUint8(pos, id);
 				pos += 1;
 				extLength += 1;
 
-				newView.setUint8(pos, value.byteLength);
+				view.setUint8(pos, value.byteLength);
 				pos += 1;
 				extLength += 1;
 
-				newArray.set(new Uint8Array(value), pos);
+				array.set(new Uint8Array(value), pos);
 				pos += value.byteLength;
 				extLength += value.byteLength;
 			}
@@ -876,7 +876,7 @@ export class RtpPacket
 			extLength = padTo4Bytes(extLength);
 
 			// Write header extension length.
-			newView.setUint16(extLengthPos, extLength / 4);
+			view.setUint16(extLengthPos, extLength / 4);
 		}
 		// Otherwise remove the header extension.
 		else
@@ -886,7 +886,7 @@ export class RtpPacket
 		}
 
 		// Write payload.
-		newArray.set(new Uint8Array(this.#payload), pos);
+		array.set(new Uint8Array(this.#payload), pos);
 		pos += this.#payload.byteLength;
 
 		// Write padding.
@@ -899,21 +899,21 @@ export class RtpPacket
 				);
 			}
 
-			newArray.fill(0, pos, pos + this.#padding - 1);
-			newView.setUint8(pos + this.#padding - 1, this.#padding);
+			array.fill(0, pos, pos + this.#padding - 1);
+			view.setUint8(pos + this.#padding - 1, this.#padding);
 			pos += this.#padding;
 		}
 
 		// Assert that current position matches new buffer length.
-		if (pos !== newBuffer.byteLength)
+		if (pos !== buffer.byteLength)
 		{
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match new buffer length (${newBuffer.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match new buffer length (${buffer.byteLength} bytes)`
 			);
 		}
 
 		// Update buffer.
-		this.#buffer = newBuffer;
+		this.#buffer = buffer;
 
 		// Reset flag.
 		this.#serializationNeeded = false;

@@ -163,19 +163,9 @@ export abstract class RtcpPacket
 		this.padding = padding;
 
 		// Update padding bit.
-		const bit = padding ? 1 : 0;
-
-		this.setPaddingBit(bit);
+		this.setPaddingBit(Boolean(this.padding));
 
 		this.serializationNeeded = true;
-	}
-
-	/**
-	 * Get the RTCP header count value.
-	 */
-	getCount(): number
-	{
-		return this.view.getUint8(0) & 0x1F;
 	}
 
 	/**
@@ -184,6 +174,14 @@ export abstract class RtcpPacket
 	getPacketType(): RtcpPacketType
 	{
 		return this.view.getUint8(1);
+	}
+
+	/**
+	 * Get the RTCP header count value.
+	 */
+	getCount(): number
+	{
+		return this.view.getUint8(0) & 0x1F;
 	}
 
 	/**
@@ -199,7 +197,9 @@ export abstract class RtcpPacket
 	 */
 	protected setCount(count: number): void
 	{
-		this.view.setUint8(0, this.view.getUint8(0) | (count & 0x1F));
+		this.view.setUint8(
+			0, (this.getVersion() << 6) | (Number(this.getPaddingBit()) << 5) | (count & 0x1F)
+		);
 	}
 
 	/**
@@ -224,15 +224,15 @@ export abstract class RtcpPacket
 		const padding = this.padding ?? 0;
 
 		// Allocate new buffer.
-		const newBuffer = new ArrayBuffer(length + padding);
-		const newView = new DataView(newBuffer);
-		const newArray = new Uint8Array(newBuffer);
+		const buffer = new ArrayBuffer(length + padding);
+		const view = new DataView(buffer);
+		const array = new Uint8Array(buffer);
 
 		// Copy the fixed header into the new buffer.
-		newArray.set(new Uint8Array(this.buffer, 0, COMMON_HEADER_LENGTH), 0);
+		array.set(new Uint8Array(this.buffer, 0, COMMON_HEADER_LENGTH), 0);
 
-		this.buffer = newBuffer;
-		this.view = newView;
+		this.buffer = buffer;
+		this.view = view;
 
 		this.writeCommonHeader();
 		this.setLength(((length + padding) / 4) - 1);
@@ -247,7 +247,7 @@ export abstract class RtcpPacket
 				);
 			}
 
-			newArray.fill(0, length, length + padding - 1);
+			array.fill(0, length, length + padding - 1);
 			this.view.setUint8(length + this.padding - 1, padding);
 		}
 	}
@@ -269,9 +269,9 @@ export abstract class RtcpPacket
 	/**
 	 * Set the RTCP packet type.
 	 */
-	private setPacketType(count: RtcpPacketType): void
+	private setPacketType(packetType: RtcpPacketType): void
 	{
-		this.view.setUint8(1, count);
+		this.view.setUint8(1, packetType);
 	}
 
 	/**
@@ -282,11 +282,16 @@ export abstract class RtcpPacket
 		this.view.setUint16(2, length);
 	}
 
+	protected getPaddingBit(): boolean
+	{
+		return Boolean((this.view.getUint8(0) >> 5) & 1);
+	}
+
 	/**
 	 * Set the padding bit.
 	 */
-	private setPaddingBit(bit: number): void
+	private setPaddingBit(flag: boolean): void
 	{
-		this.view.setUint8(0, this.view.getUint8(0) | (bit << 5));
+		this.view.setUint8(0, this.view.getUint8(0) | (Number(flag) << 5));
 	}
 }

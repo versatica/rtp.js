@@ -74,10 +74,7 @@ export class ByePacket extends RtcpPacket
 		this.buffer = buffer;
 		this.view = new DataView(this.buffer);
 
-		// Get padding.
-		const paddingFlag = Boolean((this.view.getUint8(0) >> 5) & 1);
-
-		if (paddingFlag)
+		if (this.getPaddingBit())
 		{
 			// NOTE: This will throw RangeError if there is no space in the buffer.
 			this.padding =
@@ -154,6 +151,9 @@ export class ByePacket extends RtcpPacket
 	addSsrc(ssrc: number): void
 	{
 		this.ssrcs.push(ssrc);
+
+		this.setCount(this.ssrcs.length);
+
 		this.serializationNeeded = true;
 	}
 
@@ -215,7 +215,7 @@ export class ByePacket extends RtcpPacket
 		if (this.reason)
 		{
 			reasonBuffer = stringToArrayBuffer(this.reason);
-			length += reasonBuffer.byteLength + 1 + (-(reasonBuffer.byteLength + 1) & 3);
+			length += 1 + reasonBuffer.byteLength + (-(reasonBuffer.byteLength + 1) & 3);
 		}
 
 		super.serializeBase(length);
@@ -239,19 +239,18 @@ export class ByePacket extends RtcpPacket
 
 			offset += 1;
 
-			console.log('TODO: Mal, hay que crear otro ArrayBuffer y DataView porque el reason puede ser mayor que antes');
-			reasonBuffer.copy(this.buffer, offset, 0, reasonBuffer.byteLength);
+			const array = new Uint8Array(this.buffer);
 
-			const newPayloadArray =
-				new Uint8Array(seqBuffer.byteLength + this.#payload.byteLength);
-			newArray.set(new Uint8Array(this.buffer, 0, COMMON_HEADER_LENGTH), 0);
+			array.set(new Uint8Array(reasonBuffer), offset);
 
 			const reasonPadding = -(reasonBuffer.byteLength + 1) & 3;
 
 			// Write reason padding.
 			if (reasonPadding)
 			{
-				this.buffer.fill(0, offset, reasonPadding);
+				offset += reasonBuffer.byteLength;
+
+				array.fill(0, offset, offset + reasonPadding);
 			}
 		}
 

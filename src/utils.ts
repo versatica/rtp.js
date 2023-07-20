@@ -71,6 +71,9 @@ export function areBuffersEqual(buffer1: ArrayBuffer, buffer2: ArrayBuffer)
 	{
 		if (view1.getUint8(i) !== view2.getUint8(i))
 		{
+			console.log('buffer1:', buffer1);
+			console.log('buffer2:', buffer2);
+			console.log('i:%s, buffer1:0x%s, buffer2:0x%s', i, view1.getUint8(i).toString(16), view2.getUint8(i).toString(16))
 			return false;
 		}
 	}

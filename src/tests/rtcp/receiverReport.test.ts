@@ -3,7 +3,7 @@ import {
 	ReceiverReportPacket,
 	RECEIVER_REPORT_LENGTH
 } from '../../rtcp/receiverReport';
-import { isRtcp } from '../../rtcp';
+import { isRtcp, RtcpPacketType } from '../../rtcp';
 import { areBuffersEqual, numericArrayToArrayBuffer } from '../../utils';
 
 const ssrc = 26422708;
@@ -16,7 +16,7 @@ const delaySinceLastSenderReport = 5;
 
 const buffer = new Uint8Array(
 	[
-		0x82, 0xc9, 0x00, 0x0D, // Type: 201 (Receiver Report), Count: 1, Length: 13
+		0x82, 0xc9, 0x00, 0x0D, // Type: 201 (Receiver Report), Count: 2, Length: 13
 		0x5d, 0x93, 0x15, 0x34, // Sender SSRC: 0x5d931534
 		// Receiver Report
 		0x01, 0x93, 0x2d, 0xb4, // SSRC. 0x01932db4
@@ -49,11 +49,13 @@ describe('parse RTCP Receiver Report packet', () =>
 		const report2 = packet.getReports()[1];
 
 		expect(packet.getVersion()).toBe(2);
-		expect(packet.getPadding()).toBe(0);
-		expect(packet.getPacketType()).toBe(201);
 		expect(packet.getCount()).toBe(2);
+		expect(packet.getPacketType()).toBe(RtcpPacketType.RR);
 		expect(packet.getSsrc()).toBe(0x5d931534);
 		expect(packet.getLength()).toBe(13);
+		expect(packet.getPadding()).toBe(0);
+		// Compare buffers.
+		expect(areBuffersEqual(packet.getBuffer(), buffer)).toBe(true);
 
 		checkReport(report1);
 		checkReport(report2, /* customSrrc */ 0x02932db4);
@@ -82,8 +84,9 @@ describe('parse RTCP Receiver Report packet', () =>
 
 		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPadding()).toBe(padding);
-		expect(packet.getPacketType()).toBe(201);
+		expect(packet.getPacketType()).toBe(RtcpPacketType.RR);
 		expect(packet.getCount()).toBe(1);
+		expect(packet.getLength()).toBe(8);
 		expect(packet.getSsrc()).toBe(0x5d931534);
 		// Compare buffers.
 		expect(areBuffersEqual(packet.getBuffer(), bufferWithPadding)).toBe(true);
@@ -126,8 +129,12 @@ describe('serialize RTCP Receiver Report packet', () =>
 	{
 		const packet = new ReceiverReportPacket(buffer);
 
+		// Compare buffers.
+		expect(areBuffersEqual(packet.getBuffer(), buffer)).toBe(true);
+
 		packet.serialize();
 
+		// Compare buffers.
 		expect(areBuffersEqual(packet.getBuffer(), buffer)).toBe(true);
 	});
 });
@@ -176,7 +183,13 @@ describe('create RTCP Receiver Report packet', () =>
 		packet.setPadding(padding);
 		packet.setSsrc(0x5d931534);
 
-		expect(packet.getPadding()).toBe(8);
+		packet.serialize();
+
+		expect(packet.getVersion()).toBe(2);
+		expect(packet.getPadding()).toBe(padding);
+		expect(packet.getPacketType()).toBe(RtcpPacketType.RR);
+		expect(packet.getCount()).toBe(0);
+		expect(packet.getLength()).toBe(3);
 		// Compare buffers.
 		expect(areBuffersEqual(packet.getBuffer(), bufferWithPadding)).toBe(true);
 	});
@@ -200,6 +213,7 @@ describe('create RTCP Receiver Report packet', () =>
 		expect(clonedPacket.getPadding()).toBe(packet.getPadding());
 		expect(clonedPacket.getPacketType()).toBe(packet.getPacketType());
 		expect(clonedPacket.getCount()).toBe(packet.getCount());
+		expect(packet.getLength()).toBe(3);
 		expect(clonedPacket.getSsrc()).toBe(packet.getSsrc());
 		expect(clonedPacket.getReports()).toEqual(packet.getReports());
 		expect(clonedPacket.dump()).toEqual(packet.dump());

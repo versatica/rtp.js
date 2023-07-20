@@ -100,10 +100,7 @@ export class ReceiverReportPacket extends RtcpPacket
 		this.buffer = buffer;
 		this.view = new DataView(this.buffer);
 
-		// Get padding.
-		const paddingFlag = Boolean((this.view.getUint8(0) >> 5) & 1);
-
-		if (paddingFlag)
+		if (this.getPaddingBit())
 		{
 			// NOTE: This will throw RangeError if there is no space in the buffer.
 			this.padding =
@@ -178,6 +175,9 @@ export class ReceiverReportPacket extends RtcpPacket
 	addReport(report: ReceiverReport): void
 	{
 		this.#reports.push(report);
+
+		this.setCount(this.#reports.length);
+
 		this.serializationNeeded = true;
 	}
 
@@ -220,8 +220,8 @@ export class ReceiverReportPacket extends RtcpPacket
 
 		super.serializeBase(length);
 
-		this.setCount(this.#reports.length);
 		this.setSsrc(ssrc);
+		this.setCount(this.#reports.length);
 
 		const newArray = new Uint8Array(this.buffer);
 
