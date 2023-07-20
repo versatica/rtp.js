@@ -122,7 +122,12 @@ export class ReceiverReportPacket extends RtcpPacket
 				this.buffer.slice(pos, pos + RECEIVER_REPORT_LENGTH)
 			);
 
-			this.addReport(report);
+			// NOTE: We don't call this.addReport() here because we don't want that
+			// serialization is needed when parsing a packet.
+
+			this.#reports.push(report);
+
+			this.setCount(this.#reports.length);
 		}
 
 		// Store a buffer within the packet boundaries.

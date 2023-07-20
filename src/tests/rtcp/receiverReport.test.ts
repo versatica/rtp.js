@@ -60,9 +60,13 @@ describe('parse RTCP Receiver Report packet', () =>
 	test('packet processing succeeds', () =>
 	{
 		const packet = new ReceiverReportPacket(buffer);
+
+		expect(packet.needsSerialization()).toBe(false);
+
 		const report1 = packet.getReports()[0];
 		const report2 = packet.getReports()[1];
 
+		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getVersion()).toBe(2);
 		expect(packet.getCount()).toBe(2);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.RR);
