@@ -9,11 +9,15 @@ export function clone<T>(data: T): T
 {
 	if (data instanceof ArrayBuffer)
 	{
-		return data.slice(0, data.byteLength) as unknown as T;
+		return data.slice(0) as unknown as T;
 	}
 	else if (data instanceof DataView)
 	{
-		return new DataView(data.buffer) as unknown as T;
+		return new DataView(
+			data.buffer.slice(
+				data.byteOffset, data.byteOffset + data.byteLength
+			)
+		) as unknown as T;
 	}
 	else if (data === undefined)
 	{
@@ -53,6 +57,7 @@ export function padTo4Bytes(size: number): number
 /**
  * Whether two ArrayBuffers contain the same data.
  * NOTE: Only used by tests.
+ * TODO: Probably remove.
  */
 export function areBuffersEqual(buffer1: ArrayBuffer, buffer2: ArrayBuffer)
 {
@@ -105,17 +110,80 @@ export function areBuffersEqual(buffer1: ArrayBuffer, buffer2: ArrayBuffer)
 }
 
 /**
+ * Whether two DataViews contain the same data.
+ * NOTE: Only used by tests.
+ */
+export function areDataViewsEqual(view1: DataView, view2: DataView)
+{
+	if (view1 === view2)
+	{
+		logger.debug(
+			'areDataViewsEqual() | view1 and view2 are the same DataView instance'
+		);
+
+		return true;
+	}
+
+	if (view1.byteLength !== view2.byteLength)
+	{
+		if (logger.debug.enabled)
+		{
+			logger.debug(
+				`areDataViewsEqual() | different byte length [view1.byteLength:${view1.byteLength}, view2.byteLength:${view2.byteLength}]`
+			);
+			logger.debug('areDataViewsEqual() | view1:', view1);
+			logger.debug('areDataViewsEqual() | view2:', view2);
+		}
+
+		return false;
+	}
+
+	let i = view1.byteLength;
+
+	while (i--)
+	{
+		if (view1.getUint8(i) !== view2.getUint8(i))
+		{
+			if (logger.debug.enabled)
+			{
+				logger.debug(
+					`areDataViewsEqual() | different byte [idx:${i}, view1 byte:${view1.getUint8(i).toString(16)}, view2 byte:${view2.getUint8(i).toString(16)}]`
+				);
+				logger.debug('areDataViewsEqual() | view1:', view1);
+				logger.debug('areDataViewsEqual() | view2:', view2);
+			}
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
  * Convert Node.js Buffer into ArrayBuffer.
  * NOTE: Just for Node.js.
+ *
+ * TODO: Remove in favour of bufferToDataView().
  */
-export function bufferToArrayBuffer(buffer: Buffer): ArrayBuffer
+export function nodeBufferToArrayBuffer(buffer: Buffer): ArrayBuffer
 {
 	return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
 }
 
 /**
- * Convert Array into ArrayBuffer.
+ * Convert Node.js Buffer into DataView.
+ * NOTE: Just for Node.js.
+ */
+export function nodeBufferToDataView(buffer: Buffer): DataView
+{
+	return new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+}
+
+/**
+ * Convert array of integers into ArrayBuffer.
  * NOTE: Only used by tests.
+ * TODO: Probably remove.
  */
 export function numericArrayToArrayBuffer(array: number[]): ArrayBuffer
 {
@@ -123,7 +191,18 @@ export function numericArrayToArrayBuffer(array: number[]): ArrayBuffer
 }
 
 /**
+ * Convert array of integers into DataView.
+ * NOTE: Only used by tests.
+ * TODO: Probably remove.
+ */
+export function numericArrayToDataView(array: number[]): DataView
+{
+	return new DataView((new Uint8Array(array)).buffer);
+}
+
+/**
  * Convert ArrayBuffer into string.
+ * TODO: Probably remove.
  */
 export function arrayBufferToString(buffer: ArrayBuffer): string
 {
@@ -134,10 +213,21 @@ export function arrayBufferToString(buffer: ArrayBuffer): string
 
 /**
  * Convert string into ArrayBuffer.
+ * TODO: Probably remove.
  */
 export function stringToArrayBuffer(string: string): ArrayBuffer
 {
 	const encoder = new TextEncoder();
 
 	return encoder.encode(string).buffer;
+}
+
+/**
+ * Convert string into DataView.
+ */
+export function stringToDataView(string: string): DataView
+{
+	const encoder = new TextEncoder();
+
+	return new DataView(encoder.encode(string).buffer);
 }

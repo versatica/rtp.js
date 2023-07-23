@@ -1,15 +1,15 @@
 ### TODO
 
-- Must document that `serialize()` must be called by the user when adds a receiver report in a RR packet or a ssrc in a BYE packet, etc (or fix it).
+- Make extensions in `RtpPacket` have a `DataView` as value so they don't copy bytes when parsing.
 
-- `new ByePacket(buffer)` MUST NOT internally call `this.addSsrc()` because that sets `this.serializationNeeded = true` and it doesn't make sense.
+- When parsing a RTP packet (in the constructor) do not generate `ArrayBuffers`. And so not use `buffer.slice()` at all.
 
-- Same for `ReceiverReportPacket` and `this.addReport()`.
+- Make `rtxEncode()` not create `new ArrayBuffer()`. Or probably what we need is to create a single `DataView` with length matching the the new RTP payload length, and fill it.
 
-- Remove `this.setCount(this.ssrcs.length);` from `bye.addSsrc()` since we cannot rely on `this.serializationNeeded` entirely for some things and not for others.
+- `rtpPacket.rtxDecode()` (and others including constructor): Avoid that the method calls otehr methods that set serialization flag.
 
-- Same for `receiverReport.addReport()`.
+- Must test `rtpPacket.getPayloadView()` by matching binary content and so on.
 
-- Expose a `packet.needsSerialization()` public method.
+- Use `pos` instead of `offset` everywhere.
 
-- And once above bullets are done, make tests use it and also assert whether serialization is needed or not.
+- Review exported functions in `utils.ts`.

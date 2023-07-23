@@ -29,5 +29,5 @@ export {
 } from './rtcp/bye';
 
 export {
-	bufferToArrayBuffer
+	nodeBufferToDataView
 } from './utils';
