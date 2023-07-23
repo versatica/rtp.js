@@ -679,31 +679,30 @@ export class RtpPacket
 		// Rewrite the SSRC.
 		this.setSsrc(ssrc);
 
+		const payloadView = new DataView(
+			new ArrayBuffer(2 + this.#payloadView.byteLength)
+		);
+		const payloadUint8Array = new Uint8Array(
+			payloadView.buffer, payloadView.byteOffset, payloadView.byteLength
+		);
+
 		// Write the original sequence number at the begining of the new payload.
-		const seqBuffer = new ArrayBuffer(2);
-		const seqView = new DataView(seqBuffer);
+		payloadView.setUint16(0, this.getSequenceNumber());
 
-		seqView.setUint16(0, this.getSequenceNumber());
-
-		const newPayloadArray =
-			new Uint8Array(seqBuffer.byteLength + this.#payloadView.byteLength);
-
-		// TODO: What? Just write 2 bytes using dataView.setUint16().
-		newPayloadArray.set(new Uint8Array(seqBuffer), 0);
-
-		newPayloadArray.set(
+		// Copy the original payload after the sequence number.
+		payloadUint8Array.set(
 			new Uint8Array(
 				this.#payloadView.buffer,
 				this.#payloadView.byteOffset,
 				this.#payloadView.byteLength
 			),
-			seqBuffer.byteLength
+			2
 		);
 
 		this.#payloadView = new DataView(
-			newPayloadArray.buffer,
-			newPayloadArray.byteOffset,
-			newPayloadArray.byteLength
+			payloadUint8Array.buffer,
+			payloadUint8Array.byteOffset,
+			payloadUint8Array.byteLength
 		);
 
 		// Rewrite the sequence number.

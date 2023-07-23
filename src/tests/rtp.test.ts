@@ -330,8 +330,8 @@ describe('create RTP packet 5 from scratch', () =>
 		const ssrc = packet.getSsrc();
 		const sequenceNumber = packet.getSequenceNumber();
 		const payloadLength = packet.getPayloadView().byteLength;
-		const previousView = clone<DataView>(packet.getView());
-		const previousPayloadView = clone<DataView>(packet.getPayloadView());
+		const view = clone<DataView>(packet.getView());
+		const payloadView = clone<DataView>(packet.getPayloadView());
 
 		packet.rtxEncode(69, 69696969, 6969);
 		expect(packet.needsSerialization()).toBe(true);
@@ -339,13 +339,21 @@ describe('create RTP packet 5 from scratch', () =>
 		// Serialize to reset serialization needed.
 		packet.serialize();
 
-		const payloadView = packet.getPayloadView();
+		const rtxPayloadView = packet.getPayloadView();
 
 		expect(packet.getPayloadType()).toBe(69);
 		expect(packet.getSequenceNumber()).toBe(6969);
 		expect(packet.getSsrc()).toBe(69696969);
-		expect(payloadView.byteLength).toBe(payloadLength + 2);
-		expect(payloadView.getUint16(0)).toBe(sequenceNumber);
+		expect(rtxPayloadView.byteLength).toBe(payloadLength + 2);
+		expect(rtxPayloadView.getUint16(0)).toBe(sequenceNumber);
+
+		const payloadWithoutSeqNumberView = new DataView(
+			packet.getPayloadView().buffer,
+			packet.getPayloadView().byteOffset + 2,
+			packet.getPayloadView().byteLength - 2
+		);
+
+		expect(areDataViewsEqual(payloadWithoutSeqNumberView, payloadView)).toBe(true);
 
 		packet.rtxDecode(payloadType, ssrc);
 
@@ -356,8 +364,8 @@ describe('create RTP packet 5 from scratch', () =>
 		expect(packet.getPayloadView().byteLength).toBe(payloadLength);
 		expect(packet.needsSerialization()).toBe(true);
 		// Packet and payload views must be the same.
-		expect(areDataViewsEqual(packet.getView(), previousView)).toBe(true);
-		expect(areDataViewsEqual(packet.getPayloadView(), previousPayloadView)).toBe(true);
+		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		expect(areDataViewsEqual(packet.getPayloadView(), payloadView)).toBe(true);
 	});
 });
 
