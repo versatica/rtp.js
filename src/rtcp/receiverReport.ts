@@ -114,13 +114,18 @@ export class ReceiverReportPacket extends RtcpPacket
 			throw new TypeError(`buffer is too small (${this.buffer.byteLength} bytes)`);
 		}
 
+		// Position relative to the DataView byte offset.
+		let pos = 0;
+
+		pos += FIXED_HEADER_LENGTH;
+
 		while (count-- > 0)
 		{
-			const pos = FIXED_HEADER_LENGTH + (this.#reports.length * RECEIVER_REPORT_LENGTH);
-
 			const report = new ReceiverReport(
 				this.buffer.slice(pos, pos + RECEIVER_REPORT_LENGTH)
 			);
+
+			pos += RECEIVER_REPORT_LENGTH;
 
 			// NOTE: We don't call this.addReport() here because we don't want that
 			// serialization is needed when parsing a packet.
@@ -131,19 +136,22 @@ export class ReceiverReportPacket extends RtcpPacket
 		}
 
 		// Store a buffer within the packet boundaries.
-		this.buffer = this.buffer.slice(
-			0,
-			FIXED_HEADER_LENGTH + (this.#reports.length * RECEIVER_REPORT_LENGTH) + this.padding
-		);
+		this.buffer = this.buffer.slice(0, pos + this.padding);
+
+		pos += this.padding;
+
 		this.view = new DataView(this.buffer);
 
-		console.log('TODO: yes or not?');
-		// if (offset !== this.buffer.byteLength)
-		// {
-		// 	throw new RangeError(
-		// 		`parsed length (${offset} bytes) does not match buffer length (${this.buffer.byteLength} bytes)`
-		// 	);
-		// }
+		// TODO: yes or not? I think we should assert this since there is no reason for
+		// the user to pass a DataView whose byteLength is bigger than the parsed RR.
+		// In fact, we'll provide with a function to parse compound RTCP packets. So yes,
+		// we must do this check.
+		if (pos !== this.buffer.byteLength)
+		{
+			throw new RangeError(
+				`parsed length (${pos} bytes) does not match buffer length (${this.buffer.byteLength} bytes)`
+			);
+		}
 	}
 
 	/**
