@@ -87,9 +87,9 @@ export function areBuffersEqual(buffer1: ArrayBuffer, buffer2: ArrayBuffer)
 	const view1 = new DataView(buffer1);
 	const view2 = new DataView(buffer2);
 
-	let i = buffer1.byteLength;
+	let i = 0;
 
-	while (i--)
+	while (i < view1.byteLength)
 	{
 		if (view1.getUint8(i) !== view2.getUint8(i))
 		{
@@ -104,6 +104,8 @@ export function areBuffersEqual(buffer1: ArrayBuffer, buffer2: ArrayBuffer)
 
 			return false;
 		}
+
+		i++;
 	}
 
 	return true;
@@ -138,16 +140,16 @@ export function areDataViewsEqual(view1: DataView, view2: DataView)
 		return false;
 	}
 
-	let i = view1.byteLength;
+	let i = 0;
 
-	while (i--)
+	while (i < view1.byteLength)
 	{
 		if (view1.getUint8(i) !== view2.getUint8(i))
 		{
 			if (logger.debug.enabled)
 			{
 				logger.debug(
-					`areDataViewsEqual() | different byte [idx:${i}, view1 byte:${view1.getUint8(i).toString(16)}, view2 byte:${view2.getUint8(i).toString(16)}]`
+					`areDataViewsEqual() | different byte [idx:${i}, view1:${view1.getUint8(i).toString(16)}, view2:${view2.getUint8(i).toString(16)}]`
 				);
 				logger.debug('areDataViewsEqual() | view1:', view1);
 				logger.debug('areDataViewsEqual() | view2:', view2);
@@ -155,6 +157,8 @@ export function areDataViewsEqual(view1: DataView, view2: DataView)
 
 			return false;
 		}
+
+		i++;
 	}
 
 	return true;

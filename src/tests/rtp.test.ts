@@ -371,6 +371,20 @@ describe('create RTP packet 6 from scratch', () =>
 		expect(
 			clonedPacket.getPayloadView().buffer === packet.getPayloadView().buffer
 		).toBe(false);
+
+		// Clone again, now in a given buffer.
+		const cloneBuffer = new ArrayBuffer(1500);
+		const byteOffset = 245;
+		const clonedPacket2 = packet.clone(cloneBuffer, byteOffset);
+
+		// DataViews instances must be different since it's a cloned packet.
+		expect(clonedPacket2.getView() === packet.getView()).toBe(false);
+		expect(clonedPacket2.getPayloadView() === packet.getPayloadView()).toBe(false);
+		// Internal ArrayBuffer instances must be different.
+		expect(clonedPacket2.getView().buffer === packet.getView().buffer).toBe(false);
+		expect(
+			clonedPacket2.getPayloadView().buffer === packet.getPayloadView().buffer
+		).toBe(false);
 	});
 
 	test('packet.rtxEncode() and packet.rtxDecode() succeed', () =>
@@ -477,6 +491,7 @@ describe('create RTP packet 8 from scratch', () =>
 		packet.setExtension(0, stringToDataView('ignore me'));
 		packet.setExtension(1, numericArrayToDataView([ 1, 2, 3, 4 ]));
 		packet.setExtension(16, stringToDataView('also ignore me'));
+
 		// Force serialization so extension with id 0 must be ignored.
 		packet.serialize();
 		expect(packet.getExtension(0)).toBeUndefined();
@@ -568,5 +583,41 @@ describe('create RTP packet 10 from scratch', () =>
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getView().byteLength).toBe(20);
 		expect(packet.getPadding()).toBe(3);
+	});
+});
+
+describe('serialize packet into a given buffer', () =>
+{
+	const packet = new RtpPacket();
+
+	packet.setPayloadView(numericArrayToDataView([ 1, 2, 3, 4 ]));
+	packet.serialize();
+
+	const packetView = clone<DataView>(packet.getView());
+	const payloadView = clone<DataView>(packet.getPayloadView());
+	const packetDump = clone<RtpPacketDump>(packet.dump());
+
+	test('serialization succeeds', () =>
+	{
+		const serializationBuffer = new ArrayBuffer(2000);
+		const byteOffset = 135;
+
+		packet.serialize(serializationBuffer, byteOffset);
+
+		// Packet and payload views must be the same.
+		expect(areDataViewsEqual(packet.getView(), packetView)).toBe(true);
+		expect(areDataViewsEqual(packet.getPayloadView(), payloadView)).toBe(true);
+		expect(packet.dump()).toEqual(packetDump);
+	});
+
+	test('serialization fails if given buffer do not have enough space', () =>
+	{
+		// Packet length is 16 byrtes so let's pass only 15 bytes to make it throw.
+		const serializationBuffer = new ArrayBuffer(16);
+		const byteOffset = 1;
+
+		expect(
+			() => packet.serialize(serializationBuffer, byteOffset)
+		).toThrow(RangeError);
 	});
 });

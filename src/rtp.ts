@@ -321,6 +321,15 @@ export class RtpPacket
 	}
 
 	/**
+	 * Whether {@link serialize} should be called due to modifications in the
+	 * packet not being yet applied into the internal ArrayBuffer.
+	 */
+	needsSerialization(): boolean
+	{
+		return this.#serializationNeeded;
+	}
+
+	/**
 	 * Get the DataView containing the serialized RTP binary packet.
 	 *
 	 * @remarks
@@ -338,15 +347,6 @@ export class RtpPacket
 		}
 
 		return this.#packetView;
-	}
-
-	/**
-	 * Whether {@link serialize} should be called due to modifications in the
-	 * packet not being yet applied into the internal ArrayBuffer.
-	 */
-	needsSerialization(): boolean
-	{
-		return this.#serializationNeeded;
 	}
 
 	/**
@@ -552,7 +552,7 @@ export class RtpPacket
 		// Update header extension bit if needed.
 		if (this.#extensions.size === 0)
 		{
-			this.setHeaderExtensionBit(1);
+			this.setHeaderExtensionBit(true);
 
 			// If neither One-Byte nor Two-Bytes modes are enabled, force One-Byte.
 			if (!this.hasOneByteExtensions() && !this.hasTwoBytesExtensions())
@@ -582,7 +582,7 @@ export class RtpPacket
 		// Update header extension bit if needed.
 		if (this.#extensions.size === 0)
 		{
-			this.setHeaderExtensionBit(0);
+			this.setHeaderExtensionBit(false);
 		}
 
 		this.setSerializationNeeded(true);
@@ -604,7 +604,7 @@ export class RtpPacket
 		this.#extensions.clear();
 
 		// Update header extension bit.
-		this.setHeaderExtensionBit(0);
+		this.setHeaderExtensionBit(false);
 
 		this.setSerializationNeeded(true);
 	}
@@ -642,16 +642,19 @@ export class RtpPacket
 	 * Set the padding (in bytes) after the packet payload.
 	 *
 	 * @remarks
-	 * Serialization is needed after calling this method.
+	 * Serialization maybe needed after calling this method.
 	 */
 	setPadding(padding: number): void
 	{
+		if (padding === this.#padding)
+		{
+			return;
+		}
+
 		this.#padding = padding;
 
 		// Update padding bit.
-		const bit = padding ? 1 : 0;
-
-		this.setPaddingBit(bit);
+		this.setPaddingBit(Boolean(this.#padding));
 
 		this.setSerializationNeeded(true);
 	}
@@ -670,7 +673,9 @@ export class RtpPacket
 			this.serialize();
 		}
 
-		const packetLength = padTo4Bytes(this.#packetView.byteLength - this.#padding);
+		const packetLength = padTo4Bytes(
+			this.#packetView.byteLength - this.#padding
+		);
 
 		if (packetLength === this.#packetView.byteLength)
 		{
@@ -781,34 +786,85 @@ export class RtpPacket
 	 * Clone the packet. The cloned packet does not share any memory with the
 	 * original one.
 	 *
+	 * @param buffer - Buffer in which the packet will be serialized. If not given,
+	 *   a new one will internally allocated.
+	 * @param byteOffset - Byte offset of the given `buffer` when serialization must
+	 *   be done.
+	 *
 	 * @remarks
 	 * The buffer is serialized if needed (to apply packet pending modifications).
 	 *
 	 * @throws If buffer serialization is needed and it fails due to invalid
-	 *   fields.
+	 *   fields or if `buffer` is given and it doesn't hold enough space serializing the packet.
 	 */
-	clone(): RtpPacket
+	clone(buffer?: ArrayBuffer, byteOffset?: number): RtpPacket
 	{
 		if (this.needsSerialization())
 		{
 			this.serialize();
 		}
 
-		return new RtpPacket(clone<DataView>(this.#packetView));
+		// If buffer is given, let's check whether it holds enough space for the
+		// packet.
+		if (buffer)
+		{
+			byteOffset = byteOffset ?? 0;
+
+			if (buffer.byteLength - byteOffset < this.#packetView.byteLength)
+			{
+				throw new RangeError(
+					`given buffer available space (${buffer.byteLength - byteOffset} bytes) is less than packet required length (${this.#packetView.byteLength} bytes)`
+				);
+			}
+
+			// Copy the packet into the given buffer.
+			const destPacketUint8Array = new Uint8Array(
+				buffer,
+				byteOffset,
+				this.#packetView.byteLength
+			);
+
+			destPacketUint8Array.set(
+				new Uint8Array(
+					this.#packetView.buffer,
+					this.#packetView.byteOffset,
+					this.#packetView.byteLength
+				),
+				0
+			);
+
+			const destPacketView = new DataView(
+				destPacketUint8Array.buffer,
+				destPacketUint8Array.byteOffset,
+				destPacketUint8Array.byteLength
+			);
+
+			return new RtpPacket(destPacketView);
+		}
+		else
+		{
+			return new RtpPacket(clone<DataView>(this.#packetView));
+		}
 	}
 
 	/**
 	 * Apply pending changes into the packet and serialize it into a new internal
-	 * buffer (the one that {@link getBuffer} will later return).
+	 * buffer or into the buffer of the given DataView.
+	 *
+	 * @param buffer - Buffer in which the packet will be serialized. If not given,
+	 *   a new one will internally allocated.
+	 * @param byteOffset - Byte offset of the given `buffer` when serialization must
+	 *   be done.
 	 *
 	 * @remarks
 	 * In most cases there is no need to use this method since many setter methods
 	 * apply the changes within the current buffer. To be sure, check
 	 * {@link needsSerialization} before.
 	 *
-	 * @throws If invalid fields were previously added to the packet.
+	 * @throws If invalid fields were previously added to the packet or if `buffer`
+	 *   is given and it doesn't hold enough space serializing the packet.
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
 		// Compute required buffer length.
 		let packetLength = FIXED_HEADER_LENGTH;
@@ -855,8 +911,27 @@ export class RtpPacket
 		// Add space for padding.
 		packetLength += this.#padding;
 
-		// Allocate new DataView with new buffer.
-		const packetView = new DataView(new ArrayBuffer(packetLength));
+		// If buffer is given, let's check whether it holds enough space for the
+		// packet.
+		if (buffer)
+		{
+			byteOffset = byteOffset ?? 0;
+
+			if (buffer.byteLength - byteOffset < packetLength)
+			{
+				throw new RangeError(
+					`given buffer available space (${buffer.byteLength - byteOffset} bytes) is less than packet required length (${packetLength} bytes)`
+				);
+			}
+		}
+		else
+		{
+			buffer = new ArrayBuffer(packetLength);
+			byteOffset = 0;
+		}
+
+		// Create new DataView with new buffer.
+		const packetView = new DataView(buffer, byteOffset, packetLength);
 		const packetUint8Array = new Uint8Array(
 			packetView.buffer,
 			packetView.byteOffset,
@@ -1008,7 +1083,7 @@ export class RtpPacket
 		// is discarded later when serializing.
 		else
 		{
-			this.setHeaderExtensionBit(0);
+			this.setHeaderExtensionBit(false);
 			this.#extensions.clear();
 		}
 
@@ -1025,7 +1100,7 @@ export class RtpPacket
 		// Create new payload DataView.
 		const payloadView = new DataView(
 			packetView.buffer,
-			pos,
+			packetView.byteOffset + pos,
 			this.#payloadView.byteLength
 		);
 
@@ -1053,7 +1128,7 @@ export class RtpPacket
 		if (pos !== packetView.byteLength)
 		{
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match new DataView byte length (${packetView.byteLength} bytes)`
+				`computed packet length (${pos} bytes) does not match new DataView byte length (${packetView.byteLength} bytes)`
 			);
 		}
 
@@ -1076,13 +1151,13 @@ export class RtpPacket
 		this.#packetView.setUint8(0, RTP_VERSION << 6);
 	}
 
-	private setHeaderExtensionBit(bit: number)
+	private setHeaderExtensionBit(bit: boolean)
 	{
-		this.#packetView.setUint8(0, this.#packetView.getUint8(0) | (bit << 4));
+		this.#packetView.setUint8(0, this.#packetView.getUint8(0) | (Number(bit) << 4));
 	}
 
-	private setPaddingBit(bit: number)
+	private setPaddingBit(bit: boolean)
 	{
-		this.#packetView.setUint8(0, this.#packetView.getUint8(0) | (bit << 5));
+		this.#packetView.setUint8(0, this.#packetView.getUint8(0) | (Number(bit) << 5));
 	}
 }
