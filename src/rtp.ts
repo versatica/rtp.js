@@ -58,13 +58,13 @@ export function isRtp(view: DataView): boolean
 export class RtpPacket
 {
 	// DataView holding the entire RTP packet.
-	#view: DataView;
+	#packetView: DataView;
 	// CSRC.
 	#csrc: number[] = [];
 	// Header extension id.
 	#headerExtensionId?: number;
 	// One-Byte or Two-Bytes extensions indexed by id.
-	readonly #extensions: Map<number, ArrayBuffer> = new Map();
+	readonly #extensions: Map<number, DataView> = new Map();
 	// DataView holding the entire RTP payload.
 	#payloadView: DataView;
 	// Number of bytes of padding.
@@ -82,13 +82,17 @@ export class RtpPacket
 		// If no view is given, create an empty one with minimum required length.
 		if (!view)
 		{
-			this.#view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
+			this.#packetView = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
 			// Set version.
 			this.setVersion();
 
 			// Set empty payload.
-			this.#payloadView = new DataView(new ArrayBuffer(0));
+			this.#payloadView = new DataView(
+				this.#packetView.buffer,
+				this.#packetView.byteOffset + FIXED_HEADER_LENGTH,
+				0
+			);
 
 			return;
 		}
@@ -98,13 +102,11 @@ export class RtpPacket
 			throw new TypeError('not a RTP packet');
 		}
 
-		this.#view = view;
+		this.#packetView = view;
 
-		const viewOffset = this.#view.byteOffset;
-		const viewLength = this.#view.byteLength;
-		const firstByte = this.#view.getUint8(0);
+		const firstByte = this.#packetView.getUint8(0);
 
-		// Position relative to the DataView offset.
+		// Position relative to the DataView byte offset.
 		let pos = 0;
 
 		pos += FIXED_HEADER_LENGTH;
@@ -117,53 +119,57 @@ export class RtpPacket
 			for (let i = 0; i < csrcCount; ++i)
 			{
 				// NOTE: This will throw RangeError if there is no space in the buffer.
-				this.#csrc.push(this.#view.getUint32(pos));
+				this.#csrc.push(this.#packetView.getUint32(pos));
 
 				pos += 4;
 			}
 		}
 
 		// Parse header extension.
-		const extFlag = Boolean((firstByte >> 4) & 1);
-		let extBuffer: ArrayBuffer | undefined;
+		const headerExtensionFlag = Boolean((firstByte >> 4) & 1);
+		let headerExtensionView: DataView | undefined;
 
-		if (extFlag)
+		if (headerExtensionFlag)
 		{
 			// NOTE: This will throw RangeError if there is no space in the buffer.
-			this.#headerExtensionId = this.#view.getUint16(pos);
+			this.#headerExtensionId = this.#packetView.getUint16(pos);
 
-			const length = this.#view.getUint16(pos + 2) * 4;
+			pos += 2;
 
-			// TODO: Do not create ArrayBuffer.
-			extBuffer = this.#view.buffer.slice(
-				viewOffset + pos + 4, viewOffset + pos + 4 + length
+			const headerExtensionlength = this.#packetView.getUint16(pos) * 4;
+
+			pos += 2;
+
+			headerExtensionView = new DataView(
+				this.#packetView.buffer,
+				this.#packetView.byteOffset + pos,
+				headerExtensionlength
 			);
 
-			pos += (4 + length);
+			pos += headerExtensionlength;
 		}
 
 		// Parse One-Byte or Two-Bytes extensions.
-		if (extBuffer && this.hasOneByteExtensions())
+		if (headerExtensionView && this.hasOneByteExtensions())
 		{
-			const extView = new DataView(extBuffer);
 			let extPos = 0;
 
 			// One-Byte extensions cannot have length 0.
-			while (extPos < extBuffer.byteLength)
+			while (extPos < headerExtensionView.byteLength)
 			{
-				const id = (extView.getUint8(extPos) & 0xF0) >> 4;
-				const length = (extView.getUint8(extPos) & 0x0F) + 1;
+				const extId = (headerExtensionView.getUint8(extPos) & 0xF0) >> 4;
+				const extLength = (headerExtensionView.getUint8(extPos) & 0x0F) + 1;
 
 				// id=15 in One-Byte extensions means "stop parsing here".
-				if (id === 15)
+				if (extId === 15)
 				{
 					break;
 				}
 
-				// Valid extension id.
-				if (id !== 0)
+				// Valid extension extId.
+				if (extId !== 0)
 				{
-					if (extPos + 1 + length > extBuffer.byteLength)
+					if (extPos + 1 + extLength > headerExtensionView.byteLength)
 					{
 						throw new RangeError(
 							'not enough space for the announced One-Byte extension value'
@@ -172,11 +178,15 @@ export class RtpPacket
 
 					// Store the One-Byte extension element in the map.
 					this.#extensions.set(
-						id,
-						extBuffer.slice(extPos + 1, extPos + 1 + length)
+						extId,
+						new DataView(
+							headerExtensionView.buffer,
+							headerExtensionView.byteOffset + extPos + 1,
+							extLength
+						)
 					);
 
-					extPos += (length + 1);
+					extPos += (1 + extLength);
 				}
 				// id=0 means alignment.
 				else
@@ -185,27 +195,29 @@ export class RtpPacket
 				}
 
 				// Counting padding bytes.
-				while (extPos < extBuffer.byteLength && extView.getUint8(extPos) === 0)
+				while (
+					extPos < headerExtensionView.byteLength &&
+					headerExtensionView.getUint8(extPos) === 0
+				)
 				{
 					++extPos;
 				}
 			}
 		}
-		else if (extBuffer && this.hasTwoBytesExtensions())
+		else if (headerExtensionView && this.hasTwoBytesExtensions())
 		{
-			const extView = new DataView(extBuffer);
 			let extPos = 0;
 
 			// Two-Byte extensions can have length 0.
-			while (extPos + 1 < extBuffer.byteLength)
+			while (extPos + 1 < headerExtensionView.byteLength)
 			{
-				const id = extView.getUint8(extPos);
-				const length = extView.getUint8(extPos + 1);
+				const extId = headerExtensionView.getUint8(extPos);
+				const extLength = headerExtensionView.getUint8(extPos + 1);
 
 				// Valid extension id.
-				if (id !== 0)
+				if (extId !== 0)
 				{
-					if (extPos + 2 + length > extBuffer.byteLength)
+					if (extPos + 2 + extLength > headerExtensionView.byteLength)
 					{
 						throw new RangeError(
 							'not enough space for the announced Two-Bytes extension value'
@@ -214,11 +226,15 @@ export class RtpPacket
 
 					// Store the Two-Bytes extension element in the map.
 					this.#extensions.set(
-						id,
-						extBuffer.slice(extPos + 2, extPos + 2 + length)
+						extId,
+						new DataView(
+							headerExtensionView.buffer,
+							headerExtensionView.byteOffset + extPos + 2,
+							extLength
+						)
 					);
 
-					extPos += (length + 2);
+					extPos += (2 + extLength);
 				}
 				// id=0 means alignment.
 				else
@@ -227,7 +243,10 @@ export class RtpPacket
 				}
 
 				// Counting padding bytes.
-				while (extPos < extBuffer.byteLength && extView.getUint8(extPos) === 0)
+				while (
+					extPos < headerExtensionView.byteLength &&
+					headerExtensionView.getUint8(extPos) === 0
+				)
 				{
 					++extPos;
 				}
@@ -240,32 +259,34 @@ export class RtpPacket
 		if (paddingFlag)
 		{
 			// NOTE: This will throw RangeError if there is no space in the view.
-			this.#padding = this.#view.getUint8(viewLength - 1);
+			this.#padding = this.#packetView.getUint8(
+				this.#packetView.byteLength - 1
+			);
 		}
 
 		// Get payload.
-		const payloadLength = viewLength - pos - this.#padding;
+		const payloadLength = this.#packetView.byteLength - pos - this.#padding;
 
 		if (payloadLength < 0)
 		{
 			throw new RangeError(
-				`announced padding (${this.#padding} bytes) is bigger than available space for payload (${viewLength - pos} bytes)`
+				`announced padding (${this.#padding} bytes) is bigger than available space for payload (${this.#packetView.byteLength - pos} bytes)`
 			);
 		}
 
 		this.#payloadView = new DataView(
-			this.#view.buffer,
-			viewOffset + pos,
+			this.#packetView.buffer,
+			this.#packetView.byteOffset + pos,
 			payloadLength
 		);
 
 		// Ensure that view length and parsed length match.
 		pos += (payloadLength + this.#padding);
 
-		if (pos !== viewLength)
+		if (pos !== this.#packetView.byteLength)
 		{
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${viewLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.#packetView.byteLength} bytes)`
 			);
 		}
 	}
@@ -276,11 +297,11 @@ export class RtpPacket
 	dump(): RtpPacketDump
 	{
 		const extensions = Array.from(this.#extensions)
-			.map(([ id, value ]) =>
+			.map(([ extId, view ]) =>
 			{
 				return {
-					id      : id,
-					length  : value.byteLength
+					id     : extId,
+					length : view.byteLength
 				};
 			});
 
@@ -316,7 +337,7 @@ export class RtpPacket
 			this.serialize();
 		}
 
-		return this.#view;
+		return this.#packetView;
 	}
 
 	/**
@@ -333,7 +354,7 @@ export class RtpPacket
 	 */
 	getVersion(): number
 	{
-		return (this.#view.getUint8(0) >> 6);
+		return (this.#packetView.getUint8(0) >> 6);
 	}
 
 	/**
@@ -341,7 +362,7 @@ export class RtpPacket
 	 */
 	getPayloadType(): number
 	{
-		return (this.#view.getUint8(1) & 0x7F);
+		return (this.#packetView.getUint8(1) & 0x7F);
 	}
 
 	/**
@@ -349,7 +370,9 @@ export class RtpPacket
 	 */
 	setPayloadType(payloadType: number): void
 	{
-		this.#view.setUint8(1, (this.#view.getUint8(1) & 0x80) | (payloadType & 0x7F));
+		this.#packetView.setUint8(
+			1, (this.#packetView.getUint8(1) & 0x80) | (payloadType & 0x7F)
+		);
 	}
 
 	/**
@@ -357,7 +380,7 @@ export class RtpPacket
 	 */
 	getSequenceNumber(): number
 	{
-		return this.#view.getUint16(2);
+		return this.#packetView.getUint16(2);
 	}
 
 	/**
@@ -365,7 +388,7 @@ export class RtpPacket
 	 */
 	setSequenceNumber(sequenceNumber: number): void
 	{
-		this.#view.setUint16(2, sequenceNumber);
+		this.#packetView.setUint16(2, sequenceNumber);
 	}
 
 	/**
@@ -373,7 +396,7 @@ export class RtpPacket
 	 */
 	getTimestamp(): number
 	{
-		return this.#view.getUint32(4);
+		return this.#packetView.getUint32(4);
 	}
 
 	/**
@@ -381,7 +404,7 @@ export class RtpPacket
 	 */
 	setTimestamp(timestamp: number): void
 	{
-		this.#view.setUint32(4, timestamp);
+		this.#packetView.setUint32(4, timestamp);
 	}
 
 	/**
@@ -389,7 +412,7 @@ export class RtpPacket
 	 */
 	getSsrc(): number
 	{
-		return this.#view.getUint32(8);
+		return this.#packetView.getUint32(8);
 	}
 
 	/**
@@ -397,7 +420,7 @@ export class RtpPacket
 	 */
 	setSsrc(ssrc: number): void
 	{
-		this.#view.setUint32(8, ssrc);
+		this.#packetView.setUint32(8, ssrc);
 	}
 
 	/**
@@ -422,9 +445,9 @@ export class RtpPacket
 		// Update CSRC count.
 		const count = this.#csrc.length;
 
-		this.#view.setUint8(
+		this.#packetView.setUint8(
 			0,
-			(this.#view.getUint8(0) & 0xF0) | (count & 0x0F)
+			(this.#packetView.getUint8(0) & 0xF0) | (count & 0x0F)
 		);
 
 		this.setSerializationNeeded(true);
@@ -435,7 +458,7 @@ export class RtpPacket
 	 */
 	getMarker(): boolean
 	{
-		return Boolean(this.#view.getUint8(1) >> 7);
+		return Boolean(this.#packetView.getUint8(1) >> 7);
 	}
 
 	/**
@@ -445,7 +468,7 @@ export class RtpPacket
 	{
 		const bit = marker ? 1 : 0;
 
-		this.#view.setUint8(1, this.#view.getUint8(1) | (bit << 7));
+		this.#packetView.setUint8(1, this.#packetView.getUint8(1) | (bit << 7));
 	}
 
 	/**
@@ -505,7 +528,7 @@ export class RtpPacket
 	/**
 	 * Get the value of the extension (RFC 5285) with given `id` (if any).
 	 */
-	getExtension(id: number): ArrayBuffer | undefined
+	getExtension(id: number): DataView | undefined
 	{
 		return this.#extensions.get(id);
 	}
@@ -513,7 +536,7 @@ export class RtpPacket
 	/**
 	 * Get an iterator with all the extensions (RFC 5285).
 	 */
-	getExtensions(): IterableIterator<[number, ArrayBuffer]>
+	getExtensions(): IterableIterator<[number, DataView]>
 	{
 		return this.#extensions.entries();
 	}
@@ -524,7 +547,7 @@ export class RtpPacket
 	 * @remarks
 	 * Serialization is needed after calling this method.
 	 */
-	setExtension(id: number, value: ArrayBuffer): void
+	setExtension(id: number, value: DataView): void
 	{
 		// Update header extension bit if needed.
 		if (this.#extensions.size === 0)
@@ -647,16 +670,14 @@ export class RtpPacket
 			this.serialize();
 		}
 
-		const viewLength = this.#view.byteLength;
-		const padding = this.#padding;
-		const newLength = padTo4Bytes(viewLength - padding);
+		const packetLength = padTo4Bytes(this.#packetView.byteLength - this.#padding);
 
-		if (newLength === viewLength)
+		if (packetLength === this.#packetView.byteLength)
 		{
 			return;
 		}
 
-		this.setPadding(padding + newLength - viewLength);
+		this.setPadding(this.#padding + packetLength - this.#packetView.byteLength);
 
 		this.setSerializationNeeded(true);
 	}
@@ -773,7 +794,7 @@ export class RtpPacket
 			this.serialize();
 		}
 
-		return new RtpPacket(clone<DataView>(this.#view));
+		return new RtpPacket(clone<DataView>(this.#packetView));
 	}
 
 	/**
@@ -790,64 +811,68 @@ export class RtpPacket
 	serialize(): void
 	{
 		// Compute required buffer length.
-		let length = FIXED_HEADER_LENGTH;
+		let packetLength = FIXED_HEADER_LENGTH;
 
 		// Add space for CSRC values.
-		length += this.#csrc.length * 4;
+		packetLength += this.#csrc.length * 4;
 
 		// Add space for the header extension (just if there are extensions).
 		if (this.#extensions.size > 0)
 		{
 			// Add space for header extension id/length fields.
-			length += 4;
+			packetLength += 4;
 
 			if (this.hasOneByteExtensions())
 			{
-				for (const [ id, value ] of this.#extensions)
+				for (const [ extId, extView ] of this.#extensions)
 				{
-					if (id % 16 !== 0)
+					if (extId % 16 !== 0)
 					{
 						// Add space for extension id/length fields.
-						length += 1 + value.byteLength;
+						packetLength += 1 + extView.byteLength;
 					}
 				}
 			}
 			else if (this.hasTwoBytesExtensions())
 			{
-				for (const [ id, value ] of this.#extensions)
+				for (const [ extId, extView ] of this.#extensions)
 				{
-					if (id % 256 !== 0)
+					if (extId % 256 !== 0)
 					{
 						// Add space for extension id/length fields.
-						length += 2 + value.byteLength;
+						packetLength += 2 + extView.byteLength;
 					}
 				}
 			}
 
 			// May need to add padding.
-			length = padTo4Bytes(length);
+			packetLength = padTo4Bytes(packetLength);
 		}
 
 		// Add space for payload.
-		length += this.#payloadView.byteLength;
+		packetLength += this.#payloadView.byteLength;
 
 		// Add space for padding.
-		length += this.#padding;
+		packetLength += this.#padding;
 
 		// Allocate new DataView with new buffer.
-		const view = new DataView(new ArrayBuffer(length));
+		const packetView = new DataView(new ArrayBuffer(packetLength));
+		const packetUint8Array = new Uint8Array(
+			packetView.buffer,
+			packetView.byteOffset,
+			packetView.byteLength
+		);
 
-		// This is 0, but anyway let's be strict.
-		const viewOffset = view.byteOffset;
-		const viewLength = view.byteLength;
-		const uint8Array = new Uint8Array(view.buffer, viewOffset, viewLength);
-
-		// Position relative to the DataView offset.
+		// Position relative to the DataView byte offset.
 		let pos = 0;
 
 		// Copy the fixed header into the new buffer.
-		uint8Array.set(
-			new Uint8Array(this.#view.buffer, this.#view.byteOffset, FIXED_HEADER_LENGTH),
+		packetUint8Array.set(
+			new Uint8Array(
+				this.#packetView.buffer,
+				this.#packetView.byteOffset,
+				FIXED_HEADER_LENGTH
+			),
 			0
 		);
 
@@ -856,7 +881,7 @@ export class RtpPacket
 		// Write CSRC.
 		for (const ssrc of this.#csrc)
 		{
-			view.setUint32(pos, ssrc);
+			packetView.setUint32(pos, ssrc);
 
 			pos += 4;
 		}
@@ -864,7 +889,7 @@ export class RtpPacket
 		// Write header extension.
 		if (this.#extensions.size > 0 && this.hasOneByteExtensions())
 		{
-			view.setUint16(pos, this.#headerExtensionId!);
+			packetView.setUint16(pos, this.#headerExtensionId!);
 
 			const extLengthPos = pos + 2;
 			let extLength = 0;
@@ -872,41 +897,46 @@ export class RtpPacket
 			// Move to the header extension value.
 			pos += 4;
 
-			for (const [ id, value ] of this.#extensions)
+			for (const [ extId, extView ] of this.#extensions)
 			{
-				if (id % 16 === 0)
+				if (extId % 16 === 0)
 				{
-					this.#extensions.delete(id);
+					this.#extensions.delete(extId);
 
 					continue;
 				}
 
-				if (value.byteLength === 0)
+				if (extView.byteLength === 0)
 				{
 					throw new TypeError(
 						'cannot serialize extensions with length 0 in One-Byte mode'
 					);
 				}
-				else if (value.byteLength > 16)
+				else if (extView.byteLength > 16)
 				{
 					throw new RangeError(
 						'cannot serialize extensions with length > 16 in One-Byte mode'
 					);
 				}
 
-				const idLength = (id << 4) & ((value.byteLength - 1) & 0x0F);
+				const idAndLength = (extId << 4) & ((extView.byteLength - 1) & 0x0F);
 
-				view.setUint8(pos, idLength);
+				packetView.setUint8(pos, idAndLength);
 
 				pos += 1;
 				extLength += 1;
 
-				// TODO: This must change since extensions must hold DataViews instead
-				// of ArrayBuffers.
-				uint8Array.set(new Uint8Array(value), pos);
+				packetUint8Array.set(
+					new Uint8Array(
+						extView.buffer,
+						extView.byteOffset,
+						extView.byteLength
+					),
+					pos
+				);
 
-				pos += value.byteLength;
-				extLength += value.byteLength;
+				pos += extView.byteLength;
+				extLength += extView.byteLength;
 			}
 
 			// May need to add padding.
@@ -914,11 +944,11 @@ export class RtpPacket
 			extLength = padTo4Bytes(extLength);
 
 			// Write header extension length.
-			view.setUint16(extLengthPos, extLength / 4);
+			packetView.setUint16(extLengthPos, extLength / 4);
 		}
 		else if (this.#extensions.size > 0 && this.hasTwoBytesExtensions())
 		{
-			view.setUint16(pos, this.#headerExtensionId!);
+			packetView.setUint16(pos, this.#headerExtensionId!);
 
 			const extLengthPos = pos + 2;
 			let extLength = 0;
@@ -926,38 +956,43 @@ export class RtpPacket
 			// Move to the header extension value.
 			pos += 4;
 
-			for (const [ id, value ] of this.#extensions)
+			for (const [ extId, extView ] of this.#extensions)
 			{
-				if (id % 256 === 0)
+				if (extId % 256 === 0)
 				{
-					this.#extensions.delete(id);
+					this.#extensions.delete(extId);
 
 					continue;
 				}
 
-				if (value.byteLength > 255)
+				if (extView.byteLength > 255)
 				{
 					throw new RangeError(
 						'cannot serialize extensions with length > 255 in Two-Bytes mode'
 					);
 				}
 
-				view.setUint8(pos, id);
+				packetView.setUint8(pos, extId);
 
 				pos += 1;
 				extLength += 1;
 
-				view.setUint8(pos, value.byteLength);
+				packetView.setUint8(pos, extView.byteLength);
 
 				pos += 1;
 				extLength += 1;
 
-				// TODO: This must change since extensions must hold DataViews instead
-				// of ArrayBuffers.
-				uint8Array.set(new Uint8Array(value), pos);
+				packetUint8Array.set(
+					new Uint8Array(
+						extView.buffer,
+						extView.byteOffset,
+						extView.byteLength
+					),
+					pos
+				);
 
-				pos += value.byteLength;
-				extLength += value.byteLength;
+				pos += extView.byteLength;
+				extLength += extView.byteLength;
 			}
 
 			// May need to add padding.
@@ -965,9 +1000,12 @@ export class RtpPacket
 			extLength = padTo4Bytes(extLength);
 
 			// Write header extension length.
-			view.setUint16(extLengthPos, extLength / 4);
+			packetView.setUint16(extLengthPos, extLength / 4);
 		}
 		// Otherwise remove the header extension.
+		// NOTE: This means that we don't support non RFC 5285 header extensions
+		// so, if the parsed packet contains a non RFC 5285 header extension, it
+		// is discarded later when serializing.
 		else
 		{
 			this.setHeaderExtensionBit(0);
@@ -975,7 +1013,7 @@ export class RtpPacket
 		}
 
 		// Write payload.
-		uint8Array.set(
+		packetUint8Array.set(
 			new Uint8Array(
 				this.#payloadView.buffer,
 				this.#payloadView.byteOffset,
@@ -986,7 +1024,7 @@ export class RtpPacket
 
 		// Create new payload DataView.
 		const payloadView = new DataView(
-			uint8Array.buffer,
+			packetView.buffer,
 			pos,
 			this.#payloadView.byteLength
 		);
@@ -1003,23 +1041,24 @@ export class RtpPacket
 				);
 			}
 
-			uint8Array.fill(0, pos, pos + this.#padding - 1);
+			// NOTE: No need to fill padding bytes with zeroes since ArrayBuffer
+			// constructor already fills all bytes with zero.
 
-			view.setUint8(pos + this.#padding - 1, this.#padding);
+			packetView.setUint8(pos + this.#padding - 1, this.#padding);
 
 			pos += this.#padding;
 		}
 
 		// Assert that current position matches new buffer length.
-		if (pos !== viewLength)
+		if (pos !== packetView.byteLength)
 		{
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match new DataView byte length (${viewLength} bytes)`
+				`parsed length (${pos} bytes) does not match new DataView byte length (${packetView.byteLength} bytes)`
 			);
 		}
 
 		// Update DataView.
-		this.#view = view;
+		this.#packetView = packetView;
 
 		// Update payload DataView.
 		this.#payloadView = payloadView;
@@ -1034,16 +1073,16 @@ export class RtpPacket
 
 	private setVersion(): void
 	{
-		this.#view.setUint8(0, RTP_VERSION << 6);
+		this.#packetView.setUint8(0, RTP_VERSION << 6);
 	}
 
 	private setHeaderExtensionBit(bit: number)
 	{
-		this.#view.setUint8(0, this.#view.getUint8(0) | (bit << 4));
+		this.#packetView.setUint8(0, this.#packetView.getUint8(0) | (bit << 4));
 	}
 
 	private setPaddingBit(bit: number)
 	{
-		this.#view.setUint8(0, this.#view.getUint8(0) | (bit << 5));
+		this.#packetView.setUint8(0, this.#packetView.getUint8(0) | (bit << 5));
 	}
 }
