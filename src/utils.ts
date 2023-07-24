@@ -228,6 +228,11 @@ export function stringToArrayBuffer(string: string): ArrayBuffer
 export function stringToDataView(string: string): DataView
 {
 	const encoder = new TextEncoder();
+	const uint8Array = encoder.encode(string);
 
-	return new DataView(encoder.encode(string).buffer);
+	return new DataView(
+		uint8Array.buffer,
+		uint8Array.byteOffset,
+		uint8Array.byteLength
+	);
 }
