@@ -1,11 +1,9 @@
 ### TODO
 
-- RTP is done. RTCP is not.
+- Add `packet.getByteLength()` that returns real byte length of the packet including everything. And use it internally in methods such as `serialize()`.
 
 - Use `pos` instead of `offset` everywhere.
 
 - Review exported functions in `utils.ts`.
 
-- Make `packet.serialize()` accept an optional `buffer?: ArrayBuffer` and `byteOffset?: number` and, if given, serialize into it (check length).
-
-- Same for `clone()`.
+- `RtcpPacket`: Exclude `getLength()` from docs.

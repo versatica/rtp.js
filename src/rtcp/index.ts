@@ -155,8 +155,8 @@ export abstract class RtcpPacket
 	 * The internal ArrayBuffer is serialized if needed (to apply packet pending
 	 * modifications).
 	 *
-	 * @throws If buffer serialization is needed and it fails due to invalid
-	 *   fields.
+	 * @throws
+	 * If buffer serialization is needed and it fails due to invalid fields.
 	 */
 	getView(): DataView
 	{
@@ -240,8 +240,8 @@ export abstract class RtcpPacket
 	 * @remarks
 	 * The buffer is serialized if needed (to apply packet pending modifications).
 	 *
-	 * @throws If buffer serialization is needed and it fails due to invalid
-	 *   fields.
+	 * @throws
+	 * If buffer serialization is needed and it fails due to invalid fields.
 	 */
 	abstract clone(): RtcpPacket;
 
@@ -254,7 +254,8 @@ export abstract class RtcpPacket
 	 * apply the changes within the current buffer. To be sure, check
 	 * {@link needsSerialization} before.
 	 *
-	 * @throws If invalid fields were previously added to the packet.
+	 * @throws
+	 * If invalid fields were previously added to the packet.
 	 */
 	abstract serialize(): void;
 

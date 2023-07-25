@@ -27,6 +27,7 @@ describe('parse RTP packet 1', () =>
 		packet = new RtpPacket(view);
 
 		expect(packet).toBeDefined();
+		expect(packet.getByteLength()).toBe(54);
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPayloadType()).toBe(111);
@@ -65,6 +66,7 @@ describe('parse RTP packet 2', () =>
 		packet = new RtpPacket(view);
 
 		expect(packet).toBeDefined();
+		expect(packet.getByteLength()).toBe(102);
 		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPayloadType()).toBe(111);
 		expect(packet.getSequenceNumber()).toBe(19354);
@@ -113,6 +115,7 @@ describe('parse RTP packet 3', () =>
 		packet = new RtpPacket(view);
 
 		expect(packet).toBeDefined();
+		expect(packet.getByteLength()).toBe(array.byteLength);
 		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPayloadType()).toBe(1);
 		expect(packet.getSequenceNumber()).toBe(8);
@@ -130,6 +133,10 @@ describe('parse RTP packet 3', () =>
 
 describe('parse RTP packet 4', () =>
 {
+	const uselessExtensionAlignment = 4;
+
+	// This RTP packet contains 4 extensions with id=0 meaning alignment so
+	// those are discarded if the packet is serialized.
 	const array = new Uint8Array(
 		[
 			0b10010000, 0b00000001, 0x00, 0x08,
@@ -160,6 +167,7 @@ describe('parse RTP packet 4', () =>
 		packet = new RtpPacket(view);
 
 		expect(packet).toBeDefined();
+		expect(packet.getByteLength()).toBe(array.byteLength - uselessExtensionAlignment);
 		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPayloadType()).toBe(1);
 		expect(packet.getSequenceNumber()).toBe(8);
@@ -218,6 +226,7 @@ describe('parse RTP packet 5 with uncommon header extension value', () =>
 		const packetDump = clone<RtpPacketDump>(packet.dump());
 
 		expect(packet).toBeDefined();
+		expect(packet.getByteLength()).toBe(array.byteLength);
 		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPayloadType()).toBe(1);
 		expect(packet.getSequenceNumber()).toBe(8);
@@ -232,11 +241,11 @@ describe('parse RTP packet 5 with uncommon header extension value', () =>
 		expect(packet.needsSerialization()).toBe(false);
 
 		// Serialize and then compare DataViews.
-		// NOTE: serialize() will discard non RFC 5285 header extensions, so
-		// the packet will not match the parsed one.
+		// NOTE: serialize() will NOT discard non RFC 5285 header extensions, so
+		// the packet will match the parsed one.
 		packet.serialize();
 
-		expect(areDataViewsEqual(packet.getView(), packetView)).toBe(false);
+		expect(areDataViewsEqual(packet.getView(), packetView)).toBe(true);
 		expect(areDataViewsEqual(packet.getPayloadView(), payloadView)).toBe(true);
 		expect(packet.dump()).toEqual(packetDump);
 	});
@@ -449,7 +458,7 @@ describe('create RTP packet 7 from scratch', () =>
 {
 	let packet: RtpPacket;
 
-	test('packet processing succeeds', () =>
+	test.only('packet processing succeeds', () =>
 	{
 		packet = new RtpPacket();
 
@@ -465,6 +474,8 @@ describe('create RTP packet 7 from scratch', () =>
 		// it becomes 24;
 		expect(packet.getView().byteLength).toBe(24);
 		expect(packet.needsSerialization()).toBe(false);
+
+		console.log('---- test: clearExtensions()');
 
 		packet.clearExtensions();
 		expect(packet.needsSerialization()).toBe(true);
@@ -599,25 +610,41 @@ describe('serialize packet into a given buffer', () =>
 
 	test('serialization succeeds', () =>
 	{
-		const serializationBuffer = new ArrayBuffer(2000);
+		const buffer = new ArrayBuffer(2000);
 		const byteOffset = 135;
 
-		packet.serialize(serializationBuffer, byteOffset);
+		packet.on('serialization-buffer-needed', (length, cb) =>
+		{
+			cb(buffer, byteOffset);
+		});
+
+		packet.serialize();
 
 		// Packet and payload views must be the same.
 		expect(areDataViewsEqual(packet.getView(), packetView)).toBe(true);
 		expect(areDataViewsEqual(packet.getPayloadView(), payloadView)).toBe(true);
+		expect(packet.getView().buffer === buffer).toBe(true);
+		expect(packet.getView().byteOffset).toBe(byteOffset);
 		expect(packet.dump()).toEqual(packetDump);
+
+		packet.removeAllListeners('serialization-buffer-needed');
 	});
 
 	test('serialization fails if given buffer do not have enough space', () =>
 	{
 		// Packet length is 16 byrtes so let's pass only 15 bytes to make it throw.
-		const serializationBuffer = new ArrayBuffer(16);
+		const buffer = new ArrayBuffer(16);
 		const byteOffset = 1;
 
+		packet.on('serialization-buffer-needed', (length, cb) =>
+		{
+			cb(buffer, byteOffset);
+		});
+
 		expect(
-			() => packet.serialize(serializationBuffer, byteOffset)
+			() => packet.serialize()
 		).toThrow(RangeError);
+
+		packet.removeAllListeners('serialization-buffer-needed');
 	});
 });
