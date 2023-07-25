@@ -458,7 +458,7 @@ describe('create RTP packet 7 from scratch', () =>
 {
 	let packet: RtpPacket;
 
-	test.only('packet processing succeeds', () =>
+	test('packet processing succeeds', () =>
 	{
 		packet = new RtpPacket();
 
@@ -474,8 +474,6 @@ describe('create RTP packet 7 from scratch', () =>
 		// it becomes 24;
 		expect(packet.getView().byteLength).toBe(24);
 		expect(packet.needsSerialization()).toBe(false);
-
-		console.log('---- test: clearExtensions()');
 
 		packet.clearExtensions();
 		expect(packet.needsSerialization()).toBe(true);
@@ -573,26 +571,34 @@ describe('create RTP packet 10 from scratch', () =>
 		// Packet total length must match RTP fixed header length (12) + payload
 		// (4), so 16.
 		expect(packet.getView().byteLength).toBe(16);
+		expect(packet.getByteLength()).toBe(16);
 
 		// Nothing to do since already padded to 4 bytes.
 		packet.padTo4Bytes();
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getView().byteLength).toBe(16);
+		expect(packet.getByteLength()).toBe(16);
 		expect(packet.getPadding()).toBe(0);
 
 		packet.setPadding(1);
 		expect(packet.needsSerialization()).toBe(true);
+		expect(packet.getByteLength()).toBe(17);
+
 		// Padding a packet of 17 bytes (1 byte of padding) must become 16 bytes.
 		packet.padTo4Bytes();
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getView().byteLength).toBe(16);
+		expect(packet.getByteLength()).toBe(16);
 		expect(packet.getPadding()).toBe(0);
 
 		packet.setPayloadView(numericArrayToDataView([ 1, 2, 3, 4, 5 ]));
+		expect(packet.getByteLength()).toBe(17);
+
 		// Padding a packet of 17 bytes (0 bytes of padding) must become 20 bytes.
 		packet.padTo4Bytes();
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getView().byteLength).toBe(20);
+		expect(packet.getByteLength()).toBe(20);
 		expect(packet.getPadding()).toBe(3);
 	});
 });

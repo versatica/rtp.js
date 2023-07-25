@@ -2,6 +2,28 @@ import { Logger } from './Logger';
 
 const logger = new Logger('utils');
 
+export function readBit(byte: number, bitPosition: number): boolean
+{
+	return (byte & (1 << bitPosition)) !== 0;
+}
+
+export function setBit(byte: number, bitPosition: number, bit: boolean): number
+{
+	if (bit)
+	{
+		return byte | (1 << bitPosition);
+	}
+	else
+	{
+		return byte & ~(1 << bitPosition);
+	}
+}
+
+export function toggleBit(byte: number, bitPosition: number): number
+{
+	return byte ^ (1 << bitPosition);
+}
+
 /**
  * Clones the given object/array/Buffer/etc.
  */

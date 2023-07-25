@@ -1,5 +1,5 @@
 import { RtcPacket } from './RtcPacket';
-import { clone, padTo4Bytes } from './utils';
+import { readBit, setBit, clone, padTo4Bytes } from './utils';
 
 const RTP_VERSION = 2;
 const FIXED_HEADER_LENGTH = 12;
@@ -84,11 +84,6 @@ export class RtpPacket extends RtcPacket
 	{
 		super();
 
-		if (view)
-		{
-			console.log('---- constructor() | view.byteLength:', view.byteLength);
-		}
-
 		// If no view is given, create an empty one with minimum required length.
 		if (!view)
 		{
@@ -148,8 +143,6 @@ export class RtpPacket extends RtcPacket
 			pos += 2;
 
 			const headerExtensionLength = this.packetView.getUint16(pos) * 4;
-
-			console.log('--- constructor() | headerExtensionLength:', headerExtensionLength);
 
 			pos += 2;
 
@@ -227,11 +220,6 @@ export class RtpPacket extends RtcPacket
 				const extId = headerExtensionView.getUint8(extPos);
 				const extLength = headerExtensionView.getUint8(extPos + 1);
 
-				console.log(
-					'--- constructor() | extension | pos:%o, extPos:%o, extId:%o, extLength',
-					pos, extPos, extId, extLength
-				);
-
 				// Valid extension id.
 				if (extId !== 0)
 				{
@@ -279,7 +267,7 @@ export class RtpPacket extends RtcPacket
 		}
 
 		// Get padding.
-		const paddingFlag = Boolean((firstByte >> 5) & 1);
+		const paddingFlag = this.getPaddingBit();
 
 		if (paddingFlag)
 		{
@@ -289,12 +277,8 @@ export class RtpPacket extends RtcPacket
 			);
 		}
 
-		console.log('--- constructor() | paddingFlag:%o, this.#padding:%o', paddingFlag, this.#padding);
-
 		// Get payload.
 		const payloadLength = this.packetView.byteLength - pos - this.#padding;
-
-		console.log('--- constructor() | payloadLength:%o:', payloadLength);
 
 		if (payloadLength < 0)
 		{
@@ -318,8 +302,6 @@ export class RtpPacket extends RtcPacket
 				`parsed length (${pos} bytes) does not match view length (${this.packetView.byteLength} bytes)`
 			);
 		}
-
-		console.log('---- constructor() | pos:', pos);
 	}
 
 	/**
@@ -534,17 +516,15 @@ export class RtpPacket extends RtcPacket
 	 */
 	getMarker(): boolean
 	{
-		return Boolean(this.packetView.getUint8(1) >> 7);
+		return readBit(this.packetView.getUint8(1), 7);
 	}
 
 	/**
 	 * Set the RTP marker flag.
 	 */
-	setMarker(marker: boolean): void
+	setMarker(bit: boolean): void
 	{
-		const bit = marker ? 1 : 0;
-
-		this.packetView.setUint8(1, this.packetView.getUint8(1) | (bit << 7));
+		this.packetView.setUint8(1, setBit(this.packetView.getUint8(1), 7, bit));
 	}
 
 	/**
@@ -674,20 +654,15 @@ export class RtpPacket extends RtcPacket
 	 */
 	clearExtensions(): void
 	{
-		console.log('---- RtpPacket clearExtensions()');
 		if (this.#extensions.size === 0)
 		{
 			return;
 		}
 
-		console.log('---- RtpPacket clearExtensions() 2');
-
 		this.#extensions.clear();
 
 		// Update header extension bit.
 		this.setHeaderExtensionBit(false);
-
-		console.log('--- getHeaderExtensionBit():', this.getHeaderExtensionBit());
 
 		this.setSerializationNeeded(true);
 	}
@@ -751,14 +726,16 @@ export class RtpPacket extends RtcPacket
 	 */
 	padTo4Bytes(): void
 	{
-		const packetLength = padTo4Bytes(this.getByteLength() - this.#padding);
+		const previousPacketLength = this.getByteLength();
+		const packetLength = padTo4Bytes(previousPacketLength - this.#padding);
+		const padding = this.#padding + packetLength - previousPacketLength;
 
-		if (packetLength === this.packetView.byteLength)
+		if (padding === this.#padding)
 		{
 			return;
 		}
 
-		this.setPadding(this.#padding + packetLength - this.packetView.byteLength);
+		this.setPadding(padding);
 
 		this.setSerializationNeeded(true);
 	}
@@ -1177,16 +1154,21 @@ export class RtpPacket extends RtcPacket
 
 	private getHeaderExtensionBit(): boolean
 	{
-		return Boolean((this.packetView.getUint8(0) >> 4) & 1);
+		return readBit(this.packetView.getUint8(0), 4);
 	}
 
 	private setHeaderExtensionBit(bit: boolean): void
 	{
-		this.packetView.setUint8(0, this.packetView.getUint8(0) | (Number(bit) << 4));
+		this.packetView.setUint8(0, setBit(this.packetView.getUint8(0), 4, bit));
+	}
+
+	private getPaddingBit(): boolean
+	{
+		return readBit(this.packetView.getUint8(0), 5);
 	}
 
 	private setPaddingBit(bit: boolean): void
 	{
-		this.packetView.setUint8(0, this.packetView.getUint8(0) | (Number(bit) << 5));
+		this.packetView.setUint8(0, setBit(this.packetView.getUint8(0), 5, bit));
 	}
 }
