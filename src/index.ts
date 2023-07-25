@@ -1,4 +1,9 @@
 export {
+	RtcPacket,
+	RtcPacketEvents
+} from './RtcPacket';
+
+export {
 	isRtp,
 	RtpPacket,
 	RtpPacketDump

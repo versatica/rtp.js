@@ -1,6 +1,9 @@
 import { EnhancedEventEmitter } from './EnhancedEventEmitter';
 
-type RtcPacketEvents =
+/**
+ * Events of RtcPacket.
+ */
+export type RtcPacketEvents =
 {
 	'serialization-buffer-needed':
 	[
@@ -16,7 +19,12 @@ type RtcPacketEvents =
 	];
 };
 
-export abstract class RtcPacket	extends EnhancedEventEmitter<RtcPacketEvents>
+/**
+ * Base class for RTP and RTCP packets.
+ *
+ * @noInheritDoc
+ */
+export abstract class RtcPacket extends EnhancedEventEmitter<RtcPacketEvents>
 {
 	// DataView holding the entire packet.
 	// @ts-ignore ('packetView' has not initializer and is not assigned in constructor).
