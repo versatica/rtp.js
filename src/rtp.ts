@@ -725,11 +725,7 @@ export class RtpPacket
 			2
 		);
 
-		this.#payloadView = new DataView(
-			payloadUint8Array.buffer,
-			payloadUint8Array.byteOffset,
-			payloadUint8Array.byteLength
-		);
+		this.#payloadView = payloadView;
 
 		// Rewrite the sequence number.
 		this.setSequenceNumber(sequenceNumber);
