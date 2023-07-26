@@ -2,12 +2,12 @@ import { Logger } from './Logger';
 
 const logger = new Logger('utils');
 
-export function readBit(byte: number, bitPosition: number): boolean
+export function readBit(byte: number, bitPosition: number): number
 {
-	return (byte & (1 << bitPosition)) !== 0;
+	return (byte & (1 << bitPosition)) ? 1 : 0;
 }
 
-export function setBit(byte: number, bitPosition: number, bit: boolean): number
+export function setBit(byte: number, bitPosition: number, bit: number): number
 {
 	if (bit)
 	{
@@ -187,7 +187,7 @@ export function areDataViewsEqual(view1: DataView, view2: DataView)
 }
 
 /**
- * Convert Node.js Buffer into ArrayBuffer.
+ * Convert Node.js Buffer to ArrayBuffer.
  * NOTE: Just for Node.js.
  *
  * TODO: Remove in favour of bufferToDataView().
@@ -198,7 +198,7 @@ export function nodeBufferToArrayBuffer(buffer: Buffer): ArrayBuffer
 }
 
 /**
- * Convert Node.js Buffer into DataView.
+ * Convert Node.js Buffer to DataView.
  * NOTE: Just for Node.js.
  */
 export function nodeBufferToDataView(buffer: Buffer): DataView
@@ -207,7 +207,7 @@ export function nodeBufferToDataView(buffer: Buffer): DataView
 }
 
 /**
- * Convert array of integers into ArrayBuffer.
+ * Convert array of integers to ArrayBuffer.
  * NOTE: Only used by tests.
  * TODO: Probably remove.
  */
@@ -217,7 +217,7 @@ export function numericArrayToArrayBuffer(array: number[]): ArrayBuffer
 }
 
 /**
- * Convert array of integers into DataView.
+ * Convert array of integers to DataView.
  * NOTE: Only used by tests.
  * TODO: Probably remove.
  */
@@ -227,7 +227,7 @@ export function numericArrayToDataView(array: number[]): DataView
 }
 
 /**
- * Convert ArrayBuffer into string.
+ * Convert ArrayBuffer to string.
  * TODO: Probably remove.
  */
 export function arrayBufferToString(buffer: ArrayBuffer): string
@@ -238,7 +238,17 @@ export function arrayBufferToString(buffer: ArrayBuffer): string
 }
 
 /**
- * Convert string into ArrayBuffer.
+ * Convert DataView to string.
+ */
+export function dataViewToString(view: DataView): string
+{
+	const decoder = new TextDecoder();
+
+	return decoder.decode(view);
+}
+
+/**
+ * Convert string to ArrayBuffer.
  * TODO: Probably remove.
  */
 export function stringToArrayBuffer(string: string): ArrayBuffer
@@ -249,7 +259,7 @@ export function stringToArrayBuffer(string: string): ArrayBuffer
 }
 
 /**
- * Convert string into DataView.
+ * Convert string to DataView.
  */
 export function stringToDataView(string: string): DataView
 {
@@ -261,4 +271,30 @@ export function stringToDataView(string: string): DataView
 		uint8Array.byteOffset,
 		uint8Array.byteLength
 	);
+}
+
+/**
+ * Convert string to Uint8Array.
+ */
+export function stringToUint8Array(string: string): Uint8Array
+{
+	const encoder = new TextEncoder();
+	const uint8Array = encoder.encode(string);
+
+	return new Uint8Array(
+		uint8Array.buffer,
+		uint8Array.byteOffset,
+		uint8Array.byteLength
+	);
+}
+
+/**
+ * Get the byte length of a string.
+ */
+export function getStringByteLength(string: string): number
+{
+	const encoder = new TextEncoder();
+	const uint8Array = encoder.encode(string);
+
+	return uint8Array.byteLength;
 }

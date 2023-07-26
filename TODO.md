@@ -1,11 +1,5 @@
 ### TODO
 
-- Make `RtcpPacket` inherit from `RtcPacket`.
-
-- Remove `static` members in `RtcpPacket`.
-
-- Use `pos` instead of `offset` everywhere.
-
 - Review exported functions in `utils.ts` (and remove unused ones).
 
 - Remove `EventEmitter` methods from docs!

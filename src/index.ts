@@ -1,7 +1,7 @@
 export {
-	RtcPacket,
-	RtcPacketEvents
-} from './RtcPacket';
+	Packet,
+	PacketEvents
+} from './Packet';
 
 export {
 	isRtp,

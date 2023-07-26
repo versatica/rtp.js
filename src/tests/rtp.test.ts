@@ -29,20 +29,21 @@ describe('parse RTP packet 1', () =>
 		expect(packet).toBeDefined();
 		expect(packet.getByteLength()).toBe(54);
 		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPayloadType()).toBe(111);
 		expect(packet.getSequenceNumber()).toBe(23617);
 		expect(packet.getTimestamp()).toBe(1660241882);
 		expect(packet.getSsrc()).toBe(2674985186);
-		expect(packet.getCsrc()).toEqual([]);
+		expect(packet.getCsrcs()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
 		expect(packet.hasOneByteExtensions()).toBe(true);
 		expect(packet.hasTwoBytesExtensions()).toBe(false);
+		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.getExtension(1)).toEqual(numericArrayToDataView([ 255 ]));
 		expect(packet.needsSerialization()).toBe(false);
 
 		packet.setExtension(1, stringToDataView('foo œæ€å∫∂ ®†¥∂ƒ∑©√'));
+		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getExtension(1)).toEqual(stringToDataView('foo œæ€å∫∂ ®†¥∂ƒ∑©√'));
 	});
@@ -67,12 +68,11 @@ describe('parse RTP packet 2', () =>
 
 		expect(packet).toBeDefined();
 		expect(packet.getByteLength()).toBe(102);
-		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPayloadType()).toBe(111);
 		expect(packet.getSequenceNumber()).toBe(19354);
 		expect(packet.getTimestamp()).toBe(863466045);
 		expect(packet.getSsrc()).toBe(235797202);
-		expect(packet.getCsrc()).toEqual([]);
+		expect(packet.getCsrcs()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
 		expect(packet.hasOneByteExtensions()).toBe(true);
@@ -116,12 +116,11 @@ describe('parse RTP packet 3', () =>
 
 		expect(packet).toBeDefined();
 		expect(packet.getByteLength()).toBe(array.byteLength);
-		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPayloadType()).toBe(1);
 		expect(packet.getSequenceNumber()).toBe(8);
 		expect(packet.getTimestamp()).toBe(4);
 		expect(packet.getSsrc()).toBe(5);
-		expect(packet.getCsrc()).toEqual([]);
+		expect(packet.getCsrcs()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
 		expect(packet.hasOneByteExtensions()).toBe(true);
@@ -168,16 +167,16 @@ describe('parse RTP packet 4', () =>
 
 		expect(packet).toBeDefined();
 		expect(packet.getByteLength()).toBe(array.byteLength - uselessExtensionAlignment);
-		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPayloadType()).toBe(1);
 		expect(packet.getSequenceNumber()).toBe(8);
 		expect(packet.getTimestamp()).toBe(4);
 		expect(packet.getSsrc()).toBe(5);
-		expect(packet.getCsrc()).toEqual([]);
+		expect(packet.getCsrcs()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
 		expect(packet.hasOneByteExtensions()).toBe(false);
 		expect(packet.hasTwoBytesExtensions()).toBe(true);
+		expect(packet.getExtensions().size).toBe(4);
 		expect(packet.getExtension(1)).toEqual(new DataView(new ArrayBuffer(0)));
 		expect(packet.getExtension(2)).toEqual(numericArrayToDataView([ 0x42 ]));
 		expect(packet.getExtension(3)).toEqual(numericArrayToDataView([ 0x11, 0x22 ]));
@@ -187,6 +186,7 @@ describe('parse RTP packet 4', () =>
 		expect(packet.needsSerialization()).toBe(false);
 
 		packet.deleteExtension(2);
+		expect(packet.getExtensions().size).toBe(3);
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getExtension(2)).toBeUndefined();
 	});
@@ -227,16 +227,16 @@ describe('parse RTP packet 5 with uncommon header extension value', () =>
 
 		expect(packet).toBeDefined();
 		expect(packet.getByteLength()).toBe(array.byteLength);
-		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPayloadType()).toBe(1);
 		expect(packet.getSequenceNumber()).toBe(8);
 		expect(packet.getTimestamp()).toBe(4);
 		expect(packet.getSsrc()).toBe(5);
-		expect(packet.getCsrc()).toEqual([]);
+		expect(packet.getCsrcs()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPadding()).toBe(0);
 		expect(packet.hasOneByteExtensions()).toBe(false);
 		expect(packet.hasTwoBytesExtensions()).toBe(false);
+		expect(packet.getExtensions().size).toBe(0);
 		expect(packet.getPayloadView().byteLength).toBe(4);
 		expect(packet.needsSerialization()).toBe(false);
 
@@ -261,17 +261,17 @@ describe('create RTP packet 6 from scratch', () =>
 
 		expect(packet).toBeDefined();
 		expect(isRtp(packet.getView())).toBe(true);
-		expect(packet.getVersion()).toBe(2);
 		expect(packet.getPayloadType()).toBe(0);
 		expect(packet.getSequenceNumber()).toBe(0);
 		expect(packet.getTimestamp()).toBe(0);
 		expect(packet.getSsrc()).toBe(0);
-		expect(packet.getCsrc()).toEqual([]);
+		expect(packet.getCsrcs()).toEqual([]);
 		expect(packet.getMarker()).toBe(false);
 		expect(packet.getPayloadView()).toEqual(new DataView(new ArrayBuffer(0)));
 		expect(packet.getPadding()).toBe(0);
 		expect(packet.hasOneByteExtensions()).toBe(false);
 		expect(packet.hasTwoBytesExtensions()).toBe(false);
+		expect(packet.getExtensions().size).toBe(0);
 		expect(packet.needsSerialization()).toBe(false);
 
 		packet.setPayloadType(3);
@@ -298,38 +298,45 @@ describe('create RTP packet 6 from scratch', () =>
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getMarker()).toBe(true);
 
-		packet.setCsrc([ 1111, 2222 ]);
+		packet.setCsrcs([ 1111, 2222 ]);
 		expect(packet.needsSerialization()).toBe(true);
-		expect(packet.getCsrc()).toEqual([ 1111, 2222 ]);
+		expect(packet.getCsrcs()).toEqual([ 1111, 2222 ]);
 
 		packet.enableOneByteExtensions();
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.hasOneByteExtensions()).toBe(true);
 		expect(packet.hasTwoBytesExtensions()).toBe(false);
+		expect(packet.getExtensions().size).toBe(0);
 
 		packet.enableTwoBytesExtensions();
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.hasOneByteExtensions()).toBe(false);
 		expect(packet.hasTwoBytesExtensions()).toBe(true);
+		expect(packet.getExtensions().size).toBe(0);
 
 		packet.setExtension(1, stringToDataView('foo'));
 		expect(packet.needsSerialization()).toBe(true);
+		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.getExtension(1)).toEqual(stringToDataView('foo'));
 
 		packet.setExtension(2, numericArrayToDataView([ 1, 2, 3, 4 ]));
+		expect(packet.getExtensions().size).toBe(2);
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getExtension(2)).toEqual(numericArrayToDataView([ 1, 2, 3, 4 ]));
 
 		packet.deleteExtension(1);
+		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getExtension(1)).toBeUndefined();
 
 		packet.clearExtensions();
 		expect(packet.needsSerialization()).toBe(true);
+		expect(packet.getExtensions().size).toBe(0);
 		expect(packet.getExtension(2)).toBeUndefined();
 
 		packet.setExtension(2, numericArrayToDataView([ 1, 2, 3, 4 ]));
 		expect(packet.needsSerialization()).toBe(true);
+		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.getExtension(2)).toEqual(numericArrayToDataView([ 1, 2, 3, 4 ]));
 
 		packet.setPayloadView(stringToDataView('codec'));
@@ -356,7 +363,7 @@ describe('create RTP packet 6 from scratch', () =>
 		expect(clonedPacket.getTimestamp()).toBe(1234567890);
 		expect(clonedPacket.getSsrc()).toBe(3294967295);
 		expect(clonedPacket.getMarker()).toBe(true);
-		expect(clonedPacket.getCsrc()).toEqual([ 1111, 2222 ]);
+		expect(clonedPacket.getCsrcs()).toEqual([ 1111, 2222 ]);
 		expect(clonedPacket.hasOneByteExtensions()).toBe(false);
 		expect(clonedPacket.hasTwoBytesExtensions()).toBe(true);
 		expect(clonedPacket.getExtension(2))
@@ -466,6 +473,7 @@ describe('create RTP packet 7 from scratch', () =>
 		// enabled should force One-Byte.
 		packet.setExtension(1, numericArrayToDataView([ 1, 2, 3, 4 ]));
 		expect(packet.needsSerialization()).toBe(true);
+		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.getExtension(1)).toEqual(numericArrayToDataView([ 1, 2, 3, 4 ]));
 		expect(packet.hasOneByteExtensions()).toBe(true);
 		expect(packet.hasTwoBytesExtensions()).toBe(false);
@@ -477,6 +485,7 @@ describe('create RTP packet 7 from scratch', () =>
 
 		packet.clearExtensions();
 		expect(packet.needsSerialization()).toBe(true);
+		expect(packet.getExtensions().size).toBe(0);
 		expect(packet.getExtension(1)).toBeUndefined();
 		expect(packet.hasOneByteExtensions()).toBe(true);
 		expect(packet.hasTwoBytesExtensions()).toBe(false);
@@ -497,12 +506,18 @@ describe('create RTP packet 8 from scratch', () =>
 
 		packet.enableOneByteExtensions();
 		expect(packet.needsSerialization()).toBe(true);
+		expect(packet.getExtensions().size).toBe(0);
 		packet.setExtension(0, stringToDataView('ignore me'));
 		packet.setExtension(1, numericArrayToDataView([ 1, 2, 3, 4 ]));
+		packet.setExtension(15, stringToDataView('also ignore me'));
 		packet.setExtension(16, stringToDataView('also ignore me'));
+		// We don't validate extensions (`id` and value length) until the packet
+		// is serialized.
+		expect(packet.getExtensions().size).toBe(4);
 
-		// Force serialization so extension with id 0 must be ignored.
+		// Force serialization so extension with id 0 and id >= 15 must be ignored.
 		packet.serialize();
+		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.getExtension(0)).toBeUndefined();
 		expect(packet.getExtension(1)).toEqual(numericArrayToDataView([ 1, 2, 3, 4 ]));
 		// Extension with id 16 (so 0 in 4 bits) must be ignored.
@@ -533,15 +548,23 @@ describe('create RTP packet 9 from scratch', () =>
 
 		packet.enableTwoBytesExtensions();
 		expect(packet.needsSerialization()).toBe(true);
+		expect(packet.getExtensions().size).toBe(0);
 		packet.setExtension(0, stringToDataView('ignore me'));
 		packet.setExtension(1, numericArrayToDataView([ 1, 2, 3, 4 ]));
 		packet.setExtension(256, stringToDataView('also ignore me'));
-		// Force serialization so extension with id 0 must be ignored.
+		packet.setExtension(257, stringToDataView('also ignore me'));
+		// We don't validate extensions (`id` and value length) until the packet
+		// is serialized.
+		expect(packet.getExtensions().size).toBe(4);
+
+		// Force serialization so extension with id 0, 256 and 257 must be ignored.
 		packet.serialize();
+		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.getExtension(0)).toBeUndefined();
 		expect(packet.getExtension(1)).toEqual(numericArrayToDataView([ 1, 2, 3, 4 ]));
 		// Extension with id 256 (so 0 in 8 bits) must be ignored.
 		expect(packet.getExtension(256)).toBeUndefined();
+		expect(packet.getExtension(257)).toBeUndefined();
 		expect(packet.hasOneByteExtensions()).toBe(false);
 		expect(packet.hasTwoBytesExtensions()).toBe(true);
 		// Packet total length must match RTP fixed header length (12) + header
