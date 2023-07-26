@@ -5,6 +5,10 @@ const RTP_VERSION = 2;
 const FIXED_HEADER_LENGTH = 12;
 
 /**
+ * ```ts
+ * import { RtpPacketDump } from 'rtp.js';
+ * ```
+ *
  * RTP packet dump.
  */
 export type RtpPacketDump =

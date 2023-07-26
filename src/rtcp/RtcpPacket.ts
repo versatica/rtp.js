@@ -30,6 +30,10 @@ export enum RtcpPacketType
 
 /**
  * Base RTCP packet dump.
+ *
+ * ```ts
+ * import { RtcpPacketDump } from 'rtp.js';
+ * ```
  */
 export type RtcpPacketDump =
 {

@@ -7,14 +7,14 @@ export {
 	isRtp,
 	RtpPacket,
 	RtpPacketDump
-} from './rtp';
+} from './RtpPacket';
 
 export {
 	isRtcp,
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump
-} from './rtcp';
+} from './rtcp/RtcpPacket';
 
 // export {
 // 	ReceiverReport,
