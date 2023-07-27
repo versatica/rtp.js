@@ -21,7 +21,7 @@ export type PacketDump =
  * allocated.
  *
  * @param `length: number`: Required buffer length (in bytes).
- * @param `callback: (buffer, byteOffset?): void`: A function that can be
+ * @param `callback: (buffer, byteOffset?) => void`: A function that can be
  *   optionally called to pass a buffer and a byte offset where the packet will
  *   be serialized.
  *
