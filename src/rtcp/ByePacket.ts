@@ -29,7 +29,7 @@ import {
 const FIXED_HEADER_LENGTH = 4;
 
 /**
- * RTCP Bye packet dump.
+ * RTCP Bye packet info dump.
  */
 export type ByePacketDump = RtcpPacketDump &
 {
@@ -38,11 +38,7 @@ export type ByePacketDump = RtcpPacketDump &
 };
 
 /**
- * ```ts
- * import { ByePacket } from 'rtp.js';
- * ```
- *
- * Representation of a RTCP Bye packet.
+ * RTCP Bye packet.
  */
 export class ByePacket extends RtcpPacket
 {
@@ -56,7 +52,7 @@ export class ByePacket extends RtcpPacket
 	 *   packet (with just the minimal fixed header) will be created.
 	 *
 	 * @throws
-	 * If `view` is given and it does not contain a valid RTCP Bye packet.
+	 * - If given `view` does not contain a valid RTCP Bye packet.
 	 */
 	constructor(view?: DataView)
 	{
@@ -157,14 +153,7 @@ export class ByePacket extends RtcpPacket
 	}
 
 	/**
-	 * Computes total length of the packet (in bytes) including padding if any.
-	 *
-	 * @remarks
-	 * Value returned by this method may not match the byte length of the packet's
-	 * `DataView`. This could happen if the original packet contains useless
-	 * padding or alignment in the reason field. Anyway, the value returned by
-	 * this method matches the byte length of the `DataView` once the packet is
-	 * serialized.
+	 * @inheritDoc
 	 */
 	getByteLength(): number
 	{
@@ -195,7 +184,7 @@ export class ByePacket extends RtcpPacket
 	 * Set SSRC values.
 	 *
 	 * @remarks
-	 * Serialization is needed after calling this method.
+	 * - Serialization is needed after calling this method.
 	 */
 	setSsrcs(ssrcs: number[] = []): void
 	{
@@ -226,16 +215,7 @@ export class ByePacket extends RtcpPacket
 	}
 
 	/**
-	 * Apply pending changes into the packet and serialize it into a new buffer.
-	 *
-	 * @remarks
-	 * In most cases there is no need to use this method since many setter methods
-	 * apply the changes within the current buffer. To be sure, check
-	 * {@link needsSerialization} before.
-	 *
-	 * @throws
-	 * If serialization fails due invalid fields were previously added to the
-	 * packet.
+	 * @inheritDoc
 	 */
 	serialize(): void
 	{
@@ -297,20 +277,7 @@ export class ByePacket extends RtcpPacket
 	}
 
 	/**
-	 * Clone the packet. The cloned packet does not share any memory with the
-	 * original one.
-	 *
-	 * @param buffer - Buffer in which the packet will be serialized. If not given,
-	 *   a new one will internally allocated.
-	 * @param byteOffset - Byte offset of the given `buffer` when serialization must
-	 *   be done.
-	 *
-	 * @remarks
-	 * The buffer is serialized if needed (to apply packet pending modifications).
-	 *
-	 * @throws
-	 * If buffer serialization is needed and it fails due to invalid fields or if
-	 * `buffer` is given and it doesn't hold enough space serializing the packet.
+	 * @inheritDoc
 	 */
 	clone(buffer?: ArrayBuffer, byteOffset?: number): ByePacket
 	{

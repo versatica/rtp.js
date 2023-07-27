@@ -4,32 +4,62 @@ import { readBit, setBit, clone } from './utils';
 export const RTP_VERSION = 2;
 
 /**
- * Events of Packet.
+ * Packet info dump.
+ *
+ * @remarks
+ * - Read the info dump type of each RTP and RTCP packet instead.
  */
-export type PacketEvents =
+export type PacketDump =
 {
-	'serialization-buffer-needed':
-	[
-		/**
-		 * length - Required available byte length bytes of the buffer.
-		 */
-		number,
-		/**
-		 * callback - Function to be (optionally) called by passing a buffer and
-		 *   the offset in which the packet will be serialized.
-		 */
-		(buffer: ArrayBuffer, byteOffset: number) => void
-	];
+	padding: number;
+	byteLength: number;
 };
 
 /**
- * Base class for RTP and RTCP packets.
+ * Event emitted when the packet is being serialized. The user has a chance to
+ * provide the packet with a buffer, otherwise a new one will be internally
+ * allocated.
+ *
+ * @param `length: number`: Required buffer length (in bytes).
+ * @param `callback: (buffer, byteOffset?): void`: A function that can be
+ *   optionally called to pass a buffer and a byte offset where the packet will
+ *   be serialized.
+ *
+ * @remarks
+ * - If given, the buffer byte length minus the given byte offset must be equal
+ *   or higher than `length`.
+ *
+ * @example
+ * ```ts
+ * packet.on('will-serialize', (length, callback) => {
+ *   const buffer = new ArrayBuffer(length);
+ *
+ *   callback(buffer);
+ * });
+ * ```
+ */
+export type WillSerializePacketEvent =
+[
+	number,
+	(buffer: ArrayBuffer, byteOffset?: number) => void
+];
+
+/**
+ * Common events of RTP and RTCP packets.
+ */
+export type PacketEvents =
+{
+	'will-serialize': WillSerializePacketEvent;
+};
+
+/**
+ * Parent class of all RTP and RTCP packets.
  *
  * @noInheritDoc
  */
 export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 {
-	// DataView holding the entire packet.
+	// Buffer view holding the entire packet.
 	// @ts-ignore ('packetView' has not initializer and is not assigned in constructor).
 	protected packetView: DataView;
 	// Number of bytes of padding.
@@ -38,14 +68,28 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 	#serializationNeeded: boolean = false;
 
 	/**
-	 * Get a DataView containing the serialized packet.
+	 * Base RTCP packet dump.
 	 *
 	 * @remarks
-	 * The internal ArrayBuffer is serialized if needed (to apply packet pending
+	 * - Read the info dump type of each RTCP packet instead.
+	 */
+	dump(): PacketDump
+	{
+		return {
+			padding    : this.getPadding(),
+			byteLength : this.getByteLength()
+		};
+	}
+
+	/**
+	 * Get a buffer view containing the serialized packet.
+	 *
+	 * @remarks
+	 * - The internal ArrayBuffer is serialized if needed (to apply packet pending
 	 * modifications).
 	 *
 	 * @throws
-	 * If buffer serialization is needed and it fails due to invalid fields.
+	 * - If buffer serialization is needed and it fails due to invalid fields.
 	 */
 	getView(): DataView
 	{
@@ -74,7 +118,7 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 	 * Set the padding (in bytes) after the packet.
 	 *
 	 * @remarks
-	 * Serialization maybe needed after calling this method.
+	 * - Serialization maybe needed after calling this method.
 	 */
 	setPadding(padding: number): void
 	{
@@ -104,12 +148,12 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 	 * Apply pending changes into the packet and serialize it into a new buffer.
 	 *
 	 * @remarks
-	 * In most cases there is no need to use this method since many setter methods
+	 * - In most cases there is no need to use this method since many setter methods
 	 * apply the changes within the current buffer. To be sure, check
 	 * {@link needsSerialization} before.
 	 *
 	 * @throws
-	 * If serialization fails due invalid fields were previously added to the
+	 * - If serialization fails due invalid fields were previously added to the
 	 * packet.
 	 */
 	abstract serialize(): void;
@@ -124,13 +168,35 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 	 *   be done.
 	 *
 	 * @remarks
-	 * The buffer is serialized if needed (to apply packet pending modifications).
+	 * - The buffer is serialized if needed (to apply packet pending modifications).
+	 * - Read the info dump type of each RTCP packet instead.
 	 *
 	 * @throws
-	 * If buffer serialization is needed and it fails due to invalid fields or if
+	 * - If buffer serialization is needed and it fails due to invalid fields or if
 	 * `buffer` is given and it doesn't hold enough space serializing the packet.
 	 */
 	abstract clone(buffer?: ArrayBuffer, byteOffset?: number): Packet;
+
+	protected setVersion(): void
+	{
+		this.packetView.setUint8(
+			0,
+			this.packetView.getUint8(0) | (RTP_VERSION << 6)
+		);
+	}
+
+	protected getPaddingBit(): number
+	{
+		return readBit(this.packetView.getUint8(0), 5);
+	}
+
+	protected setPaddingBit(bit: number): void
+	{
+		this.packetView.setUint8(
+			0,
+			setBit(this.packetView.getUint8(0), 5, bit)
+		);
+	}
 
 	protected setSerializationNeeded(flag: boolean): void
 	{
@@ -146,7 +212,7 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 		let buffer: ArrayBuffer | undefined;
 		let byteOffset: number | undefined;
 
-		this.safeEmit('serialization-buffer-needed', length, (_buffer, _byteOffset) =>
+		this.safeEmit('will-serialize', length, (_buffer, _byteOffset) =>
 		{
 			buffer = _buffer;
 			byteOffset = _byteOffset ?? 0;
@@ -169,27 +235,6 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 		// NOTE: TypeScript is not that smart and it doesn't know that byteOffset
 		// here is guaranteed to have a value.
 		return { buffer, byteOffset: byteOffset! };
-	}
-
-	protected setVersion(): void
-	{
-		this.packetView.setUint8(
-			0,
-			this.packetView.getUint8(0) | (RTP_VERSION << 6)
-		);
-	}
-
-	protected getPaddingBit(): number
-	{
-		return readBit(this.packetView.getUint8(0), 5);
-	}
-
-	protected setPaddingBit(bit: number): void
-	{
-		this.packetView.setUint8(
-			0,
-			setBit(this.packetView.getUint8(0), 5, bit)
-		);
 	}
 
 	protected cloneInternal(buffer?: ArrayBuffer, byteOffset?: number): DataView

@@ -1,4 +1,4 @@
-import { Packet, RTP_VERSION } from '../Packet';
+import { RTP_VERSION, Packet, PacketDump } from '../Packet';
 
 /**
  *         0                   1                   2                   3
@@ -11,9 +11,7 @@ import { Packet, RTP_VERSION } from '../Packet';
 const COMMON_HEADER_LENGTH = 4;
 
 /**
- * ```ts
- * import { RtcpPacketType } from 'rtp.js';
- * ```
+ * RTCP packet types.
  */
 // ESLint absurdly complains about "'RtcpPacketType' is already declared in the
 // upper scope".
@@ -31,31 +29,15 @@ export enum RtcpPacketType
 }
 
 /**
- * Base RTCP packet dump.
- *
- * ```ts
- * import { RtcpPacketDump } from 'rtp.js';
- * ```
+ * Base RTCP packet info dump.
  */
-export type RtcpPacketDump =
+export type RtcpPacketDump = PacketDump &
 {
 	count: number;
-	padding: number;
-	byteLength: number;
 };
 
 /**
- * ```ts
- * import { isRtcp } from 'rtp.js';
- * ```
- *
- * Whether the given `DataView` could be a valid RTCP packet or not.
- *
- * ```ts
- * if (isRtcp(view)) {
- *   console.log('it seems a valid RTCP packet');
- * }
- * ```
+ * Whether the given buffer view could be a valid RTCP packet or not.
  */
 export function isRtcp(view: DataView): boolean
 {
@@ -78,7 +60,7 @@ export function isRtcp(view: DataView): boolean
 /**
  * Get the RTCP packet type.
  *
- * @exclude
+ * @hidden
  */
 export function getRtcpPacketType(view: DataView): RtcpPacketType
 {
@@ -89,7 +71,7 @@ export function getRtcpPacketType(view: DataView): RtcpPacketType
  * Read the RTCP header length value and compute its size in bytes (including
  * first octet).
  *
- * @exclude
+ * @hidden
  */
 export function getRtcpLength(view: DataView): number
 {
@@ -102,9 +84,9 @@ export function getRtcpLength(view: DataView): number
 }
 
 /**
- * Writes given length (n bytes) in the RTCP header length field
+ * Writes given length (in bytes) in the RTCP header length field.
  *
- * @exclude
+ * @hidden
  */
 function setRtcpLength(view: DataView, byteLength: number): void
 {
@@ -114,11 +96,7 @@ function setRtcpLength(view: DataView, byteLength: number): void
 }
 
 /**
- * ```ts
- * import { RtcpPacket } from 'rtp.js';
- * ```
- *
- * Representation of a base RTCP packet.
+ * Parent class of all RTCP packets.
  */
 export abstract class RtcpPacket extends Packet
 {
@@ -140,7 +118,8 @@ export abstract class RtcpPacket extends Packet
 	/**
 	 * Base RTCP packet dump.
 	 *
-	 * @exclude
+	 * @remarks
+	 * - Read the info dump type of each RTCP packet instead.
 	 */
 	dump(): RtcpPacketDump
 	{

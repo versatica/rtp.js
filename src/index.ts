@@ -1,6 +1,8 @@
 export {
 	Packet,
-	PacketEvents
+	PacketDump,
+	PacketEvents,
+	WillSerializePacketEvent
 } from './Packet';
 
 export {
@@ -28,11 +30,13 @@ export {
 // 	SenderReportPacketDump
 // } from './rtcp/senderReport';
 
-// export {
-// 	ByePacket,
-// 	ByePacketDump
-// } from './rtcp/bye';
+export {
+	ByePacket,
+	ByePacketDump
+} from './rtcp/ByePacket';
 
 export {
-	nodeBufferToDataView
+	nodeBufferToDataView,
+	dataViewToString,
+	stringToDataView
 } from './utils';

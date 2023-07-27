@@ -21,7 +21,8 @@
 		"excludeNotDocumented": true,
 		"excludeInternal": true,
 		"includeVersion": true,
-		"theme": "default",
+		"plugin": [ "sonicware-tdt" ],
+		"theme": "sonicware",
 		"gitRemote": "origin",
 		"hideGenerator": false
 	}

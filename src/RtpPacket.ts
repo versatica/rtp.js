@@ -1,16 +1,12 @@
-import { Packet, RTP_VERSION } from './Packet';
+import { RTP_VERSION, Packet, PacketDump } from './Packet';
 import { readBit, setBit, clone, padTo4Bytes } from './utils';
 
 const FIXED_HEADER_LENGTH = 12;
 
 /**
- * ```ts
- * import { RtpPacketDump } from 'rtp.js';
- * ```
- *
- * RTP packet dump.
+ * RTP packet info dump.
  */
-export type RtpPacketDump =
+export type RtpPacketDump = PacketDump &
 {
 	payloadType: number;
 	sequenceNumber: number;
@@ -21,22 +17,10 @@ export type RtpPacketDump =
 	headerExtensionId?: number;
 	extensions: { id: number; length: number }[];
 	payloadLength: number;
-	padding: number;
-	byteLength: number;
 };
 
 /**
- * ```ts
- * import { isRtp } from 'rtp.js';
- * ```
- *
- * Whether the given `DataView` could be a valid RTP packet or not.
- *
- * ```ts
- * if (isRtp(view)) {
- *   console.log('it looks like a valid RTP packet');
- * }
- * ```
+ * Whether the given buffer view could be a valid RTP packet or not.
  */
 export function isRtp(view: DataView): boolean
 {
@@ -52,11 +36,7 @@ export function isRtp(view: DataView): boolean
 }
 
 /**
- * ```ts
- * import { RtpPacket } from 'rtp.js';
- * ```
- *
- * Representation of a RTP packet.
+ * RTP packet.
  */
 export class RtpPacket extends Packet
 {
@@ -64,12 +44,12 @@ export class RtpPacket extends Packet
 	#csrcs: number[] = [];
 	// Header extension id.
 	#headerExtensionId?: number;
-	// DataView holding the header extension value. Only if One-Byte or Two-Bytes
+	// Buffer view holding the header extension value. Only if One-Byte or Two-Bytes
 	// extensions are used.
 	#headerExtensionView?: DataView;
 	// One-Byte or Two-Bytes extensions indexed by id.
 	readonly #extensions: Map<number, DataView> = new Map();
-	// DataView holding the entire RTP payload.
+	// Buffer view holding the entire RTP payload.
 	#payloadView: DataView;
 
 	/**
@@ -77,7 +57,7 @@ export class RtpPacket extends Packet
 	 *   (with just the minimal fixed header) will be created.
 	 *
 	 * @throws
-	 * If `view` is given and it does not contain a valid RTP packet.
+	 * - If `view` is given and it does not contain a valid RTP packet.
 	 */
 	constructor(view?: DataView)
 	{
@@ -324,14 +304,7 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Computes total length of the packet (in bytes) including padding if any.
-	 *
-	 * @remarks
-	 * Value returned by this method may not match the byte length of the packet's
-	 * `DataView`. This could happen if the original packet contains useless
-	 * padding or alignment in the One-Byte or Two-Bytes header extensions.
-	 * Anyway, the value returned by this method matches the byte length of the
-	 * `DataView` once the packet is serialized.
+	 * @inheritDoc
 	 */
 	getByteLength(): number
 	{
@@ -475,7 +448,7 @@ export class RtpPacket extends Packet
 	 * array) CSRC field will be removed from the RTP packet.
 	 *
 	 * @remarks
-	 * Serialization is needed after calling this method.
+	 * - Serialization is needed after calling this method.
 	 */
 	setCsrcs(csrcs: number[] = []): void
 	{
@@ -528,7 +501,7 @@ export class RtpPacket extends Packet
 	 * Enable One-Byte extensions (RFC 5285).
 	 *
 	 * @remarks
-	 * Serialization maybe needed after calling this method.
+	 * - Serialization maybe needed after calling this method.
 	 */
 	enableOneByteExtensions(): void
 	{
@@ -547,7 +520,7 @@ export class RtpPacket extends Packet
 	 * Enable Two-Bytes extensions (RFC 5285).
 	 *
 	 * @remarks
-	 * Serialization maybe needed after calling this method.
+	 * - Serialization maybe needed after calling this method.
 	 */
 	enableTwoBytesExtensions(): void
 	{
@@ -563,7 +536,9 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Get the value of the extension (RFC 5285) with given `id` (if any).
+	 * Get the value of the given extension (RFC 5285).
+	 *
+	 * @param id - Extension id.
 	 */
 	getExtension(id: number): DataView | undefined
 	{
@@ -571,7 +546,7 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Get a map with all the extensions indexed by their `id` (RFC 5285).
+	 * Get a map with all the extensions indexed by their extension id (RFC 5285).
 	 */
 	getExtensions(): Map<number, DataView>
 	{
@@ -579,10 +554,13 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Set the value of the extension (RFC 5285) with given `id`.
+	 * Set the value of the extension (RFC 5285).
+	 *
+	 * @param id - Extension id.
+	 * @param value - Extension value.
 	 *
 	 * @remarks
-	 * Serialization is needed after calling this method.
+	 * - Serialization is needed after calling this method.
 	 */
 	setExtension(id: number, value: DataView): void
 	{
@@ -604,10 +582,12 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Delete the extension (RFC 5285) with given `id` (if any).
+	 * Delete the given extension (RFC 5285).
+	 *
+	 * @param id - Extension id.
 	 *
 	 * @remarks
-	 * Serialization maybe needed after calling this method.
+	 * - Serialization maybe needed after calling this method.
 	 */
 	deleteExtension(id: number): void
 	{
@@ -629,7 +609,7 @@ export class RtpPacket extends Packet
 	 * Clear all extensions (RFC 5285).
 	 *
 	 * @remarks
-	 * Serialization maybe needed after calling this method.
+	 * - Serialization maybe needed after calling this method.
 	 */
 	clearExtensions(): void
 	{
@@ -658,7 +638,7 @@ export class RtpPacket extends Packet
 	 * Set the packet payload.
 	 *
 	 * @remarks
-	 * Serialization is needed after calling this method.
+	 * - Serialization is needed after calling this method.
 	 */
 	setPayloadView(view: DataView): void
 	{
@@ -672,7 +652,7 @@ export class RtpPacket extends Packet
 	 * or remove bytes of padding.
 	 *
 	 * @remarks
-	 * Serialization maybe needed after calling this method.
+	 * - Serialization maybe needed after calling this method.
 	 */
 	padTo4Bytes(): void
 	{
@@ -698,7 +678,7 @@ export class RtpPacket extends Packet
 	 * @param sequenceNumber - The RTX sequence number.
 	 *
 	 * @remarks
-	 * Serialization is needed after calling this method.
+	 * - Serialization is needed after calling this method.
 	 */
 	rtxEncode(payloadType: number, ssrc: number, sequenceNumber: number)
 	{
@@ -746,10 +726,10 @@ export class RtpPacket extends Packet
 	 * @param ssrc - The original SSRC.
 	 *
 	 * @remarks
-	 * Serialization is needed after calling this method.
+	 * - Serialization is needed after calling this method.
 	 *
 	 * @throws
-	 * If payload length is less than 2 bytes, so RTX decode is not possible.
+	 * - If payload length is less than 2 bytes, so RTX decode is not possible.
 	 */
 	rtxDecode(payloadType: number, ssrc: number)
 	{
@@ -783,16 +763,7 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Apply pending changes into the packet and serialize it into a new buffer.
-	 *
-	 * @remarks
-	 * In most cases there is no need to use this method since many setter methods
-	 * apply the changes within the current buffer. To be sure, check
-	 * {@link needsSerialization} before.
-	 *
-	 * @throws
-	 * If serialization fails due invalid fields were previously added to the
-	 * packet.
+	 * @inheritDoc
 	 */
 	serialize(): void
 	{
@@ -1032,20 +1003,7 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Clone the packet. The cloned packet does not share any memory with the
-	 * original one.
-	 *
-	 * @param buffer - Buffer in which the packet will be serialized. If not given,
-	 *   a new one will internally allocated.
-	 * @param byteOffset - Byte offset of the given `buffer` when serialization must
-	 *   be done.
-	 *
-	 * @remarks
-	 * The buffer is serialized if needed (to apply packet pending modifications).
-	 *
-	 * @throws
-	 * If buffer serialization is needed and it fails due to invalid fields or if
-	 * `buffer` is given and it doesn't hold enough space serializing the packet.
+	 * @inheritDoc
 	 */
 	clone(buffer?: ArrayBuffer, byteOffset?: number): RtpPacket
 	{
