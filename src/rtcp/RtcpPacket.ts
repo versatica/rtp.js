@@ -8,7 +8,7 @@ import { RTP_VERSION, Packet, PacketDump } from '../Packet';
  *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  */
 
-const COMMON_HEADER_LENGTH = 4;
+export const COMMON_HEADER_LENGTH = 4;
 
 /**
  * RTCP packet types.
@@ -159,7 +159,7 @@ export abstract class RtcpPacket extends Packet
 	{
 		this.packetView.setUint8(
 			0,
-			RTP_VERSION | (Number(this.getPaddingBit()) << 5) | (count & 0x1F)
+			(RTP_VERSION << 6) | (Number(this.getPaddingBit()) << 5) | (count & 0x1F)
 		);
 	}
 

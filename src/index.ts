@@ -18,17 +18,17 @@ export {
 	RtcpPacketDump
 } from './rtcp/RtcpPacket';
 
-// export {
-// 	ReceiverReport,
-// 	ReceiverReportPacket,
-// 	ReceiverReportPacketDump,
-// 	ReceiverReportDump
-// } from './rtcp/receiverReport';
+export {
+	ReceiverReportPacket,
+	ReceiverReportPacketDump,
+	ReceiverReport,
+	ReceiverReportDump
+} from './rtcp/ReceiverReportPacket';
 
 // export {
 // 	SenderReportPacket,
 // 	SenderReportPacketDump
-// } from './rtcp/senderReport';
+// } from './rtcp/SenderReportPacket';
 
 export {
 	ByePacket,

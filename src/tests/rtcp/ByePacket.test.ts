@@ -26,7 +26,7 @@ describe('parse RTCP BYE packet', () =>
 		array.byteLength
 	);
 
-	test('view is RTCP', () =>
+	test('buffer view is RTCP', () =>
 	{
 		expect(isRtcp(view)).toBe(true);
 	});
@@ -35,8 +35,8 @@ describe('parse RTCP BYE packet', () =>
 	{
 		const packet = new ByePacket(view);
 
-		expect(packet.getByteLength()).toBe(28);
 		expect(packet.needsSerialization()).toBe(false);
+		expect(packet.getByteLength()).toBe(28);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
 		expect(packet.getCount()).toBe(2);
 		expect(packet.getPadding()).toBe(0);
@@ -45,7 +45,7 @@ describe('parse RTCP BYE packet', () =>
 		expect(packet.needsSerialization()).toBe(false);
 	});
 
-	test('packet processing succeeds for a view with padding', () =>
+	test('packet processing succeeds for a buffer view with padding', () =>
 	{
 		const array2 = new Uint8Array(
 			[
@@ -68,8 +68,8 @@ describe('parse RTCP BYE packet', () =>
 
 		const packet = new ByePacket(view2);
 
-		expect(packet.getByteLength()).toBe(32);
 		expect(packet.needsSerialization()).toBe(false);
+		expect(packet.getByteLength()).toBe(32);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
 		expect(packet.getCount()).toBe(2);
 		expect(packet.getPadding()).toBe(4);
@@ -79,7 +79,7 @@ describe('parse RTCP BYE packet', () =>
 		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
 	});
 
-	test('parsing a view which length does not fit the indicated count throws', () =>
+	test('parsing a buffer view which length does not fit the indicated count throws', () =>
 	{
 		// Parse the first 8 bytes of the buffer, indicating 1 SSRC and holding no
 		// SSRC at all.
@@ -105,9 +105,9 @@ describe('create RTCP BYE packet', () =>
 		const packet = new ByePacket();
 
 		expect(isRtcp(packet.getView())).toBe(true);
-		// Byte length must be 4 (fixed header length).
-		expect(packet.getByteLength()).toBe(4);
 		expect(packet.needsSerialization()).toBe(false);
+		// Byte length must be 4 (fixed header).
+		expect(packet.getByteLength()).toBe(4);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
 		expect(packet.getCount()).toBe(0);
 		expect(packet.getPadding()).toBe(0);
@@ -146,14 +146,15 @@ describe('create RTCP BYE packet', () =>
 
 		packet.serialize();
 
-		expect(packet.getByteLength()).toBe(36);
 		expect(packet.needsSerialization()).toBe(false);
+		expect(packet.getByteLength()).toBe(36);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
 		expect(packet.getCount()).toBe(2);
 		expect(packet.getPadding()).toBe(0);
 		expect(packet.getSsrcs()).toEqual([ ssrc1, ssrc2 ]);
 		expect(packet.getReason()).toBe(reason);
 		expect(packet.needsSerialization()).toBe(false);
+		expect(isRtcp(packet.getView())).toBe(true);
 	});
 
 	test('packet.clone() succeeds', () =>

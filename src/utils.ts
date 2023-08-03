@@ -77,65 +77,7 @@ export function padTo4Bytes(size: number): number
 }
 
 /**
- * Whether two ArrayBuffers contain the same data.
- * NOTE: Only used by tests.
- * TODO: Probably remove.
- */
-export function areBuffersEqual(buffer1: ArrayBuffer, buffer2: ArrayBuffer)
-{
-	if (buffer1 === buffer2)
-	{
-		logger.debug(
-			'areBuffersEqual() | buffer1 and buffer2 are the same ArrayBuffer instance'
-		);
-
-		return true;
-	}
-
-	if (buffer1.byteLength !== buffer2.byteLength)
-	{
-		if (logger.debug.enabled)
-		{
-			logger.debug(
-				`areBuffersEqual() | different buffer length [buffer1.byteLength:${buffer1.byteLength}, buffer2.byteLength:${buffer2.byteLength}]`
-			);
-			logger.debug('areBuffersEqual() | buffer1:', buffer1);
-			logger.debug('areBuffersEqual() | buffer2:', buffer2);
-		}
-
-		return false;
-	}
-
-	const view1 = new DataView(buffer1);
-	const view2 = new DataView(buffer2);
-
-	let i = 0;
-
-	while (i < view1.byteLength)
-	{
-		if (view1.getUint8(i) !== view2.getUint8(i))
-		{
-			if (logger.debug.enabled)
-			{
-				logger.debug(
-					`areBuffersEqual() | different byte [idx:${i}, buffer1 byte:${view1.getUint8(i).toString(16)}, buffer2 byte:${view2.getUint8(i).toString(16)}]`
-				);
-				logger.debug('areBuffersEqual() | buffer1:', buffer1);
-				logger.debug('areBuffersEqual() | buffer2:', buffer2);
-			}
-
-			return false;
-		}
-
-		i++;
-	}
-
-	return true;
-}
-
-/**
  * Whether two DataViews contain the same data.
- * NOTE: Only used by tests.
  */
 export function areDataViewsEqual(view1: DataView, view2: DataView)
 {
@@ -187,19 +129,10 @@ export function areDataViewsEqual(view1: DataView, view2: DataView)
 }
 
 /**
- * Convert Node.js Buffer to ArrayBuffer.
- * NOTE: Just for Node.js.
+ * Convert Node.js Buffer to DataView using the same underlying ArrayBuffer.
  *
- * TODO: Remove in favour of bufferToDataView().
- */
-export function nodeBufferToArrayBuffer(buffer: Buffer): ArrayBuffer
-{
-	return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
-}
-
-/**
- * Convert Node.js Buffer to DataView.
- * NOTE: Just for Node.js.
+ * @remarks
+ * - Just for Node.js.
  */
 export function nodeBufferToDataView(buffer: Buffer): DataView
 {
@@ -207,19 +140,18 @@ export function nodeBufferToDataView(buffer: Buffer): DataView
 }
 
 /**
- * Convert array of integers to ArrayBuffer.
- * NOTE: Only used by tests.
- * TODO: Probably remove.
+ * Convert Node.js Buffer to a new allocated ArrayBuffer.
+ *
+ * @remarks
+ * - Just for Node.js.
  */
-export function numericArrayToArrayBuffer(array: number[]): ArrayBuffer
+export function nodeBufferToArrayBuffer(buffer: Buffer): ArrayBuffer
 {
-	return (new Uint8Array(array)).buffer;
+	return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
 }
 
 /**
  * Convert array of integers to DataView.
- * NOTE: Only used by tests.
- * TODO: Probably remove.
  */
 export function numericArrayToDataView(array: number[]): DataView
 {
@@ -227,14 +159,11 @@ export function numericArrayToDataView(array: number[]): DataView
 }
 
 /**
- * Convert ArrayBuffer to string.
- * TODO: Probably remove.
+ * Convert array of integers to ArrayBuffer.
  */
-export function arrayBufferToString(buffer: ArrayBuffer): string
+export function numericArrayToArrayBuffer(array: number[]): ArrayBuffer
 {
-	const decoder = new TextDecoder();
-
-	return decoder.decode(buffer);
+	return (new Uint8Array(array)).buffer;
 }
 
 /**
@@ -248,14 +177,13 @@ export function dataViewToString(view: DataView): string
 }
 
 /**
- * Convert string to ArrayBuffer.
- * TODO: Probably remove.
+ * Convert ArrayBuffer to string.
  */
-export function stringToArrayBuffer(string: string): ArrayBuffer
+export function arrayBufferToString(buffer: ArrayBuffer): string
 {
-	const encoder = new TextEncoder();
+	const decoder = new TextDecoder();
 
-	return encoder.encode(string).buffer;
+	return decoder.decode(buffer);
 }
 
 /**
@@ -271,6 +199,16 @@ export function stringToDataView(string: string): DataView
 		uint8Array.byteOffset,
 		uint8Array.byteLength
 	);
+}
+
+/**
+ * Convert string to ArrayBuffer.
+ */
+export function stringToArrayBuffer(string: string): ArrayBuffer
+{
+	const encoder = new TextEncoder();
+
+	return encoder.encode(string).buffer;
 }
 
 /**

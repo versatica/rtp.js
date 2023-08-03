@@ -84,7 +84,7 @@ export class ByePacket extends RtcpPacket
 		// Position relative to the DataView byte offset.
 		let pos = 0;
 
-		// Move to SSRC field(s).
+		// Move to SSRC/CSRC field(s).
 		pos += FIXED_HEADER_LENGTH;
 
 		let count = this.getCount();
@@ -189,7 +189,7 @@ export class ByePacket extends RtcpPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setSsrcs(ssrcs: number[] = []): void
+	setSsrcs(ssrcs: number[]): void
 	{
 		this.#ssrcs = ssrcs;
 
@@ -230,10 +230,9 @@ export class ByePacket extends RtcpPacket
 		// Move to SSRCs/CSRCs.
 		pos += FIXED_HEADER_LENGTH;
 
-		for (let i = 0; i < this.#ssrcs.length; ++i)
+		// Write SSRCs/CSRCs.
+		for (const ssrc of this.#ssrcs)
 		{
-			const ssrc = this.#ssrcs[i];
-
 			packetView.setUint32(pos, ssrc);
 
 			pos += 4;

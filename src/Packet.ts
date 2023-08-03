@@ -86,7 +86,7 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 	 *
 	 * @remarks
 	 * - The internal ArrayBuffer is serialized if needed (to apply packet pending
-	 * modifications).
+	 * 	 modifications).
 	 *
 	 * @throws
 	 * - If buffer serialization is needed and it fails due to invalid fields.
