@@ -84,12 +84,6 @@ export class ByePacket extends RtcpPacket
 		// Position relative to the DataView byte offset.
 		let pos = 0;
 
-		// Get padding.
-		if (this.getPaddingBit())
-		{
-			this.padding = this.packetView.getUint8(this.packetView.byteLength - 1);
-		}
-
 		// Move to SSRC field(s).
 		pos += FIXED_HEADER_LENGTH;
 
@@ -102,6 +96,12 @@ export class ByePacket extends RtcpPacket
 			this.#ssrcs.push(ssrc);
 
 			pos += 4;
+		}
+
+		// Get padding.
+		if (this.getPaddingBit())
+		{
+			this.padding = this.packetView.getUint8(this.packetView.byteLength - 1);
 		}
 
 		// Check if there is reason.
@@ -132,6 +132,9 @@ export class ByePacket extends RtcpPacket
 			pos += reasonLength + reasonPadding;
 		}
 
+		pos += this.padding;
+
+		// Ensure that view length and parsed length match.
 		if (pos !== this.packetView.byteLength)
 		{
 			throw new RangeError(

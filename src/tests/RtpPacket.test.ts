@@ -26,7 +26,6 @@ describe('parse RTP packet 1', () =>
 	{
 		packet = new RtpPacket(view);
 
-		expect(packet).toBeDefined();
 		expect(packet.getByteLength()).toBe(54);
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getPayloadType()).toBe(111);
@@ -66,7 +65,6 @@ describe('parse RTP packet 2', () =>
 	{
 		packet = new RtpPacket(view);
 
-		expect(packet).toBeDefined();
 		expect(packet.getByteLength()).toBe(102);
 		expect(packet.getPayloadType()).toBe(111);
 		expect(packet.getSequenceNumber()).toBe(19354);
@@ -97,6 +95,7 @@ describe('parse RTP packet 3', () =>
 			0xFF, 0xFF, 0xFF, 0xFF
 		]
 	);
+
 	const view = new DataView(
 		array.buffer,
 		array.byteOffset,
@@ -114,7 +113,6 @@ describe('parse RTP packet 3', () =>
 	{
 		packet = new RtpPacket(view);
 
-		expect(packet).toBeDefined();
 		expect(packet.getByteLength()).toBe(array.byteLength);
 		expect(packet.getPayloadType()).toBe(1);
 		expect(packet.getSequenceNumber()).toBe(8);
@@ -148,6 +146,7 @@ describe('parse RTP packet 4', () =>
 			0x00, 0x00, 0x04, 0x00
 		]
 	);
+
 	const view = new DataView(
 		array.buffer,
 		array.byteOffset,
@@ -165,7 +164,6 @@ describe('parse RTP packet 4', () =>
 	{
 		packet = new RtpPacket(view);
 
-		expect(packet).toBeDefined();
 		expect(packet.getByteLength()).toBe(array.byteLength - uselessExtensionAlignment);
 		expect(packet.getPayloadType()).toBe(1);
 		expect(packet.getSequenceNumber()).toBe(8);
@@ -204,6 +202,7 @@ describe('parse RTP packet 5 with uncommon header extension value', () =>
 			0x11, 0x22, 0x33, 0x44 // Payload.
 		]
 	);
+
 	const view = new DataView(
 		array.buffer,
 		array.byteOffset,
@@ -225,7 +224,6 @@ describe('parse RTP packet 5 with uncommon header extension value', () =>
 		const payloadView = clone<DataView>(packet.getPayloadView());
 		const packetDump = clone<RtpPacketDump>(packet.dump());
 
-		expect(packet).toBeDefined();
 		expect(packet.getByteLength()).toBe(array.byteLength);
 		expect(packet.getPayloadType()).toBe(1);
 		expect(packet.getSequenceNumber()).toBe(8);
@@ -259,7 +257,6 @@ describe('create RTP packet 6 from scratch', () =>
 	{
 		packet = new RtpPacket();
 
-		expect(packet).toBeDefined();
 		expect(isRtp(packet.getView())).toBe(true);
 		expect(packet.getPayloadType()).toBe(0);
 		expect(packet.getSequenceNumber()).toBe(0);

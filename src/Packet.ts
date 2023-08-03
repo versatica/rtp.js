@@ -1,5 +1,5 @@
 import { EnhancedEventEmitter } from './EnhancedEventEmitter';
-import { readBit, setBit, clone } from './utils';
+import { readBit, setBit, clone, padTo4Bytes } from './utils';
 
 export const RTP_VERSION = 2;
 
@@ -131,6 +131,29 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 
 		// Update padding bit.
 		this.setPaddingBit(this.padding ? 1 : 0);
+
+		this.setSerializationNeeded(true);
+	}
+
+	/**
+	 * Pad the packet total length to 4 bytes. To achieve it, this method may add
+	 * or remove bytes of padding.
+	 *
+	 * @remarks
+	 * - Serialization maybe needed after calling this method.
+	 */
+	padTo4Bytes(): void
+	{
+		const previousPacketLength = this.getByteLength();
+		const packetLength = padTo4Bytes(previousPacketLength - this.padding);
+		const padding = this.padding + packetLength - previousPacketLength;
+
+		if (padding === this.padding)
+		{
+			return;
+		}
+
+		this.setPadding(padding);
 
 		this.setSerializationNeeded(true);
 	}

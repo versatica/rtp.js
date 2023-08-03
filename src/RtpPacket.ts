@@ -263,9 +263,9 @@ export class RtpPacket extends Packet
 			payloadLength
 		);
 
-		// Ensure that view length and parsed length match.
 		pos += (payloadLength + this.padding);
 
+		// Ensure that view length and parsed length match.
 		if (pos !== this.packetView.byteLength)
 		{
 			throw new RangeError(
@@ -643,29 +643,6 @@ export class RtpPacket extends Packet
 	setPayloadView(view: DataView): void
 	{
 		this.#payloadView = view;
-
-		this.setSerializationNeeded(true);
-	}
-
-	/**
-	 * Pad the packet total length to 4 bytes. To achieve it, this method may add
-	 * or remove bytes of padding.
-	 *
-	 * @remarks
-	 * - Serialization maybe needed after calling this method.
-	 */
-	padTo4Bytes(): void
-	{
-		const previousPacketLength = this.getByteLength();
-		const packetLength = padTo4Bytes(previousPacketLength - this.padding);
-		const padding = this.padding + packetLength - previousPacketLength;
-
-		if (padding === this.padding)
-		{
-			return;
-		}
-
-		this.setPadding(padding);
 
 		this.setSerializationNeeded(true);
 	}
