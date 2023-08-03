@@ -35,8 +35,22 @@ export {
 	ByePacketDump
 } from './rtcp/ByePacket';
 
-export {
+import {
 	nodeBufferToDataView,
+	nodeBufferToArrayBuffer,
 	dataViewToString,
-	stringToDataView
+	stringToDataView,
+	stringToUint8Array
 } from './utils';
+
+/**
+ * Utils.
+ */
+export const utils =
+{
+	nodeBufferToDataView,
+	nodeBufferToArrayBuffer,
+	dataViewToString,
+	stringToDataView,
+	stringToUint8Array
+};
