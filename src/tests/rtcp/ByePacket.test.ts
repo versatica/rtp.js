@@ -100,11 +100,12 @@ describe('create RTCP BYE packet', () =>
 	{
 		const ssrc1 = 0x624276e0;
 		const ssrc2 = 0x2624670e;
-		const reason = 'œæ€å∫ ¥∂™';
+		const reason = 'œæ€å∫ ¥∂'; // 21 bytes.
 
 		const packet = new ByePacket();
 
 		expect(isRtcp(packet.getView())).toBe(true);
+		// Byte length must be 4 (fixed header length).
 		expect(packet.getByteLength()).toBe(4);
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
@@ -115,16 +116,26 @@ describe('create RTCP BYE packet', () =>
 		expect(packet.needsSerialization()).toBe(false);
 
 		packet.setSsrcs([ ssrc1, ssrc2 ]);
+		// Byte length must be 4 + 8 (2 ssrcs) = 12.
+		expect(packet.getByteLength()).toBe(12);
+
 		packet.setPadding(9);
 		expect(packet.getPadding()).toBe(9);
+		// Byte length must be 4 + 8 + 9 (padding) = 21.
+		expect(packet.getByteLength()).toBe(21);
 
 		packet.setReason(reason);
 		expect(packet.getPadding()).toBe(9);
+		// Byte length must be 4 + 8 + 24 (reason + reason padding) + 9 (padding) = 45.
+		expect(packet.getByteLength()).toBe(45);
 
 		packet.padTo4Bytes();
+		// After padding to 4 bytes, padding must be 0 since the rest of the packet
+		// always fits into groups of 4 bytes.
 		expect(packet.getPadding()).toBe(0);
+		// Byte length must be 4 + 8 + 24 (reason + reason padding) + 0 (padding) = 36.
+		expect(packet.getByteLength()).toBe(36);
 
-		expect(packet.getByteLength() % 4).toBe(0);
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
 		expect(packet.getCount()).toBe(2);
@@ -133,11 +144,9 @@ describe('create RTCP BYE packet', () =>
 		expect(packet.getReason()).toBe(reason);
 		expect(packet.needsSerialization()).toBe(true);
 
-		const byteLength = packet.getByteLength();
-
 		packet.serialize();
 
-		expect(packet.getByteLength()).toBe(byteLength);
+		expect(packet.getByteLength()).toBe(36);
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
 		expect(packet.getCount()).toBe(2);
