@@ -182,6 +182,78 @@ export class SenderReportPacket extends RtcpPacket
 	}
 
 	/**
+	 * @inheritDoc
+	 */
+	serialize(): void
+	{
+		const packetView = super.serializeBase();
+		const packetUint8Array = new Uint8Array(
+			packetView.buffer,
+			packetView.byteOffset,
+			packetView.byteLength
+		);
+
+		// Position relative to the DataView byte offset.
+		let pos = 0;
+
+		// Move to the fixed header fields after the common header.
+		pos += COMMON_HEADER_LENGTH;
+
+		// Copy the rest of the fixed header into the new buffer.
+		packetUint8Array.set(
+			new Uint8Array(
+				this.packetView.buffer,
+				this.packetView.byteOffset + pos,
+				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH
+			),
+			pos
+		);
+
+		// Move to Receiver Reports.
+		pos += FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH;
+
+		// Write Receiver Reports.
+		for (const report of this.#reports)
+		{
+			const reportView = report.getView();
+
+			packetUint8Array.set(
+				new Uint8Array(
+					reportView.buffer,
+					reportView.byteOffset,
+					RECEIVER_REPORT_LENGTH
+				),
+				pos
+			);
+
+			pos += RECEIVER_REPORT_LENGTH;
+		}
+
+		// Assert that current position is equal than new buffer length.
+		if (pos !== packetView.byteLength)
+		{
+			throw new RangeError(
+				`computed packet length (${pos} bytes) is different than the available buffer size (${packetView.byteLength} bytes)`
+			);
+		}
+
+		// Update DataView.
+		this.packetView = packetView;
+
+		this.setSerializationNeeded(false);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	clone(buffer?: ArrayBuffer, byteOffset?: number): SenderReportPacket
+	{
+		const destPacketView = this.cloneInternal(buffer, byteOffset);
+
+		return new SenderReportPacket(destPacketView);
+	}
+
+	/**
 	 * Get sender SSRC.
 	 */
 	getSsrc(): number
@@ -299,77 +371,5 @@ export class SenderReportPacket extends RtcpPacket
 		this.setCount(this.#reports.length);
 
 		this.setSerializationNeeded(true);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	serialize(): void
-	{
-		const packetView = super.serializeBase();
-		const packetUint8Array = new Uint8Array(
-			packetView.buffer,
-			packetView.byteOffset,
-			packetView.byteLength
-		);
-
-		// Position relative to the DataView byte offset.
-		let pos = 0;
-
-		// Move to the fixed header fields after the common header.
-		pos += COMMON_HEADER_LENGTH;
-
-		// Copy the rest of the fixed header into the new buffer.
-		packetUint8Array.set(
-			new Uint8Array(
-				this.packetView.buffer,
-				this.packetView.byteOffset + pos,
-				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH
-			),
-			pos
-		);
-
-		// Move to Receiver Reports.
-		pos += FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH;
-
-		// Write Receiver Reports.
-		for (const report of this.#reports)
-		{
-			const reportView = report.getView();
-
-			packetUint8Array.set(
-				new Uint8Array(
-					reportView.buffer,
-					reportView.byteOffset,
-					RECEIVER_REPORT_LENGTH
-				),
-				pos
-			);
-
-			pos += RECEIVER_REPORT_LENGTH;
-		}
-
-		// Assert that current position is equal than new buffer length.
-		if (pos !== packetView.byteLength)
-		{
-			throw new RangeError(
-				`computed packet length (${pos} bytes) is different than the available buffer size (${packetView.byteLength} bytes)`
-			);
-		}
-
-		// Update DataView.
-		this.packetView = packetView;
-
-		this.setSerializationNeeded(false);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): SenderReportPacket
-	{
-		const destPacketView = this.cloneInternal(buffer, byteOffset);
-
-		return new SenderReportPacket(destPacketView);
 	}
 }

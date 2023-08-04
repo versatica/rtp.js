@@ -369,6 +369,256 @@ export class RtpPacket extends Packet
 	}
 
 	/**
+	 * @inheritDoc
+	 */
+	serialize(): void
+	{
+		const packetLength = this.getByteLength();
+		const { buffer, byteOffset } = this.getSerializationBuffer(packetLength);
+
+		// Create new DataView with new buffer.
+		const packetView = new DataView(buffer, byteOffset, packetLength);
+		const packetUint8Array = new Uint8Array(
+			packetView.buffer,
+			packetView.byteOffset,
+			packetView.byteLength
+		);
+
+		// Position relative to the DataView byte offset.
+		let pos = 0;
+
+		// Copy the fixed header into the new buffer.
+		packetUint8Array.set(
+			new Uint8Array(
+				this.packetView.buffer,
+				this.packetView.byteOffset,
+				FIXED_HEADER_LENGTH
+			),
+			0
+		);
+
+		// Move to CSRCs.
+		pos += FIXED_HEADER_LENGTH;
+
+		// NOTE: Before writing the CSRCs we must store the header extension value
+		// (if any) because otherwise we are writing on top of it.
+		if (this.#headerExtensionView)
+		{
+			this.#headerExtensionView = clone<DataView>(this.#headerExtensionView);
+		}
+
+		// Write CSRCs.
+		for (const csrc of this.#csrcs)
+		{
+			packetView.setUint32(pos, csrc);
+
+			pos += 4;
+		}
+
+		// Write header extension.
+		if (this.getHeaderExtensionBit())
+		{
+			packetView.setUint16(pos, this.#headerExtensionId!);
+
+			// Move to the header extension length field.
+			pos += 2;
+
+			const extLengthPos = pos;
+
+			// Move to the header extension value.
+			pos += 2;
+
+			let extLength = 0;
+
+			if (this.#extensions.size > 0 && this.hasOneByteExtensions())
+			{
+				for (const [ extId, extView ] of this.#extensions)
+				{
+					if (extId <= 0 || extId >= 15)
+					{
+						this.#extensions.delete(extId);
+
+						continue;
+					}
+
+					if (extView.byteLength === 0)
+					{
+						throw new TypeError(
+							'cannot serialize extensions with length 0 in One-Byte mode'
+						);
+					}
+					else if (extView.byteLength > 16)
+					{
+						throw new RangeError(
+							'cannot serialize extensions with length > 16 in One-Byte mode'
+						);
+					}
+
+					const idAndLength = (extId << 4) & ((extView.byteLength - 1) & 0x0F);
+
+					packetView.setUint8(pos, idAndLength);
+
+					pos += 1;
+					extLength += 1;
+
+					packetUint8Array.set(
+						new Uint8Array(
+							extView.buffer,
+							extView.byteOffset,
+							extView.byteLength
+						),
+						pos
+					);
+
+					pos += extView.byteLength;
+					extLength += extView.byteLength;
+				}
+
+				// May need to add padding.
+				pos = padTo4Bytes(pos);
+				extLength = padTo4Bytes(extLength);
+
+				// Write header extension length.
+				packetView.setUint16(extLengthPos, extLength / 4);
+			}
+			else if (this.#extensions.size > 0 && this.hasTwoBytesExtensions())
+			{
+				for (const [ extId, extView ] of this.#extensions)
+				{
+					if (extId <= 0 || extId >= 256)
+					{
+						this.#extensions.delete(extId);
+
+						continue;
+					}
+
+					if (extView.byteLength > 255)
+					{
+						throw new RangeError(
+							'cannot serialize extensions with length > 255 in Two-Bytes mode'
+						);
+					}
+
+					packetView.setUint8(pos, extId);
+
+					pos += 1;
+					extLength += 1;
+
+					packetView.setUint8(pos, extView.byteLength);
+
+					pos += 1;
+					extLength += 1;
+
+					packetUint8Array.set(
+						new Uint8Array(
+							extView.buffer,
+							extView.byteOffset,
+							extView.byteLength
+						),
+						pos
+					);
+
+					pos += extView.byteLength;
+					extLength += extView.byteLength;
+				}
+
+				// May need to add padding.
+				pos = padTo4Bytes(pos);
+				extLength = padTo4Bytes(extLength);
+
+				// Write header extension length.
+				packetView.setUint16(extLengthPos, extLength / 4);
+			}
+			// Extension header doesn't contain One-Byte or Two-Bytes extensions so
+			// honor the original header extension value (if any).
+			else if (this.#headerExtensionView)
+			{
+				extLength = this.#headerExtensionView.byteLength;
+
+				// Write header extension value.
+				packetUint8Array.set(
+					new Uint8Array(
+						this.#headerExtensionView.buffer,
+						this.#headerExtensionView.byteOffset,
+						this.#headerExtensionView.byteLength
+					),
+					pos
+				);
+
+				pos += this.#headerExtensionView.byteLength;
+
+				// Write header extension length.
+				packetView.setUint16(extLengthPos, extLength / 4);
+			}
+		}
+
+		// Write payload.
+		packetUint8Array.set(
+			new Uint8Array(
+				this.#payloadView.buffer,
+				this.#payloadView.byteOffset,
+				this.#payloadView.byteLength
+			),
+			pos
+		);
+
+		// Create new payload DataView.
+		const payloadView = new DataView(
+			packetView.buffer,
+			packetView.byteOffset + pos,
+			this.#payloadView.byteLength
+		);
+
+		pos += payloadView.byteLength;
+
+		// Write padding.
+		if (this.padding > 0)
+		{
+			if (this.padding > 255)
+			{
+				throw new TypeError(
+					`padding (${this.padding} bytes) cannot be higher than 255`
+				);
+			}
+
+			// NOTE: No need to fill padding bytes with zeroes since ArrayBuffer
+			// constructor already fills all bytes with zero.
+
+			packetView.setUint8(pos + this.padding - 1, this.padding);
+
+			pos += this.padding;
+		}
+
+		// Assert that current position is equal or less than new buffer length.
+		// NOTE: Don't be strict matching resulting length since we may have
+		// discarded/reduced some padding/alignment bytes during the process.
+		if (pos > packetView.byteLength)
+		{
+			throw new RangeError(
+				`computed packet length (${pos} bytes) is bigger than the available buffer size (${packetView.byteLength} bytes)`
+			);
+		}
+
+		// Update DataView.
+		this.packetView = packetView;
+
+		// Update payload DataView.
+		this.#payloadView = payloadView;
+
+		this.setSerializationNeeded(false);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	clone(buffer?: ArrayBuffer, byteOffset?: number): RtpPacket
+	{
+		const destPacketView = this.cloneInternal(buffer, byteOffset);
+
+		return new RtpPacket(destPacketView);
+	}
+
+	/**
 	 * Get the RTP payload type.
 	 */
 	getPayloadType(): number
@@ -737,256 +987,6 @@ export class RtpPacket extends Packet
 		this.setPadding(0);
 
 		this.setSerializationNeeded(true);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	serialize(): void
-	{
-		const packetLength = this.getByteLength();
-		const { buffer, byteOffset } = this.getSerializationBuffer(packetLength);
-
-		// Create new DataView with new buffer.
-		const packetView = new DataView(buffer, byteOffset, packetLength);
-		const packetUint8Array = new Uint8Array(
-			packetView.buffer,
-			packetView.byteOffset,
-			packetView.byteLength
-		);
-
-		// Position relative to the DataView byte offset.
-		let pos = 0;
-
-		// Copy the fixed header into the new buffer.
-		packetUint8Array.set(
-			new Uint8Array(
-				this.packetView.buffer,
-				this.packetView.byteOffset,
-				FIXED_HEADER_LENGTH
-			),
-			0
-		);
-
-		// Move to CSRCs.
-		pos += FIXED_HEADER_LENGTH;
-
-		// NOTE: Before writing the CSRCs we must store the header extension value
-		// (if any) because otherwise we are writing on top of it.
-		if (this.#headerExtensionView)
-		{
-			this.#headerExtensionView = clone<DataView>(this.#headerExtensionView);
-		}
-
-		// Write CSRCs.
-		for (const csrc of this.#csrcs)
-		{
-			packetView.setUint32(pos, csrc);
-
-			pos += 4;
-		}
-
-		// Write header extension.
-		if (this.getHeaderExtensionBit())
-		{
-			packetView.setUint16(pos, this.#headerExtensionId!);
-
-			// Move to the header extension length field.
-			pos += 2;
-
-			const extLengthPos = pos;
-
-			// Move to the header extension value.
-			pos += 2;
-
-			let extLength = 0;
-
-			if (this.#extensions.size > 0 && this.hasOneByteExtensions())
-			{
-				for (const [ extId, extView ] of this.#extensions)
-				{
-					if (extId <= 0 || extId >= 15)
-					{
-						this.#extensions.delete(extId);
-
-						continue;
-					}
-
-					if (extView.byteLength === 0)
-					{
-						throw new TypeError(
-							'cannot serialize extensions with length 0 in One-Byte mode'
-						);
-					}
-					else if (extView.byteLength > 16)
-					{
-						throw new RangeError(
-							'cannot serialize extensions with length > 16 in One-Byte mode'
-						);
-					}
-
-					const idAndLength = (extId << 4) & ((extView.byteLength - 1) & 0x0F);
-
-					packetView.setUint8(pos, idAndLength);
-
-					pos += 1;
-					extLength += 1;
-
-					packetUint8Array.set(
-						new Uint8Array(
-							extView.buffer,
-							extView.byteOffset,
-							extView.byteLength
-						),
-						pos
-					);
-
-					pos += extView.byteLength;
-					extLength += extView.byteLength;
-				}
-
-				// May need to add padding.
-				pos = padTo4Bytes(pos);
-				extLength = padTo4Bytes(extLength);
-
-				// Write header extension length.
-				packetView.setUint16(extLengthPos, extLength / 4);
-			}
-			else if (this.#extensions.size > 0 && this.hasTwoBytesExtensions())
-			{
-				for (const [ extId, extView ] of this.#extensions)
-				{
-					if (extId <= 0 || extId >= 256)
-					{
-						this.#extensions.delete(extId);
-
-						continue;
-					}
-
-					if (extView.byteLength > 255)
-					{
-						throw new RangeError(
-							'cannot serialize extensions with length > 255 in Two-Bytes mode'
-						);
-					}
-
-					packetView.setUint8(pos, extId);
-
-					pos += 1;
-					extLength += 1;
-
-					packetView.setUint8(pos, extView.byteLength);
-
-					pos += 1;
-					extLength += 1;
-
-					packetUint8Array.set(
-						new Uint8Array(
-							extView.buffer,
-							extView.byteOffset,
-							extView.byteLength
-						),
-						pos
-					);
-
-					pos += extView.byteLength;
-					extLength += extView.byteLength;
-				}
-
-				// May need to add padding.
-				pos = padTo4Bytes(pos);
-				extLength = padTo4Bytes(extLength);
-
-				// Write header extension length.
-				packetView.setUint16(extLengthPos, extLength / 4);
-			}
-			// Extension header doesn't contain One-Byte or Two-Bytes extensions so
-			// honor the original header extension value (if any).
-			else if (this.#headerExtensionView)
-			{
-				extLength = this.#headerExtensionView.byteLength;
-
-				// Write header extension value.
-				packetUint8Array.set(
-					new Uint8Array(
-						this.#headerExtensionView.buffer,
-						this.#headerExtensionView.byteOffset,
-						this.#headerExtensionView.byteLength
-					),
-					pos
-				);
-
-				pos += this.#headerExtensionView.byteLength;
-
-				// Write header extension length.
-				packetView.setUint16(extLengthPos, extLength / 4);
-			}
-		}
-
-		// Write payload.
-		packetUint8Array.set(
-			new Uint8Array(
-				this.#payloadView.buffer,
-				this.#payloadView.byteOffset,
-				this.#payloadView.byteLength
-			),
-			pos
-		);
-
-		// Create new payload DataView.
-		const payloadView = new DataView(
-			packetView.buffer,
-			packetView.byteOffset + pos,
-			this.#payloadView.byteLength
-		);
-
-		pos += payloadView.byteLength;
-
-		// Write padding.
-		if (this.padding > 0)
-		{
-			if (this.padding > 255)
-			{
-				throw new TypeError(
-					`padding (${this.padding} bytes) cannot be higher than 255`
-				);
-			}
-
-			// NOTE: No need to fill padding bytes with zeroes since ArrayBuffer
-			// constructor already fills all bytes with zero.
-
-			packetView.setUint8(pos + this.padding - 1, this.padding);
-
-			pos += this.padding;
-		}
-
-		// Assert that current position is equal or less than new buffer length.
-		// NOTE: Don't be strict matching resulting length since we may have
-		// discarded/reduced some padding/alignment bytes during the process.
-		if (pos > packetView.byteLength)
-		{
-			throw new RangeError(
-				`computed packet length (${pos} bytes) is bigger than the available buffer size (${packetView.byteLength} bytes)`
-			);
-		}
-
-		// Update DataView.
-		this.packetView = packetView;
-
-		// Update payload DataView.
-		this.#payloadView = payloadView;
-
-		this.setSerializationNeeded(false);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): RtpPacket
-	{
-		const destPacketView = this.cloneInternal(buffer, byteOffset);
-
-		return new RtpPacket(destPacketView);
 	}
 
 	private getHeaderExtensionBit(): number

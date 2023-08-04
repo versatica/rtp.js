@@ -176,48 +176,6 @@ export class ByePacket extends RtcpPacket
 	}
 
 	/**
-	 * Get SSRC values.
-	 */
-	getSsrcs(): number[]
-	{
-		return Array.from(this.#ssrcs);
-	}
-
-	/**
-	 * Set SSRC values.
-	 *
-	 * @remarks
-	 * - Serialization is needed after calling this method.
-	 */
-	setSsrcs(ssrcs: number[]): void
-	{
-		this.#ssrcs = Array.from(ssrcs);
-
-		// Update RTCP count.
-		this.setCount(this.#ssrcs.length);
-
-		this.setSerializationNeeded(true);
-	}
-
-	/**
-	 * Get reason.
-	 */
-	getReason(): string | undefined
-	{
-		return this.#reason;
-	}
-
-	/**
-	 * Set reason.
-	 */
-	setReason(reason?: string): void
-	{
-		this.#reason = reason;
-
-		this.setSerializationNeeded(true);
-	}
-
-	/**
 	 * @inheritDoc
 	 */
 	serialize(): void
@@ -286,5 +244,47 @@ export class ByePacket extends RtcpPacket
 		const destPacketView = this.cloneInternal(buffer, byteOffset);
 
 		return new ByePacket(destPacketView);
+	}
+
+	/**
+	 * Get SSRC values.
+	 */
+	getSsrcs(): number[]
+	{
+		return Array.from(this.#ssrcs);
+	}
+
+	/**
+	 * Set SSRC values.
+	 *
+	 * @remarks
+	 * - Serialization is needed after calling this method.
+	 */
+	setSsrcs(ssrcs: number[]): void
+	{
+		this.#ssrcs = Array.from(ssrcs);
+
+		// Update RTCP count.
+		this.setCount(this.#ssrcs.length);
+
+		this.setSerializationNeeded(true);
+	}
+
+	/**
+	 * Get reason.
+	 */
+	getReason(): string | undefined
+	{
+		return this.#reason;
+	}
+
+	/**
+	 * Set reason.
+	 */
+	setReason(reason?: string): void
+	{
+		this.#reason = reason;
+
+		this.setSerializationNeeded(true);
 	}
 }

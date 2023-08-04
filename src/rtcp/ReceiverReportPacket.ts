@@ -173,46 +173,6 @@ export class ReceiverReportPacket extends RtcpPacket
 	}
 
 	/**
-	 * Get sender SSRC.
-	 */
-	getSsrc(): number
-	{
-		return this.packetView.getUint32(4);
-	}
-
-	/**
-	 * Set sender SSRC.
-	 */
-	setSsrc(ssrc: number)
-	{
-		this.packetView.setUint32(4, ssrc);
-	}
-
-	/**
-	 * Get Receiver Reports.
-	 */
-	getReports(): ReceiverReport[]
-	{
-		return Array.from(this.#reports);
-	}
-
-	/**
-	 * Set Receiver Reports.
-	 *
-	 * @remarks
-	 * - Serialization is needed after calling this method.
-	 */
-	setReports(reports: ReceiverReport[]): void
-	{
-		this.#reports = Array.from(reports);
-
-		// Update RTCP count.
-		this.setCount(this.#reports.length);
-
-		this.setSerializationNeeded(true);
-	}
-
-	/**
 	 * @inheritDoc
 	 */
 	serialize(): void
@@ -282,6 +242,46 @@ export class ReceiverReportPacket extends RtcpPacket
 		const destPacketView = this.cloneInternal(buffer, byteOffset);
 
 		return new ReceiverReportPacket(destPacketView);
+	}
+
+	/**
+	 * Get sender SSRC.
+	 */
+	getSsrc(): number
+	{
+		return this.packetView.getUint32(4);
+	}
+
+	/**
+	 * Set sender SSRC.
+	 */
+	setSsrc(ssrc: number)
+	{
+		this.packetView.setUint32(4, ssrc);
+	}
+
+	/**
+	 * Get Receiver Reports.
+	 */
+	getReports(): ReceiverReport[]
+	{
+		return Array.from(this.#reports);
+	}
+
+	/**
+	 * Set Receiver Reports.
+	 *
+	 * @remarks
+	 * - Serialization is needed after calling this method.
+	 */
+	setReports(reports: ReceiverReport[]): void
+	{
+		this.#reports = Array.from(reports);
+
+		// Update RTCP count.
+		this.setCount(this.#reports.length);
+
+		this.setSerializationNeeded(true);
 	}
 }
 
