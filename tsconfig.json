@@ -4,7 +4,8 @@
 	{
 		"lib": [ "es2020" ],
 		"target": "es2020",
-		"module": "commonjs",
+		"module": "es2020",
+		"moduleResolution": "nodenext",
 		"strict": true,
 		"outDir": "lib",
 		"declaration": true,
@@ -20,7 +21,8 @@
 		"excludeNotDocumented": true,
 		"excludeInternal": true,
 		"includeVersion": true,
-		"theme": "default",
+		"plugin": [ "sonicware-tdt" ],
+		"theme": "sonicware",
 		"gitRemote": "origin",
 		"hideGenerator": false
 	}

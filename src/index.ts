@@ -1,29 +1,56 @@
 export {
+	Packet,
+	PacketDump,
+	PacketEvents,
+	WillSerializePacketEvent
+} from './Packet';
+
+export {
 	isRtp,
 	RtpPacket,
 	RtpPacketDump
-} from './rtp';
+} from './RtpPacket';
 
 export {
 	isRtcp,
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump
-} from './rtcp';
+} from './rtcp/RtcpPacket';
 
 export {
-	ReceiverReport,
 	ReceiverReportPacket,
 	ReceiverReportPacketDump,
+	ReceiverReport,
 	ReceiverReportDump
-} from './rtcp/receiverReport';
+} from './rtcp/ReceiverReportPacket';
 
 export {
 	SenderReportPacket,
 	SenderReportPacketDump
-} from './rtcp/senderReport';
+} from './rtcp/SenderReportPacket';
 
 export {
 	ByePacket,
 	ByePacketDump
-} from './rtcp/bye';
+} from './rtcp/ByePacket';
+
+import {
+	nodeBufferToDataView,
+	nodeBufferToArrayBuffer,
+	dataViewToString,
+	stringToDataView,
+	stringToUint8Array
+} from './utils';
+
+/**
+ * Utils.
+ */
+export const utils =
+{
+	nodeBufferToDataView,
+	nodeBufferToArrayBuffer,
+	dataViewToString,
+	stringToDataView,
+	stringToUint8Array
+};

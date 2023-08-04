@@ -3,9 +3,7 @@
 [![][npm-shield-rtp.js]][npm-rtp.js]
 [![][github-actions-shield-rtp.js]][github-actions-rtp.js]
 
-RTP stack for Node.js. Why not?
-
-**rtp.js** provides with an API to generate, parse, modify, inspect RTP and RTCP packets.
+RTP stack for Node.js and browser written in TypeScript. **rtp.js** provides with an API to parse, generate and modify RTP and RTCP packets.
 
 _NOTE:_ Work in progress. Many more RTCP packets will be added along with new features.
 
@@ -13,6 +11,24 @@ _NOTE:_ Work in progress. Many more RTCP packets will be added along with new fe
 ## Documentation
 
 * [API](https://versatica.github.io/rtp.js/)
+* All core classes and functions are exported by the main module. Example:
+  ```ts
+  import {
+    isRtp,
+    isRtcp,
+    RtpPacket,
+    ReceiverReportPacket,
+    ReceiverReport,
+    SenderReportPacket,
+    ByePacket
+  } from 'rtp.js';
+  ```
+* The main module also exports a `utils` module with some helpers and utilities. Example:
+  ```ts
+  import { utils } from 'rtp.js';
+  
+  const view = utils.stringToDataView('foo');
+  ```
 
 
 ## Source Code

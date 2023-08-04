@@ -6,21 +6,22 @@ const eslintConfig =
 {
 	env :
 	{
-		browser : true,
 		es6     : true,
+		// rtp.js runs in browser and Node, so we don't need browser specific types.
+		browser : false,
 		node    : true
 	},
 	plugins       : [],
 	settings      : {},
 	parserOptions :
 	{
-		ecmaVersion  : 2022,
+		ecmaVersion  : 2020,
 		sourceType   : 'module',
 		ecmaFeatures :
 		{
 			impliedStrict : true
 		},
-		lib     : [ 'es2022', 'dom' ],
+		lib     : [ 'es2020' ],
 		project : 'tsconfig.json'
 	},
 	rules :
