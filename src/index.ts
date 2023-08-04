@@ -19,6 +19,11 @@ export {
 } from './rtcp/RtcpPacket';
 
 export {
+	CompoundPacket,
+	CompoundPacketDump
+} from './rtcp/CompoundPacket';
+
+export {
 	ReceiverReportPacket,
 	ReceiverReportPacketDump,
 	ReceiverReport,
