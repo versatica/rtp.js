@@ -220,6 +220,8 @@ export class ByePacket extends RtcpPacket
 			pos += reasonLength + reasonPadding;
 		}
 
+		pos += this.padding;
+
 		// Assert that current position is equal or less than new buffer length.
 		// NOTE: Don't be strict matching resulting length since we may have
 		// discarded/reduced some padding/alignment bytes during the process.

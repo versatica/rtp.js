@@ -229,6 +229,8 @@ export class SenderReportPacket extends RtcpPacket
 			pos += RECEIVER_REPORT_LENGTH;
 		}
 
+		pos += this.padding;
+
 		// Assert that current position is equal than new buffer length.
 		if (pos !== packetView.byteLength)
 		{
