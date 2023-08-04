@@ -48,7 +48,7 @@ export class ByePacket extends RtcpPacket
 	#reason?: string;
 
 	/**
-	 * @param view - If given if will be parsed. Otherwise an empty RTCP Bye
+	 * @param view - If given it will be parsed. Otherwise an empty RTCP Bye
 	 *   packet (with just the minimal fixed header) will be created.
 	 *
 	 * @throws
@@ -191,7 +191,7 @@ export class ByePacket extends RtcpPacket
 	 */
 	setSsrcs(ssrcs: number[]): void
 	{
-		this.#ssrcs = ssrcs;
+		this.#ssrcs = Array.from(ssrcs);
 
 		// Update RTCP count.
 		this.setCount(this.#ssrcs.length);

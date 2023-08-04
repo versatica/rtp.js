@@ -76,7 +76,7 @@ export class SenderReportPacket extends RtcpPacket
 	#reports: ReceiverReport[] = [];
 
 	/**
-	 * @param view - If given if will be parsed. Otherwise an empty RTCP Sender
+	 * @param view - If given it will be parsed. Otherwise an empty RTCP Sender
 	 *   Report packet (with just the minimal fixed header) will be created.
 	 *
 	 * @throws
@@ -293,7 +293,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	setReports(reports: ReceiverReport[]): void
 	{
-		this.#reports = reports;
+		this.#reports = Array.from(reports);
 
 		// Update RTCP count.
 		this.setCount(this.#reports.length);

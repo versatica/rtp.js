@@ -53,7 +53,7 @@ export class RtpPacket extends Packet
 	#payloadView: DataView;
 
 	/**
-	 * @param view - If given if will be parsed. Otherwise an empty RTP packet
+	 * @param view - If given it will be parsed. Otherwise an empty RTP packet
 	 *   (with just the minimal fixed header) will be created.
 	 *
 	 * @throws
@@ -452,7 +452,7 @@ export class RtpPacket extends Packet
 	 */
 	setCsrcs(csrcs: number[] = []): void
 	{
-		this.#csrcs = csrcs;
+		this.#csrcs = Array.from(csrcs);
 
 		// Update CSRC count.
 		this.setCsrcCount(this.#csrcs.length);
