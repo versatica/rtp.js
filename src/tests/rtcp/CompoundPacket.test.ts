@@ -67,14 +67,14 @@ describe('parse RTCP Compound packet', () =>
 
 	test('packet processing succeeds', () =>
 	{
-		const packet = new CompoundPacket(view);
+		const compoundPacket = new CompoundPacket(view);
 
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.getByteLength()).toBe(140);
-		expect(packet.getPackets().length).toBe(3);
-		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		expect(compoundPacket.needsSerialization()).toBe(false);
+		expect(compoundPacket.getByteLength()).toBe(140);
+		expect(compoundPacket.getPackets().length).toBe(3);
+		expect(areDataViewsEqual(compoundPacket.getView(), view)).toBe(true);
 
-		const packet1 = packet.getPackets()[0] as ReceiverReportPacket;
+		const packet1 = compoundPacket.getPackets()[0] as ReceiverReportPacket;
 
 		expect(packet1.needsSerialization()).toBe(false);
 		expect(packet1.getByteLength()).toBe(56);
@@ -83,7 +83,7 @@ describe('parse RTCP Compound packet', () =>
 		expect(packet1.getPadding()).toBe(0);
 		expect(packet1.getSsrc()).toBe(0x5d931534);
 
-		const packet2 = packet.getPackets()[1] as SenderReportPacket;
+		const packet2 = compoundPacket.getPackets()[1] as SenderReportPacket;
 
 		expect(packet2.needsSerialization()).toBe(false);
 		expect(packet2.getByteLength()).toBe(52);
@@ -97,7 +97,7 @@ describe('parse RTCP Compound packet', () =>
 		expect(packet2.getPacketCount()).toBe(3608);
 		expect(packet2.getOctetCount()).toBe(577280);
 
-		const packet3 = packet.getPackets()[2] as ByePacket;
+		const packet3 = compoundPacket.getPackets()[2] as ByePacket;
 
 		expect(packet3.needsSerialization()).toBe(false);
 		expect(packet3.getByteLength()).toBe(32);
@@ -106,18 +106,29 @@ describe('parse RTCP Compound packet', () =>
 		expect(packet3.getPadding()).toBe(4);
 		expect(packet3.getSsrcs()).toEqual([ 0x624276e0, 0x2624670e ]);
 		expect(packet3.getReason()).toBe('Hasta la vista');
+
+		expect(compoundPacket.dump()).toEqual(
+			{
+				padding    : 0,
+				byteLength : 140,
+				packets    : [ packet1.dump(), packet2.dump(), packet3.dump() ]
+			});
 	});
 
 	test('packet.clone() succeeds', () =>
 	{
-		const packet = new CompoundPacket(view);
-		const clonedPacket = packet.clone();
+		const compoundPacket = new CompoundPacket(view);
+		const clonedCompoundPacket = compoundPacket.clone();
 
-		expect(clonedPacket.needsSerialization()).toBe(false);
-		expect(clonedPacket.getByteLength()).toBe(packet.getByteLength());
-		expect(clonedPacket.getPackets().length).toBe(3);
-		expect(clonedPacket.dump()).toEqual(packet.dump());
-		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(true);
+		expect(clonedCompoundPacket.needsSerialization()).toBe(false);
+		expect(clonedCompoundPacket.getByteLength())
+			.toBe(compoundPacket.getByteLength());
+		expect(clonedCompoundPacket.getPackets().length).toBe(3);
+		expect(clonedCompoundPacket.dump()).toEqual(compoundPacket.dump());
+		expect(areDataViewsEqual(
+			clonedCompoundPacket.getView(),
+			compoundPacket.getView())
+		).toBe(true);
 	});
 
 	test('parsing a buffer view with some incomplete packet throws', () =>
