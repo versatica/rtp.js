@@ -14,13 +14,13 @@ _NOTE:_ Work in progress. Many more RTCP packets will be added along with new fe
 * All core classes and functions are exported by the main module. Example:
   ```ts
   import {
-  	isRtp,
-  	isRtcp,
-  	RtpPacket,
-  	ReceiverReportPacket,
-  	ReceiverReport,
-  	SenderReportPacket,
-  	ByePacket
+    isRtp,
+    isRtcp,
+    RtpPacket,
+    ReceiverReportPacket,
+    ReceiverReport,
+    SenderReportPacket,
+    ByePacket
   } from 'rtp.js';
   ```
 * The main module also exports a `utils` module with some helpers and utilities. Example:
