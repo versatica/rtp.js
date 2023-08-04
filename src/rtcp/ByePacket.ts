@@ -222,13 +222,11 @@ export class ByePacket extends RtcpPacket
 
 		pos += this.padding;
 
-		// Assert that current position is equal or less than new buffer length.
-		// NOTE: Don't be strict matching resulting length since we may have
-		// discarded/reduced some padding/alignment bytes during the process.
-		if (pos > packetView.byteLength)
+		// Assert that current position is equal than new buffer length.
+		if (pos !== packetView.byteLength)
 		{
 			throw new RangeError(
-				`computed packet length (${pos} bytes) is bigger than the available buffer size (${packetView.byteLength} bytes)`
+				`computed packet length (${pos} bytes) is different than the available buffer size (${packetView.byteLength} bytes)`
 			);
 		}
 
