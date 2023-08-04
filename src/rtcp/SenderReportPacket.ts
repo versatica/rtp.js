@@ -239,6 +239,14 @@ export class SenderReportPacket extends RtcpPacket
 			);
 		}
 
+		// Assert that RTCP header length field is correct.
+		if (getRtcpLength(packetView) !== packetView.byteLength)
+		{
+			throw new RangeError(
+				`length in the RTCP header (${getRtcpLength(packetView)} bytes) does not match the available buffer size (${packetView.byteLength} bytes)`
+			);
+		}
+
 		// Update DataView.
 		this.packetView = packetView;
 
@@ -368,6 +376,22 @@ export class SenderReportPacket extends RtcpPacket
 	setReports(reports: ReceiverReport[]): void
 	{
 		this.#reports = Array.from(reports);
+
+		// Update RTCP count.
+		this.setCount(this.#reports.length);
+
+		this.setSerializationNeeded(true);
+	}
+
+	/**
+	 * Add Receiver Report.
+	 *
+	 * @remarks
+	 * - Serialization is needed after calling this method.
+	 */
+	addReport(report: ReceiverReport): void
+	{
+		this.#reports.push(report);
 
 		// Update RTCP count.
 		this.setCount(this.#reports.length);

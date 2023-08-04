@@ -131,7 +131,7 @@ export abstract class RtcpPacket extends Packet
 	}
 
 	/**
-	 * Get the RTCP packet type.
+	 * Get the RTCP header packet type.
 	 */
 	getPacketType(): RtcpPacketType
 	{
@@ -209,7 +209,7 @@ export abstract class RtcpPacket extends Packet
 	}
 
 	/**
-	 * Set the RTCP packet type.
+	 * Set the RTCP header packet type.
 	 */
 	private setPacketType(packetType: RtcpPacketType): void
 	{

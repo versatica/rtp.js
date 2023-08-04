@@ -878,7 +878,7 @@ export class RtpPacket extends Packet
 	/**
 	 * Get the packet payload.
 	 */
-	getPayloadView(): DataView
+	getPayload(): DataView
 	{
 		return this.#payloadView;
 	}
@@ -889,7 +889,7 @@ export class RtpPacket extends Packet
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setPayloadView(view: DataView): void
+	setPayload(view: DataView): void
 	{
 		this.#payloadView = view;
 
@@ -978,7 +978,7 @@ export class RtpPacket extends Packet
 		this.setSequenceNumber(sequenceNumber);
 
 		// Reduce the payload.
-		this.setPayloadView(
+		this.setPayload(
 			new DataView(this.#payloadView.buffer, this.#payloadView.byteOffset + 2)
 		);
 

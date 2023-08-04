@@ -1,4 +1,3 @@
-import { Logger } from '../Logger';
 import { Packet, PacketDump } from '../Packet';
 import {
 	isRtcp,
@@ -11,8 +10,7 @@ import {
 import { ReceiverReportPacket } from './ReceiverReportPacket';
 import { SenderReportPacket } from './SenderReportPacket';
 import { ByePacket } from './ByePacket';
-
-const logger = new Logger('RTCP::CompoundPacket');
+import { UnknownPacket } from './UnknownPacket';
 
 /**
  * RTCP Compound packet info dump.
@@ -103,9 +101,7 @@ export class CompoundPacket extends Packet
 
 				default:
 				{
-					// TODO: Here we may have an UnknownPacket class instead of discarding it.
-
-					logger.warn(`constructor() | discarding RTCP packet with unsupported packet type ${packetType}`);
+					packet = new UnknownPacket(packetView);
 				}
 			}
 

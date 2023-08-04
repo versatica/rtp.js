@@ -222,6 +222,14 @@ export class ByePacket extends RtcpPacket
 			);
 		}
 
+		// Assert that RTCP header length field is correct.
+		if (getRtcpLength(packetView) !== packetView.byteLength)
+		{
+			throw new RangeError(
+				`length in the RTCP header (${getRtcpLength(packetView)} bytes) does not match the available buffer size (${packetView.byteLength} bytes)`
+			);
+		}
+
 		// Update DataView.
 		this.packetView = packetView;
 
@@ -255,6 +263,22 @@ export class ByePacket extends RtcpPacket
 	setSsrcs(ssrcs: number[]): void
 	{
 		this.#ssrcs = Array.from(ssrcs);
+
+		// Update RTCP count.
+		this.setCount(this.#ssrcs.length);
+
+		this.setSerializationNeeded(true);
+	}
+
+	/**
+	 * Add SSRC value.
+	 *
+	 * @remarks
+	 * - Serialization is needed after calling this method.
+	 */
+	addSsrc(ssrc: number): void
+	{
+		this.#ssrcs.push(ssrc);
 
 		// Update RTCP count.
 		this.setCount(this.#ssrcs.length);
