@@ -2,7 +2,7 @@ import { isRtcp, RtcpPacketType } from '../../rtcp/RtcpPacket';
 import { ByePacket } from '../../rtcp/ByePacket';
 import { areDataViewsEqual } from '../../utils';
 
-describe('parse RTCP BYE packet', () =>
+describe('parse RTCP Bye packet', () =>
 {
 	const ssrc1 = 0x624276e0;
 	const ssrc2 = 0x2624670e;
@@ -94,9 +94,9 @@ describe('parse RTCP BYE packet', () =>
 	});
 });
 
-describe('create RTCP BYE packet', () =>
+describe('create RTCP Bye packet', () =>
 {
-	test('creating a BYE packet with padding succeeds', () =>
+	test('creating a Bye packet with padding succeeds', () =>
 	{
 		const ssrc1 = 0x624276e0;
 		const ssrc2 = 0x2624670e;
