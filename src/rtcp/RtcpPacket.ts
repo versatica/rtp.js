@@ -202,7 +202,7 @@ export abstract class RtcpPacket extends Packet
 				);
 			}
 
-			packetView.setUint8(packetLength - this.padding - 1, this.padding);
+			packetView.setUint8(packetLength - 1, this.padding);
 		}
 
 		return packetView;
