@@ -113,14 +113,6 @@ export class ByePacket extends RtcpPacket
 			// Move to the reason field.
 			pos += 1;
 
-			if (
-				pos + reasonLength + reasonPadding + this.padding !==
-				this.packetView.byteLength
-			)
-			{
-				throw new TypeError('invalid RTCP Bye packet');
-			}
-
 			const reasonView = new DataView(
 				this.packetView.buffer,
 				this.packetView.byteOffset + pos,

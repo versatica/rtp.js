@@ -17,6 +17,7 @@ _NOTE:_ Work in progress. Many more RTCP packets will be added along with new fe
     isRtp,
     isRtcp,
     RtpPacket,
+    CompoundPacket,
     ReceiverReportPacket,
     ReceiverReport,
     SenderReportPacket,
