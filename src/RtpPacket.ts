@@ -289,6 +289,7 @@ export class RtpPacket extends Packet
 			});
 
 		return {
+			...super.dump(),
 			payloadType       : this.getPayloadType(),
 			sequenceNumber    : this.getSequenceNumber(),
 			timestamp         : this.getTimestamp(),
@@ -297,9 +298,7 @@ export class RtpPacket extends Packet
 			marker            : this.getMarker(),
 			headerExtensionId : this.#headerExtensionId,
 			extensions        : extensions,
-			payloadLength     : this.#payloadView.byteLength,
-			padding           : this.padding,
-			byteLength        : this.getByteLength()
+			payloadLength     : this.#payloadView.byteLength
 		};
 	}
 
