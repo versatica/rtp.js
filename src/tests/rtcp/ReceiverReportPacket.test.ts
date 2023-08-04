@@ -119,6 +119,22 @@ describe('parse RTCP Receiver Report packet', () =>
 		const report = packet.getReports()[0];
 
 		checkReceiverReport(report, reportData1);
+
+		// Also test the same after serializing.
+		packet.serialize();
+
+		expect(packet.needsSerialization()).toBe(false);
+		// Byte length must be 8 (fixed header) + 24 (1 report) + 4 (padding) = 32.
+		expect(packet.getByteLength()).toBe(36);
+		expect(packet.getPacketType()).toBe(RtcpPacketType.RR);
+		expect(packet.getCount()).toBe(1);
+		expect(packet.getPadding()).toBe(4);
+		expect(packet.getSsrc()).toBe(0x5d931534);
+		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
+
+		const reportB = packet.getReports()[0];
+
+		checkReceiverReport(reportB, reportData1);
 	});
 
 	test('parsing a buffer view which length does not fit the indicated count throws', () =>

@@ -77,6 +77,19 @@ describe('parse RTCP Bye packet', () =>
 		expect(packet.getReason()).toBe(reason);
 		expect(packet.needsSerialization()).toBe(false);
 		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
+
+		// Also test the same after serializing.
+		packet.serialize();
+
+		expect(packet.needsSerialization()).toBe(false);
+		expect(packet.getByteLength()).toBe(32);
+		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
+		expect(packet.getCount()).toBe(2);
+		expect(packet.getPadding()).toBe(4);
+		expect(packet.getSsrcs()).toEqual([ ssrc1, ssrc2 ]);
+		expect(packet.getReason()).toBe(reason);
+		expect(packet.needsSerialization()).toBe(false);
+		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
 	});
 
 	test('parsing a buffer view which length does not fit the indicated count throws', () =>

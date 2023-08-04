@@ -61,8 +61,8 @@ describe('parse RTCP Sender Report packet', () =>
 	{
 		const packet = new SenderReportPacket(view);
 
-		// Byte length must be 28 (fixed header) + 24 (1 report) = 52.
 		expect(packet.needsSerialization()).toBe(false);
+		// Byte length must be 28 (fixed header) + 24 (1 report) = 52.
 		expect(packet.getByteLength()).toBe(52);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.SR);
 		expect(packet.getCount()).toBe(1);
@@ -78,6 +78,27 @@ describe('parse RTCP Sender Report packet', () =>
 		const report1 = packet.getReports()[0];
 
 		checkReceiverReport(report1, reportData1);
+
+		// Also test the same after serializing.
+		packet.serialize();
+
+		expect(packet.needsSerialization()).toBe(false);
+		// Byte length must be 28 (fixed header) + 24 (1 report) = 52.
+		expect(packet.getByteLength()).toBe(52);
+		expect(packet.getPacketType()).toBe(RtcpPacketType.SR);
+		expect(packet.getCount()).toBe(1);
+		expect(packet.getPadding()).toBe(0);
+		expect(packet.getSsrc()).toBe(ssrc);
+		expect(packet.getNtpSeconds()).toBe(ntpSeconds);
+		expect(packet.getNtpFraction()).toBe(ntpFraction);
+		expect(packet.getRtpTimestamp()).toBe(rtpTimestamp);
+		expect(packet.getPacketCount()).toBe(packetCount);
+		expect(packet.getOctetCount()).toBe(octetCount);
+		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+
+		const report1B = packet.getReports()[0];
+
+		checkReceiverReport(report1B, reportData1);
 	});
 
 	test('packet processing succeeds for a buffer view with padding', () =>
