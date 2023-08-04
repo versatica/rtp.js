@@ -113,6 +113,54 @@ describe('parse RTCP Compound packet', () =>
 				byteLength : 140,
 				packets    : [ packet1.dump(), packet2.dump(), packet3.dump() ]
 			});
+
+		// Also test the same after serializing.
+		compoundPacket.serialize();
+
+		expect(compoundPacket.needsSerialization()).toBe(false);
+		expect(compoundPacket.getByteLength()).toBe(140);
+		expect(compoundPacket.getPackets().length).toBe(3);
+		expect(areDataViewsEqual(compoundPacket.getView(), view)).toBe(true);
+
+		const packet1B = compoundPacket.getPackets()[0] as ReceiverReportPacket;
+
+		expect(packet1B.needsSerialization()).toBe(false);
+		expect(packet1B.getByteLength()).toBe(56);
+		expect(packet1B.getPacketType()).toBe(RtcpPacketType.RR);
+		expect(packet1B.getCount()).toBe(2);
+		expect(packet1B.getPadding()).toBe(0);
+		expect(packet1B.getSsrc()).toBe(0x5d931534);
+
+		const packet2B = compoundPacket.getPackets()[1] as SenderReportPacket;
+
+		expect(packet2B.needsSerialization()).toBe(false);
+		expect(packet2B.getByteLength()).toBe(52);
+		expect(packet2B.getPacketType()).toBe(RtcpPacketType.SR);
+		expect(packet2B.getCount()).toBe(1);
+		expect(packet2B.getPadding()).toBe(0);
+		expect(packet2B.getSsrc()).toBe(0x5d931534);
+		expect(packet2B.getNtpSeconds()).toBe(3711615412);
+		expect(packet2B.getNtpFraction()).toBe(1985245553);
+		expect(packet2B.getRtpTimestamp()).toBe(577280);
+		expect(packet2B.getPacketCount()).toBe(3608);
+		expect(packet2B.getOctetCount()).toBe(577280);
+
+		const packet3B = compoundPacket.getPackets()[2] as ByePacket;
+
+		expect(packet3B.needsSerialization()).toBe(false);
+		expect(packet3B.getByteLength()).toBe(32);
+		expect(packet3B.getPacketType()).toBe(RtcpPacketType.BYE);
+		expect(packet3B.getCount()).toBe(2);
+		expect(packet3B.getPadding()).toBe(4);
+		expect(packet3B.getSsrcs()).toEqual([ 0x624276e0, 0x2624670e ]);
+		expect(packet3B.getReason()).toBe('Hasta la vista');
+
+		expect(compoundPacket.dump()).toEqual(
+			{
+				padding    : 0,
+				byteLength : 140,
+				packets    : [ packet1B.dump(), packet2B.dump(), packet3B.dump() ]
+			});
 	});
 
 	test('packet.clone() succeeds', () =>
