@@ -25,10 +25,10 @@ export {
 	ReceiverReportDump
 } from './rtcp/ReceiverReportPacket';
 
-// export {
-// 	SenderReportPacket,
-// 	SenderReportPacketDump
-// } from './rtcp/SenderReportPacket';
+export {
+	SenderReportPacket,
+	SenderReportPacketDump
+} from './rtcp/SenderReportPacket';
 
 export {
 	ByePacket,

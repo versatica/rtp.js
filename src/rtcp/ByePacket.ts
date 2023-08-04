@@ -118,7 +118,7 @@ export class ByePacket extends RtcpPacket
 				this.packetView.byteLength
 			)
 			{
-				throw new TypeError('invalid RTCP BYE packet');
+				throw new TypeError('invalid RTCP Bye packet');
 			}
 
 			const reasonView = new DataView(

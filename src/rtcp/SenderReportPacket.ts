@@ -6,14 +6,29 @@ import {
 	getRtcpLength,
 	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
+import {
+	ReceiverReport,
+	ReceiverReportDump,
+	RECEIVER_REPORT_LENGTH
+} from './ReceiverReportPacket';
 
 /**
  *         0                   1                   2                   3
  *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * header |V=2|P|    RC   |   PT=RR=201   |             length            |
+ * header |V=2|P|    RC   |   PT=SR=200   |             length            |
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                     SSRC of packet sender                     |
+ *        |                         SSRC of sender                        |
+ *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * sender |              NTP timestamp, most significant word             |
+ * info   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *        |             NTP timestamp, least significant word             |
+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *        |                         RTP timestamp                         |
+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *        |                     sender's packet count                     |
+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *        |                      sender's octet count                     |
  *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  * report |                 SSRC_1 (SSRC of first source)                 |
  * block  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -35,52 +50,41 @@ import {
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
-// Common RTCP header length + 4.
-const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 4;
-
-export const RECEIVER_REPORT_LENGTH = 24;
+// Common RTCP header length + 24.
+const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 24;
 
 /**
- * RTCP Receiver Report packet info dump.
+ * RTCP Sender Report packet info dump.
  */
-export type ReceiverReportPacketDump = RtcpPacketDump &
+export type SenderReportPacketDump = RtcpPacketDump &
 {
 	ssrc: number;
+	ntpSeq: number;
+	ntpFraction: number;
+	rtpTimestamp: number;
+	packetCount: number;
+	octectCount: number;
 	reports: ReceiverReportDump[];
 };
 
 /**
- * Receiver Report dump.
+ * RTCP Sender Report packet.
  */
-export type ReceiverReportDump =
-{
-	ssrc: number;
-	fractionLost: number;
-	totalLost: number;
-	highestSeq: number;
-	jitter: number;
-	lsr: number;
-	dlsr: number;
-};
-
-/**
- * RTCP Receiver Report packet.
- */
-export class ReceiverReportPacket extends RtcpPacket
+export class SenderReportPacket extends RtcpPacket
 {
 	// Receiver Reports.
 	#reports: ReceiverReport[] = [];
 
 	/**
-	 * @param view - If given if will be parsed. Otherwise an empty RTCP Receiver
+	 * @param view - If given if will be parsed. Otherwise an empty RTCP Sender
 	 *   Report packet (with just the minimal fixed header) will be created.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid RTCP Receiver Report packet.
+	 * - If given `view` does not contain a valid RTCP Sender Report packet.
 	 */
 	constructor(view?: DataView)
 	{
-		super(RtcpPacketType.RR, view);
+		super(RtcpPacketType.SR, view);
 
 		if (!view)
 		{
@@ -92,9 +96,9 @@ export class ReceiverReportPacket extends RtcpPacket
 			return;
 		}
 
-		if (getRtcpPacketType(view) !== RtcpPacketType.RR)
+		if (getRtcpPacketType(view) !== RtcpPacketType.SR)
 		{
-			throw new TypeError('not a RTCP Receiver Report packet');
+			throw new TypeError('not a RTCP Sender Report packet');
 		}
 		else if (getRtcpLength(view) !== view.byteLength)
 		{
@@ -148,14 +152,19 @@ export class ReceiverReportPacket extends RtcpPacket
 	}
 
 	/**
-	 * Dump Receiver Report packet info.
+	 * Dump Sender Report packet info.
 	 */
-	dump(): ReceiverReportPacketDump
+	dump(): SenderReportPacketDump
 	{
 		return {
 			...super.dump(),
-			ssrc    : this.getSsrc(),
-			reports : this.#reports.map((report) => report.dump())
+			ssrc         : this.getSsrc(),
+			ntpSeq       : this.getNtpSeconds(),
+			ntpFraction  : this.getNtpFraction(),
+			rtpTimestamp : this.getRtpTimestamp(),
+			packetCount  : this.getPacketCount(),
+			octectCount  : this.getOctetCount(),
+			reports      : this.#reports.map((report) => report.dump())
 		};
 	}
 
@@ -186,6 +195,86 @@ export class ReceiverReportPacket extends RtcpPacket
 	setSsrc(ssrc: number)
 	{
 		this.packetView.setUint32(4, ssrc);
+	}
+
+	/**
+	 * Get NTP seconds.
+	 */
+	getNtpSeconds(): number
+	{
+		return this.packetView.getUint32(8);
+	}
+
+	/**
+	 * Set NTP seconds.
+	 */
+	setNtpSeconds(seconds: number): void
+	{
+		this.packetView.setUint32(8, seconds);
+	}
+
+	/**
+	 * Get NTP fraction.
+	 */
+	getNtpFraction(): number
+	{
+		return this.packetView.getUint32(12);
+	}
+
+	/**
+	 * Set NTP fraction.
+	 */
+	setNtpFraction(fraction: number): void
+	{
+		this.packetView.setUint32(12, fraction);
+	}
+
+	/**
+	 * Get RTP Timestamp.
+	 */
+	getRtpTimestamp(): number
+	{
+		return this.packetView.getUint32(16);
+	}
+
+	/**
+	 * Set RTP Timestamp.
+	 */
+	setRtpTimestamp(timestamp: number): void
+	{
+		this.packetView.setUint32(16, timestamp);
+	}
+
+	/**
+	 * Get RTP packet count.
+	 */
+	getPacketCount(): number
+	{
+		return this.packetView.getUint32(20);
+	}
+
+	/**
+	 * Set RTP packet count.
+	 */
+	setPacketCount(count: number): void
+	{
+		this.packetView.setUint32(20, count);
+	}
+
+	/**
+	 * Get RTP octect count.
+	 */
+	getOctetCount(): number
+	{
+		return this.packetView.getUint32(24);
+	}
+
+	/**
+	 * Set RTP octect count.
+	 */
+	setOctetCount(count: number): void
+	{
+		this.packetView.setUint32(24, count);
 	}
 
 	/**
@@ -277,203 +366,10 @@ export class ReceiverReportPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): ReceiverReportPacket
+	clone(buffer?: ArrayBuffer, byteOffset?: number): SenderReportPacket
 	{
 		const destPacketView = this.cloneInternal(buffer, byteOffset);
 
-		return new ReceiverReportPacket(destPacketView);
-	}
-}
-
-/**
- * RTCP Receiver Report.
- */
-export class ReceiverReport
-{
-	// Buffer view.
-	#view: DataView;
-
-	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTCP Receiver
-	 *   Report will be created.
-	 */
-	constructor(view?: DataView)
-	{
-		if (!view)
-		{
-			this.#view = new DataView(new ArrayBuffer(RECEIVER_REPORT_LENGTH));
-
-			return;
-		}
-
-		if (view.byteLength !== RECEIVER_REPORT_LENGTH)
-		{
-			throw new TypeError('wrong byte length for a RTCP Receiver Report');
-		}
-
-		this.#view = view;
-	}
-
-	/**
-	 * Dump ReceiverReport info.
-	 */
-	dump(): ReceiverReportDump
-	{
-		return {
-			ssrc         : this.getSsrc(),
-			fractionLost : this.getFractionLost(),
-			totalLost    : this.getTotalLost(),
-			highestSeq   : this.getHighestSeqNumber(),
-			jitter       : this.getJitter(),
-			lsr          : this.getLastSRTimestamp(),
-			dlsr         : this.getDelaySinceLastSR()
-		};
-	}
-
-	/**
-	 * Get a buffer view containing the serialized Receiver Report.
-	 */
-	getView(): DataView
-	{
-		return this.#view;
-	}
-
-	/**
-	 * Get receiver SSRC.
-	 */
-	getSsrc(): number
-	{
-		return this.#view.getUint32(0);
-	}
-
-	/**
-	 * Set receiver SSRC.
-	 */
-	setSsrc(ssrc: number): void
-	{
-		this.#view.setUint32(0, ssrc);
-	}
-
-	/**
-	 * Get fraction lost.
-	 */
-	getFractionLost(): number
-	{
-		return this.#view.getUint8(4);
-	}
-
-	/**
-	 * Set fraction lost.
-	 */
-	setFractionLost(fractionLost: number): void
-	{
-		this.#view.setUint8(4, fractionLost);
-	}
-
-	/**
-	 * Get total lost.
-	 */
-	getTotalLost(): number
-	{
-		let value = this.#view.getUint32(4) & 0x0FFF;
-
-		// Possitive value.
-		if (((value >> 23) & 1) == 0)
-		{
-			return value;
-		}
-
-		// Negative value.
-		if (value != 0x0800000)
-		{
-			value &= ~(1 << 23);
-		}
-
-		return -value;
-	}
-
-	/**
-	 * Set total lost.
-	 */
-	setTotalLost(totalLost: number): void
-	{
-		// Get the limit value for possitive and negative total lost.
-		const clamp = (totalLost >= 0)
-			? totalLost > 0x07FFFFF
-				? 0x07FFFFF
-				: totalLost
-			: -totalLost > 0x0800000
-				? 0x0800000
-				: -totalLost;
-
-		const value = (totalLost >= 0) ? (clamp & 0x07FFFFF) : (clamp | 0x0800000);
-		const fractionLost = this.#view.getUint8(4);
-
-		this.#view.setUint32(4, value);
-		this.#view.setUint8(4, fractionLost);
-	}
-
-	/**
-	 * Get highest RTP sequence number.
-	 */
-	getHighestSeqNumber(): number
-	{
-		return this.#view.getUint32(8);
-	}
-
-	/**
-	 * Set highest RTP sequence number.
-	 */
-	setHighestSeqNumber(seq: number): void
-	{
-		this.#view.setUint32(8, seq);
-	}
-
-	/**
-	 * Get interarrival jitter.
-	 */
-	getJitter(): number
-	{
-		return this.#view.getUint32(12);
-	}
-
-	/**
-	 * Set interarrival jitter.
-	 */
-	setJitter(jitter: number)
-	{
-		this.#view.setUint32(12, jitter);
-	}
-
-	/**
-	 * Set last Sender Report timestamp.
-	 */
-	getLastSRTimestamp(): number
-	{
-		return this.#view.getUint32(16);
-	}
-
-	/**
-	 * Set last Sender Report timestamp.
-	 */
-	setLastSRTimestamp(lsr: number): void
-	{
-		this.#view.setUint32(16, lsr);
-	}
-
-	/**
-	 * Get delay since last Sender Report.
-	 */
-	getDelaySinceLastSR(): number
-	{
-		return this.#view.getUint32(20);
-	}
-
-	/**
-	 * Set delay since last Sender Report.
-	 */
-	setDelaySinceLastSR(dlsr: number): void
-	{
-		this.#view.setUint32(20, dlsr);
+		return new SenderReportPacket(destPacketView);
 	}
 }

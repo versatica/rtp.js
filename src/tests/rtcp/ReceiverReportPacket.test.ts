@@ -1,6 +1,6 @@
 import {
-	ReceiverReport,
 	ReceiverReportPacket,
+	ReceiverReport,
 	ReceiverReportDump
 } from '../../rtcp/ReceiverReportPacket';
 import { isRtcp, RtcpPacketType } from '../../rtcp/RtcpPacket';
@@ -66,8 +66,8 @@ describe('parse RTCP Receiver Report packet', () =>
 	{
 		const packet = new ReceiverReportPacket(view);
 
-		// Byte length must be 8 (fixed header) + 48 (2 reports) = 56.
 		expect(packet.needsSerialization()).toBe(false);
+		// Byte length must be 8 (fixed header) + 48 (2 reports) = 56.
 		expect(packet.getByteLength()).toBe(56);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.RR);
 		expect(packet.getCount()).toBe(2);
@@ -78,8 +78,8 @@ describe('parse RTCP Receiver Report packet', () =>
 		const report1 = packet.getReports()[0];
 		const report2 = packet.getReports()[1];
 
-		checkReport(report1, reportData1);
-		checkReport(report2, reportData2);
+		checkReceiverReport(report1, reportData1);
+		checkReceiverReport(report2, reportData2);
 	});
 
 	test('packet processing succeeds for a buffer view with padding', () =>
@@ -118,7 +118,7 @@ describe('parse RTCP Receiver Report packet', () =>
 
 		const report = packet.getReports()[0];
 
-		checkReport(report, reportData1);
+		checkReceiverReport(report, reportData1);
 	});
 
 	test('parsing a buffer view which length does not fit the indicated count throws', () =>
@@ -184,8 +184,6 @@ describe('create RTCP Receiver Report packet', () =>
 		expect(packet.getSsrc()).toBe(1111);
 		expect(packet.needsSerialization()).toBe(false);
 		expect(isRtcp(packet.getView())).toBe(true);
-
-		packet.setReports([]);
 
 		const report = new ReceiverReport();
 
@@ -264,7 +262,7 @@ describe('parse RTCP Receiver Report', () =>
 
 		expect(report).toBeDefined();
 
-		checkReport(report, reportData1);
+		checkReceiverReport(report, reportData1);
 	});
 
 	test('parsing a buffer which length does not fit the report size throws', () =>
@@ -292,11 +290,11 @@ describe('create RTCP Receiver Report', () =>
 		report.setLastSRTimestamp(reportData1.lsr);
 		report.setDelaySinceLastSR(reportData1.dlsr);
 
-		checkReport(report, reportData1);
+		checkReceiverReport(report, reportData1);
 	});
 });
 
-function checkReport(report: ReceiverReport, data: ReceiverReportDump)
+function checkReceiverReport(report: ReceiverReport, data: ReceiverReportDump)
 {
 	expect(report.getSsrc()).toBe(data.ssrc);
 	expect(report.getFractionLost()).toBe(data.fractionLost);
