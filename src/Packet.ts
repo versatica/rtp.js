@@ -197,14 +197,14 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 		);
 	}
 
-	protected setPaddingBit(flag: boolean): void
-	{
-		writeBit({ view: this.packetView, byte: 0, bit: 5, flag });
-	}
-
 	protected hasPaddingBit(): boolean
 	{
 		return readBit({ view: this.packetView, byte: 0, bit: 5 });
+	}
+
+	protected setPaddingBit(flag: boolean): void
+	{
+		writeBit({ view: this.packetView, byte: 0, bit: 5, flag });
 	}
 
 	protected setPadding(padding: number): void
