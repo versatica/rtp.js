@@ -1,4 +1,3 @@
-import { RTP_VERSION } from '../Packet';
 import {
 	RtcpPacket,
 	RtcpPacketType,
