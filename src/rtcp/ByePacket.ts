@@ -58,7 +58,7 @@ export class ByePacket extends RtcpPacket
 	{
 		super(RtcpPacketType.BYE, view);
 
-		if (!view)
+		if (!this.packetView)
 		{
 			this.packetView = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
@@ -68,18 +68,16 @@ export class ByePacket extends RtcpPacket
 			return;
 		}
 
-		if (getRtcpPacketType(view) !== RtcpPacketType.BYE)
+		if (getRtcpPacketType(this.packetView) !== RtcpPacketType.BYE)
 		{
 			throw new TypeError('not a RTCP Bye packet');
 		}
-		else if (getRtcpLength(view) !== view.byteLength)
+		else if (getRtcpLength(this.packetView) !== this.packetView.byteLength)
 		{
 			throw new RangeError(
-				`length in the RTCP header (${getRtcpLength(view)} bytes) does not match view length (${view.byteLength} bytes)`
+				`length in the RTCP header (${getRtcpLength(this.packetView)} bytes) does not match view length (${this.packetView.byteLength} bytes)`
 			);
 		}
-
-		this.packetView = view;
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
@@ -96,12 +94,6 @@ export class ByePacket extends RtcpPacket
 			this.#ssrcs.push(ssrc);
 
 			pos += 4;
-		}
-
-		// Get padding.
-		if (this.getPaddingBit())
-		{
-			this.padding = this.packetView.getUint8(this.packetView.byteLength - 1);
 		}
 
 		// Check if there is reason.

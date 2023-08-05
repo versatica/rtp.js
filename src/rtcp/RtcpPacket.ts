@@ -1,4 +1,5 @@
 import { RTP_VERSION, Packet, PacketDump } from '../Packet';
+import { readBits, writeBits } from '../bitOps';
 
 /**
  *         0                   1                   2                   3
@@ -113,22 +114,31 @@ export abstract class RtcpPacket extends Packet
 
 	protected constructor(packetType: RtcpPacketType, view?: DataView)
 	{
-		super();
-
-		if (view && !isRtcp(view))
-		{
-			throw new TypeError('not a RTCP packet');
-		}
-
-		// RTCP packet byte length must be multiple of 4.
-		if (view && view.byteLength % 4 !== 0)
-		{
-			throw new RangeError(
-				`RTCP packet byte length must be multiple of 4 but given buffer view is ${view.byteLength} bytes`
-			);
-		}
+		super(view);
 
 		this.#packetType = packetType;
+
+		if (this.packetView)
+		{
+			if (!isRtcp(this.packetView))
+			{
+				throw new TypeError('not a RTCP packet');
+			}
+
+			// RTCP packet byte length must be multiple of 4.
+			if (this.packetView.byteLength % 4 !== 0)
+			{
+				throw new RangeError(
+					`RTCP packet byte length must be multiple of 4 but given buffer view is ${this.packetView.byteLength} bytes`
+				);
+			}
+
+			// Get padding.
+			if (this.hasPaddingBit())
+			{
+				this.padding = this.packetView.getUint8(this.packetView.byteLength - 1);
+			}
+		}
 	}
 
 	/**
@@ -157,6 +167,7 @@ export abstract class RtcpPacket extends Packet
 	protected writeCommonHeader(): void
 	{
 		this.setVersion();
+
 		this.setPacketType(this.#packetType);
 	}
 
@@ -165,7 +176,7 @@ export abstract class RtcpPacket extends Packet
 	 */
 	getCount(): number
 	{
-		return this.packetView.getUint8(0) & 0x1F;
+		return readBits({ view: this.packetView, byte: 0, mask: 0b00011111 });
 	}
 
 	/**
@@ -173,9 +184,8 @@ export abstract class RtcpPacket extends Packet
 	 */
 	protected setCount(count: number): void
 	{
-		this.packetView.setUint8(
-			0,
-			(RTP_VERSION << 6) | (Number(this.getPaddingBit()) << 5) | (count & 0x1F)
+		writeBits(
+			{ view: this.packetView, byte: 0, mask: 0b00011111, value: count }
 		);
 	}
 

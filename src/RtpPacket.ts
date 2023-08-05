@@ -1,5 +1,6 @@
 import { RTP_VERSION, Packet, PacketDump } from './Packet';
-import { readBit, setBit, clone, padTo4Bytes } from './utils';
+import { clone, padTo4Bytes } from './utils';
+import { readBit, writeBit, readBits, writeBits } from './bitOps';
 
 const FIXED_HEADER_LENGTH = 12;
 
@@ -61,9 +62,9 @@ export class RtpPacket extends Packet
 	 */
 	constructor(view?: DataView)
 	{
-		super();
+		super(view);
 
-		if (!view)
+		if (!this.packetView)
 		{
 			this.packetView = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
@@ -80,12 +81,10 @@ export class RtpPacket extends Packet
 			return;
 		}
 
-		if (!isRtp(view))
+		if (!isRtp(this.packetView))
 		{
 			throw new TypeError('not a RTP packet');
 		}
-
-		this.packetView = view;
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
@@ -105,7 +104,7 @@ export class RtpPacket extends Packet
 		}
 
 		// Parse header extension.
-		const hasHeaderExtension = this.getHeaderExtensionBit();
+		const hasHeaderExtension = this.hasHeaderExtensionBit();
 
 		let headerExtensionView: DataView | undefined;
 
@@ -137,8 +136,13 @@ export class RtpPacket extends Packet
 			// One-Byte extensions cannot have length 0.
 			while (extPos < headerExtensionView.byteLength)
 			{
-				const extId = (headerExtensionView.getUint8(extPos) & 0xF0) >> 4;
-				const extLength = (headerExtensionView.getUint8(extPos) & 0x0F) + 1;
+				const extId = readBits(
+					{ view: headerExtensionView, byte: extPos, mask: 0xF0 }
+				);
+
+				const extLength = readBits(
+					{ view: headerExtensionView, byte: extPos, mask: 0x0F }
+				) + 1;
 
 				// id=15 in One-Byte extensions means "stop parsing here".
 				if (extId === 15)
@@ -241,7 +245,7 @@ export class RtpPacket extends Packet
 		}
 
 		// Get padding.
-		if (this.getPaddingBit())
+		if (this.hasPaddingBit())
 		{
 			// NOTE: This will throw RangeError if there is no space in the view.
 			this.padding = this.packetView.getUint8(this.packetView.byteLength - 1);
@@ -315,7 +319,7 @@ export class RtpPacket extends Packet
 		packetLength += this.#csrcs.length * 4;
 
 		// Add space for the header extension.
-		if (this.getHeaderExtensionBit())
+		if (this.hasHeaderExtensionBit())
 		{
 			// Add space for header extension id/length fields.
 			packetLength += 4;
@@ -415,7 +419,7 @@ export class RtpPacket extends Packet
 		}
 
 		// Write header extension.
-		if (this.getHeaderExtensionBit())
+		if (this.hasHeaderExtensionBit())
 		{
 			packetView.setUint16(pos, this.#headerExtensionId!);
 
@@ -453,9 +457,10 @@ export class RtpPacket extends Packet
 						);
 					}
 
-					const idAndLength = (extId << 4) & ((extView.byteLength - 1) & 0x0F);
-
-					packetView.setUint8(pos, idAndLength);
+					writeBits({ view: packetView, byte: pos, mask: 0xF0, value: extId });
+					writeBits(
+						{ view: packetView, byte: pos, mask: 0x0F, value: extView.byteLength - 1 }
+					);
 
 					pos += 1;
 					extLength += 1;
@@ -622,7 +627,7 @@ export class RtpPacket extends Packet
 	 */
 	getPayloadType(): number
 	{
-		return (this.packetView.getUint8(1) & 0x7F);
+		return readBits({ view: this.packetView, byte: 1, mask: 0b01111111 });
 	}
 
 	/**
@@ -630,9 +635,8 @@ export class RtpPacket extends Packet
 	 */
 	setPayloadType(payloadType: number): void
 	{
-		this.packetView.setUint8(
-			1,
-			(this.packetView.getUint8(1) & 0x80) | (payloadType & 0x7F)
+		writeBits(
+			{ view: this.packetView, byte: 1, mask: 0b01111111, value: payloadType }
 		);
 	}
 
@@ -714,18 +718,15 @@ export class RtpPacket extends Packet
 	 */
 	getMarker(): boolean
 	{
-		return Boolean(readBit(this.packetView.getUint8(1), 7));
+		return readBit({ view: this.packetView, byte: 1, bit: 7 });
 	}
 
 	/**
 	 * Set the RTP marker flag.
 	 */
-	setMarker(bit: boolean): void
+	setMarker(flag: boolean): void
 	{
-		this.packetView.setUint8(
-			1,
-			setBit(this.packetView.getUint8(1), 7, Number(bit))
-		);
+		writeBit({ view: this.packetView, byte: 1, bit: 7, flag });
 	}
 
 	/**
@@ -816,7 +817,7 @@ export class RtpPacket extends Packet
 		// Update header extension bit if needed.
 		if (this.#extensions.size === 0)
 		{
-			this.setHeaderExtensionBit(1);
+			this.setHeaderExtensionBit(true);
 
 			// If neither One-Byte nor Two-Bytes modes are enabled, force One-Byte.
 			if (!this.hasOneByteExtensions() && !this.hasTwoBytesExtensions())
@@ -848,7 +849,7 @@ export class RtpPacket extends Packet
 		// Update header extension bit if needed.
 		if (this.#extensions.size === 0)
 		{
-			this.setHeaderExtensionBit(0);
+			this.setHeaderExtensionBit(false);
 		}
 
 		this.setSerializationNeeded(true);
@@ -870,7 +871,7 @@ export class RtpPacket extends Packet
 		this.#extensions.clear();
 
 		// Update header extension bit.
-		this.setHeaderExtensionBit(0);
+		this.setHeaderExtensionBit(false);
 
 		this.setSerializationNeeded(true);
 	}
@@ -988,17 +989,14 @@ export class RtpPacket extends Packet
 		this.setSerializationNeeded(true);
 	}
 
-	private getHeaderExtensionBit(): number
+	private hasHeaderExtensionBit(): boolean
 	{
-		return readBit(this.packetView.getUint8(0), 4);
+		return readBit({ view: this.packetView, byte: 0, bit: 4 });
 	}
 
-	private setHeaderExtensionBit(bit: number): void
+	private setHeaderExtensionBit(flag: boolean): void
 	{
-		this.packetView.setUint8(
-			0,
-			setBit(this.packetView.getUint8(0), 4, bit)
-		);
+		writeBit({ view: this.packetView, byte: 0, bit: 4, flag });
 	}
 
 	private getCsrcCount(): number
@@ -1008,9 +1006,6 @@ export class RtpPacket extends Packet
 
 	private setCsrcCount(count: number): void
 	{
-		this.packetView.setUint8(
-			0,
-			(this.packetView.getUint8(0) & 0xF0) | (count & 0x0F)
-		);
+		writeBits({ view: this.packetView, byte: 0, mask: 0b00001111, value: count });
 	}
 }

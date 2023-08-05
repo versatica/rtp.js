@@ -1,5 +1,6 @@
 import { EnhancedEventEmitter } from './EnhancedEventEmitter';
-import { readBit, setBit, clone, padTo4Bytes } from './utils';
+import { clone, padTo4Bytes } from './utils';
+import { readBit, writeBit, writeBits } from './bitOps';
 
 export const RTP_VERSION = 2;
 
@@ -66,6 +67,16 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 	protected padding: number = 0;
 	// Whether serialization is needed due to recent modifications.
 	#serializationNeeded: boolean = false;
+
+	protected constructor(view?: DataView)
+	{
+		super();
+
+		if (view)
+		{
+			this.packetView = view;
+		}
+	}
 
 	/**
 	 * Base RTCP packet dump.
@@ -181,23 +192,19 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 
 	protected setVersion(): void
 	{
-		this.packetView.setUint8(
-			0,
-			this.packetView.getUint8(0) | (RTP_VERSION << 6)
+		writeBits(
+			{ view: this.packetView, byte: 0, mask: 0b11000000, value: RTP_VERSION }
 		);
 	}
 
-	protected getPaddingBit(): number
+	protected setPaddingBit(flag: boolean): void
 	{
-		return readBit(this.packetView.getUint8(0), 5);
+		writeBit({ view: this.packetView, byte: 0, bit: 5, flag });
 	}
 
-	protected setPaddingBit(bit: number): void
+	protected hasPaddingBit(): boolean
 	{
-		this.packetView.setUint8(
-			0,
-			setBit(this.packetView.getUint8(0), 5, bit)
-		);
+		return readBit({ view: this.packetView, byte: 0, bit: 5 });
 	}
 
 	protected setPadding(padding: number): void
@@ -210,7 +217,7 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 		this.padding = padding;
 
 		// Update padding bit.
-		this.setPaddingBit(this.padding ? 1 : 0);
+		this.setPaddingBit(Boolean(this.padding));
 
 		this.setSerializationNeeded(true);
 	}
