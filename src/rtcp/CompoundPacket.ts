@@ -37,40 +37,38 @@ export class CompoundPacket extends Packet
 	 */
 	constructor(view?: DataView)
 	{
-		super();
+		super(view);
 
-		if (view && !isRtcp(view))
+		if (this.packetView && !isRtcp(this.packetView))
 		{
 			throw new TypeError('not a RTCP compound packet');
 		}
 
-		if (!view)
+		if (!this.packetView)
 		{
 			this.packetView = new DataView(new ArrayBuffer(0));
 
 			return;
 		}
 
-		this.packetView = view;
-
 		// Position relative to the DataView byte offset.
 		let pos = 0;
 
 		// Parse all RTCP packets.
-		while (pos < view.byteLength)
+		while (pos < this.packetView.byteLength)
 		{
 			const remainingView = new DataView(
-				view.buffer,
-				view.byteOffset + pos,
-				view.byteLength - pos
+				this.packetView.buffer,
+				this.packetView.byteOffset + pos,
+				this.packetView.byteLength - pos
 			);
 
 			const packetType = getRtcpPacketType(remainingView);
 			const packetLength = getRtcpLength(remainingView);
 
 			const packetView = new DataView(
-				view.buffer,
-				view.byteOffset + pos,
+				this.packetView.buffer,
+				this.packetView.byteOffset + pos,
 				packetLength
 			);
 

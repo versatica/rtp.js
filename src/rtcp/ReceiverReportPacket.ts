@@ -82,7 +82,7 @@ export class ReceiverReportPacket extends RtcpPacket
 	{
 		super(RtcpPacketType.RR, view);
 
-		if (!view)
+		if (!this.packetView)
 		{
 			this.packetView = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
@@ -92,18 +92,16 @@ export class ReceiverReportPacket extends RtcpPacket
 			return;
 		}
 
-		if (getRtcpPacketType(view) !== RtcpPacketType.RR)
+		if (getRtcpPacketType(this.packetView) !== RtcpPacketType.RR)
 		{
 			throw new TypeError('not a RTCP Receiver Report packet');
 		}
-		else if (getRtcpLength(view) !== view.byteLength)
+		else if (getRtcpLength(this.packetView) !== this.packetView.byteLength)
 		{
 			throw new RangeError(
-				`length in the RTCP header (${getRtcpLength(view)} bytes) does not match view length (${view.byteLength} bytes)`
+				`length in the RTCP header (${getRtcpLength(this.packetView)} bytes) does not match view length (${this.packetView.byteLength} bytes)`
 			);
 		}
-
-		this.packetView = view;
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
@@ -128,12 +126,6 @@ export class ReceiverReportPacket extends RtcpPacket
 			this.#reports.push(report);
 
 			pos += RECEIVER_REPORT_LENGTH;
-		}
-
-		// Get padding.
-		if (this.getPaddingBit())
-		{
-			this.padding = this.packetView.getUint8(this.packetView.byteLength - 1);
 		}
 
 		pos += this.padding;

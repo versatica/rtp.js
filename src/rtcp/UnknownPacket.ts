@@ -1,4 +1,3 @@
-import { RTP_VERSION } from '../Packet';
 import {
 	RtcpPacket,
 	RtcpPacketType,
@@ -7,6 +6,7 @@ import {
 	getRtcpLength,
 	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
+import { writeBits } from '../bitOps';
 
 /**
  *         0                   1                   2                   3
@@ -45,14 +45,14 @@ export class UnknownPacket extends RtcpPacket
 	 */
 	constructor(view?: DataView, packetType?: RtcpPacketType | number)
 	{
-		super(view ? getRtcpPacketType(view) : packetType!);
+		super(view ? getRtcpPacketType(view) : packetType!, view);
 
 		if (!view && !packetType)
 		{
 			throw new TypeError('view or packetType must be given');
 		}
 
-		if (!view)
+		if (!this.packetView)
 		{
 			this.packetView = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
 
@@ -69,26 +69,18 @@ export class UnknownPacket extends RtcpPacket
 			return;
 		}
 
-		if (getRtcpLength(view) !== view.byteLength)
+		if (getRtcpLength(this.packetView) !== this.packetView.byteLength)
 		{
 			throw new RangeError(
-				`length in the RTCP header (${getRtcpLength(view)} bytes) does not match view length (${view.byteLength} bytes)`
+				`length in the RTCP header (${getRtcpLength(this.packetView)} bytes) does not match view length (${this.packetView.byteLength} bytes)`
 			);
 		}
-
-		this.packetView = view;
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
 
 		// Move to body.
 		pos += COMMON_HEADER_LENGTH;
-
-		// Get padding.
-		if (this.getPaddingBit())
-		{
-			this.padding = this.packetView.getUint8(this.packetView.byteLength - 1);
-		}
 
 		// Get body.
 		const bodyLength = this.packetView.byteLength - pos - this.padding;
@@ -210,9 +202,8 @@ export class UnknownPacket extends RtcpPacket
 	 */
 	setCount(count: number): void
 	{
-		this.packetView.setUint8(
-			0,
-			(RTP_VERSION << 6) | (Number(this.getPaddingBit()) << 5) | (count & 0x1F)
+		writeBits(
+			{ view: this.packetView, byte: 0, mask: 0b00011111, value: count }
 		);
 	}
 
