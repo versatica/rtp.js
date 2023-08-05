@@ -7,6 +7,7 @@ import {
 	getRtcpLength,
 	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
+import { writeBits } from '../bitOps';
 
 /**
  *         0                   1                   2                   3
@@ -202,9 +203,8 @@ export class UnknownPacket extends RtcpPacket
 	 */
 	setCount(count: number): void
 	{
-		this.packetView.setUint8(
-			0,
-			(RTP_VERSION << 6) | (Number(this.hasPaddingBit()) << 5) | (count & 0x1F)
+		writeBits(
+			{ view: this.packetView, byte: 0, mask: 0b00011111, value: count }
 		);
 	}
 
