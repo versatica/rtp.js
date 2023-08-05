@@ -21,7 +21,7 @@ import {
  */
 
 /**
- * RTCP Unknown packet info dump.
+ * RTCP unknown packet info dump.
  */
 export type UnknownPacketDump = RtcpPacketDump &
 {
@@ -29,7 +29,7 @@ export type UnknownPacketDump = RtcpPacketDump &
 };
 
 /**
- * RTCP Unknown packet.
+ * RTCP unknown packet.
  */
 export class UnknownPacket extends RtcpPacket
 {
@@ -37,11 +37,11 @@ export class UnknownPacket extends RtcpPacket
 	#bodyView: DataView;
 
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTCP Unknown
+	 * @param view - If given it will be parsed. Otherwise an empty RTCP unknown
 	 *   packet (with just the minimal common header) will be created.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid RTCP Unknown packet.
+	 * - If given `view` does not contain a valid RTCP unknown packet.
 	 */
 	constructor(view?: DataView, packetType?: RtcpPacketType | number)
 	{
@@ -118,7 +118,7 @@ export class UnknownPacket extends RtcpPacket
 	}
 
 	/**
-	 * Dump RTCP Unknown packet info.
+	 * Dump RTCP unknown packet info.
 	 */
 	dump(): UnknownPacketDump
 	{
