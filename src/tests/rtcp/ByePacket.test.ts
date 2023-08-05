@@ -132,19 +132,13 @@ describe('create RTCP Bye packet', () =>
 		// Byte length must be 4 + 8 (2 ssrcs) = 12.
 		expect(packet.getByteLength()).toBe(12);
 
-		packet.setPadding(9);
-		expect(packet.getPadding()).toBe(9);
-		// Byte length must be 4 + 8 + 9 (padding) = 21.
-		expect(packet.getByteLength()).toBe(21);
-
 		packet.setReason(reason);
-		expect(packet.getPadding()).toBe(9);
-		// Byte length must be 4 + 8 + 24 (reason + reason padding) + 9 (padding) = 45.
-		expect(packet.getByteLength()).toBe(45);
+		// Byte length must be 4 + 8 + 24 (reason + reason padding) = 36.
+		expect(packet.getByteLength()).toBe(36);
 
 		packet.padTo4Bytes();
-		// After padding to 4 bytes, padding must be 0 since the rest of the packet
-		// always fits into groups of 4 bytes.
+		// After padding to 4 bytes, nothing should change since the rest of the
+		// packet always fits into groups of 4 bytes.
 		expect(packet.getPadding()).toBe(0);
 		// Byte length must be 4 + 8 + 24 (reason + reason padding) + 0 (padding) = 36.
 		expect(packet.getByteLength()).toBe(36);

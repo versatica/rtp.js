@@ -189,19 +189,14 @@ describe('create RTCP Sender Report packet', () =>
 		expect(packet.getPacketCount()).toBe(666);
 		expect(packet.getOctetCount()).toBe(999);
 
-		packet.setPadding(3);
-		expect(packet.getPadding()).toBe(3);
-		// Byte length must be 28 + 3 (padding) = 31.
-		expect(packet.getByteLength()).toBe(31);
-
 		packet.padTo4Bytes();
-		// After padding to 4 bytes, padding must be 0 since the rest of the packet
-		// always fits into groups of 4 bytes.
+		// After padding to 4 bytes, nothing should change since the rest of the
+		// packet always fits into groups of 4 bytes.
 		expect(packet.getPadding()).toBe(0);
 		// Byte length must be 28.
 		expect(packet.getByteLength()).toBe(28);
 
-		expect(packet.needsSerialization()).toBe(true);
+		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.SR);
 		expect(packet.getCount()).toBe(0);
 		expect(packet.getPadding()).toBe(0);
@@ -211,7 +206,7 @@ describe('create RTCP Sender Report packet', () =>
 		expect(packet.getRtpTimestamp()).toBe(123456789);
 		expect(packet.getPacketCount()).toBe(666);
 		expect(packet.getOctetCount()).toBe(999);
-		expect(packet.needsSerialization()).toBe(true);
+		expect(packet.needsSerialization()).toBe(false);
 
 		packet.serialize();
 

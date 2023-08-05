@@ -3,8 +3,8 @@ import { isRtcp, RtcpPacketType } from '../../rtcp/RtcpPacket';
 import { ReceiverReportPacket } from '../../rtcp/ReceiverReportPacket';
 import { SenderReportPacket } from '../../rtcp/SenderReportPacket';
 import { ByePacket } from '../../rtcp/ByePacket';
-
-import { areDataViewsEqual } from '../../utils';
+import { UnknownPacket } from '../../rtcp/UnknownPacket';
+import { areDataViewsEqual, numericArrayToDataView } from '../../utils';
 
 describe('parse RTCP Compound packet', () =>
 {
@@ -50,7 +50,12 @@ describe('parse RTCP Compound packet', () =>
 			0x74, 0x61, 0x20, 0x6c,
 			0x61, 0x20, 0x76, 0x69,
 			0x73, 0x74, 0x61, 0x00,
-			0x00, 0x00, 0x00, 0x04 // Padding (4 bytes)
+			0x00, 0x00, 0x00, 0x04, // Padding (4 bytes)
+			/* Unknown packet */
+			0xa2, 0xc1, 0x00, 0x03, // Padding, Type: 193 (unknown), Count: 2, length: 3
+			0x11, 0x22, 0x33, 0x44, // Body
+			0x55, 0x66, 0x77, 0x88,
+			0x99, 0x00, 0x00, 0x03 // Padding (3 bytes)
 		]
 	);
 
@@ -70,8 +75,8 @@ describe('parse RTCP Compound packet', () =>
 		const compoundPacket = new CompoundPacket(view);
 
 		expect(compoundPacket.needsSerialization()).toBe(false);
-		expect(compoundPacket.getByteLength()).toBe(140);
-		expect(compoundPacket.getPackets().length).toBe(3);
+		expect(compoundPacket.getByteLength()).toBe(156);
+		expect(compoundPacket.getPackets().length).toBe(4);
 		expect(areDataViewsEqual(compoundPacket.getView(), view)).toBe(true);
 
 		const packet1 = compoundPacket.getPackets()[0] as ReceiverReportPacket;
@@ -107,19 +112,37 @@ describe('parse RTCP Compound packet', () =>
 		expect(packet3.getSsrcs()).toEqual([ 0x624276e0, 0x2624670e ]);
 		expect(packet3.getReason()).toBe('Hasta la vista');
 
+		const packet4 = compoundPacket.getPackets()[3] as UnknownPacket;
+
+		expect(packet4.needsSerialization()).toBe(false);
+		expect(packet4.getByteLength()).toBe(16);
+		expect(packet4.getPacketType()).toBe(193);
+		expect(packet4.getCount()).toBe(2);
+		expect(packet4.getPadding()).toBe(3);
+		expect(packet4.needsSerialization()).toBe(false);
+		expect(packet4.getBody()).toEqual(numericArrayToDataView(
+			[ 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99 ]
+		));
+
 		expect(compoundPacket.dump()).toEqual(
 			{
 				padding    : 0,
-				byteLength : 140,
-				packets    : [ packet1.dump(), packet2.dump(), packet3.dump() ]
+				byteLength : 156,
+				packets    :
+				[
+					packet1.dump(),
+					packet2.dump(),
+					packet3.dump(),
+					packet4.dump()
+				]
 			});
 
 		// Also test the same after serializing.
 		compoundPacket.serialize();
 
 		expect(compoundPacket.needsSerialization()).toBe(false);
-		expect(compoundPacket.getByteLength()).toBe(140);
-		expect(compoundPacket.getPackets().length).toBe(3);
+		expect(compoundPacket.getByteLength()).toBe(156);
+		expect(compoundPacket.getPackets().length).toBe(4);
 		expect(areDataViewsEqual(compoundPacket.getView(), view)).toBe(true);
 
 		const packet1B = compoundPacket.getPackets()[0] as ReceiverReportPacket;
@@ -155,11 +178,49 @@ describe('parse RTCP Compound packet', () =>
 		expect(packet3B.getSsrcs()).toEqual([ 0x624276e0, 0x2624670e ]);
 		expect(packet3B.getReason()).toBe('Hasta la vista');
 
+		const packet4B = compoundPacket.getPackets()[3] as UnknownPacket;
+
+		expect(packet4B.needsSerialization()).toBe(false);
+		expect(packet4B.getByteLength()).toBe(16);
+		expect(packet4B.getPacketType()).toBe(193);
+		expect(packet4B.getCount()).toBe(2);
+		expect(packet4B.getPadding()).toBe(3);
+		expect(packet4B.needsSerialization()).toBe(false);
+		expect(packet4B.getBody()).toEqual(numericArrayToDataView(
+			[ 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99 ]
+		));
+
 		expect(compoundPacket.dump()).toEqual(
 			{
 				padding    : 0,
-				byteLength : 140,
-				packets    : [ packet1B.dump(), packet2B.dump(), packet3B.dump() ]
+				byteLength : 156,
+				packets    :
+				[
+					packet1B.dump(),
+					packet2B.dump(),
+					packet3B.dump(),
+					packet4B.dump()
+				]
+			});
+
+		// Modify Bye packet.
+		packet3.addSsrc(666);
+
+		expect(compoundPacket.needsSerialization()).toBe(true);
+		expect(compoundPacket.getByteLength()).toBe(160);
+		expect(compoundPacket.getPackets().length).toBe(4);
+
+		expect(compoundPacket.dump()).toEqual(
+			{
+				padding    : 0,
+				byteLength : 160,
+				packets    :
+				[
+					packet1B.dump(),
+					packet2B.dump(),
+					packet3B.dump(),
+					packet4B.dump()
+				]
 			});
 	});
 
@@ -171,7 +232,7 @@ describe('parse RTCP Compound packet', () =>
 		expect(clonedCompoundPacket.needsSerialization()).toBe(false);
 		expect(clonedCompoundPacket.getByteLength())
 			.toBe(compoundPacket.getByteLength());
-		expect(clonedCompoundPacket.getPackets().length).toBe(3);
+		expect(clonedCompoundPacket.getPackets().length).toBe(4);
 		expect(clonedCompoundPacket.dump()).toEqual(compoundPacket.dump());
 		expect(areDataViewsEqual(
 			clonedCompoundPacket.getView(),
@@ -190,5 +251,61 @@ describe('parse RTCP Compound packet', () =>
 
 		expect(() => (new CompoundPacket(view2)))
 			.toThrowError(RangeError);
+	});
+});
+
+describe('create RTCP unknown packet', () =>
+{
+	test('creating an unknown packet with 3 RTCP packets', () =>
+	{
+		const compoundPacket = new CompoundPacket();
+
+		const packet1 = new ReceiverReportPacket();
+		const packet2 = new UnknownPacket(undefined, 199);
+		const packet3 = new SenderReportPacket();
+
+		compoundPacket.addPacket(packet1);
+		compoundPacket.addPacket(packet2);
+		compoundPacket.addPacket(packet3);
+
+		expect(compoundPacket.dump()).toEqual(
+			{
+				padding    : 0,
+				byteLength : 8 + 4 + 28,
+				packets    :
+				[
+					packet1.dump(),
+					packet2.dump(),
+					packet3.dump()
+				]
+			});
+
+		compoundPacket.serialize();
+
+		expect(compoundPacket.dump()).toEqual(
+			{
+				padding    : 0,
+				byteLength : 8 + 4 + 28,
+				packets    :
+				[
+					packet1.dump(),
+					packet2.dump(),
+					packet3.dump()
+				]
+			});
+
+		const clonedCompoundPacket = compoundPacket.clone();
+
+		expect(clonedCompoundPacket.dump()).toEqual(
+			{
+				padding    : 0,
+				byteLength : 8 + 4 + 28,
+				packets    :
+				[
+					packet1.dump(),
+					packet2.dump(),
+					packet3.dump()
+				]
+			});
 	});
 });

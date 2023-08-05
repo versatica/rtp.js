@@ -40,6 +40,11 @@ export {
 	ByePacketDump
 } from './rtcp/ByePacket';
 
+export {
+	UnknownPacket,
+	UnknownPacketDump
+} from './rtcp/UnknownPacket';
+
 import {
 	nodeBufferToDataView,
 	nodeBufferToArrayBuffer,
