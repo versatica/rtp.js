@@ -161,17 +161,6 @@ export class CompoundPacket extends Packet
 	 *
 	 * @hidden
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	setPadding(padding: number): void
-	{
-		throw new Error('method not implemented in RTCP CompoundPacket');
-	}
-
-	/**
-	 * Not implemented in RTCP Compound packet.
-	 *
-	 * @hidden
-	 */
 	padTo4Bytes(): void
 	{
 		throw new Error('method not implemented in RTCP CompoundPacket');

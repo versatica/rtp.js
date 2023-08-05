@@ -339,10 +339,6 @@ describe('create RTP packet 6 from scratch', () =>
 		packet.setPayload(stringToDataView('codec'));
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getPayload()).toEqual(stringToDataView('codec'));
-
-		packet.setPadding(3);
-		expect(packet.needsSerialization()).toBe(true);
-		expect(packet.getPadding()).toBe(3);
 	});
 
 	test('packet.clone() succeeds', () =>
@@ -366,7 +362,7 @@ describe('create RTP packet 6 from scratch', () =>
 		expect(clonedPacket.getExtension(2))
 			.toEqual(numericArrayToDataView([ 1, 2, 3, 4 ]));
 		expect(clonedPacket.getPayload()).toEqual(stringToDataView('codec'));
-		expect(clonedPacket.getPadding()).toBe(3);
+		expect(clonedPacket.getPadding()).toBe(0);
 		expect(clonedPacket.dump()).toEqual(packet.dump());
 		expect(clonedPacket.needsSerialization()).toBe(false);
 		// Packet views and payload views must be the same.
@@ -405,13 +401,6 @@ describe('create RTP packet 6 from scratch', () =>
 		// Serialize to reset serialization needed.
 		packet.serialize();
 		expect(packet.needsSerialization()).toBe(false);
-
-		// Remove padding so we can later compare buffers.
-		packet.setPadding(0);
-		expect(packet.needsSerialization()).toBe(true);
-
-		// Serialize to reset serialization needed.
-		packet.serialize();
 
 		const payloadType = packet.getPayloadType();
 		const ssrc = packet.getSsrc();
@@ -600,13 +589,9 @@ describe('create RTP packet 10 from scratch', () =>
 		expect(packet.getByteLength()).toBe(16);
 		expect(packet.getPadding()).toBe(0);
 
-		packet.setPadding(1);
-		expect(packet.needsSerialization()).toBe(true);
-		expect(packet.getByteLength()).toBe(17);
-
-		// Padding a packet of 17 bytes (1 byte of padding) must become 16 bytes.
+		// Padding a packet of 16 bytes (0 byte of padding) must become 16 bytes.
 		packet.padTo4Bytes();
-		expect(packet.needsSerialization()).toBe(true);
+		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getView().byteLength).toBe(16);
 		expect(packet.getByteLength()).toBe(16);
 		expect(packet.getPadding()).toBe(0);

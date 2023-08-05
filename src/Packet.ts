@@ -115,27 +115,6 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 	}
 
 	/**
-	 * Set the padding (in bytes) after the packet.
-	 *
-	 * @remarks
-	 * - Serialization maybe needed after calling this method.
-	 */
-	setPadding(padding: number): void
-	{
-		if (padding === this.padding)
-		{
-			return;
-		}
-
-		this.padding = padding;
-
-		// Update padding bit.
-		this.setPaddingBit(this.padding ? 1 : 0);
-
-		this.setSerializationNeeded(true);
-	}
-
-	/**
 	 * Pad the packet total length to 4 bytes. To achieve it, this method may add
 	 * or remove bytes of padding.
 	 *
@@ -219,6 +198,21 @@ export abstract class Packet extends EnhancedEventEmitter<PacketEvents>
 			0,
 			setBit(this.packetView.getUint8(0), 5, bit)
 		);
+	}
+
+	protected setPadding(padding: number): void
+	{
+		if (padding === this.padding)
+		{
+			return;
+		}
+
+		this.padding = padding;
+
+		// Update padding bit.
+		this.setPaddingBit(this.padding ? 1 : 0);
+
+		this.setSerializationNeeded(true);
 	}
 
 	protected setSerializationNeeded(flag: boolean): void

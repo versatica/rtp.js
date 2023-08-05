@@ -126,15 +126,11 @@ describe('create RTCP unknown packet', () =>
 		packet.setCount(5);
 		expect(packet.getCount()).toBe(5);
 
-		packet.setPadding(2);
-		expect(packet.getPadding()).toBe(2);
-		// Byte length must be 4 + 3 + 2 (padding) = 9.
-		expect(packet.getByteLength()).toBe(9);
-
 		packet.padTo4Bytes();
-		// After padding to 4 bytes, padding must be 1.
+		// After padding to 4 bytes, nothing should change since the rest of the
+		// packet always fits into groups of 4 bytes.
 		expect(packet.getPadding()).toBe(1);
-		// Byte length must be 4 + 3 + 1 = 8.
+		// Byte length must be 4 + 3 (body) + 1 (padding) = 8.
 		expect(packet.getByteLength()).toBe(8);
 
 		expect(packet.needsSerialization()).toBe(true);

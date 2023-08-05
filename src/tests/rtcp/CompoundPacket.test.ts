@@ -70,7 +70,7 @@ describe('parse RTCP Compound packet', () =>
 		expect(isRtcp(view)).toBe(true);
 	});
 
-	test.only('packet processing succeeds', () =>
+	test('packet processing succeeds', () =>
 	{
 		const compoundPacket = new CompoundPacket(view);
 
@@ -202,6 +202,26 @@ describe('parse RTCP Compound packet', () =>
 					packet4B.dump()
 				]
 			});
+
+		// Modify Bye packet.
+		packet3.addSsrc(666);
+
+		expect(compoundPacket.needsSerialization()).toBe(true);
+		expect(compoundPacket.getByteLength()).toBe(160);
+		expect(compoundPacket.getPackets().length).toBe(4);
+
+		expect(compoundPacket.dump()).toEqual(
+			{
+				padding    : 0,
+				byteLength : 160,
+				packets    :
+				[
+					packet1B.dump(),
+					packet2B.dump(),
+					packet3B.dump(),
+					packet4B.dump()
+				]
+			});
 	});
 
 	test('packet.clone() succeeds', () =>
@@ -212,7 +232,7 @@ describe('parse RTCP Compound packet', () =>
 		expect(clonedCompoundPacket.needsSerialization()).toBe(false);
 		expect(clonedCompoundPacket.getByteLength())
 			.toBe(compoundPacket.getByteLength());
-		expect(clonedCompoundPacket.getPackets().length).toBe(3);
+		expect(clonedCompoundPacket.getPackets().length).toBe(4);
 		expect(clonedCompoundPacket.dump()).toEqual(compoundPacket.dump());
 		expect(areDataViewsEqual(
 			clonedCompoundPacket.getView(),
@@ -231,5 +251,61 @@ describe('parse RTCP Compound packet', () =>
 
 		expect(() => (new CompoundPacket(view2)))
 			.toThrowError(RangeError);
+	});
+});
+
+describe('create RTCP unknown packet', () =>
+{
+	test('creating an unknown packet with 3 RTCP packets', () =>
+	{
+		const compoundPacket = new CompoundPacket();
+
+		const packet1 = new ReceiverReportPacket();
+		const packet2 = new UnknownPacket(undefined, 199);
+		const packet3 = new SenderReportPacket();
+
+		compoundPacket.addPacket(packet1);
+		compoundPacket.addPacket(packet2);
+		compoundPacket.addPacket(packet3);
+
+		expect(compoundPacket.dump()).toEqual(
+			{
+				padding    : 0,
+				byteLength : 8 + 4 + 28,
+				packets    :
+				[
+					packet1.dump(),
+					packet2.dump(),
+					packet3.dump()
+				]
+			});
+
+		compoundPacket.serialize();
+
+		expect(compoundPacket.dump()).toEqual(
+			{
+				padding    : 0,
+				byteLength : 8 + 4 + 28,
+				packets    :
+				[
+					packet1.dump(),
+					packet2.dump(),
+					packet3.dump()
+				]
+			});
+
+		const clonedCompoundPacket = compoundPacket.clone();
+
+		expect(clonedCompoundPacket.dump()).toEqual(
+			{
+				padding    : 0,
+				byteLength : 8 + 4 + 28,
+				packets    :
+				[
+					packet1.dump(),
+					packet2.dump(),
+					packet3.dump()
+				]
+			});
 	});
 });

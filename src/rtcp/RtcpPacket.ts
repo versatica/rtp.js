@@ -90,6 +90,14 @@ export function getRtcpLength(view: DataView): number
  */
 function setRtcpLength(view: DataView, byteLength: number): void
 {
+	// RTCP packet byte length must be multiple of 4.
+	if (byteLength % 4 !== 0)
+	{
+		throw new RangeError(
+			`RTCP packet byte length must be multiple of 4 but given byte length is ${byteLength} bytes`
+		);
+	}
+
 	const length = (byteLength / 4) - 1;
 
 	view.setUint16(2, length);
@@ -110,6 +118,14 @@ export abstract class RtcpPacket extends Packet
 		if (view && !isRtcp(view))
 		{
 			throw new TypeError('not a RTCP packet');
+		}
+
+		// RTCP packet byte length must be multiple of 4.
+		if (view && view.byteLength % 4 !== 0)
+		{
+			throw new RangeError(
+				`RTCP packet byte length must be multiple of 4 but given buffer view is ${view.byteLength} bytes`
+			);
 		}
 
 		this.#packetType = packetType;
