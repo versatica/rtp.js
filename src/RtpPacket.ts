@@ -617,9 +617,9 @@ export class RtpPacket extends Packet
 	 */
 	clone(buffer?: ArrayBuffer, byteOffset?: number): RtpPacket
 	{
-		const destPacketView = this.cloneInternal(buffer, byteOffset);
+		const packetView = this.cloneInternal(buffer, byteOffset);
 
-		return new RtpPacket(destPacketView);
+		return new RtpPacket(packetView);
 	}
 
 	/**

@@ -186,9 +186,9 @@ export class UnknownPacket extends RtcpPacket
 	 */
 	clone(buffer?: ArrayBuffer, byteOffset?: number): UnknownPacket
 	{
-		const destPacketView = this.cloneInternal(buffer, byteOffset);
+		const packetView = this.cloneInternal(buffer, byteOffset);
 
-		return new UnknownPacket(destPacketView);
+		return new UnknownPacket(packetView);
 	}
 
 	/**

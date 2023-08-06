@@ -221,9 +221,9 @@ export class CompoundPacket extends Packet
 	 */
 	clone(buffer?: ArrayBuffer, byteOffset?: number): CompoundPacket
 	{
-		const destPacketView = this.cloneInternal(buffer, byteOffset);
+		const packetView = this.cloneInternal(buffer, byteOffset);
 
-		return new CompoundPacket(destPacketView);
+		return new CompoundPacket(packetView);
 	}
 
 	/**

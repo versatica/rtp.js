@@ -219,9 +219,9 @@ export class ByePacket extends RtcpPacket
 	 */
 	clone(buffer?: ArrayBuffer, byteOffset?: number): ByePacket
 	{
-		const destPacketView = this.cloneInternal(buffer, byteOffset);
+		const packetView = this.cloneInternal(buffer, byteOffset);
 
-		return new ByePacket(destPacketView);
+		return new ByePacket(packetView);
 	}
 
 	/**

@@ -229,9 +229,9 @@ export class ReceiverReportPacket extends RtcpPacket
 	 */
 	clone(buffer?: ArrayBuffer, byteOffset?: number): ReceiverReportPacket
 	{
-		const destPacketView = this.cloneInternal(buffer, byteOffset);
+		const packetView = this.cloneInternal(buffer, byteOffset);
 
-		return new ReceiverReportPacket(destPacketView);
+		return new ReceiverReportPacket(packetView);
 	}
 
 	/**
