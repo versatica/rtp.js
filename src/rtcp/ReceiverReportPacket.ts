@@ -72,7 +72,7 @@ export class ReceiverReportPacket extends RtcpPacket
 
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP Receiver
-	 *   Report packet (with just the minimal fixed header) will be created.
+	 *   Report packet will be created.
 	 *
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP Receiver Report packet.

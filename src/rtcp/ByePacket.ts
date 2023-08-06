@@ -2,7 +2,8 @@ import {
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump,
-	getRtcpLength
+	getRtcpLength,
+	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
 import {
 	dataViewToString,
@@ -23,9 +24,6 @@ import {
  * (opt)  |     length    |               reason for leaving            ...
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
-
-// Common RTCP header length.
-const FIXED_HEADER_LENGTH = 4;
 
 /**
  * RTCP BYE packet info dump.
@@ -48,7 +46,7 @@ export class ByePacket extends RtcpPacket
 
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP BYE
-	 *   packet (with just the minimal fixed header) will be created.
+	 *   packet will be created.
 	 *
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP BYE packet.
@@ -59,7 +57,7 @@ export class ByePacket extends RtcpPacket
 
 		if (!this.packetView)
 		{
-			this.packetView = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
+			this.packetView = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
 
 			// Write version and packet type.
 			this.writeCommonHeader();
@@ -71,7 +69,7 @@ export class ByePacket extends RtcpPacket
 		let pos = 0;
 
 		// Move to SSRC/CSRC field(s).
-		pos += FIXED_HEADER_LENGTH;
+		pos += COMMON_HEADER_LENGTH;
 
 		let count = this.getCount();
 
@@ -132,7 +130,7 @@ export class ByePacket extends RtcpPacket
 	 */
 	getByteLength(): number
 	{
-		let packetLength = FIXED_HEADER_LENGTH + (this.#ssrcs.length * 4);
+		let packetLength = COMMON_HEADER_LENGTH + (this.#ssrcs.length * 4);
 
 		if (this.#reason)
 		{
@@ -158,7 +156,7 @@ export class ByePacket extends RtcpPacket
 		let pos = 0;
 
 		// Move to SSRCs/CSRCs.
-		pos += FIXED_HEADER_LENGTH;
+		pos += COMMON_HEADER_LENGTH;
 
 		// Write SSRCs/CSRCs.
 		for (const ssrc of this.#ssrcs)

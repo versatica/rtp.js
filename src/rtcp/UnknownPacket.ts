@@ -38,7 +38,7 @@ export class UnknownPacket extends RtcpPacket
 
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP unknown
-	 *   packet (with just the minimal common header) will be created.
+	 *   packet will be created.
 	 * @param packetType - If `view` is not given, this parameter must be given.
 	 *
 	 * @throws

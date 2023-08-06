@@ -76,7 +76,7 @@ export class SenderReportPacket extends RtcpPacket
 
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP Sender
-	 *   Report packet (with just the minimal fixed header) will be created.
+	 *   Report packet will be created.
 	 *
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP Sender Report packet.
