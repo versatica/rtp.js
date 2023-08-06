@@ -321,7 +321,7 @@ export class ReceiverReport
 	}
 
 	/**
-	 * Dump ReceiverReport info.
+	 * Dump Receiver Report info.
 	 */
 	dump(): ReceiverReportDump
 	{
