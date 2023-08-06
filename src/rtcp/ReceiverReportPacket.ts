@@ -2,7 +2,6 @@ import {
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump,
-	getRtcpPacketType,
 	getRtcpLength,
 	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
@@ -90,17 +89,6 @@ export class ReceiverReportPacket extends RtcpPacket
 			this.writeCommonHeader();
 
 			return;
-		}
-
-		if (getRtcpPacketType(this.packetView) !== RtcpPacketType.RR)
-		{
-			throw new TypeError('not a RTCP Receiver Report packet');
-		}
-		else if (getRtcpLength(this.packetView) !== this.packetView.byteLength)
-		{
-			throw new RangeError(
-				`length in the RTCP header (${getRtcpLength(this.packetView)} bytes) does not match view length (${this.packetView.byteLength} bytes)`
-			);
 		}
 
 		// Position relative to the DataView byte offset.

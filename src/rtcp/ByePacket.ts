@@ -2,7 +2,6 @@ import {
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump,
-	getRtcpPacketType,
 	getRtcpLength
 } from './RtcpPacket';
 import {
@@ -29,7 +28,7 @@ import {
 const FIXED_HEADER_LENGTH = 4;
 
 /**
- * RTCP Bye packet info dump.
+ * RTCP BYE packet info dump.
  */
 export type ByePacketDump = RtcpPacketDump &
 {
@@ -38,7 +37,7 @@ export type ByePacketDump = RtcpPacketDump &
 };
 
 /**
- * RTCP Bye packet.
+ * RTCP BYE packet.
  */
 export class ByePacket extends RtcpPacket
 {
@@ -48,11 +47,11 @@ export class ByePacket extends RtcpPacket
 	#reason?: string;
 
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTCP Bye
+	 * @param view - If given it will be parsed. Otherwise an empty RTCP BYE
 	 *   packet (with just the minimal fixed header) will be created.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid RTCP Bye packet.
+	 * - If given `view` does not contain a valid RTCP BYE packet.
 	 */
 	constructor(view?: DataView)
 	{
@@ -66,17 +65,6 @@ export class ByePacket extends RtcpPacket
 			this.writeCommonHeader();
 
 			return;
-		}
-
-		if (getRtcpPacketType(this.packetView) !== RtcpPacketType.BYE)
-		{
-			throw new TypeError('not a RTCP Bye packet');
-		}
-		else if (getRtcpLength(this.packetView) !== this.packetView.byteLength)
-		{
-			throw new RangeError(
-				`length in the RTCP header (${getRtcpLength(this.packetView)} bytes) does not match view length (${this.packetView.byteLength} bytes)`
-			);
 		}
 
 		// Position relative to the DataView byte offset.
@@ -128,7 +116,7 @@ export class ByePacket extends RtcpPacket
 	}
 
 	/**
-	 * Dump RTCP Bye packet info.
+	 * Dump RTCP BYE packet info.
 	 */
 	dump(): ByePacketDump
 	{

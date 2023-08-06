@@ -39,6 +39,7 @@ export class UnknownPacket extends RtcpPacket
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP unknown
 	 *   packet (with just the minimal common header) will be created.
+	 * @param packetType - If `view` is not given, this parameter must be given.
 	 *
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP unknown packet.
@@ -67,13 +68,6 @@ export class UnknownPacket extends RtcpPacket
 			);
 
 			return;
-		}
-
-		if (getRtcpLength(this.packetView) !== this.packetView.byteLength)
-		{
-			throw new RangeError(
-				`length in the RTCP header (${getRtcpLength(this.packetView)} bytes) does not match view length (${this.packetView.byteLength} bytes)`
-			);
 		}
 
 		// Position relative to the DataView byte offset.

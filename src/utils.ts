@@ -38,6 +38,12 @@ export function clone<T>(data: T): T
 	}
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function assertUnreachable(_x: never): never
+{
+	throw new Error('we should not get here');
+}
+
 /**
  * Returns the given size padded to 4 bytes.
  */

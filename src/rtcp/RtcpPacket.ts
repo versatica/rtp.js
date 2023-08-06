@@ -1,5 +1,6 @@
 import { RTP_VERSION, Packet, PacketDump } from '../Packet';
 import { readBits, writeBits } from '../bitOps';
+import { assertUnreachable } from '../utils';
 
 /**
  *         0                   1                   2                   3
@@ -104,6 +105,57 @@ function setRtcpLength(view: DataView, byteLength: number): void
 	view.setUint16(2, length);
 }
 
+function packetTypeToString(packetType: RtcpPacketType): string
+{
+	switch (packetType)
+	{
+		case RtcpPacketType.SR:
+		{
+			return 'Sender Report';
+		}
+
+		case RtcpPacketType.RR:
+		{
+			return 'Receiver Report';
+		}
+
+		case RtcpPacketType.SDES:
+		{
+			return 'SDES';
+		}
+
+		case RtcpPacketType.BYE:
+		{
+			return 'BYE';
+		}
+
+		case RtcpPacketType.APP:
+		{
+			return 'APP';
+		}
+
+		case RtcpPacketType.RTPFB:
+		{
+			return 'RTP Feedback';
+		}
+
+		case RtcpPacketType.PSFB:
+		{
+			return 'PS Feedback';
+		}
+
+		case RtcpPacketType.XR:
+		{
+			return 'Extended Report';
+		}
+
+		default:
+		{
+			assertUnreachable(packetType);
+		}
+	}
+}
+
 /**
  * Parent class of all RTCP packets.
  */
@@ -124,12 +176,21 @@ export abstract class RtcpPacket extends Packet
 			{
 				throw new TypeError('not a RTCP packet');
 			}
-
 			// RTCP packet byte length must be multiple of 4.
-			if (this.packetView.byteLength % 4 !== 0)
+			else if (this.packetView.byteLength % 4 !== 0)
 			{
 				throw new RangeError(
 					`RTCP packet byte length must be multiple of 4 but given buffer view is ${this.packetView.byteLength} bytes`
+				);
+			}
+			else if (getRtcpPacketType(this.packetView) !== packetType)
+			{
+				throw new TypeError(`not a RTCP ${packetTypeToString(packetType)} packet`);
+			}
+			else if (getRtcpLength(this.packetView) !== this.packetView.byteLength)
+			{
+				throw new RangeError(
+					`length in the RTCP header (${getRtcpLength(this.packetView)} bytes) does not match view length (${this.packetView.byteLength} bytes)`
 				);
 			}
 
