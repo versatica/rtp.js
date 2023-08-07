@@ -347,11 +347,17 @@ export class ReceiverReport extends Serializable
 		};
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	getByteLength(): number
 	{
 		return RECEIVER_REPORT_LENGTH;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	serialize(): void
 	{
 		// Nothing to do.

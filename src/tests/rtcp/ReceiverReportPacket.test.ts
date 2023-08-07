@@ -139,11 +139,13 @@ describe('parse RTCP Receiver Report packet', () =>
 		// If a change is done in a Receiver Report, the Receiver Report packet must
 		// need serialization.
 		reportB.setDelaySinceLastSR(6);
+		expect(report.needsSerialization()).toBe(true);
 		expect(packet.needsSerialization()).toBe(true);
 
 		// And if we serialize the packet, it should unset the serialization needed
 		// flag.
 		packet.serialize();
+		expect(report.needsSerialization()).toBe(false);
 		expect(packet.needsSerialization()).toBe(false);
 	});
 
@@ -281,7 +283,7 @@ describe('parse RTCP Receiver Report', () =>
 	{
 		const report = new ReceiverReport(view);
 
-		expect(report).toBeDefined();
+		expect(report.needsSerialization()).toBe(false);
 
 		checkReceiverReport(report, reportData1);
 	});
@@ -301,8 +303,7 @@ describe('create RTCP Receiver Report', () =>
 	{
 		const report = new ReceiverReport();
 
-		expect(report).toBeDefined();
-
+		expect(report.needsSerialization()).toBe(false);
 		report.setSsrc(reportData1.ssrc);
 		report.setFractionLost(reportData1.fractionLost);
 		report.setTotalLost(reportData1.totalLost);
@@ -310,8 +311,12 @@ describe('create RTCP Receiver Report', () =>
 		report.setJitter(reportData1.jitter);
 		report.setLastSRTimestamp(reportData1.lsr);
 		report.setDelaySinceLastSR(reportData1.dlsr);
+		expect(report.needsSerialization()).toBe(true);
 
 		checkReceiverReport(report, reportData1);
+
+		report.serialize();
+		expect(report.needsSerialization()).toBe(false);
 	});
 });
 

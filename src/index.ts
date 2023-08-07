@@ -1,4 +1,6 @@
 export {
+	// NOTE: We need to export Serializable, otherwise TypeDoc doesn't document
+	// inherited methods.
 	Serializable,
 	WillSerializeEvent
 } from './Serializable';

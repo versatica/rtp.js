@@ -103,11 +103,13 @@ describe('parse RTCP Sender Report packet', () =>
 		// If a change is done in a Receiver Report, the Receiver Report packet must
 		// need serialization.
 		report1B.setDelaySinceLastSR(6);
+		expect(report1B.needsSerialization()).toBe(true);
 		expect(packet.needsSerialization()).toBe(true);
 
 		// And if we serialize the packet, it should unset the serialization needed
 		// flag.
 		packet.serialize();
+		expect(report1B.needsSerialization()).toBe(false);
 		expect(packet.needsSerialization()).toBe(false);
 	});
 

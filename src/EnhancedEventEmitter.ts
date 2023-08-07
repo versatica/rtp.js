@@ -9,7 +9,7 @@ type Events = Record<string, any[]>;
  * TODO: Problem is that static members/methods of EventEmitter class are shown
  *   in all RTP and RTCP classes despite parent class Packet uses @noInheritDoc.
  *   Issue: https://github.com/jonchardy/typedoc-plugin-no-inherit/issues/33
- *   So we override all those members with no inline doc to make Typedoc not
+ *   So we override all those members with no inline doc to make TypeDoc not
  *   show them.
  */
 export class EnhancedEventEmitter<E extends Events = Events> extends EventEmitter
