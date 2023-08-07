@@ -151,17 +151,6 @@ export class SenderReportPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	needsSerialization(): boolean
-	{
-		return (
-			super.needsSerialization() ||
-			this.#reports.some((report) => report.isModified())
-		);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
 	getByteLength(): number
 	{
 		const packetLength =
@@ -170,6 +159,17 @@ export class SenderReportPacket extends RtcpPacket
 			this.padding;
 
 		return packetLength;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	needsSerialization(): boolean
+	{
+		return (
+			super.needsSerialization() ||
+			this.#reports.some((report) => report.isModified())
+		);
 	}
 
 	/**
