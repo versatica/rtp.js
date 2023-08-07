@@ -68,6 +68,8 @@ export type SenderReportPacketDump = RtcpPacketDump &
 
 /**
  * RTCP Sender Report packet.
+ *
+ * @emits will-serialize - {@link WillSerializeEvent}
  */
 export class SenderReportPacket extends RtcpPacket
 {
@@ -85,9 +87,9 @@ export class SenderReportPacket extends RtcpPacket
 	{
 		super(RtcpPacketType.SR, view);
 
-		if (!this.packetView)
+		if (!this.view)
 		{
-			this.packetView = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
+			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
 			// Write version and packet type.
 			this.writeCommonHeader();
@@ -106,8 +108,8 @@ export class SenderReportPacket extends RtcpPacket
 		while (count-- > 0)
 		{
 			const reportView = new DataView(
-				this.packetView.buffer,
-				this.packetView.byteOffset
+				this.view.buffer,
+				this.view.byteOffset
 					+ FIXED_HEADER_LENGTH
 					+ (this.#reports.length * RECEIVER_REPORT_LENGTH),
 				RECEIVER_REPORT_LENGTH
@@ -123,10 +125,10 @@ export class SenderReportPacket extends RtcpPacket
 		pos += this.padding;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.packetView.byteLength)
+		if (pos !== this.view.byteLength)
 		{
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.packetView.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -193,8 +195,8 @@ export class SenderReportPacket extends RtcpPacket
 		// Copy the rest of the fixed header into the new buffer.
 		packetUint8Array.set(
 			new Uint8Array(
-				this.packetView.buffer,
-				this.packetView.byteOffset + pos,
+				this.view.buffer,
+				this.view.byteOffset + pos,
 				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH
 			),
 			pos
@@ -239,7 +241,7 @@ export class SenderReportPacket extends RtcpPacket
 		}
 
 		// Update DataView.
-		this.packetView = packetView;
+		this.view = packetView;
 
 		this.setSerializationNeeded(false);
 	}
@@ -259,7 +261,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	getSsrc(): number
 	{
-		return this.packetView.getUint32(4);
+		return this.view.getUint32(4);
 	}
 
 	/**
@@ -267,7 +269,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	setSsrc(ssrc: number)
 	{
-		this.packetView.setUint32(4, ssrc);
+		this.view.setUint32(4, ssrc);
 	}
 
 	/**
@@ -275,7 +277,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	getNtpSeconds(): number
 	{
-		return this.packetView.getUint32(8);
+		return this.view.getUint32(8);
 	}
 
 	/**
@@ -283,7 +285,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	setNtpSeconds(seconds: number): void
 	{
-		this.packetView.setUint32(8, seconds);
+		this.view.setUint32(8, seconds);
 	}
 
 	/**
@@ -291,7 +293,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	getNtpFraction(): number
 	{
-		return this.packetView.getUint32(12);
+		return this.view.getUint32(12);
 	}
 
 	/**
@@ -299,7 +301,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	setNtpFraction(fraction: number): void
 	{
-		this.packetView.setUint32(12, fraction);
+		this.view.setUint32(12, fraction);
 	}
 
 	/**
@@ -307,7 +309,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	getRtpTimestamp(): number
 	{
-		return this.packetView.getUint32(16);
+		return this.view.getUint32(16);
 	}
 
 	/**
@@ -315,7 +317,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	setRtpTimestamp(timestamp: number): void
 	{
-		this.packetView.setUint32(16, timestamp);
+		this.view.setUint32(16, timestamp);
 	}
 
 	/**
@@ -323,7 +325,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	getPacketCount(): number
 	{
-		return this.packetView.getUint32(20);
+		return this.view.getUint32(20);
 	}
 
 	/**
@@ -331,7 +333,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	setPacketCount(count: number): void
 	{
-		this.packetView.setUint32(20, count);
+		this.view.setUint32(20, count);
 	}
 
 	/**
@@ -339,7 +341,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	getOctetCount(): number
 	{
-		return this.packetView.getUint32(24);
+		return this.view.getUint32(24);
 	}
 
 	/**
@@ -347,7 +349,7 @@ export class SenderReportPacket extends RtcpPacket
 	 */
 	setOctetCount(count: number): void
 	{
-		this.packetView.setUint32(24, count);
+		this.view.setUint32(24, count);
 	}
 
 	/**

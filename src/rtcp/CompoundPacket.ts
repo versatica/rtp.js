@@ -22,6 +22,8 @@ export type CompoundPacketDump = PacketDump &
 
 /**
  * RTCP Compound packet.
+ *
+ * @emits will-serialize - {@link WillSerializeEvent}
  */
 export class CompoundPacket extends Packet
 {
@@ -39,14 +41,14 @@ export class CompoundPacket extends Packet
 	{
 		super(view);
 
-		if (this.packetView && !isRtcp(this.packetView))
+		if (this.view && !isRtcp(this.view))
 		{
 			throw new TypeError('not a RTCP compound packet');
 		}
 
-		if (!this.packetView)
+		if (!this.view)
 		{
-			this.packetView = new DataView(new ArrayBuffer(0));
+			this.view = new DataView(new ArrayBuffer(0));
 
 			return;
 		}
@@ -55,20 +57,20 @@ export class CompoundPacket extends Packet
 		let pos = 0;
 
 		// Parse all RTCP packets.
-		while (pos < this.packetView.byteLength)
+		while (pos < this.view.byteLength)
 		{
 			const remainingView = new DataView(
-				this.packetView.buffer,
-				this.packetView.byteOffset + pos,
-				this.packetView.byteLength - pos
+				this.view.buffer,
+				this.view.byteOffset + pos,
+				this.view.byteLength - pos
 			);
 
 			const packetType = getRtcpPacketType(remainingView);
 			const packetLength = getRtcpLength(remainingView);
 
 			const packetView = new DataView(
-				this.packetView.buffer,
-				this.packetView.byteOffset + pos,
+				this.view.buffer,
+				this.view.byteOffset + pos,
 				packetLength
 			);
 
@@ -112,10 +114,10 @@ export class CompoundPacket extends Packet
 		}
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.packetView.byteLength)
+		if (pos !== this.view.byteLength)
 		{
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.packetView.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -211,7 +213,7 @@ export class CompoundPacket extends Packet
 		}
 
 		// Update DataView.
-		this.packetView = packetView;
+		this.view = packetView;
 
 		this.setSerializationNeeded(false);
 	}

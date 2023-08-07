@@ -38,6 +38,8 @@ export function isRtp(view: DataView): boolean
 
 /**
  * RTP packet.
+ *
+ * @emits will-serialize - {@link WillSerializeEvent}
  */
 export class RtpPacket extends Packet
 {
@@ -64,24 +66,24 @@ export class RtpPacket extends Packet
 	{
 		super(view);
 
-		if (!this.packetView)
+		if (!this.view)
 		{
-			this.packetView = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
+			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
 			// Set version.
 			this.setVersion();
 
 			// Set empty payload.
 			this.#payloadView = new DataView(
-				this.packetView.buffer,
-				this.packetView.byteOffset + FIXED_HEADER_LENGTH,
+				this.view.buffer,
+				this.view.byteOffset + FIXED_HEADER_LENGTH,
 				0
 			);
 
 			return;
 		}
 
-		if (!isRtp(this.packetView))
+		if (!isRtp(this.view))
 		{
 			throw new TypeError('not a RTP packet');
 		}
@@ -96,7 +98,7 @@ export class RtpPacket extends Packet
 
 		while (csrcCount-- > 0)
 		{
-			const csrc = this.packetView.getUint32(pos);
+			const csrc = this.view.getUint32(pos);
 
 			this.#csrcs.push(csrc);
 
@@ -111,17 +113,17 @@ export class RtpPacket extends Packet
 		if (hasHeaderExtension)
 		{
 			// NOTE: This will throw RangeError if there is no space in the buffer.
-			this.#headerExtensionId = this.packetView.getUint16(pos);
+			this.#headerExtensionId = this.view.getUint16(pos);
 
 			pos += 2;
 
-			const headerExtensionLength = this.packetView.getUint16(pos) * 4;
+			const headerExtensionLength = this.view.getUint16(pos) * 4;
 
 			pos += 2;
 
 			headerExtensionView = new DataView(
-				this.packetView.buffer,
-				this.packetView.byteOffset + pos,
+				this.view.buffer,
+				this.view.byteOffset + pos,
 				headerExtensionLength
 			);
 
@@ -248,32 +250,32 @@ export class RtpPacket extends Packet
 		if (this.hasPaddingBit())
 		{
 			// NOTE: This will throw RangeError if there is no space in the view.
-			this.padding = this.packetView.getUint8(this.packetView.byteLength - 1);
+			this.padding = this.view.getUint8(this.view.byteLength - 1);
 		}
 
 		// Get payload.
-		const payloadLength = this.packetView.byteLength - pos - this.padding;
+		const payloadLength = this.view.byteLength - pos - this.padding;
 
 		if (payloadLength < 0)
 		{
 			throw new RangeError(
-				`announced padding (${this.padding} bytes) is bigger than available space for payload (${this.packetView.byteLength - pos} bytes)`
+				`announced padding (${this.padding} bytes) is bigger than available space for payload (${this.view.byteLength - pos} bytes)`
 			);
 		}
 
 		this.#payloadView = new DataView(
-			this.packetView.buffer,
-			this.packetView.byteOffset + pos,
+			this.view.buffer,
+			this.view.byteOffset + pos,
 			payloadLength
 		);
 
 		pos += (payloadLength + this.padding);
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.packetView.byteLength)
+		if (pos !== this.view.byteLength)
 		{
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.packetView.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -393,8 +395,8 @@ export class RtpPacket extends Packet
 		// Copy the fixed header into the new buffer.
 		packetUint8Array.set(
 			new Uint8Array(
-				this.packetView.buffer,
-				this.packetView.byteOffset,
+				this.view.buffer,
+				this.view.byteOffset,
 				FIXED_HEADER_LENGTH
 			),
 			0
@@ -604,7 +606,7 @@ export class RtpPacket extends Packet
 		}
 
 		// Update DataView.
-		this.packetView = packetView;
+		this.view = packetView;
 
 		// Update payload DataView.
 		this.#payloadView = payloadView;
@@ -627,7 +629,7 @@ export class RtpPacket extends Packet
 	 */
 	getPayloadType(): number
 	{
-		return readBits({ view: this.packetView, byte: 1, mask: 0b01111111 });
+		return readBits({ view: this.view, byte: 1, mask: 0b01111111 });
 	}
 
 	/**
@@ -636,7 +638,7 @@ export class RtpPacket extends Packet
 	setPayloadType(payloadType: number): void
 	{
 		writeBits(
-			{ view: this.packetView, byte: 1, mask: 0b01111111, value: payloadType }
+			{ view: this.view, byte: 1, mask: 0b01111111, value: payloadType }
 		);
 	}
 
@@ -645,7 +647,7 @@ export class RtpPacket extends Packet
 	 */
 	getSequenceNumber(): number
 	{
-		return this.packetView.getUint16(2);
+		return this.view.getUint16(2);
 	}
 
 	/**
@@ -653,7 +655,7 @@ export class RtpPacket extends Packet
 	 */
 	setSequenceNumber(sequenceNumber: number): void
 	{
-		this.packetView.setUint16(2, sequenceNumber);
+		this.view.setUint16(2, sequenceNumber);
 	}
 
 	/**
@@ -661,7 +663,7 @@ export class RtpPacket extends Packet
 	 */
 	getTimestamp(): number
 	{
-		return this.packetView.getUint32(4);
+		return this.view.getUint32(4);
 	}
 
 	/**
@@ -669,7 +671,7 @@ export class RtpPacket extends Packet
 	 */
 	setTimestamp(timestamp: number): void
 	{
-		this.packetView.setUint32(4, timestamp);
+		this.view.setUint32(4, timestamp);
 	}
 
 	/**
@@ -677,7 +679,7 @@ export class RtpPacket extends Packet
 	 */
 	getSsrc(): number
 	{
-		return this.packetView.getUint32(8);
+		return this.view.getUint32(8);
 	}
 
 	/**
@@ -685,7 +687,7 @@ export class RtpPacket extends Packet
 	 */
 	setSsrc(ssrc: number): void
 	{
-		this.packetView.setUint32(8, ssrc);
+		this.view.setUint32(8, ssrc);
 	}
 
 	/**
@@ -718,7 +720,7 @@ export class RtpPacket extends Packet
 	 */
 	getMarker(): boolean
 	{
-		return readBit({ view: this.packetView, byte: 1, bit: 7 });
+		return readBit({ view: this.view, byte: 1, bit: 7 });
 	}
 
 	/**
@@ -726,7 +728,7 @@ export class RtpPacket extends Packet
 	 */
 	setMarker(flag: boolean): void
 	{
-		writeBit({ view: this.packetView, byte: 1, bit: 7, flag });
+		writeBit({ view: this.view, byte: 1, bit: 7, flag });
 	}
 
 	/**
@@ -991,21 +993,21 @@ export class RtpPacket extends Packet
 
 	private hasHeaderExtensionBit(): boolean
 	{
-		return readBit({ view: this.packetView, byte: 0, bit: 4 });
+		return readBit({ view: this.view, byte: 0, bit: 4 });
 	}
 
 	private setHeaderExtensionBit(flag: boolean): void
 	{
-		writeBit({ view: this.packetView, byte: 0, bit: 4, flag });
+		writeBit({ view: this.view, byte: 0, bit: 4, flag });
 	}
 
 	private getCsrcCount(): number
 	{
-		return this.packetView.getUint8(0) & 0x0F;
+		return this.view.getUint8(0) & 0x0F;
 	}
 
 	private setCsrcCount(count: number): void
 	{
-		writeBits({ view: this.packetView, byte: 0, mask: 0b00001111, value: count });
+		writeBits({ view: this.view, byte: 0, mask: 0b00001111, value: count });
 	}
 }

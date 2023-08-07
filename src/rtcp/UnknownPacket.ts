@@ -30,6 +30,8 @@ export type UnknownPacketDump = RtcpPacketDump &
 
 /**
  * RTCP unknown packet.
+ *
+ * @emits will-serialize - {@link WillSerializeEvent}
  */
 export class UnknownPacket extends RtcpPacket
 {
@@ -53,17 +55,17 @@ export class UnknownPacket extends RtcpPacket
 			throw new TypeError('view or packetType must be given');
 		}
 
-		if (!this.packetView)
+		if (!this.view)
 		{
-			this.packetView = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
+			this.view = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
 
 			// Write version and packet type.
 			this.writeCommonHeader();
 
 			// Set empty body.
 			this.#bodyView = new DataView(
-				this.packetView.buffer,
-				this.packetView.byteOffset + COMMON_HEADER_LENGTH,
+				this.view.buffer,
+				this.view.byteOffset + COMMON_HEADER_LENGTH,
 				0
 			);
 
@@ -77,28 +79,28 @@ export class UnknownPacket extends RtcpPacket
 		pos += COMMON_HEADER_LENGTH;
 
 		// Get body.
-		const bodyLength = this.packetView.byteLength - pos - this.padding;
+		const bodyLength = this.view.byteLength - pos - this.padding;
 
 		if (bodyLength < 0)
 		{
 			throw new RangeError(
-				`announced padding (${this.padding} bytes) is bigger than available space for body (${this.packetView.byteLength - pos} bytes)`
+				`announced padding (${this.padding} bytes) is bigger than available space for body (${this.view.byteLength - pos} bytes)`
 			);
 		}
 
 		this.#bodyView = new DataView(
-			this.packetView.buffer,
-			this.packetView.byteOffset + pos,
+			this.view.buffer,
+			this.view.byteOffset + pos,
 			bodyLength
 		);
 
 		pos += (bodyLength + this.padding);
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.packetView.byteLength)
+		if (pos !== this.view.byteLength)
 		{
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.packetView.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -176,7 +178,7 @@ export class UnknownPacket extends RtcpPacket
 		}
 
 		// Update DataView.
-		this.packetView = packetView;
+		this.view = packetView;
 
 		this.setSerializationNeeded(false);
 	}
@@ -197,7 +199,7 @@ export class UnknownPacket extends RtcpPacket
 	setCount(count: number): void
 	{
 		writeBits(
-			{ view: this.packetView, byte: 0, mask: 0b00011111, value: count }
+			{ view: this.view, byte: 0, mask: 0b00011111, value: count }
 		);
 	}
 

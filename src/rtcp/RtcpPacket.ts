@@ -158,6 +158,8 @@ function packetTypeToString(packetType: RtcpPacketType): string
 
 /**
  * Parent class of all RTCP packets.
+ *
+ * @emits will-serialize - {@link WillSerializeEvent}
  */
 export abstract class RtcpPacket extends Packet
 {
@@ -170,34 +172,34 @@ export abstract class RtcpPacket extends Packet
 
 		this.#packetType = packetType;
 
-		if (this.packetView)
+		if (this.view)
 		{
-			if (!isRtcp(this.packetView))
+			if (!isRtcp(this.view))
 			{
 				throw new TypeError('not a RTCP packet');
 			}
 			// RTCP packet byte length must be multiple of 4.
-			else if (this.packetView.byteLength % 4 !== 0)
+			else if (this.view.byteLength % 4 !== 0)
 			{
 				throw new RangeError(
-					`RTCP packet byte length must be multiple of 4 but given buffer view is ${this.packetView.byteLength} bytes`
+					`RTCP packet byte length must be multiple of 4 but given buffer view is ${this.view.byteLength} bytes`
 				);
 			}
-			else if (getRtcpPacketType(this.packetView) !== packetType)
+			else if (getRtcpPacketType(this.view) !== packetType)
 			{
 				throw new TypeError(`not a RTCP ${packetTypeToString(packetType)} packet`);
 			}
-			else if (getRtcpLength(this.packetView) !== this.packetView.byteLength)
+			else if (getRtcpLength(this.view) !== this.view.byteLength)
 			{
 				throw new RangeError(
-					`length in the RTCP header (${getRtcpLength(this.packetView)} bytes) does not match view length (${this.packetView.byteLength} bytes)`
+					`length in the RTCP header (${getRtcpLength(this.view)} bytes) does not match view length (${this.view.byteLength} bytes)`
 				);
 			}
 
 			// Get padding.
 			if (this.hasPaddingBit())
 			{
-				this.padding = this.packetView.getUint8(this.packetView.byteLength - 1);
+				this.padding = this.view.getUint8(this.view.byteLength - 1);
 			}
 		}
 	}
@@ -222,7 +224,7 @@ export abstract class RtcpPacket extends Packet
 	 */
 	getPacketType(): RtcpPacketType
 	{
-		return this.packetView.getUint8(1);
+		return this.view.getUint8(1);
 	}
 
 	protected writeCommonHeader(): void
@@ -237,7 +239,7 @@ export abstract class RtcpPacket extends Packet
 	 */
 	getCount(): number
 	{
-		return readBits({ view: this.packetView, byte: 0, mask: 0b00011111 });
+		return readBits({ view: this.view, byte: 0, mask: 0b00011111 });
 	}
 
 	/**
@@ -246,7 +248,7 @@ export abstract class RtcpPacket extends Packet
 	protected setCount(count: number): void
 	{
 		writeBits(
-			{ view: this.packetView, byte: 0, mask: 0b00011111, value: count }
+			{ view: this.view, byte: 0, mask: 0b00011111, value: count }
 		);
 	}
 
@@ -269,8 +271,8 @@ export abstract class RtcpPacket extends Packet
 		// Copy the fixed header into the new buffer.
 		packetUint8Array.set(
 			new Uint8Array(
-				this.packetView.buffer,
-				this.packetView.byteOffset,
+				this.view.buffer,
+				this.view.byteOffset,
 				COMMON_HEADER_LENGTH
 			),
 			0
@@ -300,6 +302,6 @@ export abstract class RtcpPacket extends Packet
 	 */
 	private setPacketType(packetType: RtcpPacketType): void
 	{
-		this.packetView.setUint8(1, packetType);
+		this.view.setUint8(1, packetType);
 	}
 }

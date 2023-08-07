@@ -1,8 +1,11 @@
 export {
+	Serializable,
+	WillSerializeEvent
+} from './Serializable';
+
+export {
 	Packet,
-	PacketDump,
-	PacketEvents,
-	WillSerializePacketEvent
+	PacketDump
 } from './Packet';
 
 export {
