@@ -200,6 +200,9 @@ export class ReceiverReportPacket extends RtcpPacket
 		// Write Receiver Reports.
 		for (const report of this.#reports)
 		{
+			// NOTE: ReceiverReport class has fixed length so we don't need to deal
+			// with calls to serialize() on it.
+
 			const reportView = report.getView();
 
 			packetUint8Array.set(

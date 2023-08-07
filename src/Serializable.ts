@@ -10,8 +10,8 @@ import { EnhancedEventEmitter } from './EnhancedEventEmitter';
  *   be serialized.
  *
  * @remarks
- * - If given, the buffer byte length minus the given byte offset must be equal
- *   or higher than `length`.
+ * - If `callback` is called, the buffer byte length minus the given byte offset
+ *   must be equal or higher than `length`.
  *
  * @example
  * ```ts
@@ -135,7 +135,18 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 				`given buffer available space (${buffer.byteLength - byteOffset!} bytes) is less than content length (${length} bytes)`
 			);
 		}
-		else if (!buffer)
+		// If a buffer is given, ensure it's filled with zeroes.
+		else if (buffer)
+		{
+			const uint8Array = new Uint8Array(buffer, byteOffset!, length);
+
+			uint8Array.fill(
+				0,
+				uint8Array.byteOffset,
+				uint8Array.byteOffset + uint8Array.byteLength
+			);
+		}
+		else
 		{
 			buffer = new ArrayBuffer(length);
 			byteOffset = 0;

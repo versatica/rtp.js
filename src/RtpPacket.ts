@@ -587,9 +587,6 @@ export class RtpPacket extends Packet
 				);
 			}
 
-			// NOTE: No need to fill padding bytes with zeroes since ArrayBuffer
-			// constructor already fills all bytes with zero.
-
 			packetView.setUint8(pos + this.padding - 1, this.padding);
 
 			pos += this.padding;
