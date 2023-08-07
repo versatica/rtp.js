@@ -151,6 +151,17 @@ export class SenderReportPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
+	needsSerialization(): boolean
+	{
+		return (
+			super.needsSerialization() ||
+			this.#reports.some((report) => report.isModified())
+		);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	getByteLength(): number
 	{
 		const packetLength =
@@ -205,6 +216,9 @@ export class SenderReportPacket extends RtcpPacket
 				),
 				pos
 			);
+
+			// Mark the report as not modified.
+			report.setModified(false);
 
 			pos += RECEIVER_REPORT_LENGTH;
 		}

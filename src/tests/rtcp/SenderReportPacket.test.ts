@@ -99,6 +99,16 @@ describe('parse RTCP Sender Report packet', () =>
 		const report1B = packet.getReports()[0];
 
 		checkReceiverReport(report1B, reportData1);
+
+		// If a change is done in a Receiver Report, the Receiver Report packet must
+		// need serialization.
+		report1B.setDelaySinceLastSR(6);
+		expect(packet.needsSerialization()).toBe(true);
+
+		// And if we serialize the packet, it should unset the serialization needed
+		// flag.
+		packet.serialize();
+		expect(packet.needsSerialization()).toBe(false);
 	});
 
 	test('packet processing succeeds for a buffer view with padding', () =>

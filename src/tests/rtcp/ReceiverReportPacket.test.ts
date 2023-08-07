@@ -135,6 +135,16 @@ describe('parse RTCP Receiver Report packet', () =>
 		const reportB = packet.getReports()[0];
 
 		checkReceiverReport(reportB, reportData1);
+
+		// If a change is done in a Receiver Report, the Receiver Report packet must
+		// need serialization.
+		reportB.setDelaySinceLastSR(6);
+		expect(packet.needsSerialization()).toBe(true);
+
+		// And if we serialize the packet, it should unset the serialization needed
+		// flag.
+		packet.serialize();
+		expect(packet.needsSerialization()).toBe(false);
 	});
 
 	test('parsing a buffer view which length does not fit the indicated count throws', () =>

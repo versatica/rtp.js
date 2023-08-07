@@ -5,6 +5,7 @@ import {
 	getRtcpLength,
 	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
+import { RtcpPacketBlock } from './RtcpPacketBlock';
 
 /**
  *         0                   1                   2                   3
@@ -142,6 +143,17 @@ export class ReceiverReportPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
+	needsSerialization(): boolean
+	{
+		return (
+			super.needsSerialization() ||
+			this.#reports.some((report) => report.isModified())
+		);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	getByteLength(): number
 	{
 		const packetLength =
@@ -196,6 +208,9 @@ export class ReceiverReportPacket extends RtcpPacket
 				),
 				pos
 			);
+
+			// Mark the report as not modified.
+			report.setModified(false);
 
 			pos += RECEIVER_REPORT_LENGTH;
 		}
@@ -294,30 +309,27 @@ export class ReceiverReportPacket extends RtcpPacket
 /**
  * RTCP Receiver Report.
  */
-export class ReceiverReport
+export class ReceiverReport extends RtcpPacketBlock
 {
-	// Buffer view.
-	#view: DataView;
-
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP Receiver
 	 *   Report will be created.
 	 */
 	constructor(view?: DataView)
 	{
-		if (!view)
+		super(view);
+
+		if (!this.blockView)
 		{
-			this.#view = new DataView(new ArrayBuffer(RECEIVER_REPORT_LENGTH));
+			this.blockView = new DataView(new ArrayBuffer(RECEIVER_REPORT_LENGTH));
 
 			return;
 		}
 
-		if (view.byteLength !== RECEIVER_REPORT_LENGTH)
+		if (this.blockView.byteLength !== RECEIVER_REPORT_LENGTH)
 		{
 			throw new TypeError('wrong byte length for a RTCP Receiver Report');
 		}
-
-		this.#view = view;
 	}
 
 	/**
@@ -337,19 +349,11 @@ export class ReceiverReport
 	}
 
 	/**
-	 * Get a buffer view containing the serialized Receiver Report.
-	 */
-	getView(): DataView
-	{
-		return this.#view;
-	}
-
-	/**
 	 * Get receiver SSRC.
 	 */
 	getSsrc(): number
 	{
-		return this.#view.getUint32(0);
+		return this.blockView.getUint32(0);
 	}
 
 	/**
@@ -357,7 +361,9 @@ export class ReceiverReport
 	 */
 	setSsrc(ssrc: number): void
 	{
-		this.#view.setUint32(0, ssrc);
+		this.blockView.setUint32(0, ssrc);
+
+		this.setModified(true);
 	}
 
 	/**
@@ -365,7 +371,7 @@ export class ReceiverReport
 	 */
 	getFractionLost(): number
 	{
-		return this.#view.getUint8(4);
+		return this.blockView.getUint8(4);
 	}
 
 	/**
@@ -373,7 +379,9 @@ export class ReceiverReport
 	 */
 	setFractionLost(fractionLost: number): void
 	{
-		this.#view.setUint8(4, fractionLost);
+		this.blockView.setUint8(4, fractionLost);
+
+		this.setModified(true);
 	}
 
 	/**
@@ -381,7 +389,7 @@ export class ReceiverReport
 	 */
 	getTotalLost(): number
 	{
-		let value = this.#view.getUint32(4) & 0x0FFF;
+		let value = this.blockView.getUint32(4) & 0x0FFF;
 
 		// Possitive value.
 		if (((value >> 23) & 1) == 0)
@@ -413,10 +421,12 @@ export class ReceiverReport
 				: -totalLost;
 
 		const value = (totalLost >= 0) ? (clamp & 0x07FFFFF) : (clamp | 0x0800000);
-		const fractionLost = this.#view.getUint8(4);
+		const fractionLost = this.blockView.getUint8(4);
 
-		this.#view.setUint32(4, value);
-		this.#view.setUint8(4, fractionLost);
+		this.blockView.setUint32(4, value);
+		this.blockView.setUint8(4, fractionLost);
+
+		this.setModified(true);
 	}
 
 	/**
@@ -424,7 +434,7 @@ export class ReceiverReport
 	 */
 	getHighestSeqNumber(): number
 	{
-		return this.#view.getUint32(8);
+		return this.blockView.getUint32(8);
 	}
 
 	/**
@@ -432,7 +442,9 @@ export class ReceiverReport
 	 */
 	setHighestSeqNumber(seq: number): void
 	{
-		this.#view.setUint32(8, seq);
+		this.blockView.setUint32(8, seq);
+
+		this.setModified(true);
 	}
 
 	/**
@@ -440,7 +452,7 @@ export class ReceiverReport
 	 */
 	getJitter(): number
 	{
-		return this.#view.getUint32(12);
+		return this.blockView.getUint32(12);
 	}
 
 	/**
@@ -448,7 +460,9 @@ export class ReceiverReport
 	 */
 	setJitter(jitter: number)
 	{
-		this.#view.setUint32(12, jitter);
+		this.blockView.setUint32(12, jitter);
+
+		this.setModified(true);
 	}
 
 	/**
@@ -456,7 +470,7 @@ export class ReceiverReport
 	 */
 	getLastSRTimestamp(): number
 	{
-		return this.#view.getUint32(16);
+		return this.blockView.getUint32(16);
 	}
 
 	/**
@@ -464,7 +478,9 @@ export class ReceiverReport
 	 */
 	setLastSRTimestamp(lsr: number): void
 	{
-		this.#view.setUint32(16, lsr);
+		this.blockView.setUint32(16, lsr);
+
+		this.setModified(true);
 	}
 
 	/**
@@ -472,7 +488,7 @@ export class ReceiverReport
 	 */
 	getDelaySinceLastSR(): number
 	{
-		return this.#view.getUint32(20);
+		return this.blockView.getUint32(20);
 	}
 
 	/**
@@ -480,6 +496,8 @@ export class ReceiverReport
 	 */
 	setDelaySinceLastSR(dlsr: number): void
 	{
-		this.#view.setUint32(20, dlsr);
+		this.blockView.setUint32(20, dlsr);
+
+		this.setModified(true);
 	}
 }
