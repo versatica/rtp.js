@@ -168,7 +168,7 @@ export class SenderReportPacket extends RtcpPacket
 	{
 		return (
 			super.needsSerialization() ||
-			this.#reports.some((report) => report.isModified())
+			this.#reports.some((report) => report.needsSerialization())
 		);
 	}
 
@@ -216,9 +216,6 @@ export class SenderReportPacket extends RtcpPacket
 				),
 				pos
 			);
-
-			// Mark the report as not modified.
-			report.setModified(false);
 
 			pos += RECEIVER_REPORT_LENGTH;
 		}

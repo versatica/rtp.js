@@ -160,7 +160,7 @@ export class ReceiverReportPacket extends RtcpPacket
 	{
 		return (
 			super.needsSerialization() ||
-			this.#reports.some((report) => report.isModified())
+			this.#reports.some((report) => report.needsSerialization())
 		);
 	}
 
@@ -208,9 +208,6 @@ export class ReceiverReportPacket extends RtcpPacket
 				),
 				pos
 			);
-
-			// Mark the report as not modified.
-			report.setModified(false);
 
 			pos += RECEIVER_REPORT_LENGTH;
 		}
@@ -348,6 +345,18 @@ export class ReceiverReport extends RtcpPacketBlock
 		};
 	}
 
+	getByteLength(): number
+	{
+		return RECEIVER_REPORT_LENGTH;
+	}
+
+	serialize(): void
+	{
+		// Nothing to do.
+
+		this.setSerializationNeeded(false);
+	}
+
 	/**
 	 * Get receiver SSRC.
 	 */
@@ -363,7 +372,7 @@ export class ReceiverReport extends RtcpPacketBlock
 	{
 		this.blockView.setUint32(0, ssrc);
 
-		this.setModified(true);
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -381,7 +390,7 @@ export class ReceiverReport extends RtcpPacketBlock
 	{
 		this.blockView.setUint8(4, fractionLost);
 
-		this.setModified(true);
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -426,7 +435,7 @@ export class ReceiverReport extends RtcpPacketBlock
 		this.blockView.setUint32(4, value);
 		this.blockView.setUint8(4, fractionLost);
 
-		this.setModified(true);
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -444,7 +453,7 @@ export class ReceiverReport extends RtcpPacketBlock
 	{
 		this.blockView.setUint32(8, seq);
 
-		this.setModified(true);
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -462,7 +471,7 @@ export class ReceiverReport extends RtcpPacketBlock
 	{
 		this.blockView.setUint32(12, jitter);
 
-		this.setModified(true);
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -480,7 +489,7 @@ export class ReceiverReport extends RtcpPacketBlock
 	{
 		this.blockView.setUint32(16, lsr);
 
-		this.setModified(true);
+		this.setSerializationNeeded(true);
 	}
 
 	/**
@@ -498,6 +507,6 @@ export class ReceiverReport extends RtcpPacketBlock
 	{
 		this.blockView.setUint32(20, dlsr);
 
-		this.setModified(true);
+		this.setSerializationNeeded(true);
 	}
 }

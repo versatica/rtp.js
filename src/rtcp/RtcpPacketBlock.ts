@@ -3,8 +3,8 @@ export abstract class RtcpPacketBlock
 	// Buffer view holding the entire block.
 	// @ts-ignore ('blockView' has not initializer and is not assigned in constructor).
 	protected blockView: DataView;
-	// Whether the block has been modified.
-	#modified: boolean = false;
+	// Whether serialization is needed due to recent modifications.
+	#serializationNeeded: boolean = false;
 
 	protected constructor(view?: DataView)
 	{
@@ -16,21 +16,25 @@ export abstract class RtcpPacketBlock
 
 	getView(): DataView
 	{
+		if (this.needsSerialization())
+		{
+			this.serialize();
+		}
+
 		return this.blockView;
 	}
 
-	getByteLength(): number
+	abstract getByteLength(): number;
+
+	needsSerialization(): boolean
 	{
-		return this.blockView.byteLength;
+		return this.#serializationNeeded;
 	}
 
-	isModified(): boolean
-	{
-		return this.#modified;
-	}
+	abstract serialize(): void;
 
-	setModified(flag: boolean): void
+	setSerializationNeeded(flag: boolean): void
 	{
-		this.#modified = flag;
+		this.#serializationNeeded = flag;
 	}
 }
