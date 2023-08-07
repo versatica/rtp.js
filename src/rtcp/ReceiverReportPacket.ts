@@ -112,11 +112,11 @@ export class ReceiverReportPacket extends RtcpPacket
 				RECEIVER_REPORT_LENGTH
 			);
 
+			pos += RECEIVER_REPORT_LENGTH;
+
 			const report = new ReceiverReport(reportView);
 
 			this.#reports.push(report);
-
-			pos += RECEIVER_REPORT_LENGTH;
 		}
 
 		pos += this.padding;

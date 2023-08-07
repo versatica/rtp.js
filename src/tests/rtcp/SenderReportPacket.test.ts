@@ -6,7 +6,7 @@ import {
 import { isRtcp, RtcpPacketType } from '../../rtcp/RtcpPacket';
 import { areDataViewsEqual } from '../../utils';
 
-const reportData1: ReceiverReportDump =
+const receiverReportDump1: ReceiverReportDump =
 {
 	ssrc         : 0x01932db4,
 	fractionLost : 80,
@@ -77,7 +77,7 @@ describe('parse RTCP Sender Report packet', () =>
 
 		const report1 = packet.getReports()[0];
 
-		checkReceiverReport(report1, reportData1);
+		expect(report1.dump()).toEqual(receiverReportDump1);
 
 		// Also test the same after serializing.
 		packet.serialize();
@@ -98,7 +98,7 @@ describe('parse RTCP Sender Report packet', () =>
 
 		const report1B = packet.getReports()[0];
 
-		checkReceiverReport(report1B, reportData1);
+		expect(report1B.dump()).toEqual(receiverReportDump1);
 
 		// If a change is done in a Receiver Report, the Receiver Report packet must
 		// need serialization.
@@ -296,14 +296,3 @@ describe('create RTCP Sender Report packet', () =>
 		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(true);
 	});
 });
-
-function checkReceiverReport(report: ReceiverReport, data: ReceiverReportDump)
-{
-	expect(report.getSsrc()).toBe(data.ssrc);
-	expect(report.getFractionLost()).toBe(data.fractionLost);
-	expect(report.getTotalLost()).toBe(data.totalLost);
-	expect(report.getHighestSeqNumber()).toBe(data.highestSeq);
-	expect(report.getJitter()).toBe(data.jitter);
-	expect(report.getLastSRTimestamp()).toBe(data.lsr);
-	expect(report.getDelaySinceLastSR()).toBe(data.dlsr);
-}

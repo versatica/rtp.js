@@ -6,7 +6,7 @@ import {
 import { isRtcp, RtcpPacketType } from '../../rtcp/RtcpPacket';
 import { areDataViewsEqual, numericArrayToDataView } from '../../utils';
 
-const reportData1: ReceiverReportDump =
+const receiverReportDump1: ReceiverReportDump =
 {
 	ssrc         : 26422708,
 	fractionLost : 80,
@@ -17,7 +17,7 @@ const reportData1: ReceiverReportDump =
 	dlsr         : 5
 };
 
-const reportData2: ReceiverReportDump =
+const receiverReportDump2: ReceiverReportDump =
 {
 	ssrc         : 0x02932db4,
 	fractionLost : 81,
@@ -78,8 +78,8 @@ describe('parse RTCP Receiver Report packet', () =>
 		const report1 = packet.getReports()[0];
 		const report2 = packet.getReports()[1];
 
-		checkReceiverReport(report1, reportData1);
-		checkReceiverReport(report2, reportData2);
+		expect(report1.dump()).toEqual(receiverReportDump1);
+		expect(report2.dump()).toEqual(receiverReportDump2);
 	});
 
 	test('packet processing succeeds for a buffer view with padding', () =>
@@ -116,9 +116,9 @@ describe('parse RTCP Receiver Report packet', () =>
 		expect(packet.getSsrc()).toBe(0x5d931534);
 		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
 
-		const report = packet.getReports()[0];
+		const report1 = packet.getReports()[0];
 
-		checkReceiverReport(report, reportData1);
+		expect(report1.dump()).toEqual(receiverReportDump1);
 
 		// Also test the same after serializing.
 		packet.serialize();
@@ -132,20 +132,20 @@ describe('parse RTCP Receiver Report packet', () =>
 		expect(packet.getSsrc()).toBe(0x5d931534);
 		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
 
-		const reportB = packet.getReports()[0];
+		const report1B = packet.getReports()[0];
 
-		checkReceiverReport(reportB, reportData1);
+		expect(report1B.dump()).toEqual(receiverReportDump1);
 
 		// If a change is done in a Receiver Report, the Receiver Report packet must
 		// need serialization.
-		reportB.setDelaySinceLastSR(6);
-		expect(report.needsSerialization()).toBe(true);
+		report1B.setDelaySinceLastSR(6);
+		expect(report1B.needsSerialization()).toBe(true);
 		expect(packet.needsSerialization()).toBe(true);
 
 		// And if we serialize the packet, it should unset the serialization needed
 		// flag.
 		packet.serialize();
-		expect(report.needsSerialization()).toBe(false);
+		expect(report1B.needsSerialization()).toBe(false);
 		expect(packet.needsSerialization()).toBe(false);
 	});
 
@@ -284,8 +284,7 @@ describe('parse RTCP Receiver Report', () =>
 		const report = new ReceiverReport(view);
 
 		expect(report.needsSerialization()).toBe(false);
-
-		checkReceiverReport(report, reportData1);
+		expect(report.dump()).toEqual(receiverReportDump1);
 	});
 
 	test('parsing a buffer which length does not fit the report size throws', () =>
@@ -304,29 +303,17 @@ describe('create RTCP Receiver Report', () =>
 		const report = new ReceiverReport();
 
 		expect(report.needsSerialization()).toBe(false);
-		report.setSsrc(reportData1.ssrc);
-		report.setFractionLost(reportData1.fractionLost);
-		report.setTotalLost(reportData1.totalLost);
-		report.setHighestSeqNumber(reportData1.highestSeq);
-		report.setJitter(reportData1.jitter);
-		report.setLastSRTimestamp(reportData1.lsr);
-		report.setDelaySinceLastSR(reportData1.dlsr);
+		report.setSsrc(receiverReportDump1.ssrc);
+		report.setFractionLost(receiverReportDump1.fractionLost);
+		report.setTotalLost(receiverReportDump1.totalLost);
+		report.setHighestSeqNumber(receiverReportDump1.highestSeq);
+		report.setJitter(receiverReportDump1.jitter);
+		report.setLastSRTimestamp(receiverReportDump1.lsr);
+		report.setDelaySinceLastSR(receiverReportDump1.dlsr);
 		expect(report.needsSerialization()).toBe(true);
-
-		checkReceiverReport(report, reportData1);
+		expect(report.dump()).toEqual(receiverReportDump1);
 
 		report.serialize();
 		expect(report.needsSerialization()).toBe(false);
 	});
 });
-
-function checkReceiverReport(report: ReceiverReport, data: ReceiverReportDump)
-{
-	expect(report.getSsrc()).toBe(data.ssrc);
-	expect(report.getFractionLost()).toBe(data.fractionLost);
-	expect(report.getTotalLost()).toBe(data.totalLost);
-	expect(report.getHighestSeqNumber()).toBe(data.highestSeq);
-	expect(report.getJitter()).toBe(data.jitter);
-	expect(report.getLastSRTimestamp()).toBe(data.lsr);
-	expect(report.getDelaySinceLastSR()).toBe(data.dlsr);
-}

@@ -286,11 +286,11 @@ export class RtpPacket extends Packet
 	dump(): RtpPacketDump
 	{
 		const extensions = Array.from(this.#extensions)
-			.map(([ extId, view ]) =>
+			.map(([ extId, extView ]) =>
 			{
 				return {
 					id     : extId,
-					length : view.byteLength
+					length : extView.byteLength
 				};
 			});
 
@@ -785,7 +785,7 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Get the value of the given extension (RFC 5285).
+	 * Get the value of the extension with given `id` (RFC 5285).
 	 *
 	 * @param id - Extension id.
 	 */
@@ -803,7 +803,7 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Set the value of the extension (RFC 5285).
+	 * Set the value of the extension with given `id` (RFC 5285).
 	 *
 	 * @param id - Extension id.
 	 * @param value - Extension value.
@@ -831,7 +831,7 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Delete the given extension (RFC 5285).
+	 * Delete the extension with given `id` (RFC 5285).
 	 *
 	 * @param id - Extension id.
 	 *
