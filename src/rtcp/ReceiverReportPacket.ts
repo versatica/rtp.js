@@ -147,6 +147,11 @@ export class ReceiverReportPacket extends RtcpPacket
 	 */
 	getByteLength(): number
 	{
+		if (!this.needsSerialization())
+		{
+			return this.view.byteLength;
+		}
+
 		const packetLength =
 			FIXED_HEADER_LENGTH +
 			(this.#reports.length * RECEIVER_REPORT_LENGTH) +

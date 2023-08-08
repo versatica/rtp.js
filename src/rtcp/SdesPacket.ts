@@ -201,6 +201,11 @@ export class SdesPacket extends RtcpPacket
 	 */
 	getByteLength(): number
 	{
+		if (!this.needsSerialization())
+		{
+			return this.view.byteLength;
+		}
+
 		const packetLength =
 			COMMON_HEADER_LENGTH +
 			this.#chunks.reduce(

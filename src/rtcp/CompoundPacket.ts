@@ -146,6 +146,11 @@ export class CompoundPacket extends Packet
 	 */
 	getByteLength(): number
 	{
+		if (!this.needsSerialization())
+		{
+			return this.view.byteLength;
+		}
+
 		const packetLength = this.#packets.reduce(
 			(sum, packet) => sum + packet.getByteLength(),
 			0

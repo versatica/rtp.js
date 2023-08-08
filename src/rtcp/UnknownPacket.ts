@@ -120,6 +120,11 @@ export class UnknownPacket extends RtcpPacket
 	 */
 	getByteLength(): number
 	{
+		if (!this.needsSerialization())
+		{
+			return this.view.byteLength;
+		}
+
 		const packetLength =
 			COMMON_HEADER_LENGTH +
 			this.#bodyView.byteLength +
@@ -218,9 +223,11 @@ export class UnknownPacket extends RtcpPacket
 	{
 		this.#bodyView = view;
 
+		// We must set the flag first because padTo4Bytes() will call getByteLength()
+		// which needs that flag set in order to compute new length.
+		this.setSerializationNeeded(true);
+
 		// Ensure body is padded to 4 bytes.
 		this.padTo4Bytes();
-
-		this.setSerializationNeeded(true);
 	}
 }

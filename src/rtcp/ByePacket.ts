@@ -132,6 +132,11 @@ export class ByePacket extends RtcpPacket
 	 */
 	getByteLength(): number
 	{
+		if (!this.needsSerialization())
+		{
+			return this.view.byteLength;
+		}
+
 		let packetLength = COMMON_HEADER_LENGTH + (this.#ssrcs.length * 4);
 
 		if (this.#reason)

@@ -64,7 +64,7 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 	 * Get a buffer view containing the serialized conrent.
 	 *
 	 * @remarks
-	 * - The internal ArrayBuffer is serialized if needed (to apply pending
+	 * - The internal buffer is serialized if needed (to apply pending
 	 * 	 modifications).
 	 *
 	 * @throws
@@ -82,6 +82,10 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 
 	/**
 	 * Computes total length of the content (in bytes) including padding if any.
+	 *
+	 * @remarks
+	 * - This methods computes the effective byte length of the content if it was
+	 *   serialized at this moment, no matter modifications have been done before.
 	 */
 	abstract getByteLength(): number;
 

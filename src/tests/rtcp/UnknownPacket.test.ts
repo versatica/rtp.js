@@ -105,7 +105,7 @@ describe('create RTCP unknown packet', () =>
 			.toThrowError(TypeError);
 	});
 
-	test('creating a unknown packet with padding succeeds', () =>
+	test.only('creating a unknown packet with padding succeeds', () =>
 	{
 		const packet = new UnknownPacket(undefined, 199);
 
@@ -122,13 +122,15 @@ describe('create RTCP unknown packet', () =>
 		packet.setBody(numericArrayToDataView([ 1, 2, 3 ]));
 		// Byte length must be 4 + 3 (body) + 1 (padding) = 8.
 		expect(packet.getByteLength()).toBe(8);
+		expect(packet.getPadding()).toBe(1);
 
 		packet.setCount(5);
 		expect(packet.getCount()).toBe(5);
 
 		packet.padTo4Bytes();
 		// After padding to 4 bytes, nothing should change since the rest of the
-		// packet always fits into groups of 4 bytes.
+		// packet always fits into groups of 4 bytes (setBody() already called
+		// padTo4Bytes() internally).
 		expect(packet.getPadding()).toBe(1);
 		// Byte length must be 4 + 3 (body) + 1 (padding) = 8.
 		expect(packet.getByteLength()).toBe(8);
