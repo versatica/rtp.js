@@ -131,6 +131,7 @@ describe('create RTCP Bye packet', () =>
 		packet.setSsrcs([ ssrc1, ssrc2 ]);
 		// Byte length must be 4 + 8 (2 ssrcs) = 12.
 		expect(packet.getByteLength()).toBe(12);
+		expect(packet.needsSerialization()).toBe(true);
 
 		packet.setReason(reason);
 		// Byte length must be 4 + 8 + 24 (reason + reason padding) = 36.
