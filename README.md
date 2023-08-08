@@ -21,7 +21,8 @@ _NOTE:_ Work in progress. Many more RTCP packets will be added along with new fe
     ReceiverReportPacket,
     ReceiverReport,
     SenderReportPacket,
-    ByePacket
+    ByePacket,
+    SdesPacket
   } from 'rtp.js';
   ```
 * The main module also exports a `utils` module with some helpers and utilities. Example:

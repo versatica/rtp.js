@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>CompoundPacket | rtp.js - v0.5.2</title><meta name="description" content="Documentation for rtp.js"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><link rel="stylesheet" href="../assets/snw.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="search-script"></script></head><body><script>console.log('%cok'+'%c: Typedoc Loaded. TYPESCRIPT ON TOP', 'color:#00dd00;font-weight:bold;', 'color:black;')</script><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>SdesChunk | rtp.js - v0.5.2</title><meta name="description" content="Documentation for rtp.js"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><link rel="stylesheet" href="../assets/snw.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="search-script"></script></head><body><script>console.log('%cok'+'%c: Typedoc Loaded. TYPESCRIPT ON TOP', 'color:#00dd00;font-weight:bold;', 'color:black;')</script><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -24,22 +24,20 @@
 <div class="tsd-page-title">
 <ul class="tsd-breadcrumb">
 <li><a href="../modules.html">rtp.js</a></li>
-<li><a href="CompoundPacket.html">CompoundPacket</a></li></ul>
-<h1>Class CompoundPacket</h1></div>
+<li><a href="SdesChunk.html">SdesChunk</a></li></ul>
+<h1>Class SdesChunk</h1></div>
 <section class="tsd-panel tsd-comment">
-<div class="tsd-comment tsd-typography"><p>RTCP Compound packet.</p>
+<div class="tsd-comment tsd-typography"><p>SDES chunk.</p>
 </div>
-<div class="tsd-comment tsd-typography">
-<h4>Emits</h4><p>will-serialize - <a href="../types/WillSerializeEvent.html" class="tsd-kind-type-alias">WillSerializeEvent</a></p>
-</div></section>
+<div class="tsd-comment tsd-typography"></div></section>
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
-<li><a href="Packet.html" class="tsd-signature-type tsd-kind-class">Packet</a>
+<li><a href="Serializable.html" class="tsd-signature-type tsd-kind-class">Serializable</a>
 <ul class="tsd-hierarchy">
-<li><span class="target">CompoundPacket</span></li></ul></li></ul></section><aside class="tsd-sources">
+<li><span class="target">SdesChunk</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/CompoundPacket.ts#L29">rtcp/CompoundPacket.ts:29</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/SdesPacket.ts#L313">rtcp/SdesPacket.ts:313</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -47,113 +45,87 @@
 <div class="tsd-accordion-details">
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Constructors</h3>
-<div class="tsd-index-list"><a href="CompoundPacket.html#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-512"><rect fill="var(--color-icon-background)" stroke="#4D7FFF" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)"></path></g></svg><span>constructor</span></a>
+<div class="tsd-index-list"><a href="SdesChunk.html#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-512"><rect fill="var(--color-icon-background)" stroke="#4D7FFF" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)"></path></g></svg><span>constructor</span></a>
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Methods</h3>
-<div class="tsd-index-list"><a href="CompoundPacket.html#addPacket" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-2048"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)"></path></g></svg><span>add<wbr/>Packet</span></a>
-<a href="CompoundPacket.html#clone" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>clone</span></a>
-<a href="CompoundPacket.html#dump" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>dump</span></a>
-<a href="CompoundPacket.html#getByteLength" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Byte<wbr/>Length</span></a>
-<a href="CompoundPacket.html#getPackets" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Packets</span></a>
-<a href="CompoundPacket.html#getView" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>View</span></a>
-<a href="CompoundPacket.html#needsSerialization" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>needs<wbr/>Serialization</span></a>
-<a href="CompoundPacket.html#serialize" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>serialize</span></a>
-<a href="CompoundPacket.html#setPackets" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Packets</span></a>
+<div class="tsd-index-list"><a href="SdesChunk.html#clearItems" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-2048"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)"></path></g></svg><span>clear<wbr/>Items</span></a>
+<a href="SdesChunk.html#deleteItem" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>delete<wbr/>Item</span></a>
+<a href="SdesChunk.html#dump" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>dump</span></a>
+<a href="SdesChunk.html#getByteLength" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Byte<wbr/>Length</span></a>
+<a href="SdesChunk.html#getItem" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Item</span></a>
+<a href="SdesChunk.html#getItems" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Items</span></a>
+<a href="SdesChunk.html#getSsrc" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ssrc</span></a>
+<a href="SdesChunk.html#getView" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>View</span></a>
+<a href="SdesChunk.html#needsSerialization" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>needs<wbr/>Serialization</span></a>
+<a href="SdesChunk.html#serialize" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>serialize</span></a>
+<a href="SdesChunk.html#setItem" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Item</span></a>
+<a href="SdesChunk.html#setSsrc" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ssrc</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Constructors</h2>
 <section class="tsd-panel tsd-member"><a id="constructor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="constructor.new_CompoundPacket"><span class="tsd-kind-constructor-signature">new <wbr/>Compound<wbr/>Packet</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">view</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="CompoundPacket.html" class="tsd-signature-type tsd-kind-class">CompoundPacket</a><a href="#constructor.new_CompoundPacket" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_SdesChunk"><span class="tsd-kind-constructor-signature">new <wbr/>Sdes<wbr/>Chunk</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">view</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="SdesChunk.html" class="tsd-signature-type tsd-kind-class">SdesChunk</a><a href="#constructor.new_SdesChunk" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">view</span>: <span class="tsd-signature-type ">DataView</span></h5>
-<div class="tsd-comment tsd-typography"><p>If given it will be parsed. Otherwise an empty RTCP Compound
-  packet will be created.</p>
+<div class="tsd-comment tsd-typography"><p>If given it will be parsed. Otherwise an empty RTCP SDES
+  chunk will be created.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="CompoundPacket.html" class="tsd-signature-type tsd-kind-class">CompoundPacket</a></h4>
-<div class="tsd-comment tsd-typography">
-<h4>Throws</h4><ul>
-<li>If given <code>view</code> does not contain a valid RTCP Compound packet.</li>
-</ul>
-</div><aside class="tsd-sources">
-<p>Overrides Packet.constructor</p>
+<h4 class="tsd-returns-title">Returns <a href="SdesChunk.html" class="tsd-signature-type tsd-kind-class">SdesChunk</a></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<p>Overrides Serializable.constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/CompoundPacket.ts#L41">rtcp/CompoundPacket.ts:41</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/SdesPacket.ts#L322">rtcp/SdesPacket.ts:322</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
-<section class="tsd-panel tsd-member"><a id="addPacket" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>add<wbr/>Packet</span><a href="#addPacket" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<section class="tsd-panel tsd-member"><a id="clearItems" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>clear<wbr/>Items</span><a href="#clearItems" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="addPacket.addPacket-1"><span class="tsd-kind-call-signature">add<wbr/>Packet</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">packet</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#addPacket.addPacket-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="clearItems.clearItems-1"><span class="tsd-kind-call-signature">clear<wbr/>Items</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#clearItems.clearItems-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Add a new <a href="RtcpPacket.html" class="tsd-kind-class">RtcpPacket</a> at the end of this RTCP Compound packet.</p>
+<div class="tsd-comment tsd-typography"><p>Clear all items.</p>
 </div>
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5><span class="tsd-kind-parameter">packet</span>: <a href="RtcpPacket.html" class="tsd-signature-type tsd-kind-class">RtcpPacket</a></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/CompoundPacket.ts#L260">rtcp/CompoundPacket.ts:260</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="clone" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>clone</span><a href="#clone" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/SdesPacket.ts#L545">rtcp/SdesPacket.ts:545</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="deleteItem" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>delete<wbr/>Item</span><a href="#deleteItem" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="clone.clone-1"><span class="tsd-kind-call-signature">clone</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">buffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">byteOffset</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="CompoundPacket.html" class="tsd-signature-type tsd-kind-class">CompoundPacket</a><a href="#clone.clone-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="deleteItem.deleteItem-1"><span class="tsd-kind-call-signature">delete<wbr/>Item</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">type</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#deleteItem.deleteItem-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Clone the packet. The cloned packet does not share any memory with the
-original one.</p>
+<div class="tsd-comment tsd-typography"><p>Delete the item with given <code>type</code>.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">buffer</span>: <span class="tsd-signature-type ">ArrayBuffer</span></h5>
-<div class="tsd-comment tsd-typography"><p>Buffer in which the packet will be serialized. If not given,
-  a new one will internally allocated.</p>
-</div>
-<div class="tsd-comment tsd-typography"></div></li>
-<li>
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">byteOffset</span>: <span class="tsd-signature-type">number</span></h5>
-<div class="tsd-comment tsd-typography"><p>Byte offset of the given <code>buffer</code> when serialization must
-  be done.</p>
+<h5><span class="tsd-kind-parameter">type</span>: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Item type.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="CompoundPacket.html" class="tsd-signature-type tsd-kind-class">CompoundPacket</a></h4>
-<div class="tsd-comment tsd-typography">
-<h4>Remarks</h4><ul>
-<li>The buffer is serialized if needed (to apply packet pending modifications).</li>
-<li>Read the info dump type of each RTCP packet instead.</li>
-</ul>
-
-<h4>Throws</h4><ul>
-<li>If buffer serialization is needed and it fails due to invalid fields or if
-   <code>buffer</code> is given and it doesn&#39;t hold enough space serializing the packet.</li>
-</ul>
-</div><aside class="tsd-sources">
-<p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#clone">clone</a></p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/CompoundPacket.ts#L232">rtcp/CompoundPacket.ts:232</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/SdesPacket.ts#L532">rtcp/SdesPacket.ts:532</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="dump" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>dump</span><a href="#dump" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="dump.dump-1"><span class="tsd-kind-call-signature">dump</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/CompoundPacketDump.html" class="tsd-signature-type tsd-kind-type-alias">CompoundPacketDump</a><a href="#dump.dump-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="dump.dump-1"><span class="tsd-kind-call-signature">dump</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/SdesChunkDump.html" class="tsd-signature-type tsd-kind-type-alias">SdesChunkDump</a><a href="#dump.dump-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Dump RTCP Compound packet info.</p>
+<div class="tsd-comment tsd-typography"><p>Dump SDES chunk info.</p>
 </div>
-<h4 class="tsd-returns-title">Returns <a href="../types/CompoundPacketDump.html" class="tsd-signature-type tsd-kind-type-alias">CompoundPacketDump</a></h4>
+<h4 class="tsd-returns-title">Returns <a href="../types/SdesChunkDump.html" class="tsd-signature-type tsd-kind-type-alias">SdesChunkDump</a></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#dump">dump</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/CompoundPacket.ts#L136">rtcp/CompoundPacket.ts:136</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/SdesPacket.ts#L388">rtcp/SdesPacket.ts:388</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getByteLength" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Byte<wbr/>Length</span><a href="#getByteLength" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -163,20 +135,50 @@ original one.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#getByteLength">getByteLength</a></p>
+<p>Overrides <a href="Serializable.html">Serializable</a>.<a href="Serializable.html#getByteLength">getByteLength</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/CompoundPacket.ts#L147">rtcp/CompoundPacket.ts:147</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="getPackets" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>get<wbr/>Packets</span><a href="#getPackets" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/SdesPacket.ts#L408">rtcp/SdesPacket.ts:408</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getItem" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Item</span><a href="#getItem" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="getPackets.getPackets-1"><span class="tsd-kind-call-signature">get<wbr/>Packets</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="RtcpPacket.html" class="tsd-signature-type tsd-kind-class">RtcpPacket</a><span class="tsd-signature-symbol">[]</span><a href="#getPackets.getPackets-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="getItem.getItem-1"><span class="tsd-kind-call-signature">get<wbr/>Item</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">type</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><a href="#getItem.getItem-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Return the <a href="RtcpPacket.html" class="tsd-kind-class">RtcpPacket</a> entries in this RTCP Compound packet.</p>
+<div class="tsd-comment tsd-typography"><p>Get the value of the item with given <code>type</code>.</p>
 </div>
-<h4 class="tsd-returns-title">Returns <a href="RtcpPacket.html" class="tsd-signature-type tsd-kind-class">RtcpPacket</a><span class="tsd-signature-symbol">[]</span></h4>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">type</span>: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Item type.</p>
+</div>
+<div class="tsd-comment tsd-typography"></div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/CompoundPacket.ts#L242">rtcp/CompoundPacket.ts:242</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/SdesPacket.ts#L501">rtcp/SdesPacket.ts:501</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getItems" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Items</span><a href="#getItems" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="getItems.getItems-1"><span class="tsd-kind-call-signature">get<wbr/>Items</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><a href="#getItems.getItems-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get a map with all the items indexed by their type.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/SdesPacket.ts#L509">rtcp/SdesPacket.ts:509</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getSsrc" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Ssrc</span><a href="#getSsrc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="getSsrc.getSsrc-1"><span class="tsd-kind-call-signature">get<wbr/>Ssrc</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getSsrc.getSsrc-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get SDES chunk SSRC.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/SdesPacket.ts#L481">rtcp/SdesPacket.ts:481</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getView" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>View</span><a href="#getView" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -195,12 +197,12 @@ original one.</p>
 <li>If buffer serialization is needed and it fails due to invalid fields.</li>
 </ul>
 </div><aside class="tsd-sources">
-<p>Inherited from <a href="Packet.html">Packet</a>.<a href="Packet.html#getView">getView</a></p>
+<p>Inherited from <a href="Serializable.html">Serializable</a>.<a href="Serializable.html#getView">getView</a></p>
 <ul>
 <li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/Serializable.ts#L73">Serializable.ts:73</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="needsSerialization" class="tsd-anchor"></a>
+<section class="tsd-panel tsd-member tsd-is-inherited"><a id="needsSerialization" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>needs<wbr/>Serialization</span><a href="#needsSerialization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures">
+<ul class="tsd-signatures tsd-is-inherited">
 <li class="tsd-signature tsd-anchor-link" id="needsSerialization.needsSerialization-1"><span class="tsd-kind-call-signature">needs<wbr/>Serialization</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#needsSerialization.needsSerialization-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Whether <a href="Serializable.html#serialize" class="tsd-kind-method">serialize</a> should be called due to modifications not being
@@ -208,9 +210,9 @@ yet applied into the buffer.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#needsSerialization">needsSerialization</a></p>
+<p>Inherited from <a href="Serializable.html">Serializable</a>.<a href="Serializable.html#needsSerialization">needsSerialization</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/CompoundPacket.ts#L180">rtcp/CompoundPacket.ts:180</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/Serializable.ts#L92">Serializable.ts:92</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="serialize" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>serialize</span><a href="#serialize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -230,25 +232,49 @@ methods apply the changes within the current buffer. To be sure, check
 <li>If serialization fails due to invalid fields previously added.</li>
 </ul>
 </div><aside class="tsd-sources">
-<p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#serialize">serialize</a></p>
+<p>Overrides <a href="Serializable.html">Serializable</a>.<a href="Serializable.html#serialize">serialize</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/CompoundPacket.ts#L191">rtcp/CompoundPacket.ts:191</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="setPackets" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>set<wbr/>Packets</span><a href="#setPackets" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/SdesPacket.ts#L436">rtcp/SdesPacket.ts:436</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="setItem" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>set<wbr/>Item</span><a href="#setItem" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="setPackets.setPackets-1"><span class="tsd-kind-call-signature">set<wbr/>Packets</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">packets</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setPackets.setPackets-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="setItem.setItem-1"><span class="tsd-kind-call-signature">set<wbr/>Item</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">type</span>, <span class="tsd-kind-parameter">text</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setItem.setItem-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Set the <a href="RtcpPacket.html" class="tsd-kind-class">RtcpPacket</a> entries in this RTCP Compound packet.</p>
+<div class="tsd-comment tsd-typography"><p>Set the value of the item with given <code>type</code>.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">packets</span>: <a href="RtcpPacket.html" class="tsd-signature-type tsd-kind-class">RtcpPacket</a><span class="tsd-signature-symbol">[]</span></h5></li></ul></div>
+<h5><span class="tsd-kind-parameter">type</span>: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Item type.</p>
+</div>
+<div class="tsd-comment tsd-typography"></div></li>
+<li>
+<h5><span class="tsd-kind-parameter">text</span>: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>Item text.</p>
+</div>
+<div class="tsd-comment tsd-typography"></div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/CompoundPacket.ts#L250">rtcp/CompoundPacket.ts:250</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/SdesPacket.ts#L520">rtcp/SdesPacket.ts:520</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="setSsrc" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>set<wbr/>Ssrc</span><a href="#setSsrc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="setSsrc.setSsrc-1"><span class="tsd-kind-call-signature">set<wbr/>Ssrc</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">ssrc</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setSsrc.setSsrc-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Set SDES chunk SSRC.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">ssrc</span>: <span class="tsd-signature-type">number</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/c6b8eb6/src/rtcp/SdesPacket.ts#L489">rtcp/SdesPacket.ts:489</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">
@@ -256,15 +282,18 @@ methods apply the changes within the current buffer. To be sure, check
 <div class="tsd-accordion-details">
 <ul>
 <li><a href="#constructor" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-512"></use></svg><span>constructor</span></a></li>
-<li><a href="#addPacket" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>add<wbr/>Packet</span></a></li>
-<li><a href="#clone" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>clone</span></a></li>
+<li><a href="#clearItems" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>clear<wbr/>Items</span></a></li>
+<li><a href="#deleteItem" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>delete<wbr/>Item</span></a></li>
 <li><a href="#dump" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>dump</span></a></li>
 <li><a href="#getByteLength" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Byte<wbr/>Length</span></a></li>
-<li><a href="#getPackets" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Packets</span></a></li>
+<li><a href="#getItem" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Item</span></a></li>
+<li><a href="#getItems" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Items</span></a></li>
+<li><a href="#getSsrc" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ssrc</span></a></li>
 <li><a href="#getView" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>View</span></a></li>
-<li><a href="#needsSerialization" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>needs<wbr/>Serialization</span></a></li>
+<li><a href="#needsSerialization" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>needs<wbr/>Serialization</span></a></li>
 <li><a href="#serialize" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>serialize</span></a></li>
-<li><a href="#setPackets" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Packets</span></a></li></ul></div></details></div>
+<li><a href="#setItem" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Item</span></a></li>
+<li><a href="#setSsrc" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ssrc</span></a></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../modules.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg>
 <div>rtp.js -<wbr/> v0.5.2</div></a>
@@ -275,7 +304,7 @@ methods apply the changes within the current buffer. To be sure, check
 <li><a href="ByePacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-128"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-class)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)"></path></g></svg>
 <div>Bye<wbr/>Packet
 <div class="menu-item-desc">RTCP BYE packet.</div></div></a></li>
-<li><a href="CompoundPacket.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
+<li><a href="CompoundPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
 <div>Compound<wbr/>Packet
 <div class="menu-item-desc">RTCP Compound packet.</div></div></a></li>
 <li><a href="Packet.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
@@ -293,7 +322,7 @@ methods apply the changes within the current buffer. To be sure, check
 <li><a href="RtpPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
 <div>Rtp<wbr/>Packet
 <div class="menu-item-desc">RTP packet.</div></div></a></li>
-<li><a href="SdesChunk.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
+<li><a href="SdesChunk.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>
 <div>Sdes<wbr/>Chunk
 <div class="menu-item-desc">SDES chunk.</div></div></a></li>
 <li><a href="SdesPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>

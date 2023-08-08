@@ -1,6 +1,6 @@
 {
   "name": "rtp.js",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "RTP stack for Node.js and browser written in TypeScript",
   "contributors": [
     "Iñaki Baz Castillo <ibc@aliax.net> (https://inakibaz.me)",
@@ -66,8 +66,8 @@
     "@types/debug": "^4.1.8",
     "@types/events": "^3.0.0",
     "@types/jest": "^29.5.3",
-    "@typescript-eslint/eslint-plugin": "^6.2.1",
-    "@typescript-eslint/parser": "^6.2.1",
+    "@typescript-eslint/eslint-plugin": "^6.3.0",
+    "@typescript-eslint/parser": "^6.3.0",
     "eslint": "^8.46.0",
     "eslint-plugin-jest": "^27.2.3",
     "jest": "^29.6.2",
