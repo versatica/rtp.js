@@ -10,6 +10,7 @@ import {
 import { ReceiverReportPacket } from './ReceiverReportPacket';
 import { SenderReportPacket } from './SenderReportPacket';
 import { ByePacket } from './ByePacket';
+import { SdesPacket } from './SdesPacket';
 import { UnknownPacket } from './UnknownPacket';
 
 /**
@@ -95,6 +96,13 @@ export class CompoundPacket extends Packet
 				case RtcpPacketType.BYE:
 				{
 					packet = new ByePacket(packetView);
+
+					break;
+				}
+
+				case RtcpPacketType.SDES:
+				{
+					packet = new SdesPacket(packetView);
 
 					break;
 				}

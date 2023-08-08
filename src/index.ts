@@ -46,6 +46,13 @@ export {
 } from './rtcp/ByePacket';
 
 export {
+	SdesPacket,
+	SdesPacketDump,
+	SdesChunk,
+	SdesChunkDump
+} from './rtcp/SdesPacket';
+
+export {
 	UnknownPacket,
 	UnknownPacketDump
 } from './rtcp/UnknownPacket';
