@@ -144,11 +144,7 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 		{
 			const uint8Array = new Uint8Array(buffer, byteOffset!, length);
 
-			uint8Array.fill(
-				0,
-				uint8Array.byteOffset,
-				uint8Array.byteOffset + uint8Array.byteLength
-			);
+			uint8Array.fill(0);
 		}
 		else
 		{
