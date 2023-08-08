@@ -92,17 +92,60 @@ describe('parse RTCP Bye packet', () =>
 		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
 	});
 
+	test('packet without reason succeeds', () =>
+	{
+		const array3 = new Uint8Array(
+			[
+				0xa2, 0xcb, 0x00, 0x03, // Padding, Type: 203 (Bye), Count: 2, length: 3
+				0x62, 0x42, 0x76, 0xe0, // SSRC: 0x624276e0
+				0x26, 0x24, 0x67, 0x0e, // SSRC: 0x2624670e
+				0x00, 0x00, 0x00, 0x04 // Padding (4 bytes)
+			]
+		);
+
+		const view3 = new DataView(
+			array3.buffer,
+			array3.byteOffset,
+			array3.byteLength
+		);
+
+		const packet = new ByePacket(view3);
+
+		expect(packet.needsSerialization()).toBe(false);
+		expect(packet.getByteLength()).toBe(16);
+		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
+		expect(packet.getCount()).toBe(2);
+		expect(packet.getPadding()).toBe(4);
+		expect(packet.getSsrcs()).toEqual([ ssrc1, ssrc2 ]);
+		expect(packet.getReason()).toBe(undefined);
+		expect(packet.needsSerialization()).toBe(false);
+		expect(areDataViewsEqual(packet.getView(), view3)).toBe(true);
+
+		// Also test the same after serializing.
+		packet.serialize();
+
+		expect(packet.needsSerialization()).toBe(false);
+		expect(packet.getByteLength()).toBe(16);
+		expect(packet.getPacketType()).toBe(RtcpPacketType.BYE);
+		expect(packet.getCount()).toBe(2);
+		expect(packet.getPadding()).toBe(4);
+		expect(packet.getSsrcs()).toEqual([ ssrc1, ssrc2 ]);
+		expect(packet.getReason()).toBe(undefined);
+		expect(packet.needsSerialization()).toBe(false);
+		expect(areDataViewsEqual(packet.getView(), view3)).toBe(true);
+	});
+
 	test('parsing a buffer view which length does not fit the indicated count throws', () =>
 	{
 		// Parse the first 8 bytes of the buffer, indicating 1 SSRC and holding no
 		// SSRC at all.
-		const view3 = new DataView(
+		const view4 = new DataView(
 			array.buffer,
 			array.byteOffset,
 			8
 		);
 
-		expect(() => (new ByePacket(view3)))
+		expect(() => (new ByePacket(view4)))
 			.toThrowError(RangeError);
 	});
 });
