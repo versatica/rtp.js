@@ -399,7 +399,7 @@ export class RtpPacket extends Packet
 				this.view.byteOffset,
 				FIXED_HEADER_LENGTH
 			),
-			0
+			pos
 		);
 
 		// Move to CSRCs.
