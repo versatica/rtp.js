@@ -6,7 +6,6 @@ import {
 	getRtcpLength,
 	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
-import { writeBits } from '../bitOps';
 
 /**
  *         0                   1                   2                   3
@@ -198,9 +197,7 @@ export class UnknownPacket extends RtcpPacket
 	 */
 	setCount(count: number): void
 	{
-		writeBits(
-			{ view: this.view, byte: 0, mask: 0b00011111, value: count }
-		);
+		super.setCount(count);
 	}
 
 	/**
