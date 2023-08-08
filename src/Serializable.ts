@@ -2,7 +2,7 @@ import { EnhancedEventEmitter } from './EnhancedEventEmitter';
 
 /**
  * Event emitted when the content is being serialized. The user has a chance to
- * provide with a buffer, otherwise a new one will be internally allocated.
+ * pass a buffer, otherwise a new one will be internally allocated.
  *
  * @param `length: number`: Required buffer length (in bytes).
  * @param `callback: (buffer, byteOffset?) => void`: A function that can be
