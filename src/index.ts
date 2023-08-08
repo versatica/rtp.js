@@ -49,7 +49,8 @@ export {
 	SdesPacket,
 	SdesPacketDump,
 	SdesChunk,
-	SdesChunkDump
+	SdesChunkDump,
+	SdesItemType
 } from './rtcp/SdesPacket';
 
 export {
@@ -62,7 +63,8 @@ import {
 	nodeBufferToArrayBuffer,
 	dataViewToString,
 	stringToDataView,
-	stringToUint8Array
+	stringToUint8Array,
+	getStringByteLength
 } from './utils';
 
 /**
@@ -74,5 +76,6 @@ export const utils =
 	nodeBufferToArrayBuffer,
 	dataViewToString,
 	stringToDataView,
-	stringToUint8Array
+	stringToUint8Array,
+	getStringByteLength
 };

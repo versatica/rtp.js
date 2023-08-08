@@ -12,8 +12,8 @@ export const RTP_VERSION = 2;
  */
 export type PacketDump =
 {
-	padding: number;
 	byteLength: number;
+	padding: number;
 };
 
 /**

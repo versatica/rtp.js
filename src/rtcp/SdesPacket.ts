@@ -35,6 +35,24 @@ import {
 const SDES_CHUNK_MIN_LENGTH = 8;
 
 /**
+ * SDES chunk item types.
+ */
+// ESLint absurdly complains about "'SdesItemType' is already declared in the
+// upper scope".
+// eslint-disable-next-line no-shadow
+export enum SdesItemType
+{
+	CNAME = 1,
+	NAME = 2,
+	EMAIL = 3,
+	PHONE = 4,
+	LOC = 5,
+	TOOL = 6,
+	NOTE = 7,
+	PRIV = 8
+}
+
+/**
  * RTCP SDES packet info dump.
  */
 export type SdesPacketDump = RtcpPacketDump &
@@ -48,7 +66,7 @@ export type SdesPacketDump = RtcpPacketDump &
 export type SdesChunkDump =
 {
 	ssrc: number;
-	items: { type: number; text: string }[];
+	items: { type: SdesItemType; text: string }[];
 };
 
 /**
@@ -117,7 +135,7 @@ export class SdesPacket extends RtcpPacket
 
 					while (
 						pos < this.view.byteLength - this.padding &&
-						additionalNumNullOctets <= 3 &&
+						additionalNumNullOctets < 3 &&
 						this.view.getUint8(pos) === 0
 					)
 					{
@@ -313,7 +331,7 @@ export class SdesPacket extends RtcpPacket
 export class SdesChunk extends Serializable
 {
 	// Chunk items indexed by type with text as value.
-	readonly #items: Map<number, string> = new Map();
+	readonly #items: Map<SdesItemType, string> = new Map();
 
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP SDES
@@ -349,13 +367,16 @@ export class SdesChunk extends Serializable
 		{
 			const itemType = this.view.getUint8(pos);
 
-			++pos;
+			// NOTE: Don't increase pos here since we don't want it increased if 0.
 
 			// Item type 0 means padding.
 			if (itemType === 0)
 			{
 				break;
 			}
+
+			// So increase it here.
+			++pos;
 
 			const itemLength = this.view.getUint8(pos);
 
@@ -498,7 +519,7 @@ export class SdesChunk extends Serializable
 	 *
 	 * @param type - Item type.
 	 */
-	getItem(type: number): string | undefined
+	getItem(type: SdesItemType): string | undefined
 	{
 		return this.#items.get(type);
 	}
@@ -506,7 +527,7 @@ export class SdesChunk extends Serializable
 	/**
 	 * Get a map with all the items indexed by their type.
 	 */
-	getItems(): Map<number, string>
+	getItems(): Map<SdesItemType, string>
 	{
 		return new Map(this.#items);
 	}
@@ -517,7 +538,7 @@ export class SdesChunk extends Serializable
 	 * @param type - Item type.
 	 * @param text - Item text.
 	 */
-	setItem(type: number, text: string): void
+	setItem(type: SdesItemType, text: string): void
 	{
 		this.#items.set(type, text);
 
@@ -529,7 +550,7 @@ export class SdesChunk extends Serializable
 	 *
 	 * @param type - Item type.
 	 */
-	deleteItem(type: number): void
+	deleteItem(type: SdesItemType): void
 	{
 		if (!this.#items.delete(type))
 		{

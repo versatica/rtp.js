@@ -1,4 +1,10 @@
-import { SdesPacket, SdesChunk, SdesChunkDump } from '../../rtcp/SdesPacket';
+import {
+	SdesPacket,
+	SdesPacketDump,
+	SdesChunk,
+	SdesChunkDump,
+	SdesItemType
+} from '../../rtcp/SdesPacket';
 import { isRtcp, RtcpPacketType } from '../../rtcp/RtcpPacket';
 import { areDataViewsEqual } from '../../utils';
 
@@ -7,7 +13,7 @@ const sdesChunkDump1: SdesChunkDump =
 	ssrc  : 0x9f65e742,
 	items :
 	[
-		{ type: 1, text: 't7mkYnCm46OcINy/' }
+		{ type: SdesItemType.CNAME, text: 't7mkYnCm46OcINy/' }
 	]
 };
 
@@ -16,8 +22,8 @@ const sdesChunkDump2: SdesChunkDump =
 	ssrc  : 0x9f65e743,
 	items :
 	[
-		{ type: 2, text: 't7mkYnCm46OcINy/' },
-		{ type: 3, text: 't7mkYnCm46OcINy/' }
+		{ type: SdesItemType.NAME, text: 't7mkYnCm46OcINy/' },
+		{ type: SdesItemType.NOTE, text: 't7mkYnCm46OcINy/' }
 	]
 };
 
@@ -89,12 +95,12 @@ describe('parse SDES packet', () =>
 				0x79, 0x2f, 0x00, 0x00, // 2 null octets
 				// Chunk
 				0x9f, 0x65, 0xe7, 0x43, // SSRC: 0x9f65e743
-				0x02, 0x10, 0x74, 0x37, // Item Type: 2 (XXXX), Length: 16,
+				0x02, 0x10, 0x74, 0x37, // Item Type: 2 (NAME), Length: 16,
 				0x6d, 0x6b, 0x59, 0x6e, //   Text: "t7mkYnCm46OcINy/"
 				0x43, 0x6d, 0x34, 0x36,
 				0x4f, 0x63, 0x49, 0x4e,
 				0x79, 0x2f,
-				0x03, 0x10, 0x74, 0x37, // Item Type: 3 (XXXX), Length: 16,
+				0x07, 0x10, 0x74, 0x37, // Item Type: 7 (NOTE), Length: 16,
 				0x6d, 0x6b, 0x59, 0x6e, //   Text: "t7mkYnCm46OcINy/"
 				0x43, 0x6d, 0x34, 0x36,
 				0x4f, 0x63, 0x49, 0x4e,
@@ -148,7 +154,7 @@ describe('parse SDES packet', () =>
 				0x81, 0xca, 0x00, 0x03, // Type: 202 (SDES), Count: 1, Length: 3
 				// Chunk
 				0x11, 0x22, 0x33, 0x44, // SSRC: 0x11223344
-				0x05, 0x02, 0x61, 0x62, // Item Type: 5 (XXXX), Length: 2, Text: "ab"
+				0x05, 0x02, 0x61, 0x62, // Item Type: 5 (LOC), Length: 2, Text: "ab"
 				0x00, 0x00, 0x00, 0x00 // 4 null octets
 			]
 		);
@@ -186,37 +192,99 @@ describe('parse SDES packet', () =>
 		expect(packet.needsSerialization()).toBe(false);
 	});
 
+	test('another packet processing succeeds', () =>
+	{
+		const array4 = new Uint8Array(
+			[
+				0x82, 0xca, 0x00, 0x0c, // Type: 202 (SDES), Count: 2, Length: 12
+				// Chunk
+				0x00, 0x00, 0x04, 0xd2, // SSRC: 1234
+				0x01, 0x06, 0x71, 0x77, // Item Type: 1 (CNAME), Length: 6, Text: "qwerty"
+				0x65, 0x72, 0x74, 0x79,
+				0x06, 0x06, 0x69, 0xc3, // Item Type: 6 (TOOL), Length: 6, Text: "iñaki"
+				0xb1, 0x61, 0x6b, 0x69,
+				0x00, 0x00, 0x00, 0x00, // 4 null octects
+				// Chunk
+				0x00, 0x00, 0x16, 0x2e, // SSRC: 5678
+				0x05, 0x11, 0x73, 0x6f, // Item Type: 5 (LOC), Length: 17, Text: "somewhere œæ€"
+				0x6d, 0x65, 0x77, 0x68,
+				0x65, 0x72, 0x65, 0x20,
+				0xc5, 0x93, 0xc3, 0xa6,
+				0xe2, 0x82, 0xac, 0x00 // 1 null octect
+			]
+		);
+
+		const packetDump: SdesPacketDump =
+		{
+			byteLength : 52,
+			padding    : 0,
+			count      : 2,
+			chunks     :
+			[
+				{
+					ssrc  : 1234,
+					items :
+					[
+						{ type: SdesItemType.CNAME, text: 'qwerty' },
+						{ type: SdesItemType.TOOL, text: 'iñaki' }
+					]
+				},
+				{
+					ssrc  : 5678,
+					items : [ { type: SdesItemType.LOC, text: 'somewhere œæ€' } ]
+				}
+			]
+		};
+
+		const view4 = new DataView(
+			array4.buffer,
+			array4.byteOffset,
+			array4.byteLength
+		);
+
+		const packet = new SdesPacket(view4);
+
+		expect(packet.needsSerialization()).toBe(false);
+		expect(packet.dump()).toEqual(packetDump);
+
+		const clonedPacket = packet.clone();
+
+		expect(clonedPacket.needsSerialization()).toBe(false);
+		expect(clonedPacket.dump()).toEqual(packetDump);
+		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(true);
+	});
+
 	test('parsing a buffer view which length does not fit the indicated count throws', () =>
 	{
 		// Parse just the first 26 bytes of buffer.
-		const view4 = new DataView(
+		const view5 = new DataView(
 			array.buffer,
 			array.byteOffset,
 			26
 		);
 
-		expect(() => (new SdesPacket(view4)))
+		expect(() => (new SdesPacket(view5)))
 			.toThrowError(RangeError);
 	});
 
 	test('parsing a packet with missing null octects in the chunk throws', () =>
 	{
-		const array5 = new Uint8Array(
+		const array6 = new Uint8Array(
 			[
 				0x81, 0xca, 0x00, 0x02, // Type: 202 (SDES), Count: 1, Length: 2
 				// Chunk
 				0x11, 0x22, 0x33, 0x44, // SSRC: 0x11223344
-				0x05, 0x02, 0x61, 0x62 // Item Type: 5 (XXXX), Length: 2, Text: "ab"
+				0x08, 0x02, 0x61, 0x62 // Item Type: 8 (PRIV), Length: 2, Text: "ab"
 			]
 		);
 
-		const view5 = new DataView(
-			array5.buffer,
-			array5.byteOffset,
-			array5.byteLength
+		const view6 = new DataView(
+			array6.buffer,
+			array6.byteOffset,
+			array6.byteLength
 		);
 
-		expect(() => (new SdesPacket(view5)))
+		expect(() => (new SdesPacket(view6)))
 			.toThrowError(RangeError);
 	});
 });
@@ -257,10 +325,18 @@ describe('create RTCP SDES packet', () =>
 		const chunk1 = new SdesChunk();
 
 		chunk1.setSsrc(1234);
-		chunk1.setItem(1, 'qwerty');
-		chunk1.setItem(3, 'iñaki');
+		chunk1.setItem(SdesItemType.CNAME, 'qwerty');
+		chunk1.setItem(SdesItemType.TOOL, 'iñaki');
 
 		packet.addChunk(chunk1);
+
+		const chunk2 = new SdesChunk();
+
+		chunk2.setSsrc(5678);
+		chunk2.setItem(SdesItemType.LOC, 'somewhere œæ€');
+
+		packet.addChunk(chunk2);
+
 		expect(isRtcp(packet.getView())).toBe(true);
 
 		const clonedPacket = packet.clone();
@@ -273,19 +349,52 @@ describe('create RTCP SDES packet', () =>
 
 		expect(clonedChunk1.dump()).toEqual(chunk1.dump());
 
-		const chunk2 = new SdesChunk();
+		const chunk3 = new SdesChunk();
 
-		chunk2.setSsrc(0x66666666);
-		chunk2.setItem(8, 'ab');
+		chunk3.setSsrc(0x66666666);
+		chunk3.setItem(SdesItemType.PRIV, 'ab');
 
-		packet.addChunk(chunk2);
-		expect(isRtcp(packet.getView())).toBe(true);
+		packet.addChunk(chunk3);
 
 		packet.serialize();
 		expect(packet.getPacketType()).toBe(RtcpPacketType.SDES);
-		expect(packet.getCount()).toBe(2);
+		expect(packet.getCount()).toBe(3);
 		expect(packet.getPadding()).toBe(0);
 		expect(packet.needsSerialization()).toBe(false);
 		expect(isRtcp(packet.getView())).toBe(true);
+
+		const chunk1B = packet.getChunks()[0];
+
+		expect(chunk1B.needsSerialization()).toBe(false);
+		expect(chunk1B.dump()).toEqual(
+			{
+				ssrc  : 1234,
+				items :
+				[
+					{ type: SdesItemType.CNAME, text: 'qwerty' },
+					{ type: SdesItemType.TOOL, text: 'iñaki' }
+				]
+			}
+		);
+
+		const chunk2B = packet.getChunks()[1];
+
+		expect(chunk2B.needsSerialization()).toBe(false);
+		expect(chunk2B.dump()).toEqual(
+			{
+				ssrc  : 5678,
+				items : [ { type: SdesItemType.LOC, text: 'somewhere œæ€' } ]
+			}
+		);
+
+		const chunk3B = packet.getChunks()[2];
+
+		expect(chunk3B.needsSerialization()).toBe(false);
+		expect(chunk3B.dump()).toEqual(
+			{
+				ssrc  : 0x66666666,
+				items : [ { type: SdesItemType.PRIV, text: 'ab' } ]
+			}
+		);
 	});
 });
