@@ -17,8 +17,9 @@ import { EnhancedEventEmitter } from './EnhancedEventEmitter';
  * ```ts
  * packet.on('will-serialize', (length, callback) => {
  *   const buffer = new ArrayBuffer(length);
+ *   const byteOffset = 0;
  *
- *   callback(buffer);
+ *   callback(buffer, byteOffset);
  * });
  * ```
  */
@@ -29,7 +30,7 @@ export type WillSerializeEvent =
 ];
 
 /**
- * Common events of RTP and RTCP packets.
+ * Events emitted by all classes inheriting from Serializable class.
  */
 type SerializableEvents =
 {
@@ -84,8 +85,9 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 	 * Computes total length of the content (in bytes) including padding if any.
 	 *
 	 * @remarks
-	 * - This methods computes the effective byte length of the content if it was
-	 *   serialized at this moment, no matter modifications have been done before.
+	 * - This methods computes the effective byte length of the content as if it
+	 *   was serialized at this moment, no matter modifications have been done
+	 *   before.
 	 */
 	abstract getByteLength(): number;
 
