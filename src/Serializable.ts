@@ -123,37 +123,38 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 	}
 	{
 		let buffer: ArrayBuffer | undefined;
-		let byteOffset: number | undefined;
+		let byteOffset = 0;
 
-		this.safeEmit('will-serialize', length, (_buffer, _byteOffset) =>
+		this.emit('will-serialize', length, (userBuffer, userByteOffset) =>
 		{
-			buffer = _buffer;
-			byteOffset = _byteOffset ?? 0;
+			buffer = userBuffer;
+
+			if (userByteOffset !== undefined)
+			{
+				byteOffset = userByteOffset;
+			}
 		});
 
-		// NOTE: TypeScript is not that smart and it doesn't know that byteOffset
-		// here is guaranteed to have a value in case buffer has a value.
-		if (buffer && buffer.byteLength - byteOffset! < length)
+		// The user called the callback and passed a buffer and optional byteOffset.
+		if (buffer)
 		{
-			throw new RangeError(
-				`given buffer available space (${buffer.byteLength - byteOffset!} bytes) is less than content length (${length} bytes)`
-			);
-		}
-		// If a buffer is given, ensure it's filled with zeroes.
-		else if (buffer)
-		{
-			const uint8Array = new Uint8Array(buffer, byteOffset!, length);
+			if (buffer.byteLength - byteOffset < length)
+			{
+				throw new RangeError(
+					`given buffer available space (${buffer.byteLength - byteOffset} bytes) is less than content length (${length} bytes)`
+				);
+			}
 
+			const uint8Array = new Uint8Array(buffer, byteOffset, length);
+
+			// If a buffer is given, ensure the required length is filled with zeroes.
 			uint8Array.fill(0);
 		}
 		else
 		{
 			buffer = new ArrayBuffer(length);
-			byteOffset = 0;
 		}
 
-		// NOTE: TypeScript is not that smart and it doesn't know that byteOffset
-		// here is guaranteed to have a value.
-		return { buffer, byteOffset: byteOffset! };
+		return { buffer, byteOffset };
 	}
 }
