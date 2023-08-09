@@ -37,7 +37,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">ReceiverReport</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L314">rtcp/ReceiverReportPacket.ts:314</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L319">rtcp/ReceiverReportPacket.ts:319</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -89,7 +89,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides Serializable.constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L320">rtcp/ReceiverReportPacket.ts:320</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L325">rtcp/ReceiverReportPacket.ts:325</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member"><a id="dump" class="tsd-anchor"></a>
@@ -102,7 +102,7 @@
 <h4 class="tsd-returns-title">Returns <a href="../types/ReceiverReportDump.html" class="tsd-signature-type tsd-kind-type-alias">ReceiverReportDump</a></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L340">rtcp/ReceiverReportPacket.ts:340</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L345">rtcp/ReceiverReportPacket.ts:345</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getByteLength" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Byte<wbr/>Length</span><a href="#getByteLength" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -111,10 +111,16 @@
 <div class="tsd-comment tsd-typography"><p>Computes total length of the content (in bytes) including padding if any.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<div class="tsd-comment tsd-typography">
+<h4>Remarks</h4><ul>
+<li>This methods computes the effective byte length of the content as if it
+was serialized at this moment, no matter modifications have been done
+before.</li>
+</ul>
+</div><aside class="tsd-sources">
 <p>Overrides <a href="Serializable.html">Serializable</a>.<a href="Serializable.html#getByteLength">getByteLength</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L356">rtcp/ReceiverReportPacket.ts:356</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L361">rtcp/ReceiverReportPacket.ts:361</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getDelaySinceLastSR" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Delay<wbr/>Since<wbr/>LastSR</span><a href="#getDelaySinceLastSR" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -125,7 +131,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L509">rtcp/ReceiverReportPacket.ts:509</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L514">rtcp/ReceiverReportPacket.ts:514</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getFractionLost" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Fraction<wbr/>Lost</span><a href="#getFractionLost" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -136,7 +142,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L392">rtcp/ReceiverReportPacket.ts:392</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L397">rtcp/ReceiverReportPacket.ts:397</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getHighestSeqNumber" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Highest<wbr/>Seq<wbr/>Number</span><a href="#getHighestSeqNumber" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -147,7 +153,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L455">rtcp/ReceiverReportPacket.ts:455</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L460">rtcp/ReceiverReportPacket.ts:460</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getJitter" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Jitter</span><a href="#getJitter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -158,7 +164,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L473">rtcp/ReceiverReportPacket.ts:473</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L478">rtcp/ReceiverReportPacket.ts:478</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getLastSRTimestamp" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>LastSRTimestamp</span><a href="#getLastSRTimestamp" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -169,7 +175,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L491">rtcp/ReceiverReportPacket.ts:491</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L496">rtcp/ReceiverReportPacket.ts:496</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getSsrc" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Ssrc</span><a href="#getSsrc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -180,7 +186,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L374">rtcp/ReceiverReportPacket.ts:374</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L379">rtcp/ReceiverReportPacket.ts:379</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getTotalLost" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Total<wbr/>Lost</span><a href="#getTotalLost" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -191,7 +197,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L410">rtcp/ReceiverReportPacket.ts:410</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L415">rtcp/ReceiverReportPacket.ts:415</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getView" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>View</span><a href="#getView" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -202,7 +208,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">DataView</span></h4>
 <div class="tsd-comment tsd-typography">
 <h4>Remarks</h4><ul>
-<li>The internal ArrayBuffer is serialized if needed (to apply pending
+<li>The internal buffer is serialized if needed (to apply pending
    modifications).</li>
 </ul>
 
@@ -212,7 +218,7 @@
 </div><aside class="tsd-sources">
 <p>Inherited from <a href="Serializable.html">Serializable</a>.<a href="Serializable.html#getView">getView</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/Serializable.ts#L73">Serializable.ts:73</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/Serializable.ts#L74">Serializable.ts:74</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="needsSerialization" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>needs<wbr/>Serialization</span><a href="#needsSerialization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -225,7 +231,7 @@ yet applied into the buffer.</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="Serializable.html">Serializable</a>.<a href="Serializable.html#needsSerialization">needsSerialization</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/Serializable.ts#L92">Serializable.ts:92</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/Serializable.ts#L98">Serializable.ts:98</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="serialize" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>serialize</span><a href="#serialize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -247,7 +253,7 @@ methods apply the changes within the current buffer. To be sure, check
 </div><aside class="tsd-sources">
 <p>Overrides <a href="Serializable.html">Serializable</a>.<a href="Serializable.html#serialize">serialize</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L364">rtcp/ReceiverReportPacket.ts:364</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L369">rtcp/ReceiverReportPacket.ts:369</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setDelaySinceLastSR" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Delay<wbr/>Since<wbr/>LastSR</span><a href="#setDelaySinceLastSR" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -263,7 +269,7 @@ methods apply the changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L517">rtcp/ReceiverReportPacket.ts:517</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L522">rtcp/ReceiverReportPacket.ts:522</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setFractionLost" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Fraction<wbr/>Lost</span><a href="#setFractionLost" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -279,7 +285,7 @@ methods apply the changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L400">rtcp/ReceiverReportPacket.ts:400</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L405">rtcp/ReceiverReportPacket.ts:405</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setHighestSeqNumber" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Highest<wbr/>Seq<wbr/>Number</span><a href="#setHighestSeqNumber" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -295,7 +301,7 @@ methods apply the changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L463">rtcp/ReceiverReportPacket.ts:463</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L468">rtcp/ReceiverReportPacket.ts:468</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setJitter" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Jitter</span><a href="#setJitter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -311,7 +317,7 @@ methods apply the changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L481">rtcp/ReceiverReportPacket.ts:481</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L486">rtcp/ReceiverReportPacket.ts:486</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setLastSRTimestamp" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>LastSRTimestamp</span><a href="#setLastSRTimestamp" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -327,7 +333,7 @@ methods apply the changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L499">rtcp/ReceiverReportPacket.ts:499</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L504">rtcp/ReceiverReportPacket.ts:504</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setSsrc" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Ssrc</span><a href="#setSsrc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -343,7 +349,7 @@ methods apply the changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L382">rtcp/ReceiverReportPacket.ts:382</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L387">rtcp/ReceiverReportPacket.ts:387</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setTotalLost" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Total<wbr/>Lost</span><a href="#setTotalLost" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -359,7 +365,7 @@ methods apply the changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/ReceiverReportPacket.ts#L432">rtcp/ReceiverReportPacket.ts:432</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/ReceiverReportPacket.ts#L437">rtcp/ReceiverReportPacket.ts:437</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">

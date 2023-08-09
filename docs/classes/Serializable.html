@@ -43,7 +43,7 @@
 <li><a href="ReceiverReport.html" class="tsd-signature-type tsd-kind-class">ReceiverReport</a></li>
 <li><a href="SdesChunk.html" class="tsd-signature-type tsd-kind-class">SdesChunk</a></li></ul></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/Serializable.ts#L45">Serializable.ts:45</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/Serializable.ts#L46">Serializable.ts:46</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -66,9 +66,15 @@
 <div class="tsd-comment tsd-typography"><p>Computes total length of the content (in bytes) including padding if any.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<div class="tsd-comment tsd-typography">
+<h4>Remarks</h4><ul>
+<li>This methods computes the effective byte length of the content as if it
+was serialized at this moment, no matter modifications have been done
+before.</li>
+</ul>
+</div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/Serializable.ts#L86">Serializable.ts:86</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/Serializable.ts#L92">Serializable.ts:92</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getView" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>View</span><a href="#getView" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -79,7 +85,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">DataView</span></h4>
 <div class="tsd-comment tsd-typography">
 <h4>Remarks</h4><ul>
-<li>The internal ArrayBuffer is serialized if needed (to apply pending
+<li>The internal buffer is serialized if needed (to apply pending
    modifications).</li>
 </ul>
 
@@ -88,7 +94,7 @@
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/Serializable.ts#L73">Serializable.ts:73</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/Serializable.ts#L74">Serializable.ts:74</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="needsSerialization" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>needs<wbr/>Serialization</span><a href="#needsSerialization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -100,7 +106,7 @@ yet applied into the buffer.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/Serializable.ts#L92">Serializable.ts:92</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/Serializable.ts#L98">Serializable.ts:98</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="serialize" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagAbstract">Abstract</code> <span>serialize</span><a href="#serialize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -121,7 +127,7 @@ methods apply the changes within the current buffer. To be sure, check
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/Serializable.ts#L108">Serializable.ts:108</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/Serializable.ts#L114">Serializable.ts:114</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">

@@ -39,7 +39,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">CompoundPacket</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/CompoundPacket.ts#L29">rtcp/CompoundPacket.ts:29</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/CompoundPacket.ts#L29">rtcp/CompoundPacket.ts:29</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -85,7 +85,7 @@
 </div><aside class="tsd-sources">
 <p>Overrides Packet.constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/CompoundPacket.ts#L41">rtcp/CompoundPacket.ts:41</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/CompoundPacket.ts#L41">rtcp/CompoundPacket.ts:41</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member"><a id="addPacket" class="tsd-anchor"></a>
@@ -103,7 +103,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/CompoundPacket.ts#L260">rtcp/CompoundPacket.ts:260</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/CompoundPacket.ts#L265">rtcp/CompoundPacket.ts:265</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="clone" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>clone</span><a href="#clone" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -117,14 +117,14 @@ original one.</p>
 <ul class="tsd-parameter-list">
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">buffer</span>: <span class="tsd-signature-type ">ArrayBuffer</span></h5>
-<div class="tsd-comment tsd-typography"><p>Buffer in which the packet will be serialized. If not given,
-  a new one will internally allocated.</p>
+<div class="tsd-comment tsd-typography"><p>Buffer in which the packet will be serialized. If not
+  given, a new one will internally allocated.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">byteOffset</span>: <span class="tsd-signature-type">number</span></h5>
-<div class="tsd-comment tsd-typography"><p>Byte offset of the given <code>buffer</code> when serialization must
-  be done.</p>
+<div class="tsd-comment tsd-typography"><p>Byte offset of the given <code>buffer</code> where serialization
+  will start.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="CompoundPacket.html" class="tsd-signature-type tsd-kind-class">CompoundPacket</a></h4>
@@ -135,13 +135,13 @@ original one.</p>
 </ul>
 
 <h4>Throws</h4><ul>
-<li>If buffer serialization is needed and it fails due to invalid fields or if
-   <code>buffer</code> is given and it doesn&#39;t hold enough space serializing the packet.</li>
+<li>If serialization is needed and it fails due to invalid fields or if
+<code>buffer</code> is given and it doesn&#39;t hold enough space to serialize the packet.</li>
 </ul>
 </div><aside class="tsd-sources">
 <p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#clone">clone</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/CompoundPacket.ts#L232">rtcp/CompoundPacket.ts:232</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/CompoundPacket.ts#L237">rtcp/CompoundPacket.ts:237</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="dump" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>dump</span><a href="#dump" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -153,7 +153,7 @@ original one.</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#dump">dump</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/CompoundPacket.ts#L136">rtcp/CompoundPacket.ts:136</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/CompoundPacket.ts#L136">rtcp/CompoundPacket.ts:136</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getByteLength" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Byte<wbr/>Length</span><a href="#getByteLength" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -162,10 +162,16 @@ original one.</p>
 <div class="tsd-comment tsd-typography"><p>Computes total length of the content (in bytes) including padding if any.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<div class="tsd-comment tsd-typography">
+<h4>Remarks</h4><ul>
+<li>This methods computes the effective byte length of the content as if it
+was serialized at this moment, no matter modifications have been done
+before.</li>
+</ul>
+</div><aside class="tsd-sources">
 <p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#getByteLength">getByteLength</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/CompoundPacket.ts#L147">rtcp/CompoundPacket.ts:147</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/CompoundPacket.ts#L147">rtcp/CompoundPacket.ts:147</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getPackets" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Packets</span><a href="#getPackets" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -176,7 +182,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <a href="RtcpPacket.html" class="tsd-signature-type tsd-kind-class">RtcpPacket</a><span class="tsd-signature-symbol">[]</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/CompoundPacket.ts#L242">rtcp/CompoundPacket.ts:242</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/CompoundPacket.ts#L247">rtcp/CompoundPacket.ts:247</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getView" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>View</span><a href="#getView" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -187,7 +193,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">DataView</span></h4>
 <div class="tsd-comment tsd-typography">
 <h4>Remarks</h4><ul>
-<li>The internal ArrayBuffer is serialized if needed (to apply pending
+<li>The internal buffer is serialized if needed (to apply pending
    modifications).</li>
 </ul>
 
@@ -197,7 +203,7 @@ original one.</p>
 </div><aside class="tsd-sources">
 <p>Inherited from <a href="Packet.html">Packet</a>.<a href="Packet.html#getView">getView</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/Serializable.ts#L73">Serializable.ts:73</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/Serializable.ts#L74">Serializable.ts:74</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="needsSerialization" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>needs<wbr/>Serialization</span><a href="#needsSerialization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -210,7 +216,7 @@ yet applied into the buffer.</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#needsSerialization">needsSerialization</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/CompoundPacket.ts#L180">rtcp/CompoundPacket.ts:180</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/CompoundPacket.ts#L185">rtcp/CompoundPacket.ts:185</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="serialize" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>serialize</span><a href="#serialize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -232,7 +238,7 @@ methods apply the changes within the current buffer. To be sure, check
 </div><aside class="tsd-sources">
 <p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#serialize">serialize</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/CompoundPacket.ts#L191">rtcp/CompoundPacket.ts:191</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/CompoundPacket.ts#L196">rtcp/CompoundPacket.ts:196</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setPackets" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Packets</span><a href="#setPackets" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -248,7 +254,7 @@ methods apply the changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/rtcp/CompoundPacket.ts#L250">rtcp/CompoundPacket.ts:250</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/rtcp/CompoundPacket.ts#L255">rtcp/CompoundPacket.ts:255</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">

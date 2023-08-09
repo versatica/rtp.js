@@ -80,18 +80,18 @@ export abstract class Packet extends Serializable
 	 * Clone the packet. The cloned packet does not share any memory with the
 	 * original one.
 	 *
-	 * @param buffer - Buffer in which the packet will be serialized. If not given,
-	 *   a new one will internally allocated.
-	 * @param byteOffset - Byte offset of the given `buffer` when serialization must
-	 *   be done.
+	 * @param buffer - Buffer in which the packet will be serialized. If not
+	 *   given, a new one will internally allocated.
+	 * @param byteOffset - Byte offset of the given `buffer` where serialization
+	 *   will start.
 	 *
 	 * @remarks
 	 * - The buffer is serialized if needed (to apply packet pending modifications).
 	 * - Read the info dump type of each RTCP packet instead.
 	 *
 	 * @throws
-	 * - If buffer serialization is needed and it fails due to invalid fields or if
-	 * 	 `buffer` is given and it doesn't hold enough space serializing the packet.
+	 * - If serialization is needed and it fails due to invalid fields or if
+	 *   `buffer` is given and it doesn't hold enough space to serialize the packet.
 	 */
 	abstract clone(buffer?: ArrayBuffer, byteOffset?: number): Packet;
 

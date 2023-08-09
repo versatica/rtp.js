@@ -39,7 +39,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">RtpPacket</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L44">RtpPacket.ts:44</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L44">RtpPacket.ts:44</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -109,7 +109,7 @@
 </div><aside class="tsd-sources">
 <p>Overrides Packet.constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L65">RtpPacket.ts:65</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L65">RtpPacket.ts:65</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member"><a id="clearExtensions" class="tsd-anchor"></a>
@@ -126,7 +126,7 @@
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L863">RtpPacket.ts:863</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L869">RtpPacket.ts:869</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="clone" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>clone</span><a href="#clone" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -140,14 +140,14 @@ original one.</p>
 <ul class="tsd-parameter-list">
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">buffer</span>: <span class="tsd-signature-type ">ArrayBuffer</span></h5>
-<div class="tsd-comment tsd-typography"><p>Buffer in which the packet will be serialized. If not given,
-  a new one will internally allocated.</p>
+<div class="tsd-comment tsd-typography"><p>Buffer in which the packet will be serialized. If not
+  given, a new one will internally allocated.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">byteOffset</span>: <span class="tsd-signature-type">number</span></h5>
-<div class="tsd-comment tsd-typography"><p>Byte offset of the given <code>buffer</code> when serialization must
-  be done.</p>
+<div class="tsd-comment tsd-typography"><p>Byte offset of the given <code>buffer</code> where serialization
+  will start.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="RtpPacket.html" class="tsd-signature-type tsd-kind-class">RtpPacket</a></h4>
@@ -158,13 +158,13 @@ original one.</p>
 </ul>
 
 <h4>Throws</h4><ul>
-<li>If buffer serialization is needed and it fails due to invalid fields or if
-   <code>buffer</code> is given and it doesn&#39;t hold enough space serializing the packet.</li>
+<li>If serialization is needed and it fails due to invalid fields or if
+<code>buffer</code> is given and it doesn&#39;t hold enough space to serialize the packet.</li>
 </ul>
 </div><aside class="tsd-sources">
 <p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#clone">clone</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L617">RtpPacket.ts:617</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L623">RtpPacket.ts:623</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="deleteExtension" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>delete<wbr/>Extension</span><a href="#deleteExtension" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -187,7 +187,7 @@ original one.</p>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L841">RtpPacket.ts:841</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L847">RtpPacket.ts:847</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="dump" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>dump</span><a href="#dump" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -199,7 +199,7 @@ original one.</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#dump">dump</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L286">RtpPacket.ts:286</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L286">RtpPacket.ts:286</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="enableOneByteExtensions" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>enable<wbr/>One<wbr/>Byte<wbr/>Extensions</span><a href="#enableOneByteExtensions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -214,7 +214,7 @@ original one.</p>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L755">RtpPacket.ts:755</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L761">RtpPacket.ts:761</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="enableTwoBytesExtensions" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>enable<wbr/>Two<wbr/>Bytes<wbr/>Extensions</span><a href="#enableTwoBytesExtensions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -229,7 +229,7 @@ original one.</p>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L774">RtpPacket.ts:774</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L780">RtpPacket.ts:780</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getByteLength" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Byte<wbr/>Length</span><a href="#getByteLength" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -238,10 +238,16 @@ original one.</p>
 <div class="tsd-comment tsd-typography"><p>Computes total length of the content (in bytes) including padding if any.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<div class="tsd-comment tsd-typography">
+<h4>Remarks</h4><ul>
+<li>This methods computes the effective byte length of the content as if it
+was serialized at this moment, no matter modifications have been done
+before.</li>
+</ul>
+</div><aside class="tsd-sources">
 <p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#getByteLength">getByteLength</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L314">RtpPacket.ts:314</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L314">RtpPacket.ts:314</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getCsrcs" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Csrcs</span><a href="#getCsrcs" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -252,7 +258,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L693">RtpPacket.ts:693</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L699">RtpPacket.ts:699</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getExtension" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Extension</span><a href="#getExtension" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -271,7 +277,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">DataView</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L792">RtpPacket.ts:792</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L798">RtpPacket.ts:798</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getExtensions" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Extensions</span><a href="#getExtensions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -282,7 +288,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type ">DataView</span><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L800">RtpPacket.ts:800</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L806">RtpPacket.ts:806</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getMarker" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Marker</span><a href="#getMarker" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -293,7 +299,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L718">RtpPacket.ts:718</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L724">RtpPacket.ts:724</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getPadding" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Padding</span><a href="#getPadding" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -305,7 +311,7 @@ original one.</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="Packet.html">Packet</a>.<a href="Packet.html#getPadding">getPadding</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/Packet.ts#L51">Packet.ts:51</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/Packet.ts#L51">Packet.ts:51</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getPayload" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Payload</span><a href="#getPayload" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -316,7 +322,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">DataView</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L881">RtpPacket.ts:881</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L887">RtpPacket.ts:887</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getPayloadType" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Payload<wbr/>Type</span><a href="#getPayloadType" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -327,7 +333,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L627">RtpPacket.ts:627</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L633">RtpPacket.ts:633</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getSequenceNumber" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Sequence<wbr/>Number</span><a href="#getSequenceNumber" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -338,7 +344,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L645">RtpPacket.ts:645</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L651">RtpPacket.ts:651</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getSsrc" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Ssrc</span><a href="#getSsrc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -349,7 +355,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L677">RtpPacket.ts:677</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L683">RtpPacket.ts:683</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getTimestamp" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Timestamp</span><a href="#getTimestamp" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -360,7 +366,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L661">RtpPacket.ts:661</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L667">RtpPacket.ts:667</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getView" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>View</span><a href="#getView" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -371,7 +377,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">DataView</span></h4>
 <div class="tsd-comment tsd-typography">
 <h4>Remarks</h4><ul>
-<li>The internal ArrayBuffer is serialized if needed (to apply pending
+<li>The internal buffer is serialized if needed (to apply pending
    modifications).</li>
 </ul>
 
@@ -381,7 +387,7 @@ original one.</p>
 </div><aside class="tsd-sources">
 <p>Inherited from <a href="Packet.html">Packet</a>.<a href="Packet.html#getView">getView</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/Serializable.ts#L73">Serializable.ts:73</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/Serializable.ts#L74">Serializable.ts:74</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="hasOneByteExtensions" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>has<wbr/>One<wbr/>Byte<wbr/>Extensions</span><a href="#hasOneByteExtensions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -392,7 +398,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L734">RtpPacket.ts:734</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L740">RtpPacket.ts:740</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="hasTwoBytesExtensions" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>has<wbr/>Two<wbr/>Bytes<wbr/>Extensions</span><a href="#hasTwoBytesExtensions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -403,7 +409,7 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L742">RtpPacket.ts:742</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L748">RtpPacket.ts:748</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="needsSerialization" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>needs<wbr/>Serialization</span><a href="#needsSerialization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -416,7 +422,7 @@ yet applied into the buffer.</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="Packet.html">Packet</a>.<a href="Packet.html#needsSerialization">needsSerialization</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/Serializable.ts#L92">Serializable.ts:92</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/Serializable.ts#L98">Serializable.ts:98</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="padTo4Bytes" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>pad<wbr/>To4<wbr/>Bytes</span><a href="#padTo4Bytes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -433,7 +439,7 @@ or remove bytes of padding.</p>
 </div><aside class="tsd-sources">
 <p>Inherited from <a href="Packet.html">Packet</a>.<a href="Packet.html#padTo4Bytes">padTo4Bytes</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/Packet.ts#L63">Packet.ts:63</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/Packet.ts#L63">Packet.ts:63</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="rtxDecode" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>rtx<wbr/>Decode</span><a href="#rtxDecode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -465,7 +471,7 @@ or remove bytes of padding.</p>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L960">RtpPacket.ts:960</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L966">RtpPacket.ts:966</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="rtxEncode" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>rtx<wbr/>Encode</span><a href="#rtxEncode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -498,7 +504,7 @@ or remove bytes of padding.</p>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L909">RtpPacket.ts:909</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L915">RtpPacket.ts:915</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="serialize" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>serialize</span><a href="#serialize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -520,7 +526,7 @@ methods apply the changes within the current buffer. To be sure, check
 </div><aside class="tsd-sources">
 <p>Overrides <a href="Packet.html">Packet</a>.<a href="Packet.html#serialize">serialize</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L379">RtpPacket.ts:379</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L384">RtpPacket.ts:384</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setCsrcs" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Csrcs</span><a href="#setCsrcs" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -541,7 +547,7 @@ array) CSRC field will be removed from the RTP packet.</p>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L705">RtpPacket.ts:705</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L711">RtpPacket.ts:711</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setExtension" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Extension</span><a href="#setExtension" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -569,7 +575,7 @@ array) CSRC field will be removed from the RTP packet.</p>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L814">RtpPacket.ts:814</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L820">RtpPacket.ts:820</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setMarker" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Marker</span><a href="#setMarker" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -585,7 +591,7 @@ array) CSRC field will be removed from the RTP packet.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L726">RtpPacket.ts:726</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L732">RtpPacket.ts:732</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setPayload" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Payload</span><a href="#setPayload" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -605,7 +611,7 @@ array) CSRC field will be removed from the RTP packet.</p>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L892">RtpPacket.ts:892</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L898">RtpPacket.ts:898</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setPayloadType" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Payload<wbr/>Type</span><a href="#setPayloadType" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -621,7 +627,7 @@ array) CSRC field will be removed from the RTP packet.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L635">RtpPacket.ts:635</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L641">RtpPacket.ts:641</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setSequenceNumber" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Sequence<wbr/>Number</span><a href="#setSequenceNumber" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -637,7 +643,7 @@ array) CSRC field will be removed from the RTP packet.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L653">RtpPacket.ts:653</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L659">RtpPacket.ts:659</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setSsrc" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Ssrc</span><a href="#setSsrc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -653,7 +659,7 @@ array) CSRC field will be removed from the RTP packet.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L685">RtpPacket.ts:685</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L691">RtpPacket.ts:691</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setTimestamp" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Timestamp</span><a href="#setTimestamp" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -669,7 +675,7 @@ array) CSRC field will be removed from the RTP packet.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/27981b7/src/RtpPacket.ts#L669">RtpPacket.ts:669</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/7991cee/src/RtpPacket.ts#L675">RtpPacket.ts:675</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">
