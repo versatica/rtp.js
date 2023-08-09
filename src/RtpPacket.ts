@@ -315,7 +315,7 @@ export class RtpPacket extends Packet
 	{
 		// NOTE: Here, even if serialization is not needed, we cannot bypass full
 		// length computation since the original and unmodified parsed packet
-		// may have useless padding octects in extensions, octects that we ignore
+		// may have useless padding octets in extensions, octets that we ignore
 		// when computing packet length and when serializing the packet.
 
 		let packetLength = 0;
@@ -599,7 +599,7 @@ export class RtpPacket extends Packet
 
 		// Assert that current position is equal or less than new buffer length.
 		// NOTE: Don't be strict matching resulting length since we may have
-		// discarded/reduced some padding/alignment octects in the extensions
+		// discarded/reduced some padding/alignment octets in the extensions
 		// during the process.
 		if (pos > packetView.byteLength)
 		{

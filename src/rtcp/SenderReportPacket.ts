@@ -62,7 +62,7 @@ export type SenderReportPacketDump = RtcpPacketDump &
 	ntpFraction: number;
 	rtpTimestamp: number;
 	packetCount: number;
-	octectCount: number;
+	octetCount: number;
 	reports: ReceiverReportDump[];
 };
 
@@ -145,7 +145,7 @@ export class SenderReportPacket extends RtcpPacket
 			ntpFraction  : this.getNtpFraction(),
 			rtpTimestamp : this.getRtpTimestamp(),
 			packetCount  : this.getPacketCount(),
-			octectCount  : this.getOctetCount(),
+			octetCount   : this.getOctetCount(),
 			reports      : this.#reports.map((report) => report.dump())
 		};
 	}
@@ -345,7 +345,7 @@ export class SenderReportPacket extends RtcpPacket
 	}
 
 	/**
-	 * Get RTP octect count.
+	 * Get RTP octet count.
 	 */
 	getOctetCount(): number
 	{
@@ -353,7 +353,7 @@ export class SenderReportPacket extends RtcpPacket
 	}
 
 	/**
-	 * Set RTP octect count.
+	 * Set RTP octet count.
 	 */
 	setOctetCount(count: number): void
 	{
