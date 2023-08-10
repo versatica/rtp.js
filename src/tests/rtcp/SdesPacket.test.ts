@@ -4,8 +4,8 @@ import {
 	SdesChunk,
 	SdesChunkDump,
 	SdesItemType
-} from '../../rtcp/SdesPacket';
-import { isRtcp, RtcpPacketType } from '../../rtcp/RtcpPacket';
+} from '../../RTCP/SdesPacket';
+import { isRtcp, RtcpPacketType } from '../../RTCP/RtcpPacket';
 import { areDataViewsEqual } from '../../utils';
 
 const sdesChunkDump1: SdesChunkDump =

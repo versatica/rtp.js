@@ -1,5 +1,5 @@
-import { UnknownPacket } from '../../rtcp/UnknownPacket';
-import { isRtcp } from '../../rtcp/RtcpPacket';
+import { UnknownPacket } from '../../RTCP/UnknownPacket';
+import { isRtcp } from '../../RTCP/RtcpPacket';
 import { areDataViewsEqual, numericArrayToDataView } from '../../utils';
 
 describe('parse RTCP unknown packet', () =>
@@ -105,7 +105,7 @@ describe('create RTCP unknown packet', () =>
 			.toThrowError(TypeError);
 	});
 
-	test.only('creating a unknown packet with padding succeeds', () =>
+	test('creating a unknown packet with padding succeeds', () =>
 	{
 		const packet = new UnknownPacket(undefined, 199);
 

@@ -21,29 +21,29 @@ export {
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump
-} from './rtcp/RtcpPacket';
+} from './RTCP/RtcpPacket';
 
 export {
 	CompoundPacket,
 	CompoundPacketDump
-} from './rtcp/CompoundPacket';
+} from './RTCP/CompoundPacket';
 
 export {
 	ReceiverReportPacket,
 	ReceiverReportPacketDump,
 	ReceptionReport,
 	ReceptionReportDump
-} from './rtcp/ReceiverReportPacket';
+} from './RTCP/ReceiverReportPacket';
 
 export {
 	SenderReportPacket,
 	SenderReportPacketDump
-} from './rtcp/SenderReportPacket';
+} from './RTCP/SenderReportPacket';
 
 export {
 	ByePacket,
 	ByePacketDump
-} from './rtcp/ByePacket';
+} from './RTCP/ByePacket';
 
 export {
 	SdesPacket,
@@ -51,12 +51,12 @@ export {
 	SdesChunk,
 	SdesChunkDump,
 	SdesItemType
-} from './rtcp/SdesPacket';
+} from './RTCP/SdesPacket';
 
 export {
 	UnknownPacket,
 	UnknownPacketDump
-} from './rtcp/UnknownPacket';
+} from './RTCP/UnknownPacket';
 
 import {
 	nodeBufferToDataView,

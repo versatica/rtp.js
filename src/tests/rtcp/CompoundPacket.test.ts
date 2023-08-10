@@ -1,10 +1,10 @@
-import { CompoundPacket } from '../../rtcp/CompoundPacket';
-import { isRtcp, RtcpPacketType } from '../../rtcp/RtcpPacket';
-import { ReceiverReportPacket } from '../../rtcp/ReceiverReportPacket';
-import { SenderReportPacket } from '../../rtcp/SenderReportPacket';
-import { ByePacket } from '../../rtcp/ByePacket';
-import { SdesPacket } from '../../rtcp/SdesPacket';
-import { UnknownPacket } from '../../rtcp/UnknownPacket';
+import { CompoundPacket } from '../../RTCP/CompoundPacket';
+import { isRtcp, RtcpPacketType } from '../../RTCP/RtcpPacket';
+import { ReceiverReportPacket } from '../../RTCP/ReceiverReportPacket';
+import { SenderReportPacket } from '../../RTCP/SenderReportPacket';
+import { ByePacket } from '../../RTCP/ByePacket';
+import { SdesPacket } from '../../RTCP/SdesPacket';
+import { UnknownPacket } from '../../RTCP/UnknownPacket';
 import { areDataViewsEqual, numericArrayToDataView } from '../../utils';
 
 describe('parse RTCP Compound packet', () =>

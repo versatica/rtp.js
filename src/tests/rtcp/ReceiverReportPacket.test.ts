@@ -2,8 +2,8 @@ import {
 	ReceiverReportPacket,
 	ReceptionReport,
 	ReceptionReportDump
-} from '../../rtcp/ReceiverReportPacket';
-import { isRtcp, RtcpPacketType } from '../../rtcp/RtcpPacket';
+} from '../../RTCP/ReceiverReportPacket';
+import { isRtcp, RtcpPacketType } from '../../RTCP/RtcpPacket';
 import { areDataViewsEqual, numericArrayToDataView } from '../../utils';
 
 const receptionReportDump1: ReceptionReportDump =

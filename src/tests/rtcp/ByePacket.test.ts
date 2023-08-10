@@ -1,5 +1,5 @@
-import { ByePacket } from '../../rtcp/ByePacket';
-import { isRtcp, RtcpPacketType } from '../../rtcp/RtcpPacket';
+import { ByePacket } from '../../RTCP/ByePacket';
+import { isRtcp, RtcpPacketType } from '../../RTCP/RtcpPacket';
 import { areDataViewsEqual } from '../../utils';
 
 describe('parse RTCP Bye packet', () =>
