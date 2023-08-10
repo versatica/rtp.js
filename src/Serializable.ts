@@ -1,4 +1,5 @@
 import { EnhancedEventEmitter } from './EnhancedEventEmitter';
+import { clone } from './utils';
 
 /**
  * Event emitted when the content is being serialized. The user has a chance to
@@ -113,6 +114,25 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 	 */
 	abstract serialize(): void;
 
+	/**
+	 * Clone the content. The cloned instance does not share any memory with the
+	 * original one.
+	 *
+	 * @param buffer - Buffer in which the content will be serialized. If not
+	 *   given, a new one will internally allocated.
+	 * @param byteOffset - Byte offset of the given `buffer` where serialization
+	 *   will start.
+	 *
+	 * @remarks
+	 * - The buffer is serialized if needed (to apply pending modifications).
+	 *
+	 * @throws
+	 * - If serialization is needed and it fails due to invalid fields or if
+	 *   `buffer` is given and it doesn't hold enough space to serialize the
+	 *   content.
+	 */
+	abstract clone(buffer?: ArrayBuffer, byteOffset?: number): Serializable;
+
 	protected setSerializationNeeded(flag: boolean): void
 	{
 		this.#serializationNeeded = flag;
@@ -158,5 +178,57 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 		}
 
 		return { buffer, byteOffset };
+	}
+
+	protected cloneInternal(buffer?: ArrayBuffer, byteOffset?: number): DataView
+	{
+		if (this.needsSerialization())
+		{
+			this.serialize();
+		}
+
+		let view: DataView;
+
+		// If buffer is given, let's check whether it holds enough space for the
+		// content.
+		if (buffer)
+		{
+			byteOffset = byteOffset ?? 0;
+
+			if (buffer.byteLength - byteOffset < this.view.byteLength)
+			{
+				throw new RangeError(
+					`given buffer available space (${buffer.byteLength - byteOffset} bytes) is less than required length (${this.view.byteLength} bytes)`
+				);
+			}
+
+			// Copy the content into the given buffer.
+			const uint8Array = new Uint8Array(
+				buffer,
+				byteOffset,
+				this.view.byteLength
+			);
+
+			uint8Array.set(
+				new Uint8Array(
+					this.view.buffer,
+					this.view.byteOffset,
+					this.view.byteLength
+				),
+				0
+			);
+
+			view = new DataView(
+				uint8Array.buffer,
+				uint8Array.byteOffset,
+				uint8Array.byteLength
+			);
+		}
+		else
+		{
+			view = clone<DataView>(this.view);
+		}
+
+		return view;
 	}
 }

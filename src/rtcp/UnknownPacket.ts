@@ -138,11 +138,11 @@ export class UnknownPacket extends RtcpPacket
 	 */
 	serialize(): void
 	{
-		const packetView = super.serializeBase();
-		const packetUint8Array = new Uint8Array(
-			packetView.buffer,
-			packetView.byteOffset,
-			packetView.byteLength
+		const view = super.serializeBase();
+		const uint8Array = new Uint8Array(
+			view.buffer,
+			view.byteOffset,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -152,7 +152,7 @@ export class UnknownPacket extends RtcpPacket
 		pos += COMMON_HEADER_LENGTH;
 
 		// Copy the body into the new buffer.
-		packetUint8Array.set(
+		uint8Array.set(
 			new Uint8Array(
 				this.#bodyView.buffer,
 				this.#bodyView.byteOffset,
@@ -166,23 +166,23 @@ export class UnknownPacket extends RtcpPacket
 		pos += this.padding;
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== packetView.byteLength)
+		if (pos !== view.byteLength)
 		{
 			throw new RangeError(
-				`computed packet length (${pos} bytes) is different than the available buffer size (${packetView.byteLength} bytes)`
+				`computed packet length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
 		// Assert that RTCP header length field is correct.
-		if (getRtcpLength(packetView) !== packetView.byteLength)
+		if (getRtcpLength(view) !== view.byteLength)
 		{
 			throw new RangeError(
-				`length in the RTCP header (${getRtcpLength(packetView)} bytes) does not match the available buffer size (${packetView.byteLength} bytes)`
+				`length in the RTCP header (${getRtcpLength(view)} bytes) does not match the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
 		// Update DataView.
-		this.view = packetView;
+		this.view = view;
 
 		this.setSerializationNeeded(false);
 	}
@@ -192,9 +192,9 @@ export class UnknownPacket extends RtcpPacket
 	 */
 	clone(buffer?: ArrayBuffer, byteOffset?: number): UnknownPacket
 	{
-		const packetView = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(buffer, byteOffset);
 
-		return new UnknownPacket(packetView);
+		return new UnknownPacket(view);
 	}
 
 	/**

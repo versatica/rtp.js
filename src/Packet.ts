@@ -1,5 +1,5 @@
 import { Serializable } from './Serializable';
-import { clone, padTo4Bytes } from './utils';
+import { padTo4Bytes } from './utils';
 import { readBit, writeBit, writeBits } from './bitOps';
 
 export const RTP_VERSION = 2;
@@ -76,25 +76,6 @@ export abstract class Packet extends Serializable
 		this.setSerializationNeeded(true);
 	}
 
-	/**
-	 * Clone the packet. The cloned packet does not share any memory with the
-	 * original one.
-	 *
-	 * @param buffer - Buffer in which the packet will be serialized. If not
-	 *   given, a new one will internally allocated.
-	 * @param byteOffset - Byte offset of the given `buffer` where serialization
-	 *   will start.
-	 *
-	 * @remarks
-	 * - The buffer is serialized if needed (to apply packet pending modifications).
-	 * - Read the info dump type of each RTCP packet instead.
-	 *
-	 * @throws
-	 * - If serialization is needed and it fails due to invalid fields or if
-	 *   `buffer` is given and it doesn't hold enough space to serialize the packet.
-	 */
-	abstract clone(buffer?: ArrayBuffer, byteOffset?: number): Packet;
-
 	protected setVersion(): void
 	{
 		writeBits(
@@ -125,57 +106,5 @@ export abstract class Packet extends Serializable
 		this.setPaddingBit(Boolean(this.padding));
 
 		this.setSerializationNeeded(true);
-	}
-
-	protected cloneInternal(buffer?: ArrayBuffer, byteOffset?: number): DataView
-	{
-		if (this.needsSerialization())
-		{
-			this.serialize();
-		}
-
-		let packetView: DataView;
-
-		// If buffer is given, let's check whether it holds enough space for the
-		// packet.
-		if (buffer)
-		{
-			byteOffset = byteOffset ?? 0;
-
-			if (buffer.byteLength - byteOffset < this.view.byteLength)
-			{
-				throw new RangeError(
-					`given buffer available space (${buffer.byteLength - byteOffset} bytes) is less than packet required length (${this.view.byteLength} bytes)`
-				);
-			}
-
-			// Copy the packet into the given buffer.
-			const packetUint8Array = new Uint8Array(
-				buffer,
-				byteOffset,
-				this.view.byteLength
-			);
-
-			packetUint8Array.set(
-				new Uint8Array(
-					this.view.buffer,
-					this.view.byteOffset,
-					this.view.byteLength
-				),
-				0
-			);
-
-			packetView = new DataView(
-				packetUint8Array.buffer,
-				packetUint8Array.byteOffset,
-				packetUint8Array.byteLength
-			);
-		}
-		else
-		{
-			packetView = clone<DataView>(this.view);
-		}
-
-		return packetView;
 	}
 }

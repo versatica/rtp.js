@@ -157,7 +157,7 @@ export class ByePacket extends RtcpPacket
 	 */
 	serialize(): void
 	{
-		const packetView = super.serializeBase();
+		const view = super.serializeBase();
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
@@ -168,7 +168,7 @@ export class ByePacket extends RtcpPacket
 		// Write SSRCs/CSRCs.
 		for (const ssrc of this.#ssrcs)
 		{
-			packetView.setUint32(pos, ssrc);
+			view.setUint32(pos, ssrc);
 
 			pos += 4;
 		}
@@ -178,20 +178,20 @@ export class ByePacket extends RtcpPacket
 			const reasonUint8Array = stringToUint8Array(this.#reason);
 			const reasonLength = reasonUint8Array.byteLength;
 			const reasonPadding = -(reasonLength + 1) & 3;
-			const packetUint8Array = new Uint8Array(
-				packetView.buffer,
-				packetView.byteOffset,
-				packetView.byteLength
+			const uint8Array = new Uint8Array(
+				view.buffer,
+				view.byteOffset,
+				view.byteLength
 			);
 
 			// Write reason length.
-			packetView.setUint8(pos, reasonLength);
+			view.setUint8(pos, reasonLength);
 
 			// Move to reason field.
 			pos += 1;
 
 			// Copy reason.
-			packetUint8Array.set(reasonUint8Array, pos);
+			uint8Array.set(reasonUint8Array, pos);
 
 			// Move to padding.
 			pos += reasonLength + reasonPadding;
@@ -200,23 +200,23 @@ export class ByePacket extends RtcpPacket
 		pos += this.padding;
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== packetView.byteLength)
+		if (pos !== view.byteLength)
 		{
 			throw new RangeError(
-				`computed packet length (${pos} bytes) is different than the available buffer size (${packetView.byteLength} bytes)`
+				`computed packet length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
 		// Assert that RTCP header length field is correct.
-		if (getRtcpLength(packetView) !== packetView.byteLength)
+		if (getRtcpLength(view) !== view.byteLength)
 		{
 			throw new RangeError(
-				`length in the RTCP header (${getRtcpLength(packetView)} bytes) does not match the available buffer size (${packetView.byteLength} bytes)`
+				`length in the RTCP header (${getRtcpLength(view)} bytes) does not match the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
 		// Update DataView.
-		this.view = packetView;
+		this.view = view;
 
 		this.setSerializationNeeded(false);
 	}
@@ -226,9 +226,9 @@ export class ByePacket extends RtcpPacket
 	 */
 	clone(buffer?: ArrayBuffer, byteOffset?: number): ByePacket
 	{
-		const packetView = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(buffer, byteOffset);
 
-		return new ByePacket(packetView);
+		return new ByePacket(view);
 	}
 
 	/**

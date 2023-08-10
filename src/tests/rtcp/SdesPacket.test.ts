@@ -398,3 +398,47 @@ describe('create RTCP SDES packet', () =>
 		);
 	});
 });
+
+describe('create SDES Chunk', () =>
+{
+	test('creating a Chunk succeeds', () =>
+	{
+		const chunk = new SdesChunk();
+
+		expect(chunk.needsSerialization()).toBe(false);
+		chunk.setSsrc(sdesChunkDump2.ssrc);
+
+		for (const item of sdesChunkDump2.items)
+		{
+			chunk.setItem(item.type, item.text);
+		}
+
+		expect(chunk.needsSerialization()).toBe(true);
+		expect(chunk.dump()).toEqual(sdesChunkDump2);
+
+		const serializationBuffer = new ArrayBuffer(2000);
+		const serializationByteOffset = 234;
+
+		const cloningBuffer = new ArrayBuffer(1000);
+		const cloningByteOffset = 123;
+
+		chunk.on('will-serialize', (length, cb) =>
+		{
+			cb(serializationBuffer, serializationByteOffset);
+		});
+
+		// Clone the chunk instead of just serializing it since clone() will
+		// serialize it anyway.
+		const clonedChunk = chunk.clone(cloningBuffer, cloningByteOffset);
+
+		expect(chunk.needsSerialization()).toBe(false);
+		expect(chunk.getView().buffer === serializationBuffer).toBe(true);
+		expect(chunk.getView().byteOffset).toBe(serializationByteOffset);
+		expect(chunk.dump()).toEqual(sdesChunkDump2);
+
+		expect(clonedChunk.needsSerialization()).toBe(false);
+		expect(clonedChunk.getView().buffer === cloningBuffer).toBe(true);
+		expect(clonedChunk.getView().byteOffset).toBe(cloningByteOffset);
+		expect(clonedChunk.dump()).toEqual(sdesChunkDump2);
+	});
+});

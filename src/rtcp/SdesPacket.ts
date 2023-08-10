@@ -233,7 +233,7 @@ export class SdesPacket extends RtcpPacket
 	 */
 	serialize(): void
 	{
-		const packetView = super.serializeBase();
+		const view = super.serializeBase();
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
@@ -247,7 +247,7 @@ export class SdesPacket extends RtcpPacket
 			// Serialize the chunk into the current position.
 			chunk.prependOnceListener('will-serialize', (length, cb) =>
 			{
-				cb(packetView.buffer, packetView.byteOffset + pos);
+				cb(view.buffer, view.byteOffset + pos);
 
 				pos += length;
 			});
@@ -258,23 +258,23 @@ export class SdesPacket extends RtcpPacket
 		pos += this.padding;
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== packetView.byteLength)
+		if (pos !== view.byteLength)
 		{
 			throw new RangeError(
-				`computed packet length (${pos} bytes) is different than the available buffer size (${packetView.byteLength} bytes)`
+				`computed packet length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
 		// Assert that RTCP header length field is correct.
-		if (getRtcpLength(packetView) !== packetView.byteLength)
+		if (getRtcpLength(view) !== view.byteLength)
 		{
 			throw new RangeError(
-				`length in the RTCP header (${getRtcpLength(packetView)} bytes) does not match the available buffer size (${packetView.byteLength} bytes)`
+				`length in the RTCP header (${getRtcpLength(view)} bytes) does not match the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
 		// Update DataView.
-		this.view = packetView;
+		this.view = view;
 
 		this.setSerializationNeeded(false);
 	}
@@ -284,9 +284,9 @@ export class SdesPacket extends RtcpPacket
 	 */
 	clone(buffer?: ArrayBuffer, byteOffset?: number): SdesPacket
 	{
-		const packetView = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(buffer, byteOffset);
 
-		return new SdesPacket(packetView);
+		return new SdesPacket(view);
 	}
 
 	/**
@@ -332,6 +332,8 @@ export class SdesPacket extends RtcpPacket
 
 /**
  * SDES chunk.
+ *
+ * @emits will-serialize - {@link WillSerializeEvent}
  */
 export class SdesChunk extends Serializable
 {
@@ -463,17 +465,17 @@ export class SdesChunk extends Serializable
 	{
 		const chunkLength = this.getByteLength();
 		const { buffer, byteOffset } = this.getSerializationBuffer(chunkLength);
-		const chunkView = new DataView(buffer, byteOffset, chunkLength);
-		const chunkUint8Array = new Uint8Array(
-			chunkView.buffer,
-			chunkView.byteOffset,
-			chunkView.byteLength
+		const view = new DataView(buffer, byteOffset, chunkLength);
+		const uint8Array = new Uint8Array(
+			view.buffer,
+			view.byteOffset,
+			view.byteLength
 		);
 
 		let pos = 0;
 
 		// Copy the SSRC.
-		chunkView.setUint32(pos, this.getSsrc());
+		view.setUint32(pos, this.getSsrc());
 
 		// Move to items.
 		pos += 4;
@@ -482,23 +484,33 @@ export class SdesChunk extends Serializable
 		{
 			const itemUint8Array = stringToUint8Array(itemText);
 
-			chunkView.setUint8(pos, itemType);
-			chunkView.setUint8(pos + 1, itemUint8Array.byteLength);
+			view.setUint8(pos, itemType);
+			view.setUint8(pos + 1, itemUint8Array.byteLength);
 
 			pos += 2;
 
-			chunkUint8Array.set(itemUint8Array, pos);
+			uint8Array.set(itemUint8Array, pos);
 
 			pos += itemUint8Array.byteLength;
 		}
 
 		// Update DataView.
-		this.view = chunkView;
+		this.view = view;
 
 		// NOTE: No need to care about chunk padding since the obtained buffer
 		// has the proper size (multiple of 4 bytes) and is filled with zeroes.
 
 		this.setSerializationNeeded(false);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	clone(buffer?: ArrayBuffer, byteOffset?: number): SdesChunk
+	{
+		const view = this.cloneInternal(buffer, byteOffset);
+
+		return new SdesChunk(view);
 	}
 
 	/**
@@ -521,8 +533,6 @@ export class SdesChunk extends Serializable
 
 	/**
 	 * Get the value of the item with given `type`.
-	 *
-	 * @param type - Item type.
 	 */
 	getItem(type: SdesItemType): string | undefined
 	{
@@ -539,9 +549,6 @@ export class SdesChunk extends Serializable
 
 	/**
 	 * Set the value of the item with given `type`.
-	 *
-	 * @param type - Item type.
-	 * @param text - Item text.
 	 */
 	setItem(type: SdesItemType, text: string): void
 	{
@@ -552,8 +559,6 @@ export class SdesChunk extends Serializable
 
 	/**
 	 * Delete the item with given `type`.
-	 *
-	 * @param type - Item type.
 	 */
 	deleteItem(type: SdesItemType): void
 	{

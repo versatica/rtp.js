@@ -199,7 +199,7 @@ export class CompoundPacket extends Packet
 		const { buffer, byteOffset } = this.getSerializationBuffer(packetLength);
 
 		// Create new DataView with new buffer.
-		const packetView = new DataView(buffer, byteOffset, packetLength);
+		const view = new DataView(buffer, byteOffset, packetLength);
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
@@ -209,7 +209,7 @@ export class CompoundPacket extends Packet
 			// Serialize the RTCP packet into the current position.
 			packet.prependOnceListener('will-serialize', (length, cb) =>
 			{
-				cb(packetView.buffer, packetView.byteOffset + pos);
+				cb(view.buffer, view.byteOffset + pos);
 
 				pos += length;
 			});
@@ -218,15 +218,15 @@ export class CompoundPacket extends Packet
 		}
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== packetView.byteLength)
+		if (pos !== view.byteLength)
 		{
 			throw new RangeError(
-				`computed packet length (${pos} bytes) is different than the available buffer size (${packetView.byteLength} bytes)`
+				`computed packet length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
 		// Update DataView.
-		this.view = packetView;
+		this.view = view;
 
 		this.setSerializationNeeded(false);
 	}
@@ -236,9 +236,9 @@ export class CompoundPacket extends Packet
 	 */
 	clone(buffer?: ArrayBuffer, byteOffset?: number): CompoundPacket
 	{
-		const packetView = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(buffer, byteOffset);
 
-		return new CompoundPacket(packetView);
+		return new CompoundPacket(view);
 	}
 
 	/**
