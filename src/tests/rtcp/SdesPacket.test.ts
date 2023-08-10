@@ -216,6 +216,7 @@ describe('parse SDES packet', () =>
 
 		const packetDump: SdesPacketDump =
 		{
+			packetType : RtcpPacketType.SDES,
 			byteLength : 52,
 			padding    : 0,
 			count      : 2,
