@@ -35,7 +35,7 @@ import {
 const SDES_CHUNK_MIN_LENGTH = 8;
 
 /**
- * SDES chunk item types.
+ * SDES Chunk Item types.
  */
 // ESLint absurdly complains about "'SdesItemType' is already declared in the
 // upper scope".
@@ -43,35 +43,35 @@ const SDES_CHUNK_MIN_LENGTH = 8;
 export enum SdesItemType
 {
 	/**
-	 * Canonical End-Point Identifier SDES item.
+	 * Canonical End-Point Identifier SDES Item.
 	 */
 	CNAME = 1,
 	/**
-	 * User Name SDES item.
+	 * User Name SDES Item.
 	 */
 	NAME = 2,
 	/**
-	 * Electronic Mail Address SDES item.
+	 * Electronic Mail Address SDES Item.
 	 */
 	EMAIL = 3,
 	/**
-	 * Phone Number SDES item.
+	 * Phone Number SDES Item.
 	 */
 	PHONE = 4,
 	/**
-	 * Geographic User Location SDES item.
+	 * Geographic User Location SDES Item.
 	 */
 	LOC = 5,
 	/**
-	 * Application or Tool Name SDES item.
+	 * Application or Tool Name SDES Item.
 	 */
 	TOOL = 6,
 	/**
-	 * Notice/Status SDES item.
+	 * Notice/Status SDES Item.
 	 */
 	NOTE = 7,
 	/**
-	 * Private Extensions SDES item.
+	 * Private Extensions SDES Item.
 	 */
 	PRIV = 8
 }
@@ -85,7 +85,7 @@ export type SdesPacketDump = RtcpPacketDump &
 };
 
 /**
- * SDES chunk dump.
+ * SDES Chunk dump.
  */
 export type SdesChunkDump =
 {
@@ -100,7 +100,7 @@ export type SdesChunkDump =
  */
 export class SdesPacket extends RtcpPacket
 {
-	// ChunksReceiver Reports.
+	// SDES Chunks.
 	#chunks: SdesChunk[] = [];
 
 	/**
@@ -194,7 +194,7 @@ export class SdesPacket extends RtcpPacket
 		if (this.#chunks.length !== this.getCount())
 		{
 			throw new RangeError(
-				`num of parsed SDES chunks (${this.#chunks.length}) doesn't match RTCP cound field ({${this.getCount()}})`
+				`num of parsed SDES Chunks (${this.#chunks.length}) doesn't match RTCP cound field ({${this.getCount()}})`
 			);
 		}
 
@@ -314,7 +314,7 @@ export class SdesPacket extends RtcpPacket
 	}
 
 	/**
-	 * Get SDES chunks.
+	 * Get SDES Chunks.
 	 */
 	getChunks(): SdesChunk[]
 	{
@@ -322,7 +322,7 @@ export class SdesPacket extends RtcpPacket
 	}
 
 	/**
-	 * Set SDES chunks.
+	 * Set SDES Chunks.
 	 *
 	 * @remarks
 	 * - Serialization is needed after calling this method.
@@ -338,7 +338,7 @@ export class SdesPacket extends RtcpPacket
 	}
 
 	/**
-	 * Add SDES chunk.
+	 * Add SDES Chunk.
 	 *
 	 * @remarks
 	 * - Serialization is needed after calling this method.
@@ -355,18 +355,18 @@ export class SdesPacket extends RtcpPacket
 }
 
 /**
- * SDES chunk.
+ * SDES Chunk.
  *
  * @emits will-serialize - {@link WillSerializeEvent}
  */
 export class SdesChunk extends Serializable
 {
-	// Chunk items indexed by type with text as value.
+	// SDES Items indexed by type with text as value.
 	readonly #items: Map<SdesItemType, string> = new Map();
 
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP SDES
-	 *   chunk will be created.
+	 *   Chunk will be created.
 	 */
 	constructor(view?: DataView)
 	{
@@ -385,7 +385,7 @@ export class SdesChunk extends Serializable
 		}
 		else if (this.view.byteLength % 4 !== 0)
 		{
-			throw new RangeError(`chunk length must be multiple of 4 bytes but it is ${this.view.byteLength} bytes`);
+			throw new RangeError(`SDES Chunk length must be multiple of 4 bytes but it is ${this.view.byteLength} bytes`);
 		}
 
 		// Position relative to the DataView byte offset.
@@ -430,12 +430,12 @@ export class SdesChunk extends Serializable
 
 		if (numNullOctets < 1 || numNullOctets > 4)
 		{
-			throw new RangeError(`chunk has wrong number of null octests at the end (${numNullOctets} null octets)`);
+			throw new RangeError(`SDES Chunk has wrong number of null octests at the end (${numNullOctets} null octets)`);
 		}
 	}
 
 	/**
-	 * Dump SDES chunk info.
+	 * Dump SDES Chunk info.
 	 */
 	dump(): SdesChunkDump
 	{
@@ -538,7 +538,7 @@ export class SdesChunk extends Serializable
 	}
 
 	/**
-	 * Get SDES chunk SSRC.
+	 * Get SDES Chunk SSRC.
 	 */
 	getSsrc(): number
 	{
@@ -546,7 +546,7 @@ export class SdesChunk extends Serializable
 	}
 
 	/**
-	 * Set SDES chunk SSRC.
+	 * Set SDES Chunk SSRC.
 	 */
 	setSsrc(ssrc: number): void
 	{
@@ -556,7 +556,7 @@ export class SdesChunk extends Serializable
 	}
 
 	/**
-	 * Get the value of the item with given `type`.
+	 * Get the value of the SDES Item with given `type`.
 	 */
 	getItem(type: SdesItemType): string | undefined
 	{
@@ -564,7 +564,7 @@ export class SdesChunk extends Serializable
 	}
 
 	/**
-	 * Get a map with all the items indexed by their type.
+	 * Get a map with all the SDES Items indexed by their type.
 	 */
 	getItems(): Map<SdesItemType, string>
 	{
@@ -572,7 +572,7 @@ export class SdesChunk extends Serializable
 	}
 
 	/**
-	 * Set the value of the item with given `type`.
+	 * Set the value of the SDES Item with given `type`.
 	 */
 	setItem(type: SdesItemType, text: string): void
 	{
@@ -582,7 +582,7 @@ export class SdesChunk extends Serializable
 	}
 
 	/**
-	 * Delete the item with given `type`.
+	 * Delete the SDES Item with given `type`.
 	 */
 	deleteItem(type: SdesItemType): void
 	{
@@ -595,7 +595,7 @@ export class SdesChunk extends Serializable
 	}
 
 	/**
-	 * Clear all items.
+	 * Clear all SDES Items.
 	 */
 	clearItems(): void
 	{
