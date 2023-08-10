@@ -40,8 +40,8 @@ export abstract class Packet extends Serializable
 	dump(): PacketDump
 	{
 		return {
-			padding    : this.getPadding(),
-			byteLength : this.getByteLength()
+			byteLength : this.getByteLength(),
+			padding    : this.getPadding()
 		};
 	}
 

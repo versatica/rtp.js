@@ -59,6 +59,7 @@ export enum RtcpPacketType
  */
 export type RtcpPacketDump = PacketDump &
 {
+	packetType: RtcpPacketType;
 	count: number;
 };
 
@@ -237,9 +238,9 @@ export abstract class RtcpPacket extends Packet
 	dump(): RtcpPacketDump
 	{
 		return {
-			count      : this.getCount(),
-			padding    : this.getPadding(),
-			byteLength : this.getByteLength()
+			...super.dump(),
+			packetType : this.#packetType,
+			count      : this.getCount()
 		};
 	}
 
