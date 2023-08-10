@@ -659,3 +659,41 @@ describe('serialize packet into a given buffer', () =>
 		packet.removeAllListeners('will-serialize');
 	});
 });
+
+describe('clone packet into a given buffer', () =>
+{
+	const packet = new RtpPacket();
+
+	packet.setPayload(numericArrayToDataView([ 1, 2, 3, 4 ]));
+	packet.serialize();
+
+	const packetView = clone<DataView>(packet.getView());
+	const payloadView = clone<DataView>(packet.getPayload());
+	const packetDump = clone<RtpPacketDump>(packet.dump());
+
+	test('cloning succeeds', () =>
+	{
+		const buffer = new ArrayBuffer(2000);
+		const byteOffset = 135;
+
+		const clonedPacket = packet.clone(buffer, byteOffset);
+
+		// Packet and payload views must be the same.
+		expect(areDataViewsEqual(clonedPacket.getView(), packetView)).toBe(true);
+		expect(areDataViewsEqual(clonedPacket.getPayload(), payloadView)).toBe(true);
+		expect(clonedPacket.getView().buffer === buffer).toBe(true);
+		expect(clonedPacket.getView().byteOffset).toBe(byteOffset);
+		expect(clonedPacket.dump()).toEqual(packetDump);
+	});
+
+	test('cloning fails if given buffer do not have enough space', () =>
+	{
+		// Packet length is 16 byrtes so let's pass only 15 bytes to make it throw.
+		const buffer = new ArrayBuffer(16);
+		const byteOffset = 1;
+
+		expect(
+			() => packet.clone(buffer, byteOffset)
+		).toThrow(RangeError);
+	});
+});
