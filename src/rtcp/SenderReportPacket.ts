@@ -6,9 +6,9 @@ import {
 	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
 import {
-	ReceiverReport,
-	ReceiverReportDump,
-	RECEIVER_REPORT_LENGTH
+	ReceptionReport,
+	ReceptionReportDump,
+	RECEPTION_REPORT_LENGTH
 } from './ReceiverReportPacket';
 
 /**
@@ -63,7 +63,7 @@ export type SenderReportPacketDump = RtcpPacketDump &
 	rtpTimestamp: number;
 	packetCount: number;
 	octetCount: number;
-	reports: ReceiverReportDump[];
+	reports: ReceptionReportDump[];
 };
 
 /**
@@ -73,8 +73,8 @@ export type SenderReportPacketDump = RtcpPacketDump &
  */
 export class SenderReportPacket extends RtcpPacket
 {
-	// Receiver Reports.
-	#reports: ReceiverReport[] = [];
+	// Reception Reports.
+	#reports: ReceptionReport[] = [];
 
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP Sender
@@ -100,7 +100,7 @@ export class SenderReportPacket extends RtcpPacket
 		// Position relative to the DataView byte offset.
 		let pos = 0;
 
-		// Move to Receiver Reports.
+		// Move to Reception Reports.
 		pos += FIXED_HEADER_LENGTH;
 
 		let count = this.getCount();
@@ -111,13 +111,13 @@ export class SenderReportPacket extends RtcpPacket
 				this.view.buffer,
 				this.view.byteOffset
 					+ FIXED_HEADER_LENGTH
-					+ (this.#reports.length * RECEIVER_REPORT_LENGTH),
-				RECEIVER_REPORT_LENGTH
+					+ (this.#reports.length * RECEPTION_REPORT_LENGTH),
+				RECEPTION_REPORT_LENGTH
 			);
 
-			pos += RECEIVER_REPORT_LENGTH;
+			pos += RECEPTION_REPORT_LENGTH;
 
-			const report = new ReceiverReport(reportView);
+			const report = new ReceptionReport(reportView);
 
 			this.#reports.push(report);
 		}
@@ -162,7 +162,7 @@ export class SenderReportPacket extends RtcpPacket
 
 		const packetLength =
 			FIXED_HEADER_LENGTH +
-			(this.#reports.length * RECEIVER_REPORT_LENGTH) +
+			(this.#reports.length * RECEPTION_REPORT_LENGTH) +
 			this.padding;
 
 		return packetLength;
@@ -207,13 +207,13 @@ export class SenderReportPacket extends RtcpPacket
 			pos
 		);
 
-		// Move to Receiver Reports.
+		// Move to Reception Reports.
 		pos += FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH;
 
-		// Write Receiver Reports.
+		// Write Reception Reports.
 		for (const report of this.#reports)
 		{
-			// NOTE: ReceiverReport class has fixed length so we don't need to deal
+			// NOTE: ReceptionReport class has fixed length so we don't need to deal
 			// with calls to serialize() on it.
 
 			const reportView = report.getView();
@@ -222,12 +222,12 @@ export class SenderReportPacket extends RtcpPacket
 				new Uint8Array(
 					reportView.buffer,
 					reportView.byteOffset,
-					RECEIVER_REPORT_LENGTH
+					RECEPTION_REPORT_LENGTH
 				),
 				pos
 			);
 
-			pos += RECEIVER_REPORT_LENGTH;
+			pos += RECEPTION_REPORT_LENGTH;
 		}
 
 		pos += this.padding;
@@ -361,20 +361,20 @@ export class SenderReportPacket extends RtcpPacket
 	}
 
 	/**
-	 * Get Receiver Reports.
+	 * Get Reception Reports.
 	 */
-	getReports(): ReceiverReport[]
+	getReports(): ReceptionReport[]
 	{
 		return Array.from(this.#reports);
 	}
 
 	/**
-	 * Set Receiver Reports.
+	 * Set Reception Reports.
 	 *
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setReports(reports: ReceiverReport[]): void
+	setReports(reports: ReceptionReport[]): void
 	{
 		this.#reports = Array.from(reports);
 
@@ -385,12 +385,12 @@ export class SenderReportPacket extends RtcpPacket
 	}
 
 	/**
-	 * Add Receiver Report.
+	 * Add Reception Report.
 	 *
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	addReport(report: ReceiverReport): void
+	addReport(report: ReceptionReport): void
 	{
 		this.#reports.push(report);
 

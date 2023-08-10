@@ -38,7 +38,7 @@ import { Serializable } from '../Serializable';
 // Common RTCP header length + 4.
 const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 4;
 
-export const RECEIVER_REPORT_LENGTH = 24;
+export const RECEPTION_REPORT_LENGTH = 24;
 
 /**
  * RTCP Receiver Report packet info dump.
@@ -46,13 +46,13 @@ export const RECEIVER_REPORT_LENGTH = 24;
 export type ReceiverReportPacketDump = RtcpPacketDump &
 {
 	ssrc: number;
-	reports: ReceiverReportDump[];
+	reports: ReceptionReportDump[];
 };
 
 /**
- * Receiver Report dump.
+ * Reception Report dump.
  */
-export type ReceiverReportDump =
+export type ReceptionReportDump =
 {
 	ssrc: number;
 	fractionLost: number;
@@ -70,8 +70,8 @@ export type ReceiverReportDump =
  */
 export class ReceiverReportPacket extends RtcpPacket
 {
-	// Receiver Reports.
-	#reports: ReceiverReport[] = [];
+	// Reception Reports.
+	#reports: ReceptionReport[] = [];
 
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP Receiver
@@ -97,7 +97,7 @@ export class ReceiverReportPacket extends RtcpPacket
 		// Position relative to the DataView byte offset.
 		let pos = 0;
 
-		// Move to Receiver Reports.
+		// Move to Reception Reports.
 		pos += FIXED_HEADER_LENGTH;
 
 		let count = this.getCount();
@@ -108,13 +108,13 @@ export class ReceiverReportPacket extends RtcpPacket
 				this.view.buffer,
 				this.view.byteOffset
 					+ FIXED_HEADER_LENGTH
-					+ (this.#reports.length * RECEIVER_REPORT_LENGTH),
-				RECEIVER_REPORT_LENGTH
+					+ (this.#reports.length * RECEPTION_REPORT_LENGTH),
+				RECEPTION_REPORT_LENGTH
 			);
 
-			pos += RECEIVER_REPORT_LENGTH;
+			pos += RECEPTION_REPORT_LENGTH;
 
-			const report = new ReceiverReport(reportView);
+			const report = new ReceptionReport(reportView);
 
 			this.#reports.push(report);
 		}
@@ -154,7 +154,7 @@ export class ReceiverReportPacket extends RtcpPacket
 
 		const packetLength =
 			FIXED_HEADER_LENGTH +
-			(this.#reports.length * RECEIVER_REPORT_LENGTH) +
+			(this.#reports.length * RECEPTION_REPORT_LENGTH) +
 			this.padding;
 
 		return packetLength;
@@ -199,13 +199,13 @@ export class ReceiverReportPacket extends RtcpPacket
 			pos
 		);
 
-		// Move to Receiver Reports.
+		// Move to Reception Reports.
 		pos += FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH;
 
-		// Write Receiver Reports.
+		// Write Reception Reports.
 		for (const report of this.#reports)
 		{
-			// NOTE: ReceiverReport class has fixed length so we don't need to deal
+			// NOTE: ReceptionReport class has fixed length so we don't need to deal
 			// with calls to serialize() on it.
 
 			const reportView = report.getView();
@@ -214,12 +214,12 @@ export class ReceiverReportPacket extends RtcpPacket
 				new Uint8Array(
 					reportView.buffer,
 					reportView.byteOffset,
-					RECEIVER_REPORT_LENGTH
+					RECEPTION_REPORT_LENGTH
 				),
 				pos
 			);
 
-			pos += RECEIVER_REPORT_LENGTH;
+			pos += RECEPTION_REPORT_LENGTH;
 		}
 
 		pos += this.padding;
@@ -273,20 +273,20 @@ export class ReceiverReportPacket extends RtcpPacket
 	}
 
 	/**
-	 * Get Receiver Reports.
+	 * Get Reception Reports.
 	 */
-	getReports(): ReceiverReport[]
+	getReports(): ReceptionReport[]
 	{
 		return Array.from(this.#reports);
 	}
 
 	/**
-	 * Set Receiver Reports.
+	 * Set Reception Reports.
 	 *
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setReports(reports: ReceiverReport[]): void
+	setReports(reports: ReceptionReport[]): void
 	{
 		this.#reports = Array.from(reports);
 
@@ -297,12 +297,12 @@ export class ReceiverReportPacket extends RtcpPacket
 	}
 
 	/**
-	 * Add Receiver Report.
+	 * Add Reception Report.
 	 *
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	addReport(report: ReceiverReport): void
+	addReport(report: ReceptionReport): void
 	{
 		this.#reports.push(report);
 
@@ -314,9 +314,9 @@ export class ReceiverReportPacket extends RtcpPacket
 }
 
 /**
- * RTCP Receiver Report.
+ * RTCP Reception Report.
  */
-export class ReceiverReport extends Serializable
+export class ReceptionReport extends Serializable
 {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP Receiver
@@ -328,21 +328,21 @@ export class ReceiverReport extends Serializable
 
 		if (!this.view)
 		{
-			this.view = new DataView(new ArrayBuffer(RECEIVER_REPORT_LENGTH));
+			this.view = new DataView(new ArrayBuffer(RECEPTION_REPORT_LENGTH));
 
 			return;
 		}
 
-		if (this.view.byteLength !== RECEIVER_REPORT_LENGTH)
+		if (this.view.byteLength !== RECEPTION_REPORT_LENGTH)
 		{
-			throw new TypeError('wrong byte length for a RTCP Receiver Report');
+			throw new TypeError('wrong byte length for a RTCP Reception Report');
 		}
 	}
 
 	/**
-	 * Dump Receiver Report info.
+	 * Dump Reception Report info.
 	 */
-	dump(): ReceiverReportDump
+	dump(): ReceptionReportDump
 	{
 		return {
 			ssrc         : this.getSsrc(),
@@ -360,7 +360,7 @@ export class ReceiverReport extends Serializable
 	 */
 	getByteLength(): number
 	{
-		return RECEIVER_REPORT_LENGTH;
+		return RECEPTION_REPORT_LENGTH;
 	}
 
 	/**
@@ -376,11 +376,11 @@ export class ReceiverReport extends Serializable
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): ReceiverReport
+	clone(buffer?: ArrayBuffer, byteOffset?: number): ReceptionReport
 	{
 		const view = this.cloneInternal(buffer, byteOffset);
 
-		return new ReceiverReport(view);
+		return new ReceptionReport(view);
 	}
 
 	/**

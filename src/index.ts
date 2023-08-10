@@ -31,8 +31,8 @@ export {
 export {
 	ReceiverReportPacket,
 	ReceiverReportPacketDump,
-	ReceiverReport,
-	ReceiverReportDump
+	ReceptionReport,
+	ReceptionReportDump
 } from './rtcp/ReceiverReportPacket';
 
 export {

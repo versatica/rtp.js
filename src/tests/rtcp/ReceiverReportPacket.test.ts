@@ -1,12 +1,12 @@
 import {
 	ReceiverReportPacket,
-	ReceiverReport,
-	ReceiverReportDump
+	ReceptionReport,
+	ReceptionReportDump
 } from '../../rtcp/ReceiverReportPacket';
 import { isRtcp, RtcpPacketType } from '../../rtcp/RtcpPacket';
 import { areDataViewsEqual, numericArrayToDataView } from '../../utils';
 
-const receiverReportDump1: ReceiverReportDump =
+const receptionReportDump1: ReceptionReportDump =
 {
 	ssrc         : 26422708,
 	fractionLost : 80,
@@ -17,7 +17,7 @@ const receiverReportDump1: ReceiverReportDump =
 	dlsr         : 5
 };
 
-const receiverReportDump2: ReceiverReportDump =
+const receptionReportDump2: ReceptionReportDump =
 {
 	ssrc         : 0x02932db4,
 	fractionLost : 81,
@@ -34,14 +34,14 @@ describe('parse RTCP Receiver Report packet', () =>
 		[
 			0x82, 0xc9, 0x00, 0x0D, // Type: 201 (Receiver Report), Count: 2, Length: 13
 			0x5d, 0x93, 0x15, 0x34, // Sender SSRC: 0x5d931534
-			// Receiver Report
+			// Reception Report
 			0x01, 0x93, 0x2d, 0xb4, // SSRC. 0x01932db4
 			0x50, 0x00, 0x00, 0xd8, // Fraction lost: 80, Total lost: 216
 			0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 342342
 			0x00, 0x00, 0x00, 0x00, // Jitter: 0
 			0x00, 0x00, 0x20, 0x2a, // Last SR: 8234
 			0x00, 0x00, 0x00, 0x05, // DLSR: 5
-			// Receiver Report
+			// Reception Report
 			0x02, 0x93, 0x2d, 0xb4, // SSRC. 0x02932db4
 			0x51, 0x00, 0x00, 0xd9, // Fraction lost: 81, Total lost: 217
 			0x00, 0x05, 0x39, 0x47, // Extended highest sequence number: 342343
@@ -78,8 +78,8 @@ describe('parse RTCP Receiver Report packet', () =>
 		const report1 = packet.getReports()[0];
 		const report2 = packet.getReports()[1];
 
-		expect(report1.dump()).toEqual(receiverReportDump1);
-		expect(report2.dump()).toEqual(receiverReportDump2);
+		expect(report1.dump()).toEqual(receptionReportDump1);
+		expect(report2.dump()).toEqual(receptionReportDump2);
 	});
 
 	test('packet processing succeeds for a buffer view with padding', () =>
@@ -88,7 +88,7 @@ describe('parse RTCP Receiver Report packet', () =>
 			[
 				0xa1, 0xc9, 0x00, 0x08, // Padding, Type: 201, Count: 1, Length: 8
 				0x5d, 0x93, 0x15, 0x34, // Sender SSRC: 0x5d931534
-				// Receiver Report
+				// Reception Report
 				0x01, 0x93, 0x2d, 0xb4, // SSRC. 0x01932db4
 				0x50, 0x00, 0x00, 0xd8, // Fraction lost: 80, Total lost: 216
 				0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 342342
@@ -118,7 +118,7 @@ describe('parse RTCP Receiver Report packet', () =>
 
 		const report1 = packet.getReports()[0];
 
-		expect(report1.dump()).toEqual(receiverReportDump1);
+		expect(report1.dump()).toEqual(receptionReportDump1);
 
 		// Also test the same after serializing.
 		packet.serialize();
@@ -134,9 +134,9 @@ describe('parse RTCP Receiver Report packet', () =>
 
 		const report1B = packet.getReports()[0];
 
-		expect(report1B.dump()).toEqual(receiverReportDump1);
+		expect(report1B.dump()).toEqual(receptionReportDump1);
 
-		// If a change is done in a Receiver Report, the Receiver Report packet must
+		// If a change is done in a Reception Report, the Receiver Report packet must
 		// need serialization.
 		report1B.setDelaySinceLastSR(6);
 		expect(report1B.needsSerialization()).toBe(true);
@@ -151,7 +151,7 @@ describe('parse RTCP Receiver Report packet', () =>
 
 	test('parsing a buffer view which length does not fit the indicated count throws', () =>
 	{
-		// Parse the first 8 bytes of buffer, indicating 1 Receiver Report and
+		// Parse the first 8 bytes of buffer, indicating 1 Reception Report and
 		// holding no report at all.
 		const view3 = new DataView(
 			array.buffer,
@@ -205,7 +205,7 @@ describe('create RTCP Receiver Report packet', () =>
 		expect(packet.needsSerialization()).toBe(false);
 		expect(isRtcp(packet.getView())).toBe(true);
 
-		const report = new ReceiverReport();
+		const report = new ReceptionReport();
 
 		report.setSsrc(1234);
 		report.setFractionLost(50);
@@ -256,11 +256,11 @@ describe('create RTCP Receiver Report packet', () =>
 	});
 });
 
-describe('parse RTCP Receiver Report', () =>
+describe('parse RTCP Reception Report', () =>
 {
 	const array = new Uint8Array(
 		[
-			// Receiver Report
+			// Reception Report
 			0x01, 0x93, 0x2d, 0xb4, // SSRC. 0x01932db4
 			0x50, 0x00, 0x00, 0xd8, // Fraction lost: 80, Total lost: 216
 			0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 342342
@@ -278,37 +278,37 @@ describe('parse RTCP Receiver Report', () =>
 
 	test('report processing succeeds', () =>
 	{
-		const report = new ReceiverReport(view);
+		const report = new ReceptionReport(view);
 
 		expect(report.needsSerialization()).toBe(false);
-		expect(report.dump()).toEqual(receiverReportDump1);
+		expect(report.dump()).toEqual(receptionReportDump1);
 	});
 
 	test('parsing a buffer which length does not fit the report size throws', () =>
 	{
 		// Parse a 23 bytes buffer.
 		expect(
-			() => (new ReceiverReport(numericArrayToDataView([ 23 ]))))
+			() => (new ReceptionReport(numericArrayToDataView([ 23 ]))))
 			.toThrowError(TypeError);
 	});
 });
 
-describe('create RTCP Receiver Report', () =>
+describe('create RTCP Reception Report', () =>
 {
-	test('creating a Receiver Report succeeds', () =>
+	test('creating a Reception Report succeeds', () =>
 	{
-		const report = new ReceiverReport();
+		const report = new ReceptionReport();
 
 		expect(report.needsSerialization()).toBe(false);
-		report.setSsrc(receiverReportDump1.ssrc);
-		report.setFractionLost(receiverReportDump1.fractionLost);
-		report.setTotalLost(receiverReportDump1.totalLost);
-		report.setHighestSeqNumber(receiverReportDump1.highestSeq);
-		report.setJitter(receiverReportDump1.jitter);
-		report.setLastSRTimestamp(receiverReportDump1.lsr);
-		report.setDelaySinceLastSR(receiverReportDump1.dlsr);
+		report.setSsrc(receptionReportDump1.ssrc);
+		report.setFractionLost(receptionReportDump1.fractionLost);
+		report.setTotalLost(receptionReportDump1.totalLost);
+		report.setHighestSeqNumber(receptionReportDump1.highestSeq);
+		report.setJitter(receptionReportDump1.jitter);
+		report.setLastSRTimestamp(receptionReportDump1.lsr);
+		report.setDelaySinceLastSR(receptionReportDump1.dlsr);
 		expect(report.needsSerialization()).toBe(true);
-		expect(report.dump()).toEqual(receiverReportDump1);
+		expect(report.dump()).toEqual(receptionReportDump1);
 
 		report.serialize();
 		expect(report.needsSerialization()).toBe(false);

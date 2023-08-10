@@ -1,12 +1,12 @@
 import { SenderReportPacket } from '../../rtcp/SenderReportPacket';
 import {
-	ReceiverReport,
-	ReceiverReportDump
+	ReceptionReport,
+	ReceptionReportDump
 } from '../../rtcp/ReceiverReportPacket';
 import { isRtcp, RtcpPacketType } from '../../rtcp/RtcpPacket';
 import { areDataViewsEqual } from '../../utils';
 
-const receiverReportDump1: ReceiverReportDump =
+const receptionReportDump1: ReceptionReportDump =
 {
 	ssrc         : 0x01932db4,
 	fractionLost : 80,
@@ -36,7 +36,7 @@ describe('parse RTCP Sender Report packet', () =>
 			0x00, 0x08, 0xcf, 0x00, // RTP timestamp: 577280
 			0x00, 0x00, 0x0e, 0x18, // Packet count: 3608
 			0x00, 0x08, 0xcf, 0x00, // Octet count: 577280
-			// Receiver Report
+			// Reception Report
 			0x01, 0x93, 0x2d, 0xb4, // SSRC. 0x01932db4
 			0x50, 0x00, 0x00, 0xd8, // Fraction lost: 0, Total lost: 1
 			0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 0
@@ -77,7 +77,7 @@ describe('parse RTCP Sender Report packet', () =>
 
 		const report1 = packet.getReports()[0];
 
-		expect(report1.dump()).toEqual(receiverReportDump1);
+		expect(report1.dump()).toEqual(receptionReportDump1);
 
 		// Also test the same after serializing.
 		packet.serialize();
@@ -98,9 +98,9 @@ describe('parse RTCP Sender Report packet', () =>
 
 		const report1B = packet.getReports()[0];
 
-		expect(report1B.dump()).toEqual(receiverReportDump1);
+		expect(report1B.dump()).toEqual(receptionReportDump1);
 
-		// If a change is done in a Receiver Report, the Receiver Report packet must
+		// If a change is done in a Reception Report, the Receiver Report packet must
 		// need serialization.
 		report1B.setDelaySinceLastSR(6);
 		expect(report1B.needsSerialization()).toBe(true);
@@ -153,7 +153,7 @@ describe('parse RTCP Sender Report packet', () =>
 
 	test('parsing a buffer view which length does not fit the indicated count throws', () =>
 	{
-		// Parse the first 8 bytes of buffer, indicating 1 Receiver Report and
+		// Parse the first 8 bytes of buffer, indicating 1 Reception Report and
 		// holding no report at all.
 		const view3 = new DataView(
 			array.buffer,
@@ -233,7 +233,7 @@ describe('create RTCP Sender Report packet', () =>
 		expect(packet.needsSerialization()).toBe(false);
 		expect(isRtcp(packet.getView())).toBe(true);
 
-		const report = new ReceiverReport();
+		const report = new ReceptionReport();
 
 		report.setSsrc(1234);
 		report.setFractionLost(50);

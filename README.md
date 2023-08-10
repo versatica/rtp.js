@@ -19,8 +19,8 @@ _NOTE:_ Work in progress. Many more RTCP packets will be added along with new fe
     RtpPacket,
     CompoundPacket,
     ReceiverReportPacket,
-    ReceiverReport,
     SenderReportPacket,
+    ReceptionReport,
     ByePacket,
     SdesPacket
   } from 'rtp.js';
