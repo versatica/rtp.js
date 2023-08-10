@@ -55,6 +55,12 @@
         }
       ]
     },
+    "coveragePathIgnorePatterns": [
+      "src/EnhancedEventEmitter.ts",
+      "src/Logger.ts",
+      "src/utils.ts",
+      "src/tests"
+    ],
     "cacheDirectory": ".cache/jest"
   },
   "dependencies": {
