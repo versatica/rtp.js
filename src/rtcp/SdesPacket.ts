@@ -42,13 +42,37 @@ const SDES_CHUNK_MIN_LENGTH = 8;
 // eslint-disable-next-line no-shadow
 export enum SdesItemType
 {
+	/**
+	 * Canonical End-Point Identifier SDES item.
+	 */
 	CNAME = 1,
+	/**
+	 * User Name SDES item.
+	 */
 	NAME = 2,
+	/**
+	 * Electronic Mail Address SDES item.
+	 */
 	EMAIL = 3,
+	/**
+	 * Phone Number SDES item.
+	 */
 	PHONE = 4,
+	/**
+	 * Geographic User Location SDES item.
+	 */
 	LOC = 5,
+	/**
+	 * Application or Tool Name SDES item.
+	 */
 	TOOL = 6,
+	/**
+	 * Notice/Status SDES item.
+	 */
 	NOTE = 7,
+	/**
+	 * Private Extensions SDES item.
+	 */
 	PRIV = 8
 }
 

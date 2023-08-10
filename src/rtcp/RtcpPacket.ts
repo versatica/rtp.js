@@ -20,13 +20,37 @@ export const COMMON_HEADER_LENGTH = 4;
 // eslint-disable-next-line no-shadow
 export enum RtcpPacketType
 {
+	/**
+	 * RTCP Sender Report packet.
+	 */
 	SR = 200,
+	/**
+	 * RTCP Receiver Report packet.
+	 */
 	RR = 201,
+	/**
+	 * RTCP Sender Report packet.
+	 */
 	SDES = 202,
+	/**
+	 * RTCP BYE packet.
+	 */
 	BYE = 203,
+	/**
+	 * RTCP APP packet.
+	 */
 	APP = 204,
+	/**
+	 * RTCP Transport Layer Feedback packet.
+	 */
 	RTPFB = 205,
+	/**
+	 * RTCP Payload Specific Feedback packet.
+	 */
 	PSFB = 206,
+	/**
+	 * RTCP Extended Report packet.
+	 */
 	XR = 207
 }
 
