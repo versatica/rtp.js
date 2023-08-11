@@ -161,7 +161,14 @@ export class UnknownPacket extends RtcpPacket
 			pos
 		);
 
-		pos += this.#bodyView.byteLength;
+		// Create new body DataView.
+		const bodyView = new DataView(
+			view.buffer,
+			view.byteOffset + pos,
+			this.#bodyView.byteLength
+		);
+
+		pos += bodyView.byteLength;
 
 		pos += this.padding;
 
@@ -183,6 +190,9 @@ export class UnknownPacket extends RtcpPacket
 
 		// Update DataView.
 		this.view = view;
+
+		// Update body DataView.
+		this.#bodyView = bodyView;
 
 		this.setSerializationNeeded(false);
 	}

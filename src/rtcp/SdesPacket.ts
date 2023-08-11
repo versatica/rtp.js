@@ -194,7 +194,7 @@ export class SdesPacket extends RtcpPacket
 		if (this.#chunks.length !== this.getCount())
 		{
 			throw new RangeError(
-				`num of parsed SDES Chunks (${this.#chunks.length}) doesn't match RTCP cound field ({${this.getCount()}})`
+				`num of parsed SDES Chunks (${this.#chunks.length}) doesn't match RTCP count field ({${this.getCount()}})`
 			);
 		}
 
@@ -518,11 +518,11 @@ export class SdesChunk extends Serializable
 			pos += itemUint8Array.byteLength;
 		}
 
-		// Update DataView.
-		this.view = view;
-
 		// NOTE: No need to care about chunk padding since the obtained buffer
 		// has the proper size (multiple of 4 bytes) and is filled with zeroes.
+
+		// Update DataView.
+		this.view = view;
 
 		this.setSerializationNeeded(false);
 	}
