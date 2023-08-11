@@ -35,7 +35,7 @@ import { Serializable } from '../Serializable';
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
-// Common RTCP header length + 4.
+// Common RTCP header length + 4 (SSRC of packet sender).
 const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 4;
 
 export const RECEPTION_REPORT_LENGTH = 24;

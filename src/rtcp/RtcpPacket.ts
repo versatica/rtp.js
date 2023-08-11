@@ -252,13 +252,6 @@ export abstract class RtcpPacket extends Packet
 		return this.view.getUint8(1);
 	}
 
-	protected writeCommonHeader(): void
-	{
-		this.setVersion();
-
-		this.setPacketType(this.#packetType);
-	}
-
 	/**
 	 * Get the RTCP header count value.
 	 */
@@ -267,8 +260,18 @@ export abstract class RtcpPacket extends Packet
 		return readBits({ view: this.view, byte: 0, mask: 0b00011111 });
 	}
 
+	protected writeCommonHeader(): void
+	{
+		this.setVersion();
+		this.setPacketType(this.#packetType);
+	}
+
 	/**
 	 * Set the RTCP header count value.
+	 *
+	 * @privateRemarks
+	 * - This method is not public since users should not manipulate this field
+	 *   directly.
 	 */
 	protected setCount(count: number): void
 	{
@@ -324,6 +327,10 @@ export abstract class RtcpPacket extends Packet
 
 	/**
 	 * Set the RTCP header packet type.
+	 *
+	 * @privateRemarks
+	 * - This method is not public since users should not manipulate this field
+	 *   directly.
 	 */
 	private setPacketType(packetType: RtcpPacketType): void
 	{
