@@ -1,6 +1,11 @@
 import { RTP_VERSION, Packet, PacketDump } from './Packet';
 import { clone, padTo4Bytes } from './utils';
-import { readBit, writeBit, readBits, writeBits } from './bitOps';
+import {
+	readBitInDataView,
+	writeBitInDataView,
+	readBitsInDataView,
+	writeBitsInDataView
+} from './bitOps';
 
 const FIXED_HEADER_LENGTH = 12;
 
@@ -138,11 +143,11 @@ export class RtpPacket extends Packet
 			// One-Byte extensions cannot have length 0.
 			while (extPos < headerExtensionView.byteLength)
 			{
-				const extId = readBits(
+				const extId = readBitsInDataView(
 					{ view: headerExtensionView, byte: extPos, mask: 0xF0 }
 				);
 
-				const extLength = readBits(
+				const extLength = readBitsInDataView(
 					{ view: headerExtensionView, byte: extPos, mask: 0x0F }
 				) + 1;
 
@@ -464,8 +469,10 @@ export class RtpPacket extends Packet
 						);
 					}
 
-					writeBits({ view: view, byte: pos, mask: 0xF0, value: extId });
-					writeBits(
+					writeBitsInDataView(
+						{ view: view, byte: pos, mask: 0xF0, value: extId }
+					);
+					writeBitsInDataView(
 						{ view: view, byte: pos, mask: 0x0F, value: extView.byteLength - 1 }
 					);
 
@@ -632,7 +639,7 @@ export class RtpPacket extends Packet
 	 */
 	getPayloadType(): number
 	{
-		return readBits({ view: this.view, byte: 1, mask: 0b01111111 });
+		return readBitsInDataView({ view: this.view, byte: 1, mask: 0b01111111 });
 	}
 
 	/**
@@ -640,7 +647,7 @@ export class RtpPacket extends Packet
 	 */
 	setPayloadType(payloadType: number): void
 	{
-		writeBits(
+		writeBitsInDataView(
 			{ view: this.view, byte: 1, mask: 0b01111111, value: payloadType }
 		);
 	}
@@ -723,7 +730,7 @@ export class RtpPacket extends Packet
 	 */
 	getMarker(): boolean
 	{
-		return readBit({ view: this.view, byte: 1, bit: 7 });
+		return readBitInDataView({ view: this.view, byte: 1, bit: 7 });
 	}
 
 	/**
@@ -731,7 +738,7 @@ export class RtpPacket extends Packet
 	 */
 	setMarker(flag: boolean): void
 	{
-		writeBit({ view: this.view, byte: 1, bit: 7, flag });
+		writeBitInDataView({ view: this.view, byte: 1, bit: 7, flag });
 	}
 
 	/**
@@ -989,12 +996,12 @@ export class RtpPacket extends Packet
 
 	private hasHeaderExtensionBit(): boolean
 	{
-		return readBit({ view: this.view, byte: 0, bit: 4 });
+		return readBitInDataView({ view: this.view, byte: 0, bit: 4 });
 	}
 
 	private setHeaderExtensionBit(flag: boolean): void
 	{
-		writeBit({ view: this.view, byte: 0, bit: 4, flag });
+		writeBitInDataView({ view: this.view, byte: 0, bit: 4, flag });
 	}
 
 	private getCsrcCount(): number
@@ -1004,6 +1011,8 @@ export class RtpPacket extends Packet
 
 	private setCsrcCount(count: number): void
 	{
-		writeBits({ view: this.view, byte: 0, mask: 0b00001111, value: count });
+		writeBitsInDataView(
+			{ view: this.view, byte: 0, mask: 0b00001111, value: count }
+		);
 	}
 }
