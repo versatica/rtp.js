@@ -229,11 +229,6 @@ export function parseChunk(chunk: number): ExtendedReportChunk
 	{
 		return { chunkType: 'terminating-null' };
 	}
-
-	if (readBit({ }))
-	{
-
-	}
 }
 
 /**
