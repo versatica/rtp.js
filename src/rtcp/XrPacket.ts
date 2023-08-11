@@ -6,7 +6,8 @@ import {
 	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
 import { Serializable } from '../Serializable';
-import { assertUnreachable } from '../utils';
+import { padTo4Bytes, assertUnreachable } from '../utils';
+import { readBit, writeBit, readBits, writeBits } from '../bitOps';
 
 /*
  * https://tools.ietf.org/html/rfc3611
@@ -20,8 +21,6 @@ import { assertUnreachable } from '../utils';
  * report :                         report blocks                         :
  * blocks +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
-
-
 
 // Common RTCP header length + 4 (SSRC of packet sender).
 const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 4;
@@ -78,11 +77,50 @@ export type XrPacketDump = RtcpPacketDump &
 /**
  * Extended Report dump.
  */
-// TODO: MAke this an interface so other dumps implement it and add fields.
-export interface ExtendedReportDump
+export type ExtendedReportDump =
 {
 	blockType: ExtendedReportType;
-}
+};
+
+/**
+ * Loss RLE Extended Report dump.
+ */
+export type ExtendedReportLRLEDump = ExtendedReportDump &
+{
+	thinning: number;
+	ssrc: number;
+	beginSeq: number;
+	endSeq: number;
+	chunks: number[];
+};
+
+/**
+ * Unknown Extended Report dump.
+ */
+export type UnknownExtendedReportDump = ExtendedReportDump;
+
+/**
+ * Loss RLE and Duplicate RLE Extended Report chunk info.
+ */
+export type ExtendedReportChunk =
+{
+	/**
+	 * Chunk type (Run Length Chunk, Bit Vector Chunk or Terminating Null Chunk).
+	 */
+	chunkType: 'run-length' | 'bit-vector' | 'terminating-null';
+	/**
+	 * Chunk run type (only set if `chunkType` is 'run-length').
+	 */
+	runType?: 'zeros' | 'ones';
+	/**
+	 * Chunk run length (only set if `chunkType` is 'run-length').
+	 */
+	runLength?: number;
+	/**
+	 * Chunk bit vector (only set if `chunkType` is 'bit-vector').
+	 */
+	bitVector?: number;
+};
 
 /**
  * Get the RTCP packet type.
@@ -178,6 +216,46 @@ function blockTypeToString(blockType: ExtendedReportType): string
 }
 
 /**
+ * Parse given 2 bytes number as a Extended Report chunk.
+ */
+export function parseChunk(chunk: number): ExtendedReportChunk
+{
+	if (chunk < 0 || chunk > 0xFFFF)
+	{
+		throw new TypeError('invalid chunk value');
+	}
+
+	if (chunk === 0)
+	{
+		return { chunkType: 'terminating-null' };
+	}
+
+	if (readBit({ }))
+	{
+
+	}
+}
+
+/**
+ * Create a Run Length Chunk.
+ */
+export function createRunLengthChunk(
+	runType: 'zeros' | 'ones',
+	runLength: number
+): void
+{
+	// TODO
+}
+
+/**
+ * Create a Bit Vector Chunk.
+ */
+export function createBitVectorChunk(bitVector: number): void
+{
+	// TODO
+}
+
+/**
  * RTCP XR packet.
  *
  * @emits will-serialize - {@link WillSerializeEvent}
@@ -216,11 +294,94 @@ export class XrPacket extends RtcpPacket
 
 		let count = this.getCount();
 
-		while (count-- > 0)
-		{
-			// TODO
+		const reportsLength = this.view.byteLength - this.padding;
 
-			// this.#reports.push(report);
+		while (count-- > 0 && pos < reportsLength)
+		{
+			const remainingView = new DataView(
+				this.view.buffer,
+				this.view.byteOffset + pos,
+				reportsLength - pos
+			);
+
+			const blockType = getExtendedReportType(remainingView);
+			const reportLength = getExtendedReportLength(remainingView);
+
+			const reportView = new DataView(
+				this.view.buffer,
+				this.view.byteOffset + pos,
+				reportLength
+			);
+
+			let report: ExtendedReport;
+
+			switch (blockType)
+			{
+				case ExtendedReportType.LRLE:
+				{
+					report = new ExtendedReportLRLE(reportView);
+
+					break;
+				}
+
+				// case ExtendedReportType.DRLE:
+				// {
+				// 	report = new ExtendedReportDRLE(reportView);
+
+				// 	break;
+				// }
+
+				// case ExtendedReportType.PRT:
+				// {
+				// 	report = new ExtendedReportPRT(reportView);
+
+				// 	break;
+				// }
+
+				// case ExtendedReportType.RRT:
+				// {
+				// 	report = new ExtendedReportRRT(reportView);
+
+				// 	break;
+				// }
+
+				// case ExtendedReportType.DLRR:
+				// {
+				// 	report = new ExtendedReportDLRR(reportView);
+
+				// 	break;
+				// }
+
+				// case ExtendedReportType.SS:
+				// {
+				// 	report = new ExtendedReportSS(reportView);
+
+				// 	break;
+				// }
+
+				// case ExtendedReportType.VM:
+				// {
+				// 	report = new ExtendedReportVM(reportView);
+
+				// 	break;
+				// }
+
+				default:
+				{
+					report = new UnknownExtendedReport(reportView);
+				}
+			}
+
+			pos += reportLength;
+
+			this.#reports.push(report);
+		}
+
+		if (this.#reports.length !== this.getCount())
+		{
+			throw new RangeError(
+				`num of parsed Extended Reports (${this.#reports.length}) doesn't match RTCP count field ({${this.getCount()}})`
+			);
 		}
 
 		pos += this.padding;
@@ -312,7 +473,15 @@ export class XrPacket extends RtcpPacket
 		// Write Reception Reports.
 		for (const report of this.#reports)
 		{
-			// TODO
+			// Serialize the report into the current position.
+			report.prependOnceListener('will-serialize', (length, cb) =>
+			{
+				cb(view.buffer, view.byteOffset + pos);
+
+				pos += length;
+			});
+
+			report.serialize();
 		}
 
 		pos += this.padding;
@@ -511,5 +680,463 @@ export abstract class ExtendedReport extends Serializable
 	private setBlockType(blockType: ExtendedReportType): void
 	{
 		this.view.setUint8(1, blockType);
+	}
+}
+
+/**
+ * Loss RLE Extended Report.
+ *
+ * @emits will-serialize - {@link WillSerializeEvent}
+ */
+export class ExtendedReportLRLE extends ExtendedReport
+{
+	// Chunks (2 bytes numbers, unparsed).
+	#chunks: number[] = [];
+
+	/**
+	 * @param view - If given it will be parsed. Otherwise an empty Loss RLE
+	 *   Extended Report will be created.
+	 */
+	constructor(view?: DataView)
+	{
+		super(ExtendedReportType.LRLE, view);
+
+		if (!this.view)
+		{
+			this.view = new DataView(
+				new ArrayBuffer(EXTENDED_REPORT_COMMON_HEADER_LENGTH)
+			);
+
+			// Write block type.
+			this.writeCommonHeader();
+
+			return;
+		}
+
+		if (this.view.byteLength < EXTENDED_REPORT_COMMON_HEADER_LENGTH)
+		{
+			throw new TypeError('wrong byte length for a Loss RLE Extended Report');
+		}
+		else if (this.view.byteLength % 4 !== 0)
+		{
+			throw new RangeError(`Loss RLE Extended Report length must be multiple of 4 bytes but it is ${this.view.byteLength} bytes`);
+		}
+
+		// Position relative to the DataView byte offset.
+		let pos = 0;
+
+		// Move to chunks.
+		pos += EXTENDED_REPORT_COMMON_HEADER_LENGTH + 4 + 2 + 2;
+
+		while (pos < this.view.byteLength)
+		{
+			const chunk = this.view.getUint16(pos);
+
+			if (chunk === 0)
+			{
+				break;
+			}
+
+			this.#chunks.push(chunk);
+
+			pos += 2;
+		}
+	}
+
+	/**
+	 * Dump Loss RLE Extended Report info.
+	 */
+	dump(): ExtendedReportLRLEDump
+	{
+		return {
+			...super.dump(),
+			thinning : this.getThinning(),
+			ssrc     : this.getSsrc(),
+			beginSeq : this.getBeginSeq(),
+			endSeq   : this.getEndSeq(),
+			chunks   : Array.from(this.#chunks)
+		};
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	getByteLength(): number
+	{
+		// Header + SSRC + begin seq + end seq.
+		let reportLength = EXTENDED_REPORT_COMMON_HEADER_LENGTH + 4 + 2 + 2;
+
+		// Add chunks.
+		reportLength += this.#chunks.length * 2;
+
+		// The list of chunks must terminate in terminating null chunks, which
+		// basically means padding them to 4 bytes.
+		reportLength = padTo4Bytes(reportLength);
+
+		return reportLength;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	serialize(): void
+	{
+		const view = super.serializeBase();
+
+		// Position relative to the DataView byte offset.
+		let pos = 0;
+
+		// Move to source of SSRC.
+		pos += 4;
+
+		// Copy the SSRC.
+		view.setUint32(pos, this.getSsrc());
+
+		// Move to being seq.
+		pos += 4;
+
+		// Copy being seq.
+		view.setUint16(pos, this.getBeginSeq());
+
+		// Move to end seq.
+		pos += 2;
+
+		// Copy being seq.
+		view.setUint16(pos, this.getEndSeq());
+
+		// Move to chunks.
+		pos += 2;
+
+		// Copy chunks.
+		for (const chunk of this.#chunks)
+		{
+			view.setUint16(pos, chunk);
+
+			++pos;
+		}
+
+		// NOTE: No need to care about chunk padding since the obtained buffer
+		// has the proper size (multiple of 4 bytes) and is filled with zeroes.
+
+		// Update DataView.
+		this.view = view;
+
+		this.setSerializationNeeded(false);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	clone(buffer?: ArrayBuffer, byteOffset?: number): ExtendedReportLRLE
+	{
+		const view = this.cloneInternal(buffer, byteOffset);
+
+		return new ExtendedReportLRLE(view);
+	}
+
+	/**
+	 * Get thinning.
+	 */
+	getThinning(): number
+	{
+		return readBits({ view: this.view, byte: 1, mask: 0x0F0 });
+	}
+
+	/**
+	 * Set thinning.
+	 */
+	setThinning(thinning: number): void
+	{
+		writeBits({ view: this.view, byte: 1, mask: 0x0F0, value: thinning });
+
+		this.setSerializationNeeded(true);
+	}
+
+	/**
+	 * Get SSRC of source.
+	 */
+	getSsrc(): number
+	{
+		return this.view.getUint32(4);
+	}
+
+	/**
+	 * Set SSRC of source.
+	 */
+	setSsrc(ssrc: number): void
+	{
+		this.view.setUint32(4, ssrc);
+
+		this.setSerializationNeeded(true);
+	}
+
+	/**
+	 * Get begin sequence number.
+	 */
+	getBeginSeq(): number
+	{
+		return this.view.getUint16(8);
+	}
+
+	/**
+	 * Set begin sequence number.
+	 */
+	setBeginSeq(seq: number): void
+	{
+		this.view.setUint16(8, seq);
+
+		this.setSerializationNeeded(true);
+	}
+
+	/**
+	 * Get end sequence number.
+	 */
+	getEndSeq(): number
+	{
+		return this.view.getUint16(10);
+	}
+
+	/**
+	 * Set end sequence number.
+	 */
+	setEndSeq(seq: number): void
+	{
+		this.view.setUint16(10, seq);
+
+		this.setSerializationNeeded(true);
+	}
+
+	/**
+	 * Get chunks.
+	 *
+	 * @remarmks
+	 * - Chunks are given as a list of 2 byte integers.
+	 * - Use {@link parseChunk} to parse them.
+	 */
+	getChunks(): number[]
+	{
+		return Array.from(this.#chunks);
+	}
+
+	/**
+	 * Set chunks.
+	 *
+	 * @remarmks
+	 * - Chunks must be given as a list of 2 byte integers.
+	 * - Use {@link createRunLengthChunk} or {@link createBitVectorChunk} to
+	 *   create them.
+	 */
+	setChunks(chunks: number[]): void
+	{
+		this.#chunks = Array.from(chunks);
+
+		this.setSerializationNeeded(true);
+	}
+
+	/**
+	 * Add chunk.
+	 *
+	 * @remarmks
+	 * - Chunk must be given as 2 byte integer.
+	 * - Use {@link createRunLengthChunk} or {@link createBitVectorChunk} to
+	 *   create it.
+	 * - Given chunk cannot be a terminating null chunk (0 number).
+	 */
+	addChunk(chunk: number): void
+	{
+		if (chunk === 0)
+		{
+			throw new TypeError('cannot add terminating null chunks');
+		}
+
+		this.#chunks.push(chunk);
+
+		this.setSerializationNeeded(true);
+	}
+}
+
+/**
+ * Loss RLE Extended Report.
+ *
+ * @emits will-serialize - {@link WillSerializeEvent}
+ */
+export class UnknownExtendedReport extends ExtendedReport
+{
+	// Buffer view holding the report body.
+	#bodyView: DataView;
+
+	/**
+	 * @param view - If given it will be parsed. Otherwise an empty unknown
+	 *   Extended Report will be created.
+	 * @param blockType - If `view` is not given, this parameter must be given.
+	 *
+	 * @throws
+	 * - If given `view` does not contain a valid unknown Extended Report.
+	 */
+	constructor(view?: DataView, blockType?: ExtendedReportType | number)
+	{
+		super(view ? getExtendedReportType(view) : blockType!, view);
+
+		if (!view && !blockType)
+		{
+			throw new TypeError('view or blockType must be given');
+		}
+
+		if (!this.view)
+		{
+			this.view = new DataView(
+				new ArrayBuffer(EXTENDED_REPORT_COMMON_HEADER_LENGTH)
+			);
+
+			// Write block type.
+			this.writeCommonHeader();
+
+			// Set empty body.
+			this.#bodyView = new DataView(
+				this.view.buffer,
+				this.view.byteOffset + EXTENDED_REPORT_COMMON_HEADER_LENGTH,
+				0
+			);
+
+			return;
+		}
+
+		// Position relative to the DataView byte offset.
+		let pos = 0;
+
+		// Move to body.
+		pos += EXTENDED_REPORT_COMMON_HEADER_LENGTH;
+
+		// Get body.
+		const bodyLength = this.view.byteLength - pos;
+
+		this.#bodyView = new DataView(
+			this.view.buffer,
+			this.view.byteOffset + pos,
+			bodyLength
+		);
+
+		pos += bodyLength;
+
+		// Ensure that view length and parsed length match.
+		if (pos !== this.view.byteLength)
+		{
+			throw new RangeError(
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+			);
+		}
+	}
+
+	/**
+	 * Dump unknown Extended Report info.
+	 */
+	dump(): UnknownExtendedReportDump
+	{
+		return super.dump();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	getByteLength(): number
+	{
+		if (!this.needsSerialization())
+		{
+			return this.view.byteLength;
+		}
+
+		const packetLength =
+			EXTENDED_REPORT_COMMON_HEADER_LENGTH +
+			this.#bodyView.byteLength;
+
+		return packetLength;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	serialize(): void
+	{
+		const view = super.serializeBase();
+		const uint8Array = new Uint8Array(
+			view.buffer,
+			view.byteOffset,
+			view.byteLength
+		);
+
+		// Position relative to the DataView byte offset.
+		let pos = 0;
+
+		// Move to body.
+		pos += EXTENDED_REPORT_COMMON_HEADER_LENGTH;
+
+		// Copy the body into the new buffer.
+		uint8Array.set(
+			new Uint8Array(
+				this.#bodyView.buffer,
+				this.#bodyView.byteOffset,
+				this.#bodyView.byteLength
+			),
+			pos
+		);
+
+		// Create new body DataView.
+		const bodyView = new DataView(
+			view.buffer,
+			view.byteOffset + pos,
+			this.#bodyView.byteLength
+		);
+
+		pos += bodyView.byteLength;
+
+		// Assert that RTCP header length field is correct.
+		if (getRtcpLength(view) !== view.byteLength)
+		{
+			throw new RangeError(
+				`length in the RTCP header (${getRtcpLength(view)} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+			);
+		}
+
+		// Update DataView.
+		this.view = view;
+
+		// Update body DataView.
+		this.#bodyView = bodyView;
+
+		this.setSerializationNeeded(false);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	clone(buffer?: ArrayBuffer, byteOffset?: number): UnknownExtendedReport
+	{
+		const view = this.cloneInternal(buffer, byteOffset);
+
+		return new UnknownExtendedReport(view);
+	}
+
+	/**
+	 * Get the report body.
+	 */
+	getBody(): DataView
+	{
+		return this.#bodyView;
+	}
+
+	/**
+	 * Set the reportpacket body.
+	 */
+	setBody(view: DataView): void
+	{
+		this.#bodyView = view;
+
+		// Ensure body is padded to 4 bytes.
+		if (view.byteLength % 4 !== 0)
+		{
+			throw new TypeError('body byte length must be multiple of 4 bytes');
+		}
+
+		this.setSerializationNeeded(true);
 	}
 }
