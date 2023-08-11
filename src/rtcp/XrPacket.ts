@@ -7,7 +7,12 @@ import {
 } from './RtcpPacket';
 import { Serializable } from '../Serializable';
 import { padTo4Bytes, assertUnreachable } from '../utils';
-import { readBit, writeBit, readBits, writeBits } from '../bitOps';
+import {
+	readBit,
+	writeBit,
+	readBitsInDataView,
+	writeBitsInDataView
+} from '../bitOps';
 
 /*
  * https://tools.ietf.org/html/rfc3611
@@ -834,7 +839,7 @@ export class ExtendedReportLRLE extends ExtendedReport
 	 */
 	getThinning(): number
 	{
-		return readBits({ view: this.view, byte: 1, mask: 0x0F0 });
+		return readBitsInDataView({ view: this.view, byte: 1, mask: 0x0F0 });
 	}
 
 	/**
@@ -842,7 +847,9 @@ export class ExtendedReportLRLE extends ExtendedReport
 	 */
 	setThinning(thinning: number): void
 	{
-		writeBits({ view: this.view, byte: 1, mask: 0x0F0, value: thinning });
+		writeBitsInDataView(
+			{ view: this.view, byte: 1, mask: 0x0F0, value: thinning }
+		);
 
 		this.setSerializationNeeded(true);
 	}
