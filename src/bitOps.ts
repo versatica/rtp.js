@@ -1,38 +1,38 @@
 /**
- * Read the value of `bit` position` of byte `byte`.
+ * Read the value of `bit` position` of `value`.
  */
-export function readBit({ byte, bit }:{ byte: number; bit: number }): boolean
+export function readBit({ value, bit }:{ value: number; bit: number }): boolean
 {
-	return (byte & (1 << bit)) ? true : false;
+	return (value & (1 << bit)) ? true : false;
 }
 
 /**
- * Write `flag` in `bit` position` of byte `byte` and return updated value.
+ * Write `flag` in `bit` position` of `value` and return updated value.
  */
 export function writeBit(
-	{ byte, bit, flag }:
-	{ byte: number; bit: number; flag: boolean }
+	{ value, bit, flag }:
+	{ value: number; bit: number; flag: boolean }
 ): number
 {
 	if (flag)
 	{
-		return byte | (1 << bit);
+		return value | (1 << bit);
 	}
 	else
 	{
-		return byte & ~(1 << bit);
+		return value & ~(1 << bit);
 	}
 }
 
 /**
- * Toggle value of `bit` position` of byte `byte` and return update value.
+ * Toggle value of `bit` position` of `value` and return update value.
  */
 export function toggleBit(
-	{ byte, bit }:
-	{ byte: number; bit: number }
+	{ value, bit }:
+	{ value: number; bit: number }
 ): number
 {
-	return byte ^ (1 << bit);
+	return value ^ (1 << bit);
 }
 
 /**
@@ -71,7 +71,7 @@ export function readBitInDataView(
 	{ view: DataView; byte: number; bit: number }
 ): boolean
 {
-	return readBit({ byte: view.getUint8(byte), bit });
+	return readBit({ value: view.getUint8(byte), bit });
 }
 
 /**
@@ -82,7 +82,7 @@ export function writeBitInDataView(
 	{ view: DataView; byte: number; bit: number; flag: boolean }
 ): void
 {
-	view.setUint8(byte, writeBit({ byte: view.getUint8(byte), bit, flag }));
+	view.setUint8(byte, writeBit({ value: view.getUint8(byte), bit, flag }));
 }
 
 /**
@@ -93,7 +93,7 @@ export function toggleBitInDataView(
 	{ view: DataView; byte: number; bit: number }
 ): void
 {
-	view.setUint8(byte, toggleBit({ byte: view.getUint8(byte), bit }));
+	view.setUint8(byte, toggleBit({ value: view.getUint8(byte), bit }));
 }
 
 /**
