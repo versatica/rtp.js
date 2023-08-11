@@ -75,7 +75,7 @@ export class CompoundPacket extends Packet
 				packetLength
 			);
 
-			let packet: RtcpPacket | undefined;
+			let packet: RtcpPacket;
 
 			switch (packetType)
 			{
@@ -115,10 +115,7 @@ export class CompoundPacket extends Packet
 
 			pos += packetLength;
 
-			if (packet)
-			{
-				this.#packets.push(packet);
-			}
+			this.#packets.push(packet);
 		}
 
 		// Ensure that view length and parsed length match.
