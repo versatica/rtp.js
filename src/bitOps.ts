@@ -1,71 +1,121 @@
 /**
+ * Read the value of `bit` position` of byte `byte`.
+ */
+export function readBit({ byte, bit }:{ byte: number; bit: number }): boolean
+{
+	return (byte & (1 << bit)) ? true : false;
+}
+
+/**
+ * Write `flag` in `bit` position` of byte `byte` and return updated value.
+ */
+export function writeBit(
+	{ byte, bit, flag }:
+	{ byte: number; bit: number; flag: boolean }
+): number
+{
+	if (flag)
+	{
+		return byte | (1 << bit);
+	}
+	else
+	{
+		return byte & ~(1 << bit);
+	}
+}
+
+/**
+ * Toggle value of `bit` position` of byte `byte` and return update value.
+ */
+export function toggleBit(
+	{ byte, bit }:
+	{ byte: number; bit: number }
+): number
+{
+	return byte ^ (1 << bit);
+}
+
+/**
+ * Read the value of the enabled bits of `mask` of byte `byte`.
+ */
+export function readBits(
+	{ byte, mask }:
+	{ byte: number; mask: number }
+): number
+{
+	const bitsToShift = getFirstEnabledBitInMask(mask);
+
+	return (byte & mask) >> bitsToShift;
+}
+
+/**
+ * Write `value` in the enabled bits of `mask` of byte `byte` and return
+ * updated value
+ */
+export function writeBits(
+	{ byte, mask, value }:
+	{ byte: number; mask: number; value: number }
+): number
+{
+	const inverseMask = mask ^ 0b11111111;
+	const bitsToShift = getFirstEnabledBitInMask(mask);
+
+	return (byte & inverseMask) | ((value << bitsToShift) & mask);
+}
+
+/**
  * Read the value of `bit` position` of byte `byte` in `view`.
  */
-export function readBit(
+export function readBitInDataView(
 	{ view, byte, bit }:
 	{ view: DataView; byte: number; bit: number }
 ): boolean
 {
-	return (view.getUint8(byte) & (1 << bit)) ? true : false;
+	return readBit({ byte: view.getUint8(byte), bit });
 }
 
 /**
  * Write `flag` in `bit` position` of byte `byte` in `view`.
  */
-export function writeBit(
+export function writeBitInDataView(
 	{ view, byte, bit, flag }:
 	{ view: DataView; byte: number; bit: number; flag: boolean }
 ): void
 {
-	if (flag)
-	{
-		view.setUint8(byte, view.getUint8(byte) | (1 << bit));
-	}
-	else
-	{
-		view.setUint8(byte, view.getUint8(byte) & ~(1 << bit));
-	}
+	view.setUint8(byte, writeBit({ byte: view.getUint8(byte), bit, flag }));
 }
 
 /**
  * Toggle value of `bit` position` of byte `byte` in `view`.
  */
-export function toggleBit(
+export function toggleBitInDataView(
 	{ view, byte, bit }:
 	{ view: DataView; byte: number; bit: number }
 ): void
 {
-	view.setUint8(byte, view.getUint8(byte) ^ (1 << bit));
+	view.setUint8(byte, toggleBit({ byte: view.getUint8(byte), bit }));
 }
 
 /**
  * Read the value of the enabled bits of `mask` of byte `byte` in `view`.
  */
-export function readBits(
+export function readBitsInDataView(
 	{ view, byte, mask }:
 	{ view: DataView; byte: number; mask: number }
 ): number
 {
-	const bitsToShift = getFirstEnabledBitInMask(mask);
-
-	return (view.getUint8(byte) & mask) >> bitsToShift;
+	return readBits({ byte: view.getUint8(byte), mask });
 }
 
 /**
  * Write `value` in the enabled bits of `mask` of byte `byte` in `view`.
  */
-export function writeBits(
+export function writeBitsInDataView(
 	{ view, byte, mask, value }:
 	{ view: DataView; byte: number; mask: number; value: number }
 ): void
 {
-	const inverseMask = mask ^ 0b11111111;
-	const bitsToShift = getFirstEnabledBitInMask(mask);
-
-	view.setUint8(
-		byte,
-		(view.getUint8(byte) & inverseMask) | ((value << bitsToShift) & mask)
-	);
+	view.setUint8(byte, writeBits({ byte: view.getUint8(byte), mask, value }));
 }
 
 function getFirstEnabledBitInMask(mask: number): number

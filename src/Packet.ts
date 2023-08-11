@@ -1,6 +1,10 @@
 import { Serializable } from './Serializable';
 import { padTo4Bytes } from './utils';
-import { readBit, writeBit, writeBits } from './bitOps';
+import {
+	readBitInDataView,
+	writeBitInDataView,
+	writeBitsInDataView
+} from './bitOps';
 
 export const RTP_VERSION = 2;
 
@@ -78,19 +82,19 @@ export abstract class Packet extends Serializable
 
 	protected setVersion(): void
 	{
-		writeBits(
+		writeBitsInDataView(
 			{ view: this.view, byte: 0, mask: 0b11000000, value: RTP_VERSION }
 		);
 	}
 
 	protected hasPaddingBit(): boolean
 	{
-		return readBit({ view: this.view, byte: 0, bit: 5 });
+		return readBitInDataView({ view: this.view, byte: 0, bit: 5 });
 	}
 
 	protected setPaddingBit(flag: boolean): void
 	{
-		writeBit({ view: this.view, byte: 0, bit: 5, flag });
+		writeBitInDataView({ view: this.view, byte: 0, bit: 5, flag });
 	}
 
 	protected setPadding(padding: number): void
