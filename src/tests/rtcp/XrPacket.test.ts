@@ -6,9 +6,9 @@ import {
 	ExtendedReportLRLEDump
 } from '../../RTCP/ExtendedReports/ExtendedReportLRLE';
 import {
-	parseChunk,
-	createRunLengthChunk,
-	createBitVectorChunk
+	parseExtendedReportChunk,
+	createExtendedReportRunLengthChunk,
+	createExtendedReportBitVectorChunk
 } from '../../RTCP/ExtendedReports/chunks';
 import { areDataViewsEqual } from '../../utils';
 
@@ -19,6 +19,7 @@ const terminatingNullChunk = 0b0000000000000000;
 
 const report1Dump: ExtendedReportLRLEDump =
 {
+	byteLength : 20,
 	reportType : ExtendedReportType.LRLE,
 	thinning   : 9,
 	ssrc       : 0x03932db4,
@@ -147,14 +148,37 @@ describe('create RTCP XR packet', () =>
 				byteLength : 28,
 				padding    : 0
 			});
+
+		packet.serialize();
+		expect(packet.needsSerialization()).toBe(false);
+		expect(report1.needsSerialization()).toBe(false);
+		// We cannot add padding to RTCP packets so fix the dump.
+		expect(packet.dump()).toEqual(
+			{
+				...packetDump,
+				byteLength : 28,
+				padding    : 0
+			});
+
+		const clonedPacket = packet.clone();
+
+		expect(clonedPacket.dump()).toEqual(
+			{
+				...packetDump,
+				byteLength : 28,
+				padding    : 0
+			});
+		expect(
+			areDataViewsEqual(clonedPacket.getView(), packet.getView())
+		).toBe(true);
 	});
 });
 
 describe('chunks parsing and creation', () =>
 {
-	test('parseChunk()', () =>
+	test('parseExtendedReportChunk()', () =>
 	{
-		expect(parseChunk(runLengthZerosChunk)).toEqual(
+		expect(parseExtendedReportChunk(runLengthZerosChunk)).toEqual(
 			{
 				chunkType : 'run-length',
 				runType   : 'zeros',
@@ -162,7 +186,7 @@ describe('chunks parsing and creation', () =>
 			}
 		);
 
-		expect(parseChunk(runLengthOnesChunk)).toEqual(
+		expect(parseExtendedReportChunk(runLengthOnesChunk)).toEqual(
 			{
 				chunkType : 'run-length',
 				runType   : 'ones',
@@ -170,27 +194,30 @@ describe('chunks parsing and creation', () =>
 			}
 		);
 
-		expect(parseChunk(bitVectorChunk)).toEqual(
+		expect(parseExtendedReportChunk(bitVectorChunk)).toEqual(
 			{
 				chunkType : 'bit-vector',
 				bitVector : 0b110101010101010
 			}
 		);
 
-		expect(parseChunk(terminatingNullChunk)).toEqual(
+		expect(parseExtendedReportChunk(terminatingNullChunk)).toEqual(
 			{ chunkType: 'terminating-null' }
 		);
 	});
 
-	test('createRunLengthChunk()', () =>
+	test('createExtendedReportRunLengthChunk()', () =>
 	{
-		expect(createRunLengthChunk('zeros', 0b10101010101010))
+		expect(createExtendedReportRunLengthChunk('zeros', 0b10101010101010))
 			.toBe(runLengthZerosChunk);
 
-		expect(createRunLengthChunk('ones', 0b10101010101010))
+		expect(createExtendedReportRunLengthChunk('ones', 0b10101010101010))
 			.toBe(runLengthOnesChunk);
+	});
 
-		expect(createBitVectorChunk(0b110101010101010))
+	test('createExtendedReportBitVectorChunk()', () =>
+	{
+		expect(createExtendedReportBitVectorChunk(0b110101010101010))
 			.toBe(bitVectorChunk);
 	});
 });

@@ -2,6 +2,14 @@ import { EnhancedEventEmitter } from './EnhancedEventEmitter';
 import { clone } from './utils';
 
 /**
+ * Serializable info dump.
+ */
+export type SerializableDump =
+{
+	byteLength: number;
+};
+
+/**
  * Event emitted when the content is being serialized. The user has a chance to
  * pass a buffer, otherwise a new one will be internally allocated.
  *
@@ -60,6 +68,16 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 		{
 			this.view = view;
 		}
+	}
+
+	/**
+	 * Serializable dump.
+	 */
+	dump(): SerializableDump
+	{
+		return {
+			byteLength : this.getByteLength()
+		};
 	}
 
 	/**

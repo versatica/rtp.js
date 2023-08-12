@@ -22,7 +22,10 @@ _NOTE:_ Work in progress. Many more RTCP packets will be added along with new fe
     SenderReportPacket,
     ReceptionReport,
     ByePacket,
-    SdesPacket
+    SdesPacket,
+    XrPacket,
+    UnknownPacket,
+    // etc
   } from 'rtp.js';
   ```
 * The main module also exports a `utils` module with some helpers and utilities. Example:

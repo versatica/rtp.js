@@ -8,6 +8,7 @@ import { areDataViewsEqual, numericArrayToDataView } from '../../utils';
 
 const receptionReportDump1: ReceptionReportDump =
 {
+	byteLength   : 24,
 	ssrc         : 26422708,
 	fractionLost : 80,
 	totalLost    : 216,
@@ -19,6 +20,7 @@ const receptionReportDump1: ReceptionReportDump =
 
 const receptionReportDump2: ReceptionReportDump =
 {
+	byteLength   : 24,
 	ssrc         : 0x02932db4,
 	fractionLost : 81,
 	totalLost    : 217,

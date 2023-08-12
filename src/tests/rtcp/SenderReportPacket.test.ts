@@ -8,6 +8,7 @@ import { areDataViewsEqual } from '../../utils';
 
 const receptionReportDump1: ReceptionReportDump =
 {
+	byteLength   : 24,
 	ssrc         : 0x01932db4,
 	fractionLost : 80,
 	totalLost    : 216,

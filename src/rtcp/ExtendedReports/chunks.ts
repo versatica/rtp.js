@@ -26,7 +26,7 @@ export type ExtendedReportChunk =
 /**
  * Parse given 2 bytes number as a Extended Report chunk.
  */
-export function parseChunk(chunk: number): ExtendedReportChunk
+export function parseExtendedReportChunk(chunk: number): ExtendedReportChunk
 {
 	if (chunk < 0 || chunk > 0xFFFF)
 	{
@@ -60,7 +60,7 @@ export function parseChunk(chunk: number): ExtendedReportChunk
 /**
  * Create a Run Length Chunk and return a 2 bytes number representing it.
  */
-export function createRunLengthChunk(
+export function createExtendedReportRunLengthChunk(
 	runType: 'zeros' | 'ones',
 	runLength: number
 ): number
@@ -83,7 +83,7 @@ export function createRunLengthChunk(
 /**
  * Create a Bit Vector Chunk and return a 2 bytes number representing it.
  */
-export function createBitVectorChunk(bitVector: number): number
+export function createExtendedReportBitVectorChunk(bitVector: number): number
 {
 	if (bitVector < 0 || bitVector > 32767)
 	{

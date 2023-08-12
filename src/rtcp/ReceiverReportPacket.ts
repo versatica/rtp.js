@@ -5,7 +5,7 @@ import {
 	getRtcpLength,
 	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
-import { Serializable } from '../Serializable';
+import { Serializable, SerializableDump } from '../Serializable';
 
 /**
  *         0                   1                   2                   3
@@ -52,7 +52,7 @@ export type ReceiverReportPacketDump = RtcpPacketDump &
 /**
  * Reception Report dump.
  */
-export type ReceptionReportDump =
+export type ReceptionReportDump = SerializableDump &
 {
 	ssrc: number;
 	fractionLost: number;
@@ -345,6 +345,7 @@ export class ReceptionReport extends Serializable
 	dump(): ReceptionReportDump
 	{
 		return {
+			...super.dump(),
 			ssrc         : this.getSsrc(),
 			fractionLost : this.getFractionLost(),
 			totalLost    : this.getTotalLost(),

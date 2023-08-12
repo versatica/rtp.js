@@ -2,6 +2,7 @@ export {
 	// NOTE: We need to export Serializable, otherwise TypeDoc doesn't document
 	// inherited methods.
 	Serializable,
+	SerializableDump,
 	WillSerializeEvent
 } from './Serializable';
 
@@ -52,6 +53,29 @@ export {
 	SdesChunkDump,
 	SdesItemType
 } from './RTCP/SdesPacket';
+
+export {
+	XrPacket,
+	XrPacketDump
+} from './RTCP/XrPacket';
+
+export {
+	ExtendedReport,
+	ExtendedReportType,
+	ExtendedReportDump
+} from './RTCP/ExtendedReports/ExtendedReport';
+
+export {
+	ExtendedReportLRLE,
+	ExtendedReportLRLEDump
+} from './RTCP/ExtendedReports/ExtendedReportLRLE';
+
+export {
+	ExtendedReportChunk,
+	parseExtendedReportChunk,
+	createExtendedReportRunLengthChunk,
+	createExtendedReportBitVectorChunk
+} from './RTCP/ExtendedReports/chunks';
 
 export {
 	UnknownPacket,
