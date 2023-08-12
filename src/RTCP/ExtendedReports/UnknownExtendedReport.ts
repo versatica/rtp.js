@@ -8,6 +8,18 @@ import {
 } from './ExtendedReport';
 
 /**
+ * 0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |     BT=???    | type-specific |         block length          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                             body                              |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * :                              ...                              :
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+
+/**
  * Unknown Extended Report dump.
  */
 export type UnknownExtendedReportDump = ExtendedReportDump;
@@ -169,6 +181,26 @@ export class UnknownExtendedReport extends ExtendedReport
 		const view = this.cloneInternal(buffer, byteOffset);
 
 		return new UnknownExtendedReport(view);
+	}
+
+	/**
+	 * Get the value of the type specific field (second byte in the Extended
+	 * Report common header).
+	 */
+	getTypeSpecific(): number
+	{
+		return this.view.getUint8(1);
+	}
+
+	/**
+	 * Set the value of the type specific field (second byte in the Extended
+	 * Report common header).
+	 */
+	setTypeSpecific(typeSpecific: number): void
+	{
+		this.view.setUint8(1, typeSpecific);
+
+		this.setSerializationNeeded(true);
 	}
 
 	/**
