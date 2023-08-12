@@ -254,6 +254,10 @@ export abstract class RtcpPacket extends Packet
 
 	/**
 	 * Get the RTCP header count value.
+	 *
+	 * @remarks
+	 * - Some RTCP packets do not use this byte (the second one in the common
+	 *   RTCP header) for counting chunks or items.
 	 */
 	getCount(): number
 	{

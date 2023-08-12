@@ -4,7 +4,7 @@ import { assertUnreachable } from '../../utils';
 export const COMMON_HEADER_LENGTH = 4;
 
 /**
- *  0                   1                   2                   3
+ * 0                   1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |      BT       | type-specific |         block length          |

@@ -210,6 +210,10 @@ export class UnknownPacket extends RtcpPacket
 	/**
 	 * Set the RTCP header count value.
 	 *
+	 * @remarks
+	 * - This byte (the second one in the common RTCP header) can be used for
+	 *   other custom purpose in case the packet needs it for something else.
+	 *
 	 * @privateRemarks
 	 * - This method is made public for this class since the user is free to add
 	 *   whatever body to this packet, and hence the user may want to also
