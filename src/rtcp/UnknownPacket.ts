@@ -65,7 +65,7 @@ export class UnknownPacket extends RtcpPacket
 			this.#bodyView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + COMMON_HEADER_LENGTH,
-				0
+				this.view.byteLength - COMMON_HEADER_LENGTH - this.padding
 			);
 
 			return;

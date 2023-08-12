@@ -4,6 +4,7 @@ import { ReceiverReportPacket } from '../../RTCP/ReceiverReportPacket';
 import { SenderReportPacket } from '../../RTCP/SenderReportPacket';
 import { ByePacket } from '../../RTCP/ByePacket';
 import { SdesPacket } from '../../RTCP/SdesPacket';
+import { XrPacket } from '../../RTCP/XrPacket';
 import { UnknownPacket } from '../../RTCP/UnknownPacket';
 import { areDataViewsEqual, numericArrayToDataView } from '../../utils';
 
@@ -11,24 +12,24 @@ describe('parse RTCP Compound packet', () =>
 {
 	const array = new Uint8Array(
 		[
-			/* Reception Report packet */
+			/* (packet 1) Reception Report packet */
 			0x82, 0xc9, 0x00, 0x0D, // Type: 201 (Receiver Report), Count: 2, Length: 13
 			0x5d, 0x93, 0x15, 0x34, // Sender SSRC: 0x5d931534
 			// Reception Report
-			0x01, 0x93, 0x2d, 0xb4, // SSRC. 0x01932db4
+			0x01, 0x93, 0x2d, 0xb4, // SSRC: 0x01932db4
 			0x50, 0x00, 0x00, 0xd8, // Fraction lost: 80, Total lost: 216
 			0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 342342
 			0x00, 0x00, 0x00, 0x00, // Jitter: 0
 			0x00, 0x00, 0x20, 0x2a, // Last SR: 8234
 			0x00, 0x00, 0x00, 0x05, // DLSR: 5
 			// Reception Report
-			0x02, 0x93, 0x2d, 0xb4, // SSRC. 0x02932db4
+			0x02, 0x93, 0x2d, 0xb4, // SSRC: 0x02932db4
 			0x51, 0x00, 0x00, 0xd9, // Fraction lost: 81, Total lost: 217
 			0x00, 0x05, 0x39, 0x47, // Extended highest sequence number: 342343
 			0x00, 0x00, 0x00, 0x02, // Jitter: 2
 			0x00, 0x00, 0x20, 0x2b, // Last SR: 8235
 			0x00, 0x00, 0x00, 0x06, // DLSR: 6
-			/* Sender Report packet */
+			/* (packet 2) Sender Report packet */
 			0x81, 0xc8, 0x00, 0x0c, // Type: 200 (Sender Report), Count: 1, Length: 12
 			0x5d, 0x93, 0x15, 0x34, // SSRC: 0x5d931534
 			0xdd, 0x3a, 0xc1, 0xb4, // NTP Sec: 3711615412
@@ -37,13 +38,13 @@ describe('parse RTCP Compound packet', () =>
 			0x00, 0x00, 0x0e, 0x18, // Packet count: 3608
 			0x00, 0x08, 0xcf, 0x00, // Octet count: 577280
 			// Reception Report
-			0x01, 0x93, 0x2d, 0xb4, // SSRC. 0x01932db4
+			0x01, 0x93, 0x2d, 0xb4, // SSRC: 0x01932db4
 			0x50, 0x00, 0x00, 0xd8, // Fraction lost: 0, Total lost: 1
 			0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 0
 			0x00, 0x00, 0x00, 0x00, // Jitter: 0
 			0x00, 0x00, 0x20, 0x2a, // Last SR: 8234
 			0x00, 0x00, 0x00, 0x05, // DLSR: 5
-			/* BYE packet */
+			/* (packet 3) BYE packet */
 			0xa2, 0xcb, 0x00, 0x07, // Padding, Type: 203 (Bye), Count: 2, length: 7
 			0x62, 0x42, 0x76, 0xe0, // SSRC: 0x624276e0
 			0x26, 0x24, 0x67, 0x0e, // SSRC: 0x2624670e
@@ -52,17 +53,28 @@ describe('parse RTCP Compound packet', () =>
 			0x61, 0x20, 0x76, 0x69,
 			0x73, 0x74, 0x61, 0x00,
 			0x00, 0x00, 0x00, 0x04, // Padding (4 bytes)
-			/* Unknown packet */
+			/* (packet 4) Unknown packet */
 			0xa2, 0xc1, 0x00, 0x03, // Padding, Type: 193 (unknown), Count: 2, length: 3
 			0x11, 0x22, 0x33, 0x44, // Body
 			0x55, 0x66, 0x77, 0x88,
 			0x99, 0x00, 0x00, 0x03, // Padding (3 bytes)
-			/* SDES packet */
+			/* (packet 5) SDES packet */
 			0x81, 0xca, 0x00, 0x03, // Type: 202 (SDES), Count: 1, Length: 3
 			// Chunk
 			0x11, 0x22, 0x33, 0x44, // SSRC: 0x11223344
 			0x05, 0x02, 0x61, 0x62, // Item Type: 5 (XXXX), Length: 2, Text: "ab"
-			0x00, 0x00, 0x00, 0x00 // 4 null octets
+			0x00, 0x00, 0x00, 0x00, // 4 null octets
+			/* (packet 6) XR packet */
+			0x80, 0xcf, 0x00, 0x06, // Type: 207 (XR), Length: 6
+			0x5d, 0x93, 0x15, 0x34, // Sender SSRC: 0x5d931534
+			// Extended Report LRLE
+			0x01, 0x09, 0x00, 0x04, // BT: 1 (LRLE), T: 9, Block Length: 4
+			0x03, 0x93, 0x2d, 0xb4, // SSRC of source: 0x03932db4
+			0x00, 0x11, 0x00, 0x22, // Begin Seq: 0x11, End Seq: 0x22
+			0b00101010, 0b10101010, // Run Lengh Chunk (zeros)
+			0b01101010, 0b10101010, // Run Lengh Chunk (ones)
+			0b11101010, 0b10101010, // Bit Vector Chunk
+			0b00000000, 0b00000000 // Terminating Null Chunk
 		]
 	);
 
@@ -82,8 +94,8 @@ describe('parse RTCP Compound packet', () =>
 		const compoundPacket = new CompoundPacket(view);
 
 		expect(compoundPacket.needsSerialization()).toBe(false);
-		expect(compoundPacket.getByteLength()).toBe(172);
-		expect(compoundPacket.getPackets().length).toBe(5);
+		expect(compoundPacket.getByteLength()).toBe(200);
+		expect(compoundPacket.getPackets().length).toBe(6);
 		expect(areDataViewsEqual(compoundPacket.getView(), view)).toBe(true);
 
 		const packet1 = compoundPacket.getPackets()[0] as ReceiverReportPacket;
@@ -140,17 +152,28 @@ describe('parse RTCP Compound packet', () =>
 		expect(packet5.getPadding()).toBe(0);
 		expect(packet5.getChunks().length).toBe(1);
 
+		const packet6 = compoundPacket.getPackets()[5] as XrPacket;
+
+		expect(packet6.needsSerialization()).toBe(false);
+		expect(packet6.getByteLength()).toBe(28);
+		expect(packet6.getPacketType()).toBe(RtcpPacketType.XR);
+		expect(packet6.getCount()).toBe(0); // No count in XR packets.
+		expect(packet6.getPadding()).toBe(0);
+		expect(packet6.getSsrc()).toBe(0x5d931534);
+		expect(packet6.getReports().length).toBe(1);
+
 		expect(compoundPacket.dump()).toEqual(
 			{
 				padding    : 0,
-				byteLength : 172,
+				byteLength : 200,
 				packets    :
 				[
 					packet1.dump(),
 					packet2.dump(),
 					packet3.dump(),
 					packet4.dump(),
-					packet5.dump()
+					packet5.dump(),
+					packet6.dump()
 				]
 			});
 
@@ -158,8 +181,8 @@ describe('parse RTCP Compound packet', () =>
 		compoundPacket.serialize();
 
 		expect(compoundPacket.needsSerialization()).toBe(false);
-		expect(compoundPacket.getByteLength()).toBe(172);
-		expect(compoundPacket.getPackets().length).toBe(5);
+		expect(compoundPacket.getByteLength()).toBe(200);
+		expect(compoundPacket.getPackets().length).toBe(6);
 		expect(areDataViewsEqual(compoundPacket.getView(), view)).toBe(true);
 
 		const packet1B = compoundPacket.getPackets()[0] as ReceiverReportPacket;
@@ -216,17 +239,28 @@ describe('parse RTCP Compound packet', () =>
 		expect(packet5B.getPadding()).toBe(0);
 		expect(packet5B.getChunks().length).toBe(1);
 
+		const packet6B = compoundPacket.getPackets()[5] as XrPacket;
+
+		expect(packet6B.needsSerialization()).toBe(false);
+		expect(packet6B.getByteLength()).toBe(28);
+		expect(packet6B.getPacketType()).toBe(RtcpPacketType.XR);
+		expect(packet6B.getCount()).toBe(0); // No count in XR packets.
+		expect(packet6B.getPadding()).toBe(0);
+		expect(packet6B.getSsrc()).toBe(0x5d931534);
+		expect(packet6B.getReports().length).toBe(1);
+
 		expect(compoundPacket.dump()).toEqual(
 			{
 				padding    : 0,
-				byteLength : 172,
+				byteLength : 200,
 				packets    :
 				[
 					packet1B.dump(),
 					packet2B.dump(),
 					packet3B.dump(),
 					packet4B.dump(),
-					packet5B.dump()
+					packet5B.dump(),
+					packet6B.dump()
 				]
 			});
 
@@ -234,20 +268,21 @@ describe('parse RTCP Compound packet', () =>
 		packet3.addSsrc(666);
 
 		expect(compoundPacket.needsSerialization()).toBe(true);
-		expect(compoundPacket.getByteLength()).toBe(176);
-		expect(compoundPacket.getPackets().length).toBe(5);
+		expect(compoundPacket.getByteLength()).toBe(204);
+		expect(compoundPacket.getPackets().length).toBe(6);
 
 		expect(compoundPacket.dump()).toEqual(
 			{
 				padding    : 0,
-				byteLength : 176,
+				byteLength : 204,
 				packets    :
 				[
 					packet1B.dump(),
 					packet2B.dump(),
 					packet3B.dump(),
 					packet4B.dump(),
-					packet5B.dump()
+					packet5B.dump(),
+					packet6B.dump()
 				]
 			});
 	});
@@ -271,7 +306,7 @@ describe('parse RTCP Compound packet', () =>
 
 	test('parsing a buffer view with some incomplete packet throws', () =>
 	{
-		// Read only 136 of the 140 bytes of the buffer view.
+		// Read only 136 bytes of the buffer view.
 		const view2 = new DataView(
 			array.buffer,
 			array.byteOffset,
