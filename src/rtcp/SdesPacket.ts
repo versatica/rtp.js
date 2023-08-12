@@ -5,7 +5,7 @@ import {
 	getRtcpLength,
 	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
-import { Serializable } from '../Serializable';
+import { Serializable, SerializableDump } from '../Serializable';
 import {
 	padTo4Bytes,
 	dataViewToString,
@@ -87,7 +87,7 @@ export type SdesPacketDump = RtcpPacketDump &
 /**
  * SDES Chunk dump.
  */
-export type SdesChunkDump =
+export type SdesChunkDump = SerializableDump &
 {
 	ssrc: number;
 	items: { type: SdesItemType; text: string }[];
@@ -449,6 +449,7 @@ export class SdesChunk extends Serializable
 			});
 
 		return {
+			...super.dump(),
 			ssrc  : this.getSsrc(),
 			items : items
 		};
@@ -459,6 +460,11 @@ export class SdesChunk extends Serializable
 	 */
 	getByteLength(): number
 	{
+		if (!this.needsSerialization())
+		{
+			return this.view.byteLength;
+		}
+
 		// SSRC (4 bytes).
 		let chunkLength = 4;
 

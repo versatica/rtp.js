@@ -1,4 +1,4 @@
-import { Serializable } from './Serializable';
+import { Serializable, SerializableDump } from './Serializable';
 import { padTo4Bytes } from './utils';
 import {
 	readBitInDataView,
@@ -14,9 +14,8 @@ export const RTP_VERSION = 2;
  * @remarks
  * - Read the info dump type of each RTP and RTCP packet instead.
  */
-export type PacketDump =
+export type PacketDump = SerializableDump &
 {
-	byteLength: number;
 	padding: number;
 };
 
@@ -44,7 +43,7 @@ export abstract class Packet extends Serializable
 	dump(): PacketDump
 	{
 		return {
-			byteLength : this.getByteLength(),
+			...super.dump(),
 			padding    : this.getPadding()
 		};
 	}

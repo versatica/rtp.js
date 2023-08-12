@@ -8,6 +8,7 @@ import { areDataViewsEqual } from '../../utils';
 
 const receptionReportDump1: ReceptionReportDump =
 {
+	byteLength   : 24,
 	ssrc         : 0x01932db4,
 	fractionLost : 80,
 	totalLost    : 216,
@@ -37,7 +38,7 @@ describe('parse RTCP Sender Report packet', () =>
 			0x00, 0x00, 0x0e, 0x18, // Packet count: 3608
 			0x00, 0x08, 0xcf, 0x00, // Octet count: 577280
 			// Reception Report
-			0x01, 0x93, 0x2d, 0xb4, // SSRC. 0x01932db4
+			0x01, 0x93, 0x2d, 0xb4, // SSRC: 0x01932db4
 			0x50, 0x00, 0x00, 0xd8, // Fraction lost: 0, Total lost: 1
 			0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 0
 			0x00, 0x00, 0x00, 0x00, // Jitter: 0

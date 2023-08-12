@@ -10,8 +10,9 @@ import { areDataViewsEqual } from '../../utils';
 
 const sdesChunkDump1: SdesChunkDump =
 {
-	ssrc  : 0x9f65e742,
-	items :
+	byteLength : 24,
+	ssrc       : 0x9f65e742,
+	items      :
 	[
 		{ type: SdesItemType.CNAME, text: 't7mkYnCm46OcINy/' }
 	]
@@ -19,8 +20,9 @@ const sdesChunkDump1: SdesChunkDump =
 
 const sdesChunkDump2: SdesChunkDump =
 {
-	ssrc  : 0x9f65e743,
-	items :
+	byteLength : 44,
+	ssrc       : 0x9f65e743,
+	items      :
 	[
 		{ type: SdesItemType.NAME, text: 't7mkYnCm46OcINy/' },
 		{ type: SdesItemType.NOTE, text: 't7mkYnCm46OcINy/' }
@@ -29,8 +31,9 @@ const sdesChunkDump2: SdesChunkDump =
 
 const sdesChunkDump3: SdesChunkDump =
 {
-	ssrc  : 0x11223344,
-	items :
+	byteLength : 12,
+	ssrc       : 0x11223344,
+	items      :
 	[
 		{ type: 5, text: 'ab' }
 	]
@@ -223,16 +226,18 @@ describe('parse SDES packet', () =>
 			chunks     :
 			[
 				{
-					ssrc  : 1234,
-					items :
+					byteLength : 24,
+					ssrc       : 1234,
+					items      :
 					[
 						{ type: SdesItemType.CNAME, text: 'qwerty' },
 						{ type: SdesItemType.TOOL, text: 'iñaki' }
 					]
 				},
 				{
-					ssrc  : 5678,
-					items : [ { type: SdesItemType.LOC, text: 'somewhere œæ€' } ]
+					byteLength : 24,
+					ssrc       : 5678,
+					items      : [ { type: SdesItemType.LOC, text: 'somewhere œæ€' } ]
 				}
 			]
 		};
@@ -369,8 +374,9 @@ describe('create RTCP SDES packet', () =>
 		expect(chunk1B.needsSerialization()).toBe(false);
 		expect(chunk1B.dump()).toEqual(
 			{
-				ssrc  : 1234,
-				items :
+				byteLength : 24,
+				ssrc       : 1234,
+				items      :
 				[
 					{ type: SdesItemType.CNAME, text: 'qwerty' },
 					{ type: SdesItemType.TOOL, text: 'iñaki' }
@@ -383,8 +389,9 @@ describe('create RTCP SDES packet', () =>
 		expect(chunk2B.needsSerialization()).toBe(false);
 		expect(chunk2B.dump()).toEqual(
 			{
-				ssrc  : 5678,
-				items : [ { type: SdesItemType.LOC, text: 'somewhere œæ€' } ]
+				byteLength : 24,
+				ssrc       : 5678,
+				items      : [ { type: SdesItemType.LOC, text: 'somewhere œæ€' } ]
 			}
 		);
 
@@ -393,8 +400,9 @@ describe('create RTCP SDES packet', () =>
 		expect(chunk3B.needsSerialization()).toBe(false);
 		expect(chunk3B.dump()).toEqual(
 			{
-				ssrc  : 0x66666666,
-				items : [ { type: SdesItemType.PRIV, text: 'ab' } ]
+				byteLength : 12,
+				ssrc       : 0x66666666,
+				items      : [ { type: SdesItemType.PRIV, text: 'ab' } ]
 			}
 		);
 	});

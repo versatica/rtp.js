@@ -272,6 +272,8 @@ export abstract class RtcpPacket extends Packet
 	 * @privateRemarks
 	 * - This method is not public since users should not manipulate this field
 	 *   directly.
+	 * - Also, there is no `count` field in all RTCP packets. For instance, XR
+	 *   and APP packets do not have it.
 	 */
 	protected setCount(count: number): void
 	{
