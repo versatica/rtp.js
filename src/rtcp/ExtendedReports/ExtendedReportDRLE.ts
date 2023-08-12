@@ -12,7 +12,7 @@ import { readBitsInDataView, writeBitsInDataView } from '../../bitOps';
  * 0                   1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |     BT=1      | rsvd. |   T   |         block length          |
+ * |     BT=2      | rsvd. |   T   |         block length          |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |                        SSRC of source                         |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -27,12 +27,12 @@ import { readBitsInDataView, writeBitsInDataView } from '../../bitOps';
  */
 
 // Common header + SSRC + begin seq + end seq.
-const EXTENDED_REPORT_LRLE_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
+const EXTENDED_REPORT_DRLE_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
 
 /**
- * Loss RLE Extended Report dump.
+ * Duplicate RLE Extended Report dump.
  */
-export type ExtendedReportLRLEDump = ExtendedReportDump &
+export type ExtendedReportDRLEDump = ExtendedReportDump &
 {
 	thinning: number;
 	ssrc: number;
@@ -42,27 +42,27 @@ export type ExtendedReportLRLEDump = ExtendedReportDump &
 };
 
 /**
- * Loss RLE Extended Report.
+ * Duplicate RLE Extended Report.
  *
  * @emits will-serialize - {@link WillSerializeEvent}
  */
-export class ExtendedReportLRLE extends ExtendedReport
+export class ExtendedReportDRLE extends ExtendedReport
 {
 	// Chunks (2 bytes numbers, unparsed).
 	#chunks: number[] = [];
 
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty Loss RLE
+	 * @param view - If given it will be parsed. Otherwise an empty Duplicate RLE
 	 *   Extended Report will be created.
 	 */
 	constructor(view?: DataView)
 	{
-		super(ExtendedReportType.LRLE, view);
+		super(ExtendedReportType.DRLE, view);
 
 		if (!this.view)
 		{
 			this.view = new DataView(
-				new ArrayBuffer(EXTENDED_REPORT_LRLE_MIN_LENGTH)
+				new ArrayBuffer(EXTENDED_REPORT_DRLE_MIN_LENGTH)
 			);
 
 			// Write report type.
@@ -71,14 +71,16 @@ export class ExtendedReportLRLE extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength < EXTENDED_REPORT_LRLE_MIN_LENGTH)
+		if (this.view.byteLength < EXTENDED_REPORT_DRLE_MIN_LENGTH)
 		{
-			throw new TypeError('wrong byte length for a Loss RLE Extended Report');
+			throw new TypeError(
+				'wrong byte length for a Duplicate RLE Extended Report'
+			);
 		}
 		else if (this.view.byteLength % 4 !== 0)
 		{
 			throw new RangeError(
-				`Loss RLE Extended Report length must be multiple of 4 bytes but it is ${this.view.byteLength} bytes`
+				`Duplicate RLE Extended Report length must be multiple of 4 bytes but it is ${this.view.byteLength} bytes`
 			);
 		}
 
@@ -86,7 +88,7 @@ export class ExtendedReportLRLE extends ExtendedReport
 		let pos = 0;
 
 		// Move to chunks.
-		pos += EXTENDED_REPORT_LRLE_MIN_LENGTH;
+		pos += EXTENDED_REPORT_DRLE_MIN_LENGTH;
 
 		while (pos < this.view.byteLength)
 		{
@@ -104,9 +106,9 @@ export class ExtendedReportLRLE extends ExtendedReport
 	}
 
 	/**
-	 * Dump Loss RLE Extended Report info.
+	 * Dump Duplicate RLE Extended Report info.
 	 */
-	dump(): ExtendedReportLRLEDump
+	dump(): ExtendedReportDRLEDump
 	{
 		return {
 			...super.dump(),
@@ -129,7 +131,7 @@ export class ExtendedReportLRLE extends ExtendedReport
 		}
 
 		// Common header + SSRC + begin seq + end seq.
-		let reportLength = EXTENDED_REPORT_LRLE_MIN_LENGTH;
+		let reportLength = EXTENDED_REPORT_DRLE_MIN_LENGTH;
 
 		// Add chunks.
 		reportLength += this.#chunks.length * 2;
@@ -200,11 +202,11 @@ export class ExtendedReportLRLE extends ExtendedReport
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): ExtendedReportLRLE
+	clone(buffer?: ArrayBuffer, byteOffset?: number): ExtendedReportDRLE
 	{
 		const view = this.cloneInternal(buffer, byteOffset);
 
-		return new ExtendedReportLRLE(view);
+		return new ExtendedReportDRLE(view);
 	}
 
 	/**

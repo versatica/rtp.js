@@ -71,6 +71,16 @@ export {
 } from './RTCP/ExtendedReports/ExtendedReportLRLE';
 
 export {
+	ExtendedReportDRLE,
+	ExtendedReportDRLEDump
+} from './RTCP/ExtendedReports/ExtendedReportDRLE';
+
+export {
+	UnknownExtendedReport,
+	UnknownExtendedReportDump
+} from './RTCP/ExtendedReports/UnknownExtendedReport';
+
+export {
 	ExtendedReportChunk,
 	parseExtendedReportChunk,
 	createExtendedReportRunLengthChunk,
