@@ -8,9 +8,17 @@ RTP stack for Node.js and browser written in TypeScript. **rtp.js** provides wit
 _NOTE:_ Work in progress. Many more RTCP packets will be added along with new features.
 
 
-## Documentation
+## Installation
 
-* [API](https://versatica.github.io/rtp.js/)
+```bash
+npm install rtp.js
+```
+
+
+## Usage
+
+* [API documentation](https://versatica.github.io/rtp.js/)
+
 * All core classes and functions are exported by the main module. Example:
   ```ts
   import {
@@ -34,11 +42,6 @@ _NOTE:_ Work in progress. Many more RTCP packets will be added along with new fe
   
   const view = utils.stringToDataView('foo');
   ```
-
-
-## Source Code
-
-* [GitHub](https://github.com/versatica/rtp.js/)
 
 
 ## Authors

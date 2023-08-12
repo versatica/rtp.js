@@ -24,6 +24,14 @@
 		"plugin": [ "sonicware-tdt" ],
 		"theme": "sonicware",
 		"gitRemote": "origin",
-		"hideGenerator": false
+		"hideGenerator": false,
+		"titleLink": "https://versatica.github.io/rtp.js",
+		"navigationLinks": {
+			"GitHub": "https://github.com/versatica/rtp.js",
+			"NPM": "https://www.npmjs.com/package/rtp.js"
+		},
+		"navigationLinks": {
+			"GitHub": "https://github.com/versatica/rtp.js"
+		}
 	}
 }
