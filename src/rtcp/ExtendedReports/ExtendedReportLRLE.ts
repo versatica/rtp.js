@@ -286,7 +286,7 @@ export class ExtendedReportLRLE extends ExtendedReport
 	 *
 	 * @remarks
 	 * - Chunks are given as a list of 2 byte integers.
-	 * - Use {@link parseChunk} to parse them.
+	 * - Use {@link parseExtendedReportChunk} to parse them.
 	 */
 	getChunks(): number[]
 	{
@@ -298,8 +298,8 @@ export class ExtendedReportLRLE extends ExtendedReport
 	 *
 	 * @remarks
 	 * - Chunks must be given as a list of 2 byte integers.
-	 * - Use {@link createRunLengthChunk} or {@link createBitVectorChunk} to
-	 *   create them.
+	 * - Use {@link createExtendedReportRunLengthChunk} or
+	 *   {@link createExtendedReportBitVectorChunk} to create them.
 	 */
 	setChunks(chunks: number[]): void
 	{
@@ -313,8 +313,8 @@ export class ExtendedReportLRLE extends ExtendedReport
 	 *
 	 * @remarks
 	 * - Chunk must be given as 2 byte integer.
-	 * - Use {@link createRunLengthChunk} or {@link createBitVectorChunk} to
-	 *   create it.
+	 * - Use {@link createExtendedReportRunLengthChunk} or
+	 *   {@link createExtendedReportBitVectorChunk} to create it.
 	 * - Given chunk cannot be a terminating null chunk (0 number).
 	 */
 	addChunk(chunk: number): void
