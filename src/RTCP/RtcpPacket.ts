@@ -239,7 +239,7 @@ export abstract class RtcpPacket extends Packet
 	{
 		return {
 			...super.dump(),
-			packetType : this.#packetType,
+			packetType : this.getPacketType(),
 			count      : this.getCount()
 		};
 	}

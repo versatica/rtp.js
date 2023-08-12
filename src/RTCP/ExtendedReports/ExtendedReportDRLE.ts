@@ -116,7 +116,7 @@ export class ExtendedReportDRLE extends ExtendedReport
 			ssrc     : this.getSsrc(),
 			beginSeq : this.getBeginSeq(),
 			endSeq   : this.getEndSeq(),
-			chunks   : Array.from(this.#chunks)
+			chunks   : this.getChunks()
 		};
 	}
 

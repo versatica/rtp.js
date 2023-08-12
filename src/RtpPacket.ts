@@ -305,7 +305,7 @@ export class RtpPacket extends Packet
 			sequenceNumber    : this.getSequenceNumber(),
 			timestamp         : this.getTimestamp(),
 			ssrc              : this.getSsrc(),
-			csrcs             : this.#csrcs,
+			csrcs             : this.getCsrcs(),
 			marker            : this.getMarker(),
 			headerExtensionId : this.#headerExtensionId,
 			extensions        : extensions,

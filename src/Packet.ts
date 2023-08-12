@@ -44,7 +44,7 @@ export abstract class Packet extends Serializable
 	{
 		return {
 			...super.dump(),
-			padding    : this.getPadding()
+			padding : this.getPadding()
 		};
 	}
 
