@@ -26,7 +26,7 @@ import { readBitsInDataView, writeBitsInDataView } from '../../bitOps';
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
-// Common header + SSRC + begin seq + end seq.
+// Common header + SSRC of source + begin seq + end seq.
 const EXTENDED_REPORT_LRLE_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
 
 /**
@@ -74,12 +74,6 @@ export class ExtendedReportLRLE extends ExtendedReport
 		if (this.view.byteLength < EXTENDED_REPORT_LRLE_MIN_LENGTH)
 		{
 			throw new TypeError('wrong byte length for a Loss RLE Extended Report');
-		}
-		else if (this.view.byteLength % 4 !== 0)
-		{
-			throw new RangeError(
-				`Loss RLE Extended Report length must be multiple of 4 bytes but it is ${this.view.byteLength} bytes`
-			);
 		}
 
 		// Position relative to the DataView byte offset.
