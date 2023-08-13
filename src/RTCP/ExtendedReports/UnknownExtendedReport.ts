@@ -3,7 +3,6 @@ import {
 	ExtendedReportType,
 	ExtendedReportDump,
 	getExtendedReportType,
-	getExtendedReportLength,
 	COMMON_HEADER_LENGTH
 } from './ExtendedReport';
 
@@ -163,11 +162,10 @@ export class UnknownExtendedReport extends ExtendedReport
 
 		pos += bodyView.byteLength;
 
-		// Assert that RTCP header length field is correct.
-		if (getExtendedReportLength(view) !== view.byteLength)
+		if (pos !== view.byteLength)
 		{
 			throw new RangeError(
-				`length in the Extended Report header (${getExtendedReportLength(view)} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 

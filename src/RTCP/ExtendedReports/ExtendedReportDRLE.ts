@@ -2,7 +2,6 @@ import {
 	ExtendedReport,
 	ExtendedReportType,
 	ExtendedReportDump,
-	getExtendedReportLength,
 	COMMON_HEADER_LENGTH
 } from './ExtendedReport';
 import { padTo4Bytes } from '../../utils';
@@ -176,14 +175,13 @@ export class ExtendedReportDRLE extends ExtendedReport
 			pos += 2;
 		}
 
-		// NOTE: No need to care about chunk padding since the obtained buffer
-		// has the proper size (multiple of 4 bytes) and is filled with zeroes.
+		// NOTE: Must pad the content to 4 bytes.
+		pos = padTo4Bytes(pos);
 
-		// Assert that RTCP header length field is correct.
-		if (getExtendedReportLength(view) !== view.byteLength)
+		if (pos !== view.byteLength)
 		{
 			throw new RangeError(
-				`length in the Extended Report header (${getExtendedReportLength(view)} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 

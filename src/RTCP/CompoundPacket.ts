@@ -226,7 +226,7 @@ export class CompoundPacket extends Packet
 		if (pos !== view.byteLength)
 		{
 			throw new RangeError(
-				`computed packet length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 

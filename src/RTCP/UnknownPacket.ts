@@ -3,7 +3,6 @@ import {
 	RtcpPacketType,
 	RtcpPacketDump,
 	getRtcpPacketType,
-	getRtcpLength,
 	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
 
@@ -176,15 +175,7 @@ export class UnknownPacket extends RtcpPacket
 		if (pos !== view.byteLength)
 		{
 			throw new RangeError(
-				`computed packet length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
-			);
-		}
-
-		// Assert that RTCP header length field is correct.
-		if (getRtcpLength(view) !== view.byteLength)
-		{
-			throw new RangeError(
-				`length in the RTCP header (${getRtcpLength(view)} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
