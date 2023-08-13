@@ -140,30 +140,30 @@ export class ExtendedReportLRLE extends ExtendedReport
 	serialize(): void
 	{
 		const view = super.serializeBase();
+		const uint8Array = new Uint8Array(
+			view.buffer,
+			view.byteOffset,
+			view.byteLength
+		);
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
 
-		// Move to source of SSRC.
-		pos += 4;
+		// Move to the fixed header fields after the common header.
+		pos += COMMON_HEADER_LENGTH;
 
-		// Copy the SSRC.
-		view.setUint32(pos, this.getSsrc());
-
-		// Move to being seq.
-		pos += 4;
-
-		// Copy being seq.
-		view.setUint16(pos, this.getBeginSeq());
-
-		// Move to end seq.
-		pos += 2;
-
-		// Copy end seq.
-		view.setUint16(pos, this.getEndSeq());
+		// Copy the rest of the fixed fields into the new buffer.
+		uint8Array.set(
+			new Uint8Array(
+				this.view.buffer,
+				this.view.byteOffset + pos,
+				EXTENDED_REPORT_LRLE_MIN_LENGTH - COMMON_HEADER_LENGTH
+			),
+			pos
+		);
 
 		// Move to chunks.
-		pos += 2;
+		pos += EXTENDED_REPORT_LRLE_MIN_LENGTH - COMMON_HEADER_LENGTH;
 
 		// Copy chunks.
 		for (const chunk of this.#chunks)
