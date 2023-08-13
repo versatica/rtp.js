@@ -388,11 +388,10 @@ export class RtpPacket extends Packet
 	 */
 	serialize(): void
 	{
-		const packetLength = this.getByteLength();
-		const { buffer, byteOffset } = this.getSerializationBuffer(packetLength);
+		const { buffer, byteOffset, byteLength } = this.getSerializationBuffer();
 
 		// Create new DataView with new buffer.
-		const view = new DataView(buffer, byteOffset, packetLength);
+		const view = new DataView(buffer, byteOffset, byteLength);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,

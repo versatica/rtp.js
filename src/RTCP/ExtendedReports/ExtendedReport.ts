@@ -221,11 +221,10 @@ export abstract class ExtendedReport extends Serializable
 	 */
 	protected serializeBase(): DataView
 	{
-		const reportLength = this.getByteLength();
-		const { buffer, byteOffset } = this.getSerializationBuffer(reportLength);
+		const { buffer, byteOffset, byteLength } = this.getSerializationBuffer();
 
 		// Create new DataView with new buffer.
-		const view = new DataView(buffer, byteOffset, reportLength);
+		const view = new DataView(buffer, byteOffset, byteLength);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -243,7 +242,7 @@ export abstract class ExtendedReport extends Serializable
 		);
 
 		// Update the report length field in the report header.
-		setExtendedReportLength(view, reportLength);
+		setExtendedReportLength(view, byteLength);
 
 		return view;
 	}

@@ -200,11 +200,10 @@ export class CompoundPacket extends Packet
 	 */
 	serialize(): void
 	{
-		const packetLength = this.getByteLength();
-		const { buffer, byteOffset } = this.getSerializationBuffer(packetLength);
+		const { buffer, byteOffset, byteLength } = this.getSerializationBuffer();
 
 		// Create new DataView with new buffer.
-		const view = new DataView(buffer, byteOffset, packetLength);
+		const view = new DataView(buffer, byteOffset, byteLength);
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;

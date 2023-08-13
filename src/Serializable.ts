@@ -156,16 +156,22 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 		this.#serializationNeeded = flag;
 	}
 
-	protected getSerializationBuffer(length: number):
+	protected getSerializationBuffer():
 	{
 		buffer: ArrayBuffer;
 		byteOffset: number;
+		byteLength: number;
+		// NOTE: ESlint absurdly complaining about "Expected indentation of 2 tabs but
+		// found 1".
+		// eslint-disable-next-line indent
 	}
 	{
+		const byteLength = this.getByteLength();
+
 		let buffer: ArrayBuffer | undefined;
 		let byteOffset = 0;
 
-		this.emit('will-serialize', length, (userBuffer, userByteOffset) =>
+		this.emit('will-serialize', byteLength, (userBuffer, userByteOffset) =>
 		{
 			buffer = userBuffer;
 
@@ -178,24 +184,24 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 		// The user called the callback and passed a buffer and optional byteOffset.
 		if (buffer)
 		{
-			if (buffer.byteLength - byteOffset < length)
+			if (buffer.byteLength - byteOffset < byteLength)
 			{
 				throw new RangeError(
-					`given buffer available space (${buffer.byteLength - byteOffset} bytes) is less than content length (${length} bytes)`
+					`given buffer available space (${buffer.byteLength - byteOffset} bytes) is less than content length (${byteLength} bytes)`
 				);
 			}
 
-			const uint8Array = new Uint8Array(buffer, byteOffset, length);
+			const uint8Array = new Uint8Array(buffer, byteOffset, byteLength);
 
 			// If a buffer is given, ensure the required length is filled with zeroes.
 			uint8Array.fill(0);
 		}
 		else
 		{
-			buffer = new ArrayBuffer(length);
+			buffer = new ArrayBuffer(byteLength);
 		}
 
-		return { buffer, byteOffset };
+		return { buffer, byteOffset, byteLength };
 	}
 
 	protected cloneInternal(buffer?: ArrayBuffer, byteOffset?: number): DataView

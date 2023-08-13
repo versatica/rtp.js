@@ -484,9 +484,8 @@ export class SdesChunk extends Serializable
 	 */
 	serialize(): void
 	{
-		const chunkLength = this.getByteLength();
-		const { buffer, byteOffset } = this.getSerializationBuffer(chunkLength);
-		const view = new DataView(buffer, byteOffset, chunkLength);
+		const { buffer, byteOffset, byteLength } = this.getSerializationBuffer();
+		const view = new DataView(buffer, byteOffset, byteLength);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,

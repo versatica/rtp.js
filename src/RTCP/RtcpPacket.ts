@@ -291,11 +291,10 @@ export abstract class RtcpPacket extends Packet
 	 */
 	protected serializeBase(): DataView
 	{
-		const packetLength = this.getByteLength();
-		const { buffer, byteOffset } = this.getSerializationBuffer(packetLength);
+		const { buffer, byteOffset, byteLength } = this.getSerializationBuffer();
 
 		// Create new DataView with new buffer.
-		const view = new DataView(buffer, byteOffset, packetLength);
+		const view = new DataView(buffer, byteOffset, byteLength);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -313,7 +312,7 @@ export abstract class RtcpPacket extends Packet
 		);
 
 		// Update the length field in the RTCP header.
-		setRtcpLength(view, packetLength);
+		setRtcpLength(view, byteLength);
 
 		// Write padding.
 		if (this.padding > 0)
@@ -325,7 +324,7 @@ export abstract class RtcpPacket extends Packet
 				);
 			}
 
-			view.setUint8(packetLength - 1, this.padding);
+			view.setUint8(byteLength - 1, this.padding);
 		}
 
 		return view;
