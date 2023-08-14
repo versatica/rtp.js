@@ -97,6 +97,11 @@ export {
 } from './RTCP/ExtendedReports/ExtendedReportSS';
 
 export {
+	ExtendedReportVM,
+	ExtendedReportVMDump
+} from './RTCP/ExtendedReports/ExtendedReportVM';
+
+export {
 	GenericExtendedReport,
 	GenericExtendedReportDump
 } from './RTCP/ExtendedReports/GenericExtendedReport';
