@@ -15,7 +15,7 @@ import {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |             NTP timestamp, least significant word             |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-*/
+ */
 
 // Common header + NTP timestamp.
 const EXTENDED_REPORT_RRT_LENGTH = COMMON_HEADER_LENGTH + 8;

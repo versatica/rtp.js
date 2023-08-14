@@ -69,13 +69,6 @@ export class UnknownExtendedReport extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength < COMMON_HEADER_LENGTH)
-		{
-			throw new TypeError(
-				'wrong byte length for an Unknown Extended Report'
-			);
-		}
-
 		// Position relative to the DataView byte offset.
 		let pos = 0;
 

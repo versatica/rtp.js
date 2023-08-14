@@ -169,8 +169,12 @@ export abstract class ExtendedReport extends Serializable
 
 		if (this.view)
 		{
+			if (this.view.byteLength < COMMON_HEADER_LENGTH)
+			{
+				throw new TypeError('too small buffer');
+			}
 			// Extended Report byte length must be multiple of 4.
-			if (this.view.byteLength % 4 !== 0)
+			else if (this.view.byteLength % 4 !== 0)
 			{
 				throw new RangeError(
 					`Extended Report byte length must be multiple of 4 but given buffer view is ${this.view.byteLength} bytes`

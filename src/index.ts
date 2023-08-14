@@ -86,6 +86,12 @@ export {
 } from './RTCP/ExtendedReports/ExtendedReportRRT';
 
 export {
+	ExtendedReportDLRR,
+	ExtendedReportDLRRDump,
+	DLRRSubReport
+} from './RTCP/ExtendedReports/ExtendedReportDLRR';
+
+export {
 	UnknownExtendedReport,
 	UnknownExtendedReportDump
 } from './RTCP/ExtendedReports/UnknownExtendedReport';

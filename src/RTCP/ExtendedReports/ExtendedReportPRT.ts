@@ -24,7 +24,7 @@ import { readBitsInDataView, writeBitsInDataView } from '../../bitOps';
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |       Receipt time of packet (end_seq - 1) mod 65536          |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-*/
+ */
 
 // Common header + SSRC of source + begin seq + end seq.
 const EXTENDED_REPORT_PRT_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
@@ -281,7 +281,7 @@ export class ExtendedReportPRT extends ExtendedReport
 	 * @remarks
 	 * - Receipt times must be given as a list of 4 byte integers.
 	 */
-	seqReceiptTimes(receiptTimes: number[]): void
+	setReceiptTimes(receiptTimes: number[]): void
 	{
 		this.#receiptTimes = Array.from(receiptTimes);
 
