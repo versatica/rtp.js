@@ -49,7 +49,8 @@ type SerializableEvents =
 /**
  * Class holding a serializable buffer view.
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  *
  */
 export abstract class Serializable extends EnhancedEventEmitter<SerializableEvents>

@@ -5,7 +5,7 @@ import { SenderReportPacket } from '../../RTCP/SenderReportPacket';
 import { ByePacket } from '../../RTCP/ByePacket';
 import { SdesPacket } from '../../RTCP/SdesPacket';
 import { XrPacket } from '../../RTCP/XrPacket';
-import { UnknownPacket } from '../../RTCP/UnknownPacket';
+import { GenericPacket } from '../../RTCP/GenericPacket';
 import { areDataViewsEqual, numericArrayToDataView } from '../../utils';
 
 describe('parse RTCP Compound packet', () =>
@@ -53,7 +53,7 @@ describe('parse RTCP Compound packet', () =>
 			0x61, 0x20, 0x76, 0x69,
 			0x73, 0x74, 0x61, 0x00,
 			0x00, 0x00, 0x00, 0x04, // Padding (4 bytes)
-			/* (packet 4) Unknown packet */
+			/* (packet 4) Generic packet */
 			0xa2, 0xc1, 0x00, 0x03, // Padding, Type: 193 (unknown), Count: 2, length: 3
 			0x11, 0x22, 0x33, 0x44, // Body
 			0x55, 0x66, 0x77, 0x88,
@@ -131,7 +131,7 @@ describe('parse RTCP Compound packet', () =>
 		expect(packet3.getSsrcs()).toEqual([ 0x624276e0, 0x2624670e ]);
 		expect(packet3.getReason()).toBe('Hasta la vista');
 
-		const packet4 = compoundPacket.getPackets()[3] as UnknownPacket;
+		const packet4 = compoundPacket.getPackets()[3] as GenericPacket;
 
 		expect(packet4.needsSerialization()).toBe(false);
 		expect(packet4.getByteLength()).toBe(16);
@@ -218,7 +218,7 @@ describe('parse RTCP Compound packet', () =>
 		expect(packet3B.getSsrcs()).toEqual([ 0x624276e0, 0x2624670e ]);
 		expect(packet3B.getReason()).toBe('Hasta la vista');
 
-		const packet4B = compoundPacket.getPackets()[3] as UnknownPacket;
+		const packet4B = compoundPacket.getPackets()[3] as GenericPacket;
 
 		expect(packet4B.needsSerialization()).toBe(false);
 		expect(packet4B.getByteLength()).toBe(16);
@@ -325,7 +325,7 @@ describe('create RTCP Compound packet', () =>
 		const compoundPacket = new CompoundPacket();
 
 		const packet1 = new ReceiverReportPacket();
-		const packet2 = new UnknownPacket(undefined, 199);
+		const packet2 = new GenericPacket(undefined, 199);
 		const packet3 = new SenderReportPacket();
 
 		compoundPacket.addPacket(packet1);

@@ -6,26 +6,6 @@ import {
 } from './ExtendedReport';
 import { readBitsInDataView, writeBitsInDataView } from '../../bitOps';
 
-/**
- *  0                   1                   2                   3
- *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |     BT=3      | rsvd. |   T   |         block length          |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |                        SSRC of source                         |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |          begin_seq            |             end_seq           |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |       Receipt time of packet begin_seq                        |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |       Receipt time of packet (begin_seq + 1) mod 65536        |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * :                              ...                              :
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |       Receipt time of packet (end_seq - 1) mod 65536          |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- */
-
 // Common header + SSRC of source + begin seq + end seq.
 const EXTENDED_REPORT_PRT_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
 
@@ -44,7 +24,31 @@ export type ExtendedReportPRTDump = ExtendedReportDump &
 /**
  * Packet Receipt Times Extended Report.
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * ```text
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |     BT=3      | rsvd. |   T   |         block length          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                        SSRC of source                         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |          begin_seq            |             end_seq           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |       Receipt time of packet begin_seq                        |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |       Receipt time of packet (begin_seq + 1) mod 65536        |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * :                              ...                              :
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |       Receipt time of packet (end_seq - 1) mod 65536          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * ```
+ *
+ * @see
+ * - [RFC 3611 section 4.3](https://datatracker.ietf.org/doc/html/rfc3611#autoid-12)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
 export class ExtendedReportPRT extends ExtendedReport
 {

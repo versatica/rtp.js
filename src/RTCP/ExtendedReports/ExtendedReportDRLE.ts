@@ -7,24 +7,6 @@ import {
 import { padTo4Bytes } from '../../utils';
 import { readBitsInDataView, writeBitsInDataView } from '../../bitOps';
 
-/**
- * 0                   1                   2                   3
- *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |     BT=2      | rsvd. |   T   |         block length          |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |                        SSRC of source                         |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |          begin_seq            |             end_seq           |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |          chunk 1              |             chunk 2           |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * :                              ...                              :
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |          chunk n-1            |             chunk n           |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- */
-
 // Common header + SSRC of source + begin seq + end seq.
 const EXTENDED_REPORT_DRLE_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
 
@@ -43,7 +25,29 @@ export type ExtendedReportDRLEDump = ExtendedReportDump &
 /**
  * Duplicate RLE Extended Report.
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * ```text
+ * 0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |     BT=2      | rsvd. |   T   |         block length          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                        SSRC of source                         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |          begin_seq            |             end_seq           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |          chunk 1              |             chunk 2           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * :                              ...                              :
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |          chunk n-1            |             chunk n           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * ```
+ *
+ * @see
+ * - [RFC 3611 section 4.2](https://datatracker.ietf.org/doc/html/rfc3611#autoid-11)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
 export class ExtendedReportDRLE extends ExtendedReport
 {

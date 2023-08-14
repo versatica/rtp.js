@@ -6,24 +6,6 @@ import {
 } from './ExtendedReport';
 
 /**
- *  0                   1                   2                   3
- *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |     BT=5      |   reserved    |         block length          |
- * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
- * |                 SSRC_1 (SSRC of first receiver)               | sub-
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ block
- * |                         last RR (LRR)                         |   1
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |                   delay since last RR (DLRR)                  |
- * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
- * |                 SSRC_2 (SSRC of second receiver)              | sub-
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ block
- * :                               ...                             :   2
- * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
- */
-
-/**
  * DLRR Extended Report dump.
  */
 export type ExtendedReportDLRRDump = ExtendedReportDump &
@@ -53,7 +35,29 @@ export type DLRRSubReport =
 /**
  * DLRR Extended Report.
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * ```text
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |     BT=5      |   reserved    |         block length          |
+ * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * |                 SSRC_1 (SSRC of first receiver)               | sub-
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ block
+ * |                         last RR (LRR)                         |   1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                   delay since last RR (DLRR)                  |
+ * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * |                 SSRC_2 (SSRC of second receiver)              | sub-
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ block
+ * :                               ...                             :   2
+ * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * ```
+ *
+ * @see
+ * - [RFC 3611 section 4.5](https://datatracker.ietf.org/doc/html/rfc3611#autoid-14)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
 export class ExtendedReportDLRR extends ExtendedReport
 {

@@ -12,24 +12,6 @@ import {
 	getStringByteLength
 } from '../utils';
 
-/**
- *         0                   1                   2                   3
- *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * header |V=2|P|    SC   |  PT=SDES=202  |             length            |
- *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
- * chunk  |                          SSRC/CSRC_1                          |
- *   1    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                           SDES items                          |
- *        |                              ...                              |
- *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
- * chunk  |                          SSRC/CSRC_2                          |
- *   2    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                           SDES items                          |
- *        |                              ...                              |
- *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
- */
-
 // SSRC (4 bytes) + null type (1 byte) + padding (3 bytes).
 const SDES_CHUNK_MIN_LENGTH = 8;
 
@@ -95,7 +77,29 @@ export type SdesChunkDump = SerializableDump &
 /**
  * RTCP SDES packet.
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * ```text
+ *         0                   1                   2                   3
+ *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * header |V=2|P|    SC   |  PT=SDES=202  |             length            |
+ *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * chunk  |                          SSRC/CSRC_1                          |
+ *   1    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *        |                           SDES items                          |
+ *        |                              ...                              |
+ *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * chunk  |                          SSRC/CSRC_2                          |
+ *   2    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *        |                           SDES items                          |
+ *        |                              ...                              |
+ *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * ```
+ *
+ * @see
+ * - [RFC 3550 section 6.5](https://datatracker.ietf.org/doc/html/rfc3550#autoid-31)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
 export class SdesPacket extends RtcpPacket
 {
@@ -348,7 +352,8 @@ export class SdesPacket extends RtcpPacket
 /**
  * SDES Chunk.
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
 export class SdesChunk extends Serializable
 {

@@ -11,27 +11,13 @@ import { ExtendedReportPRT } from './ExtendedReports/ExtendedReportPRT';
 import { ExtendedReportRRT } from './ExtendedReports/ExtendedReportRRT';
 import { ExtendedReportDLRR } from './ExtendedReports/ExtendedReportDLRR';
 import { ExtendedReportSS } from './ExtendedReports/ExtendedReportSS';
-import { UnknownExtendedReport } from './ExtendedReports/UnknownExtendedReport';
+import { GenericExtendedReport } from './ExtendedReports/GenericExtendedReport';
 import {
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump,
 	COMMON_HEADER_LENGTH
 } from './RtcpPacket';
-
-/*
- * https://tools.ietf.org/html/rfc3611
- *
- *         0                   1                   2                   3
- *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * header |V=2|P|reserved |   PT=XR=207   |             length            |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                              SSRC                             |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * report :                         report blocks                         :
- * blocks +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- */
 
 // Common RTCP header length + 4 (SSRC of packet sender).
 const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 4;
@@ -48,7 +34,24 @@ export type XrPacketDump = RtcpPacketDump &
 /**
  * RTCP XR packet.
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * ```text
+ *
+ *         0                   1                   2                   3
+ *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * header |V=2|P|reserved |   PT=XR=207   |             length            |
+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *        |                              SSRC                             |
+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * report :                         report blocks                         :
+ * blocks +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * ```
+ *
+ * @see
+ * - [RFC 3611 section 2](https://datatracker.ietf.org/doc/html/rfc3611#autoid-4)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
 export class XrPacket extends RtcpPacket
 {
@@ -154,7 +157,7 @@ export class XrPacket extends RtcpPacket
 
 				default:
 				{
-					report = new UnknownExtendedReport(reportView);
+					report = new GenericExtendedReport(reportView);
 				}
 			}
 

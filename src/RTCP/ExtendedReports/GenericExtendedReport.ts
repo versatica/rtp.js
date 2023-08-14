@@ -7,6 +7,14 @@ import {
 } from './ExtendedReport';
 
 /**
+ * Generic Extended Report dump.
+ */
+export type GenericExtendedReportDump = ExtendedReportDump;
+
+/**
+ * Generic Extended Report.
+ *
+ * ```text
  * 0                   1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -16,30 +24,26 @@ import {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * :                              ...                              :
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- */
-
-/**
- * Unknown Extended Report dump.
- */
-export type UnknownExtendedReportDump = ExtendedReportDump;
-
-/**
- * Unknown Extended Report.
+ * ```
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * @see
+ * - [RFC 3611 section 3](https://datatracker.ietf.org/doc/html/rfc3611#autoid-5)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
-export class UnknownExtendedReport extends ExtendedReport
+export class GenericExtendedReport extends ExtendedReport
 {
 	// Buffer view holding the report body.
 	#bodyView: DataView;
 
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty unknown
+	 * @param view - If given it will be parsed. Otherwise an empty generic
 	 *   Extended Report will be created.
 	 * @param reportType - If `view` is not given, this parameter must be given.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid unknown Extended Report.
+	 * - If given `view` does not contain a valid generic Extended Report.
 	 */
 	constructor(view?: DataView, reportType?: ExtendedReportType | number)
 	{
@@ -96,9 +100,9 @@ export class UnknownExtendedReport extends ExtendedReport
 	}
 
 	/**
-	 * Dump unknown Extended Report info.
+	 * Dump generic Extended Report info.
 	 */
-	dump(): UnknownExtendedReportDump
+	dump(): GenericExtendedReportDump
 	{
 		return super.dump();
 	}
@@ -174,11 +178,11 @@ export class UnknownExtendedReport extends ExtendedReport
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): UnknownExtendedReport
+	clone(buffer?: ArrayBuffer, byteOffset?: number): GenericExtendedReport
 	{
 		const view = this.cloneInternal(buffer, byteOffset);
 
-		return new UnknownExtendedReport(view);
+		return new GenericExtendedReport(view);
 	}
 
 	/**

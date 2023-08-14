@@ -1,8 +1,8 @@
-import { UnknownPacket } from '../../RTCP/UnknownPacket';
+import { GenericPacket } from '../../RTCP/GenericPacket';
 import { isRtcp } from '../../RTCP/RtcpPacket';
 import { areDataViewsEqual, numericArrayToDataView } from '../../utils';
 
-describe('parse RTCP unknown packet', () =>
+describe('parse RTCP generic packet', () =>
 {
 	const array = new Uint8Array(
 		[
@@ -25,7 +25,7 @@ describe('parse RTCP unknown packet', () =>
 
 	test('packet processing succeeds', () =>
 	{
-		const packet = new UnknownPacket(view);
+		const packet = new GenericPacket(view);
 
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getByteLength()).toBe(12);
@@ -55,7 +55,7 @@ describe('parse RTCP unknown packet', () =>
 			array2.byteLength
 		);
 
-		const packet = new UnknownPacket(view2);
+		const packet = new GenericPacket(view2);
 
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getByteLength()).toBe(16);
@@ -92,22 +92,22 @@ describe('parse RTCP unknown packet', () =>
 			8
 		);
 
-		expect(() => (new UnknownPacket(view3)))
+		expect(() => (new GenericPacket(view3)))
 			.toThrowError(RangeError);
 	});
 });
 
-describe('create RTCP unknown packet', () =>
+describe('create RTCP generic packet', () =>
 {
-	test('creating a unknown packet without view and packet type throws', () =>
+	test('creating a generic packet without view and packet type throws', () =>
 	{
-		expect(() => (new UnknownPacket()))
+		expect(() => (new GenericPacket()))
 			.toThrowError(TypeError);
 	});
 
-	test('creating a unknown packet with padding succeeds', () =>
+	test('creating a generic packet with padding succeeds', () =>
 	{
-		const packet = new UnknownPacket(undefined, 199);
+		const packet = new GenericPacket(undefined, 199);
 
 		expect(isRtcp(packet.getView())).toBe(true);
 		expect(packet.needsSerialization()).toBe(false);
@@ -170,7 +170,7 @@ describe('create RTCP unknown packet', () =>
 			array.byteLength
 		);
 
-		const packet = new UnknownPacket(view);
+		const packet = new GenericPacket(view);
 		const clonedPacket = packet.clone();
 
 		expect(clonedPacket.needsSerialization()).toBe(false);

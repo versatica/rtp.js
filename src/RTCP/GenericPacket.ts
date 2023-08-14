@@ -7,6 +7,17 @@ import {
 } from './RtcpPacket';
 
 /**
+ * RTCP generic packet info dump.
+ */
+export type GenericPacketDump = RtcpPacketDump &
+{
+	bodyLength: number;
+};
+
+/**
+ * RTCP generic packet.
+ *
+ * ```text
  *         0                   1                   2                   3
  *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -16,33 +27,26 @@ import {
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *        :                              ...                              :
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- */
-
-/**
- * RTCP unknown packet info dump.
- */
-export type UnknownPacketDump = RtcpPacketDump &
-{
-	bodyLength: number;
-};
-
-/**
- * RTCP unknown packet.
+ * ```
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * @see
+ * - [RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
-export class UnknownPacket extends RtcpPacket
+export class GenericPacket extends RtcpPacket
 {
 	// Buffer view holding the packet body.
 	#bodyView: DataView;
 
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTCP unknown
+	 * @param view - If given it will be parsed. Otherwise an empty RTCP generic
 	 *   packet will be created.
 	 * @param packetType - If `view` is not given, this parameter must be given.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid RTCP unknown packet.
+	 * - If given `view` does not contain a valid RTCP generic packet.
 	 */
 	constructor(view?: DataView, packetType?: RtcpPacketType | number)
 	{
@@ -104,9 +108,9 @@ export class UnknownPacket extends RtcpPacket
 	}
 
 	/**
-	 * Dump RTCP unknown packet info.
+	 * Dump RTCP generic packet info.
 	 */
-	dump(): UnknownPacketDump
+	dump(): GenericPacketDump
 	{
 		return {
 			...super.dump(),
@@ -191,11 +195,11 @@ export class UnknownPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): UnknownPacket
+	clone(buffer?: ArrayBuffer, byteOffset?: number): GenericPacket
 	{
 		const view = this.cloneInternal(buffer, byteOffset);
 
-		return new UnknownPacket(view);
+		return new GenericPacket(view);
 	}
 
 	/**

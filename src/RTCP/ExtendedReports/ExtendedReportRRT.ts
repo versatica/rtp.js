@@ -5,18 +5,6 @@ import {
 	COMMON_HEADER_LENGTH
 } from './ExtendedReport';
 
-/**
- *  0                   1                   2                   3
- *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |     BT=4      |   reserved    |       block length = 2        |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |              NTP timestamp, most significant word             |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |             NTP timestamp, least significant word             |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- */
-
 // Common header + NTP timestamp.
 const EXTENDED_REPORT_RRT_LENGTH = COMMON_HEADER_LENGTH + 8;
 
@@ -32,7 +20,23 @@ export type ExtendedReportRRTDump = ExtendedReportDump &
 /**
  * Receiver Reference Time Extended Report.
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * ```text
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |     BT=4      |   reserved    |       block length = 2        |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |              NTP timestamp, most significant word             |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |             NTP timestamp, least significant word             |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * ```
+ *
+ * @see
+ * - [RFC 3611 section 4.4](https://datatracker.ietf.org/doc/html/rfc3611#autoid-13)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
 export class ExtendedReportRRT extends ExtendedReport
 {

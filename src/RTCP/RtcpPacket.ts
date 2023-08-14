@@ -182,9 +182,21 @@ function packetTypeToString(packetType: RtcpPacketType): string
 }
 
 /**
- * Parent class of all RTCP packets.
+ * RTCP packet. Parent class of all RTCP packets.
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * ```text
+ *         0                   1                   2                   3
+ *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * header |V=2|P|    SC   |      PT       |             length            |
+ *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * ```
+ *
+ * @see
+ * - [RFC 3550 section 6.1](https://datatracker.ietf.org/doc/html/rfc3550#autoid-16)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
 export abstract class RtcpPacket extends Packet
 {

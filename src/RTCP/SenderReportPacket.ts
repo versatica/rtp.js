@@ -10,7 +10,27 @@ import {
 	RECEPTION_REPORT_LENGTH
 } from './ReceiverReportPacket';
 
+// Common RTCP header length + 24.
+const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 24;
+
 /**
+ * RTCP Sender Report packet info dump.
+ */
+export type SenderReportPacketDump = RtcpPacketDump &
+{
+	ssrc: number;
+	ntpSeq: number;
+	ntpFraction: number;
+	rtpTimestamp: number;
+	packetCount: number;
+	octetCount: number;
+	reports: ReceptionReportDump[];
+};
+
+/**
+ * RTCP Sender Report packet.
+ *
+ * ```text
  *         0                   1                   2                   3
  *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -46,29 +66,13 @@ import {
  *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  *        |                  profile-specific extensions                  |
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- */
-
-// Common RTCP header length + 24.
-const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 24;
-
-/**
- * RTCP Sender Report packet info dump.
- */
-export type SenderReportPacketDump = RtcpPacketDump &
-{
-	ssrc: number;
-	ntpSeq: number;
-	ntpFraction: number;
-	rtpTimestamp: number;
-	packetCount: number;
-	octetCount: number;
-	reports: ReceptionReportDump[];
-};
-
-/**
- * RTCP Sender Report packet.
+ * ```
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * @see
+ * - [RFC 3550 section 6.4.1](https://datatracker.ietf.org/doc/html/rfc3550#autoid-31)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
 export class SenderReportPacket extends RtcpPacket
 {

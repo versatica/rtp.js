@@ -21,8 +21,6 @@
 		"excludeNotDocumented": true,
 		"excludeInternal": true,
 		"includeVersion": true,
-		"plugin": [ "sonicware-tdt" ],
-		"theme": "sonicware",
 		"gitRemote": "origin",
 		"hideGenerator": false,
 		"titleLink": "https://versatica.github.io/rtp.js",

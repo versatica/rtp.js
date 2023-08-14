@@ -2,6 +2,9 @@ import { readBit,	writeBit } from '../../bitOps';
 
 /**
  * Loss RLE and Duplicate RLE Extended Report chunk info.
+ *
+ * @see
+ * - [RFC 3611 section 4.1](https://datatracker.ietf.org/doc/html/rfc3611#autoid-7)
  */
 export type ExtendedReportChunk =
 {
@@ -25,6 +28,9 @@ export type ExtendedReportChunk =
 
 /**
  * Parse given 2 bytes number as a Extended Report chunk.
+ *
+ * @see
+ * - [RFC 3611 section 4.1](https://datatracker.ietf.org/doc/html/rfc3611#autoid-7)
  */
 export function parseExtendedReportChunk(chunk: number): ExtendedReportChunk
 {
@@ -59,6 +65,9 @@ export function parseExtendedReportChunk(chunk: number): ExtendedReportChunk
 
 /**
  * Create a Run Length Chunk and return a 2 bytes number representing it.
+ *
+ * @see
+ * - [RFC 3611 section 4.1.1](https://datatracker.ietf.org/doc/html/rfc3611#autoid-8)
  */
 export function createExtendedReportRunLengthChunk(
 	runType: 'zeros' | 'ones',
@@ -82,6 +91,9 @@ export function createExtendedReportRunLengthChunk(
 
 /**
  * Create a Bit Vector Chunk and return a 2 bytes number representing it.
+ *
+ * @see
+ * - [RFC 3611 section 4.1.2](https://datatracker.ietf.org/doc/html/rfc3611#autoid-9)
  */
 export function createExtendedReportBitVectorChunk(bitVector: number): number
 {

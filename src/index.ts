@@ -97,9 +97,9 @@ export {
 } from './RTCP/ExtendedReports/ExtendedReportSS';
 
 export {
-	UnknownExtendedReport,
-	UnknownExtendedReportDump
-} from './RTCP/ExtendedReports/UnknownExtendedReport';
+	GenericExtendedReport,
+	GenericExtendedReportDump
+} from './RTCP/ExtendedReports/GenericExtendedReport';
 
 export {
 	ExtendedReportChunk,
@@ -109,9 +109,9 @@ export {
 } from './RTCP/ExtendedReports/chunks';
 
 export {
-	UnknownPacket,
-	UnknownPacketDump
-} from './RTCP/UnknownPacket';
+	GenericPacket,
+	GenericPacketDump
+} from './RTCP/GenericPacket';
 
 import {
 	nodeBufferToDataView,

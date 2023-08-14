@@ -44,7 +44,27 @@ export function isRtp(view: DataView): boolean
 /**
  * RTP packet.
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * ```text
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |V=2|P|X|  CC   |M|     PT      |       sequence number         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                           timestamp                           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |           synchronization source (SSRC) identifier            |
+ * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * |            contributing source (CSRC) identifiers             |
+ * |                             ....                              |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * ```
+ *
+ * @see
+ * - [RFC 3550 section 5.1](https://datatracker.ietf.org/doc/html/rfc3550#autoid-11)
+ * - [RFC 5285 section 4](https://datatracker.ietf.org/doc/html/rfc5285#autoid-4)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
 export class RtpPacket extends Packet
 {

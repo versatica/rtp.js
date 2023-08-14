@@ -4,16 +4,6 @@ import { assertUnreachable } from '../../utils';
 export const COMMON_HEADER_LENGTH = 4;
 
 /**
- * 0                   1                   2                   3
- *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |      BT       | type-specific |         block length          |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * :             type-specific block contents                      :
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- */
-
-/**
  * Extended Report types.
  */
 // ESLint absurdly complains about "'ExtendedReportType' is already declared in
@@ -153,9 +143,23 @@ export function reportTypeToString(reportType: ExtendedReportType): string
 }
 
 /**
- * Parent class of all Extended Reports.
+ * Parent class of all {@link XrPacket} Extended Reports.
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * ```text
+ * 0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |      BT       | type-specific |         block length          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * :             type-specific block contents                      :
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * ```
+ *
+ * @see
+ * - [RFC 3611 section 3](https://datatracker.ietf.org/doc/html/rfc3611#autoid-5)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
 export abstract class ExtendedReport extends Serializable
 {

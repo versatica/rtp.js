@@ -12,7 +12,7 @@ import { SenderReportPacket } from './SenderReportPacket';
 import { ByePacket } from './ByePacket';
 import { SdesPacket } from './SdesPacket';
 import { XrPacket } from './XrPacket';
-import { UnknownPacket } from './UnknownPacket';
+import { GenericPacket } from './GenericPacket';
 
 /**
  * RTCP Compound packet info dump.
@@ -25,7 +25,11 @@ export type CompoundPacketDump = PacketDump &
 /**
  * RTCP Compound packet.
  *
- * @emits will-serialize - {@link WillSerializeEvent}
+ * @see
+ * - [RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)
+ *
+ * @emits
+ * - will-serialize: {@link WillSerializeEvent}
  */
 export class CompoundPacket extends Packet
 {
@@ -117,7 +121,7 @@ export class CompoundPacket extends Packet
 
 				default:
 				{
-					packet = new UnknownPacket(packetView);
+					packet = new GenericPacket(packetView);
 				}
 			}
 
