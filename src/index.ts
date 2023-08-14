@@ -92,6 +92,11 @@ export {
 } from './RTCP/ExtendedReports/ExtendedReportDLRR';
 
 export {
+	ExtendedReportSS,
+	ExtendedReportSSDump
+} from './RTCP/ExtendedReports/ExtendedReportSS';
+
+export {
 	UnknownExtendedReport,
 	UnknownExtendedReportDump
 } from './RTCP/ExtendedReports/UnknownExtendedReport';

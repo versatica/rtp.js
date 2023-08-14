@@ -10,6 +10,7 @@ import { ExtendedReportDRLE } from './ExtendedReports/ExtendedReportDRLE';
 import { ExtendedReportPRT } from './ExtendedReports/ExtendedReportPRT';
 import { ExtendedReportRRT } from './ExtendedReports/ExtendedReportRRT';
 import { ExtendedReportDLRR } from './ExtendedReports/ExtendedReportDLRR';
+import { ExtendedReportSS } from './ExtendedReports/ExtendedReportSS';
 import { UnknownExtendedReport } from './ExtendedReports/UnknownExtendedReport';
 import {
 	RtcpPacket,
@@ -137,12 +138,12 @@ export class XrPacket extends RtcpPacket
 					break;
 				}
 
-				// case ExtendedReportType.SS:
-				// {
-				// 	report = new ExtendedReportSS(reportView);
+				case ExtendedReportType.SS:
+				{
+					report = new ExtendedReportSS(reportView);
 
-				// 	break;
-				// }
+					break;
+				}
 
 				// case ExtendedReportType.VM:
 				// {
