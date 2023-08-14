@@ -128,7 +128,7 @@ import {
 } from './utils';
 
 /**
- * Utils.
+ * Utils module.
  */
 export const utils =
 {
