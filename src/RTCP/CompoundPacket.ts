@@ -12,6 +12,14 @@ import { SenderReportPacket } from './SenderReportPacket';
 import { ByePacket } from './ByePacket';
 import { SdesPacket } from './SdesPacket';
 import { XrPacket } from './XrPacket';
+import {
+	RtpFeedbackMessageType,
+	PsFeedbackMessageType,
+	getRtcpFeedbackMessageType
+} from './FeedbackPacket';
+import { NackPacket } from './NackPacket';
+import { PliPacket } from './PliPacket';
+import { GenericFeedbackPacket } from './GenericFeedbackPacket';
 import { GenericPacket } from './GenericPacket';
 
 /**
@@ -71,7 +79,6 @@ export class CompoundPacket extends Packet
 				this.view.byteLength - pos
 			);
 
-			const packetType = getRtcpPacketType(remainingView);
 			const packetLength = getRtcpLength(remainingView);
 
 			const packetView = new DataView(
@@ -82,7 +89,7 @@ export class CompoundPacket extends Packet
 
 			let packet: RtcpPacket;
 
-			switch (packetType)
+			switch (getRtcpPacketType(remainingView))
 			{
 				case RtcpPacketType.RR:
 				{
@@ -115,6 +122,46 @@ export class CompoundPacket extends Packet
 				case RtcpPacketType.XR:
 				{
 					packet = new XrPacket(packetView);
+
+					break;
+				}
+
+				case RtcpPacketType.RTPFB:
+				{
+					switch (getRtcpFeedbackMessageType(packetView))
+					{
+						case RtpFeedbackMessageType.NACK:
+						{
+							packet = new NackPacket(packetView);
+
+							break;
+						}
+
+						default:
+						{
+							packet = new GenericFeedbackPacket(packetView);
+						}
+					}
+
+					break;
+				}
+
+				case RtcpPacketType.PSFB:
+				{
+					switch (getRtcpFeedbackMessageType(packetView))
+					{
+						case PsFeedbackMessageType.PLI:
+						{
+							packet = new PliPacket(packetView);
+
+							break;
+						}
+
+						default:
+						{
+							packet = new GenericFeedbackPacket(packetView);
+						}
+					}
 
 					break;
 				}

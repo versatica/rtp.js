@@ -1,10 +1,13 @@
 import { CompoundPacket } from '../../RTCP/CompoundPacket';
 import { isRtcp, RtcpPacketType } from '../../RTCP/RtcpPacket';
+import { RtpFeedbackMessageType } from '../../RTCP/FeedbackPacket';
 import { ReceiverReportPacket } from '../../RTCP/ReceiverReportPacket';
 import { SenderReportPacket } from '../../RTCP/SenderReportPacket';
 import { ByePacket } from '../../RTCP/ByePacket';
 import { SdesPacket } from '../../RTCP/SdesPacket';
 import { XrPacket } from '../../RTCP/XrPacket';
+import { NackPacket } from '../../RTCP/NackPacket';
+import { PliPacket } from '../../RTCP/PliPacket';
 import { GenericPacket } from '../../RTCP/GenericPacket';
 import { areDataViewsEqual, numericArrayToDataView } from '../../utils';
 
@@ -74,7 +77,14 @@ describe('parse RTCP Compound packet', () =>
 			0b00101010, 0b10101010, // Run Lengh Chunk (zeros)
 			0b01101010, 0b10101010, // Run Lengh Chunk (ones)
 			0b11101010, 0b10101010, // Bit Vector Chunk
-			0b00000000, 0b00000000 // Terminating Null Chunk
+			0b00000000, 0b00000000, // Terminating Null Chunk
+			// (packet 7) NACK packet */
+			0xa1, 0xcd, 0x00, 0x04, // Padding, Type: 205 (RTPFB), FMT: 1 (NACK), Length: 4
+			0x11, 0x22, 0x33, 0x44, // Sender SSRC: 0x11223344
+			0x55, 0x66, 0x77, 0x88, // Sender SSRC: 0x55667788
+			0x03, 0xe8, // PID: 1000
+			0b10101010, 0b10101010, // BLP: 0b1010101010101010
+			0x00, 0x00, 0x00, 0x04 // Padding (4 bytes)
 		]
 	);
 
@@ -94,8 +104,8 @@ describe('parse RTCP Compound packet', () =>
 		const compoundPacket = new CompoundPacket(view);
 
 		expect(compoundPacket.needsSerialization()).toBe(false);
-		expect(compoundPacket.getByteLength()).toBe(200);
-		expect(compoundPacket.getPackets().length).toBe(6);
+		expect(compoundPacket.getByteLength()).toBe(220);
+		expect(compoundPacket.getPackets().length).toBe(7);
 		expect(areDataViewsEqual(compoundPacket.getView(), view)).toBe(true);
 
 		const packet1 = compoundPacket.getPackets()[0] as ReceiverReportPacket;
@@ -162,10 +172,21 @@ describe('parse RTCP Compound packet', () =>
 		expect(packet6.getSsrc()).toBe(0x5d931534);
 		expect(packet6.getReports().length).toBe(1);
 
+		const packet7 = compoundPacket.getPackets()[6] as NackPacket;
+
+		expect(packet7.needsSerialization()).toBe(false);
+		expect(packet7.getByteLength()).toBe(20);
+		expect(packet7.getPacketType()).toBe(RtcpPacketType.RTPFB);
+		expect(packet7.getMessageType()).toBe(RtpFeedbackMessageType.NACK);
+		expect(packet7.getPadding()).toBe(4);
+		expect(packet7.getItems()).toEqual(
+			[ { pid: 1000, bitmask: 0b1010101010101010 } ]
+		);
+
 		expect(compoundPacket.dump()).toEqual(
 			{
 				padding    : 0,
-				byteLength : 200,
+				byteLength : 220,
 				packets    :
 				[
 					packet1.dump(),
@@ -173,7 +194,8 @@ describe('parse RTCP Compound packet', () =>
 					packet3.dump(),
 					packet4.dump(),
 					packet5.dump(),
-					packet6.dump()
+					packet6.dump(),
+					packet7.dump()
 				]
 			});
 
@@ -181,8 +203,8 @@ describe('parse RTCP Compound packet', () =>
 		compoundPacket.serialize();
 
 		expect(compoundPacket.needsSerialization()).toBe(false);
-		expect(compoundPacket.getByteLength()).toBe(200);
-		expect(compoundPacket.getPackets().length).toBe(6);
+		expect(compoundPacket.getByteLength()).toBe(220);
+		expect(compoundPacket.getPackets().length).toBe(7);
 		expect(areDataViewsEqual(compoundPacket.getView(), view)).toBe(true);
 
 		const packet1B = compoundPacket.getPackets()[0] as ReceiverReportPacket;
@@ -249,10 +271,21 @@ describe('parse RTCP Compound packet', () =>
 		expect(packet6B.getSsrc()).toBe(0x5d931534);
 		expect(packet6B.getReports().length).toBe(1);
 
+		const packet7B = compoundPacket.getPackets()[6] as NackPacket;
+
+		expect(packet7B.needsSerialization()).toBe(false);
+		expect(packet7B.getByteLength()).toBe(20);
+		expect(packet7B.getPacketType()).toBe(RtcpPacketType.RTPFB);
+		expect(packet7B.getMessageType()).toBe(RtpFeedbackMessageType.NACK);
+		expect(packet7B.getPadding()).toBe(4);
+		expect(packet7B.getItems()).toEqual(
+			[ { pid: 1000, bitmask: 0b1010101010101010 } ]
+		);
+
 		expect(compoundPacket.dump()).toEqual(
 			{
 				padding    : 0,
-				byteLength : 200,
+				byteLength : 220,
 				packets    :
 				[
 					packet1B.dump(),
@@ -260,7 +293,8 @@ describe('parse RTCP Compound packet', () =>
 					packet3B.dump(),
 					packet4B.dump(),
 					packet5B.dump(),
-					packet6B.dump()
+					packet6B.dump(),
+					packet7B.dump()
 				]
 			});
 
@@ -268,13 +302,13 @@ describe('parse RTCP Compound packet', () =>
 		packet3.addSsrc(666);
 
 		expect(compoundPacket.needsSerialization()).toBe(true);
-		expect(compoundPacket.getByteLength()).toBe(204);
-		expect(compoundPacket.getPackets().length).toBe(6);
+		expect(compoundPacket.getByteLength()).toBe(224);
+		expect(compoundPacket.getPackets().length).toBe(7);
 
 		expect(compoundPacket.dump()).toEqual(
 			{
 				padding    : 0,
-				byteLength : 204,
+				byteLength : 224,
 				packets    :
 				[
 					packet1B.dump(),
@@ -282,7 +316,8 @@ describe('parse RTCP Compound packet', () =>
 					packet3B.dump(),
 					packet4B.dump(),
 					packet5B.dump(),
-					packet6B.dump()
+					packet6B.dump(),
+					packet7B.dump()
 				]
 			});
 	});
@@ -327,20 +362,23 @@ describe('create RTCP Compound packet', () =>
 		const packet1 = new ReceiverReportPacket();
 		const packet2 = new GenericPacket(undefined, 199);
 		const packet3 = new SenderReportPacket();
+		const packet4 = new PliPacket();
 
 		compoundPacket.addPacket(packet1);
 		compoundPacket.addPacket(packet2);
 		compoundPacket.addPacket(packet3);
+		compoundPacket.addPacket(packet4);
 
 		expect(compoundPacket.dump()).toEqual(
 			{
 				padding    : 0,
-				byteLength : 8 + 4 + 28,
+				byteLength : 8 + 4 + 28 + 12,
 				packets    :
 				[
 					packet1.dump(),
 					packet2.dump(),
-					packet3.dump()
+					packet3.dump(),
+					packet4.dump()
 				]
 			});
 
@@ -349,12 +387,13 @@ describe('create RTCP Compound packet', () =>
 		expect(compoundPacket.dump()).toEqual(
 			{
 				padding    : 0,
-				byteLength : 8 + 4 + 28,
+				byteLength : 8 + 4 + 28 + 12,
 				packets    :
 				[
 					packet1.dump(),
 					packet2.dump(),
-					packet3.dump()
+					packet3.dump(),
+					packet4.dump()
 				]
 			});
 
@@ -363,12 +402,13 @@ describe('create RTCP Compound packet', () =>
 		expect(clonedCompoundPacket.dump()).toEqual(
 			{
 				padding    : 0,
-				byteLength : 8 + 4 + 28,
+				byteLength : 8 + 4 + 28 + 12,
 				packets    :
 				[
 					packet1.dump(),
 					packet2.dump(),
-					packet3.dump()
+					packet3.dump(),
+					packet4.dump()
 				]
 			});
 	});

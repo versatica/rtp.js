@@ -1,74 +1,86 @@
+import { RtcpPacketType, getRtcpPacketType } from './RtcpPacket';
 import {
-	RtcpPacket,
-	RtcpPacketType,
-	RtcpPacketDump,
-	getRtcpPacketType,
-	COMMON_HEADER_LENGTH
-} from './RtcpPacket';
+	FeedbackPacket,
+	RtpFeedbackMessageType,
+	PsFeedbackMessageType,
+	FeedbackPacketDump,
+	getRtcpFeedbackMessageType,
+	FIXED_HEADER_LENGTH
+} from './FeedbackPacket';
 
 /**
- * RTCP generic packet info dump.
+ * RTCP generic Feedback packet info.
  */
-export type GenericPacketDump = RtcpPacketDump &
+export type GenericFeedbackPacketDump = FeedbackPacketDump &
 {
 	bodyLength: number;
 };
 
 /**
- * RTCP generic packet.
+ * RTCP Feedback generic packet.
  *
- * ```text
- *         0                   1                   2                   3
- *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * header |V=2|P|    SC   |   PT=???      |             length            |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * body   |                              ...                              |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        :                              ...                              :
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * ```
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |V=2|P| FMT=??? |  PT=205|206   |          length               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                  SSRC of packet sender                        |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                  SSRC of media source                         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * :            Feedback Control Information (FCI)                 :
+ * :                                                               :
  *
  * @see
- * - [RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)
+ * - [RFC 4585 section 6.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.1)
  *
  * @emits
  * - will-serialize: {@link WillSerializeEvent}
  */
-export class GenericPacket extends RtcpPacket
+export class GenericFeedbackPacket extends FeedbackPacket
 {
 	// Buffer view holding the packet body.
 	#bodyView: DataView;
 
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP generic
-	 *   packet will be created.
+	 *   Feedback packet will be created.
 	 * @param packetType - If `view` is not given, this parameter must be given.
+	 * @param messageType - If `view` is not given, this parameter must be given.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid RTCP generic packet.
+	 * - If given `view` does not contain a valid RTCP generic Feedback packet.
 	 */
-	constructor(view?: DataView, packetType?: RtcpPacketType | number)
+	constructor(
+		view?: DataView,
+		packetType?: RtcpPacketType.RTPFB | RtcpPacketType.PSFB,
+		messageType?: RtpFeedbackMessageType | PsFeedbackMessageType
+	)
 	{
-		super(view ? getRtcpPacketType(view) : packetType!, view);
+		super(
+			(view ? getRtcpPacketType(view) : packetType!) as
+				RtcpPacketType.RTPFB | RtcpPacketType.PSFB,
+			view ? getRtcpFeedbackMessageType(view) : messageType!,
+			view
+		);
 
-		if (!view && !packetType)
+		if (!view && (!packetType || !messageType))
 		{
-			throw new TypeError('view or packetType must be given');
+			throw new TypeError('view or (packetType and messageType) must be given');
 		}
 
 		if (!this.view)
 		{
-			this.view = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
+			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
-			// Write version and packet type.
-			this.writeCommonHeader();
+			// Write version, packet type and feedback message type.
+			this.writeFixedHeader();
 
 			// Set empty body.
 			this.#bodyView = new DataView(
 				this.view.buffer,
-				this.view.byteOffset + COMMON_HEADER_LENGTH,
-				this.view.byteLength - COMMON_HEADER_LENGTH - this.padding
+				this.view.byteOffset + FIXED_HEADER_LENGTH,
+				this.view.byteLength - FIXED_HEADER_LENGTH - this.padding
 			);
 
 			return;
@@ -78,7 +90,7 @@ export class GenericPacket extends RtcpPacket
 		let pos = 0;
 
 		// Move to body.
-		pos += COMMON_HEADER_LENGTH;
+		pos += FIXED_HEADER_LENGTH;
 
 		// Get body.
 		const bodyLength = this.view.byteLength - pos - this.padding;
@@ -89,7 +101,7 @@ export class GenericPacket extends RtcpPacket
 			bodyLength
 		);
 
-		pos += (bodyLength + this.padding);
+		pos += this.padding;
 
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength)
@@ -101,9 +113,9 @@ export class GenericPacket extends RtcpPacket
 	}
 
 	/**
-	 * Dump RTCP generic packet info.
+	 * Dump RTCP generic Feedback packet info.
 	 */
-	dump(): GenericPacketDump
+	dump(): GenericFeedbackPacketDump
 	{
 		return {
 			...super.dump(),
@@ -122,7 +134,7 @@ export class GenericPacket extends RtcpPacket
 		}
 
 		const packetLength =
-			COMMON_HEADER_LENGTH +
+			FIXED_HEADER_LENGTH +
 			this.#bodyView.byteLength +
 			this.padding;
 
@@ -145,7 +157,7 @@ export class GenericPacket extends RtcpPacket
 		let pos = 0;
 
 		// Move to body.
-		pos += COMMON_HEADER_LENGTH;
+		pos += FIXED_HEADER_LENGTH;
 
 		// Copy the body into the new buffer.
 		uint8Array.set(
@@ -188,29 +200,11 @@ export class GenericPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): GenericPacket
+	clone(buffer?: ArrayBuffer, byteOffset?: number): GenericFeedbackPacket
 	{
 		const view = this.cloneInternal(buffer, byteOffset);
 
-		return new GenericPacket(view);
-	}
-
-	/**
-	 * Set the RTCP header count value.
-	 *
-	 * @remarks
-	 * - This field (the 5 less significant bits in the first byte of the common
-	 *   RTCP header) can be used for other custom purpose in case the packet
-	 *   needs it for something else.
-	 *
-	 * @privateRemarks
-	 * - This method is made public for this class since the user is free to add
-	 *   whatever body to this packet, and hence the user may want to also
-	 *   manipulate this field.
-	 */
-	setCount(count: number): void
-	{
-		super.setCount(count);
+		return new GenericFeedbackPacket(view);
 	}
 
 	/**
