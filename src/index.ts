@@ -54,6 +54,23 @@ export {
 } from './RTCP/SdesPacket';
 
 export {
+	FeedbackPacket,
+	RtpFeedbackMessageType,
+	PsFeedbackMessageType,
+	FeedbackPacketDump
+} from './RTCP/FeedbackPacket';
+
+export {
+	NackPacket,
+	NackPacketDump
+} from './RTCP/NackPacket';
+
+export {
+	PliPacket,
+	PliPacketDump
+} from './RTCP/PliPacket';
+
+export {
 	XrPacket,
 	XrPacketDump
 } from './RTCP/XrPacket';

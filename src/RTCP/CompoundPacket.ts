@@ -11,7 +11,6 @@ import { ReceiverReportPacket } from './ReceiverReportPacket';
 import { SenderReportPacket } from './SenderReportPacket';
 import { ByePacket } from './ByePacket';
 import { SdesPacket } from './SdesPacket';
-import { XrPacket } from './XrPacket';
 import {
 	RtpFeedbackMessageType,
 	PsFeedbackMessageType,
@@ -20,6 +19,7 @@ import {
 import { NackPacket } from './NackPacket';
 import { PliPacket } from './PliPacket';
 import { GenericFeedbackPacket } from './GenericFeedbackPacket';
+import { XrPacket } from './XrPacket';
 import { GenericPacket } from './GenericPacket';
 
 /**
@@ -116,13 +116,6 @@ export class CompoundPacket extends Packet
 					break;
 				}
 
-				case RtcpPacketType.XR:
-				{
-					packet = new XrPacket(packetView);
-
-					break;
-				}
-
 				case RtcpPacketType.RTPFB:
 				{
 					switch (getRtcpFeedbackMessageType(packetView))
@@ -159,6 +152,13 @@ export class CompoundPacket extends Packet
 							packet = new GenericFeedbackPacket(packetView);
 						}
 					}
+
+					break;
+				}
+
+				case RtcpPacketType.XR:
+				{
+					packet = new XrPacket(packetView);
 
 					break;
 				}

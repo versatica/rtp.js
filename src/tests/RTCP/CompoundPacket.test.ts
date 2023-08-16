@@ -5,9 +5,9 @@ import { ReceiverReportPacket } from '../../RTCP/ReceiverReportPacket';
 import { SenderReportPacket } from '../../RTCP/SenderReportPacket';
 import { ByePacket } from '../../RTCP/ByePacket';
 import { SdesPacket } from '../../RTCP/SdesPacket';
-import { XrPacket } from '../../RTCP/XrPacket';
 import { NackPacket } from '../../RTCP/NackPacket';
 import { PliPacket } from '../../RTCP/PliPacket';
+import { XrPacket } from '../../RTCP/XrPacket';
 import { GenericPacket } from '../../RTCP/GenericPacket';
 import { areDataViewsEqual, numericArrayToDataView } from '../../utils';
 

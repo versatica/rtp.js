@@ -31,8 +31,10 @@ npm install rtp.js
     ReceptionReport,
     ByePacket,
     SdesPacket,
+    NackPacket,
+    PliPacket,
     XrPacket,
-    UnknownPacket,
+    GenericPacket,
     // etc
   } from 'rtp.js';
   ```
