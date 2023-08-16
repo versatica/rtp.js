@@ -208,7 +208,7 @@ export class NackPacket extends FeedbackPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	addItem({ pid, bitmask }: { pid: number; bitmask: number }): void
+	addItem(pid: number, bitmask: number): void
 	{
 		this.#items.push({ pid, bitmask });
 
