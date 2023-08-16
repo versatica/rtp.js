@@ -15,7 +15,7 @@ export type NackPacketDump = FeedbackPacketDump &
 };
 
 /**
- * RTCP NACK packet.
+ * RTCP NACK packet (RTCP Transport Layer Feedback).
  *
  * ```text
  *  0                   1                   2                   3

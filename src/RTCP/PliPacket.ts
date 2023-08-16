@@ -12,8 +12,19 @@ import {
 export type PliPacketDump = FeedbackPacketDump;
 
 /**
- * RTCP PLI packet.
+ * RTCP PLI packet (RTCP Payload Specific Feedback).
  *
+ * ```text
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |V=2|P|  FMT=1  |  PT=PSFB=206  |          length               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                  SSRC of packet sender                        |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                  SSRC of media source                         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * ```
  *
  * @see
  * - [RFC 4585 section 6.3.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.3.1)
