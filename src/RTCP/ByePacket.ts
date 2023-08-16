@@ -37,7 +37,7 @@ export type ByePacketDump = RtcpPacketDump &
  * ```
  *
  * @see
- * - [RFC 3550 section 6.6](https://datatracker.ietf.org/doc/html/rfc3550#autoid-43)
+ * - [RFC 3550 section 6.6](https://datatracker.ietf.org/doc/html/rfc3550#section-6.6)
  *
  * @emits
  * - will-serialize: {@link WillSerializeEvent}

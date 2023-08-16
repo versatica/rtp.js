@@ -54,7 +54,7 @@ export type DLRRSubReport =
  * ```
  *
  * @see
- * - [RFC 3611 section 4.5](https://datatracker.ietf.org/doc/html/rfc3611#autoid-14)
+ * - [RFC 3611 section 4.5](https://datatracker.ietf.org/doc/html/rfc3611#section-4.5)
  *
  * @emits
  * - will-serialize: {@link WillSerializeEvent}

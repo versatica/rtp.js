@@ -27,7 +27,7 @@ export type GenericExtendedReportDump = ExtendedReportDump;
  * ```
  *
  * @see
- * - [RFC 3611 section 3](https://datatracker.ietf.org/doc/html/rfc3611#autoid-5)
+ * - [RFC 3611 section 3](https://datatracker.ietf.org/doc/html/rfc3611#section-3)
  *
  * @emits
  * - will-serialize: {@link WillSerializeEvent}

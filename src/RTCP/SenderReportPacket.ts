@@ -69,7 +69,7 @@ export type SenderReportPacketDump = RtcpPacketDump &
  * ```
  *
  * @see
- * - [RFC 3550 section 6.4.1](https://datatracker.ietf.org/doc/html/rfc3550#autoid-31)
+ * - [RFC 3550 section 6.4.1](https://datatracker.ietf.org/doc/html/rfc3550#section-6.4.1)
  *
  * @emits
  * - will-serialize: {@link WillSerializeEvent}

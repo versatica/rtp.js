@@ -66,7 +66,7 @@ export type ReceptionReportDump = SerializableDump &
  * ```
  *
  * @see
- * - [RFC 3550 section 6.4.2](https://datatracker.ietf.org/doc/html/rfc3550#autoid-31)
+ * - [RFC 3550 section 6.4.2](https://datatracker.ietf.org/doc/html/rfc3550#section-6.4.2)
  *
  * @emits
  * - will-serialize: {@link WillSerializeEvent}

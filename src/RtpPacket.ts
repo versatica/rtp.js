@@ -60,8 +60,8 @@ export function isRtp(view: DataView): boolean
  * ```
  *
  * @see
- * - [RFC 3550 section 5.1](https://datatracker.ietf.org/doc/html/rfc3550#autoid-11)
- * - [RFC 5285 section 4](https://datatracker.ietf.org/doc/html/rfc5285#autoid-4)
+ * - [RFC 3550 section 5.1](https://datatracker.ietf.org/doc/html/rfc3550#section-5.1)
+ * - [RFC 5285 section 4](https://datatracker.ietf.org/doc/html/rfc5285#section-4)
  *
  * @emits
  * - will-serialize: {@link WillSerializeEvent}

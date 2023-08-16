@@ -33,7 +33,7 @@ export type ExtendedReportRRTDump = ExtendedReportDump &
  * ```
  *
  * @see
- * - [RFC 3611 section 4.4](https://datatracker.ietf.org/doc/html/rfc3611#autoid-13)
+ * - [RFC 3611 section 4.4](https://datatracker.ietf.org/doc/html/rfc3611#section-4.4)
  *
  * @emits
  * - will-serialize: {@link WillSerializeEvent}

@@ -66,7 +66,7 @@ export type ExtendedReportVMDump = ExtendedReportDump &
  * ```
  *
  * @see
- * - [RFC 3611 section 4.7](https://datatracker.ietf.org/doc/html/rfc3611#autoid-16)
+ * - [RFC 3611 section 4.7](https://datatracker.ietf.org/doc/html/rfc3611#section-4.7)
  *
  * @emits
  * - will-serialize: {@link WillSerializeEvent}

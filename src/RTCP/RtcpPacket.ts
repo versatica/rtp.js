@@ -193,7 +193,7 @@ function packetTypeToString(packetType: RtcpPacketType): string
  * ```
  *
  * @see
- * - [RFC 3550 section 6.1](https://datatracker.ietf.org/doc/html/rfc3550#autoid-16)
+ * - [RFC 3550 section 6.1](https://datatracker.ietf.org/doc/html/rfc3550#section-6.1)
  *
  * @emits
  * - will-serialize: {@link WillSerializeEvent}
@@ -215,6 +215,12 @@ export abstract class RtcpPacket extends Packet
 			{
 				throw new TypeError('not a RTCP packet');
 			}
+			else if (this.getPacketType() !== this.#packetType)
+			{
+				throw new TypeError(
+					`given buffer view is not a RTCP ${packetTypeToString(this.#packetType)} packet`
+				);
+			}
 			// RTCP packet byte length must be multiple of 4.
 			else if (this.view.byteLength % 4 !== 0)
 			{
@@ -222,16 +228,10 @@ export abstract class RtcpPacket extends Packet
 					`RTCP packet byte length must be multiple of 4 but given buffer view is ${this.view.byteLength} bytes`
 				);
 			}
-			else if (getRtcpPacketType(this.view) !== this.#packetType)
-			{
-				throw new TypeError(
-					`not a RTCP ${packetTypeToString(this.#packetType)} packet`
-				);
-			}
 			else if (getRtcpLength(this.view) !== this.view.byteLength)
 			{
 				throw new RangeError(
-					`length in the RTCP header (${getRtcpLength(this.view)} bytes) does not match view length (${this.view.byteLength} bytes)`
+					`length in the RTCP header (${getRtcpLength(this.view)} bytes) does not match buffer view length (${this.view.byteLength} bytes)`
 				);
 			}
 
@@ -259,7 +259,7 @@ export abstract class RtcpPacket extends Packet
 	}
 
 	/**
-	 * Get the RTCP header packet type.
+	 * Get the RTCP packet type.
 	 */
 	getPacketType(): RtcpPacketType
 	{
@@ -281,7 +281,7 @@ export abstract class RtcpPacket extends Packet
 	protected writeCommonHeader(): void
 	{
 		this.setVersion();
-		this.setPacketType(this.#packetType);
+		this.setPacketType();
 	}
 
 	/**
@@ -315,7 +315,7 @@ export abstract class RtcpPacket extends Packet
 			view.byteLength
 		);
 
-		// Copy the fixed header into the new buffer.
+		// Copy the common header into the new buffer.
 		uint8Array.set(
 			new Uint8Array(
 				this.view.buffer,
@@ -345,14 +345,14 @@ export abstract class RtcpPacket extends Packet
 	}
 
 	/**
-	 * Set the RTCP header packet type.
+	 * Set the RTCP packet type.
 	 *
 	 * @privateRemarks
 	 * - This method is not public since users should not manipulate this field
 	 *   directly.
 	 */
-	private setPacketType(packetType: RtcpPacketType): void
+	private setPacketType(): void
 	{
-		this.view.setUint8(1, packetType);
+		this.view.setUint8(1, this.#packetType);
 	}
 }

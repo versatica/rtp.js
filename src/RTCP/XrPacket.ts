@@ -49,7 +49,7 @@ export type XrPacketDump = RtcpPacketDump &
  * ```
  *
  * @see
- * - [RFC 3611 section 2](https://datatracker.ietf.org/doc/html/rfc3611#autoid-4)
+ * - [RFC 3611 section 2](https://datatracker.ietf.org/doc/html/rfc3611#section-2)
  *
  * @emits
  * - will-serialize: {@link WillSerializeEvent}
