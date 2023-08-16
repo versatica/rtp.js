@@ -160,9 +160,6 @@ export function reportTypeToString(reportType: ExtendedReportType): string
  *
  * @see
  * - [RFC 3611 section 3](https://datatracker.ietf.org/doc/html/rfc3611#section-3)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export abstract class ExtendedReport extends Serializable
 {
@@ -230,12 +227,16 @@ export abstract class ExtendedReport extends Serializable
 	/**
 	 * Serialize base RTCP packet into a new buffer.
 	 */
-	protected serializeBase(): DataView
+	protected serializeBase(buffer?: ArrayBuffer, byteOffset?: number): DataView
 	{
-		const { buffer, byteOffset, byteLength } = this.getSerializationBuffer();
+		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
-		const view = new DataView(buffer, byteOffset, byteLength);
+		const view = new DataView(
+			bufferData.buffer,
+			bufferData.byteOffset,
+			bufferData.byteLength
+		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -253,7 +254,7 @@ export abstract class ExtendedReport extends Serializable
 		);
 
 		// Update the report length field in the report header.
-		setExtendedReportLength(view, byteLength);
+		setExtendedReportLength(view, view.byteLength);
 
 		return view;
 	}

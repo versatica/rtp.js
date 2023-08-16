@@ -31,9 +31,6 @@ export type GenericPacketDump = RtcpPacketDump &
  *
  * @see
  * - [RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class GenericPacket extends RtcpPacket
 {
@@ -132,9 +129,9 @@ export class GenericPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const view = super.serializeBase();
+		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -188,9 +185,19 @@ export class GenericPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): GenericPacket
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): GenericPacket
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new GenericPacket(view);
 	}

@@ -50,9 +50,6 @@ export type XrPacketDump = RtcpPacketDump &
  *
  * @see
  * - [RFC 3611 section 2](https://datatracker.ietf.org/doc/html/rfc3611#section-2)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class XrPacket extends RtcpPacket
 {
@@ -225,9 +222,9 @@ export class XrPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const view = super.serializeBase();
+		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -257,14 +254,9 @@ export class XrPacket extends RtcpPacket
 		for (const report of this.#reports)
 		{
 			// Serialize the report into the current position.
-			report.prependOnceListener('will-serialize', (length, cb) =>
-			{
-				cb(view.buffer, view.byteOffset + pos);
+			report.serialize(view.buffer, view.byteOffset + pos);
 
-				pos += length;
-			});
-
-			report.serialize();
+			pos += report.getByteLength();
 		}
 
 		pos += this.padding;
@@ -286,9 +278,19 @@ export class XrPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): XrPacket
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): XrPacket
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new XrPacket(view);
 	}

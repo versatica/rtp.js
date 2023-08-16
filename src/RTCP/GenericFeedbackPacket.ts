@@ -33,9 +33,6 @@ export type GenericFeedbackPacketDump = FeedbackPacketDump &
  *
  * @see
  * - [RFC 4585 section 6.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.1)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class GenericFeedbackPacket extends FeedbackPacket
 {
@@ -144,9 +141,9 @@ export class GenericFeedbackPacket extends FeedbackPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const view = super.serializeBase();
+		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -200,9 +197,19 @@ export class GenericFeedbackPacket extends FeedbackPacket
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): GenericFeedbackPacket
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): GenericFeedbackPacket
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new GenericFeedbackPacket(view);
 	}

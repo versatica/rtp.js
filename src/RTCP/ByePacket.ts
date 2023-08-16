@@ -38,9 +38,6 @@ export type ByePacketDump = RtcpPacketDump &
  *
  * @see
  * - [RFC 3550 section 6.6](https://datatracker.ietf.org/doc/html/rfc3550#section-6.6)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class ByePacket extends RtcpPacket
 {
@@ -158,9 +155,9 @@ export class ByePacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const view = super.serializeBase();
+		const view = this.serializeBase(buffer, byteOffset);
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
@@ -219,9 +216,19 @@ export class ByePacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): ByePacket
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): ByePacket
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new ByePacket(view);
 	}

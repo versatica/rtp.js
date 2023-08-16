@@ -1,4 +1,3 @@
-import { EnhancedEventEmitter } from './EnhancedEventEmitter';
 import { clone } from './utils';
 
 /**
@@ -10,50 +9,9 @@ export type SerializableDump =
 };
 
 /**
- * Event emitted when the content is being serialized. The user has a chance to
- * pass a buffer, otherwise a new one will be internally allocated.
- *
- * @param `length: number`: Required buffer length (in bytes).
- * @param `callback: (buffer, byteOffset?) => void`: A function that can be
- *   optionally called to pass a buffer and a byte offset where the content will
- *   be serialized.
- *
- * @remarks
- * - If `callback` is called, the buffer byte length minus the given byte offset
- *   must be equal or higher than `length`.
- *
- * @example
- * ```ts
- * packet.on('will-serialize', (length, callback) => {
- *   const buffer = new ArrayBuffer(length);
- *   const byteOffset = 0;
- *
- *   callback(buffer, byteOffset);
- * });
- * ```
- */
-export type WillSerializeEvent =
-[
-	number,
-	(buffer: ArrayBuffer, byteOffset?: number) => void
-];
-
-/**
- * Events emitted by all classes inheriting from Serializable class.
- */
-type SerializableEvents =
-{
-	'will-serialize': WillSerializeEvent;
-};
-
-/**
  * Class holding a serializable buffer view.
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
- *
  */
-export abstract class Serializable extends EnhancedEventEmitter<SerializableEvents>
+export abstract class Serializable
 {
 	// Buffer view holding the content.
 	// @ts-ignore ('view' has not initializer and is not assigned in constructor).
@@ -63,8 +21,6 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 
 	protected constructor(view?: DataView)
 	{
-		super();
-
 		if (view)
 		{
 			this.view = view;
@@ -82,20 +38,30 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 	}
 
 	/**
-	 * Get a buffer view containing the serialized conrent.
+	 * Get a buffer view containing the serialized content.
+	 *
+	 * @param serializationBuffer - Buffer in which the content will be serialized
+	 *   in case serialization is needed. If not given, a new one will internally
+	 *   allocated.
+	 * @param serializationByteOffset - Byte offset of the given `serializationBuffer`
+	 *   where serialization (if needed) will start.
 	 *
 	 * @remarks
 	 * - The internal buffer is serialized if needed (to apply pending
 	 * 	 modifications).
 	 *
 	 * @throws
-	 * - If buffer serialization is needed and it fails due to invalid fields.
+	 * - If buffer serialization is needed and it fails due to invalid
+	 *   content.
 	 */
-	getView(): DataView
+	getView(
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): DataView
 	{
 		if (this.needsSerialization())
 		{
-			this.serialize();
+			this.serialize(serializationBuffer, serializationByteOffset);
 		}
 
 		return this.view;
@@ -123,41 +89,63 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 	/**
 	 * Apply pending changes and serialize the content into a new buffer.
 	 *
-	 * @remarks
-	 * - In most cases there is no need to use this method since many setter
-	 *   methods apply the changes within the current buffer. To be sure, check
-	 *   {@link needsSerialization} before.
-	 *
-	 * @throws
-	 * - If serialization fails due to invalid fields previously added.
-	 */
-	abstract serialize(): void;
-
-	/**
-	 * Clone the content. The cloned instance does not share any memory with the
-	 * original one.
-	 *
 	 * @param buffer - Buffer in which the content will be serialized. If not
 	 *   given, a new one will internally allocated.
 	 * @param byteOffset - Byte offset of the given `buffer` where serialization
 	 *   will start.
 	 *
 	 * @remarks
+	 * - In most cases there is no need to use this method since many setter
+	 *   methods apply changes within the current buffer. To be sure, check
+	 *   {@link needsSerialization} before.
+	 *
+	 * @throws
+	 * - If serialization fails due to invalid content previously added.
+	 * - If given `buffer` doesn't have space enough to serialize the content.
+	 */
+	abstract serialize(buffer?: ArrayBuffer, byteOffset?: number): void;
+
+	/**
+	 * Clone the content. The cloned instance does not share any memory with the
+	 * original one.
+	 *
+	 * @param buffer - Buffer in which the content will be cloned. If not given, a
+	 *   new one will internally allocated.
+	 * @param byteOffset - Byte offset of the given `buffer` where clonation will
+	 *   start.
+	 * @param serializationBuffer - Buffer in which the content will be serialized
+	 *   in case serialization is needed. If not given, a new one will internally
+	 *   allocated.
+	 * @param serializationByteOffset - Byte offset of the given
+	 *   `serializationBuffer` where serialization (if needed) will start.
+	 *
+	 * @remarks
 	 * - The buffer is serialized if needed (to apply pending modifications).
 	 *
 	 * @throws
-	 * - If serialization is needed and it fails due to invalid fields or if
-	 *   `buffer` is given and it doesn't hold enough space to serialize the
+	 * - If serialization is needed and it fails.
+	 * - If given `buffer` doesn't have space enough to clone the content.
+	 * - If given `serializationBuffer` doesn't have space enough to clone the
 	 *   content.
 	 */
-	abstract clone(buffer?: ArrayBuffer, byteOffset?: number): Serializable;
+	abstract clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): Serializable;
 
 	protected setSerializationNeeded(flag: boolean): void
 	{
 		this.#serializationNeeded = flag;
 	}
 
-	protected getSerializationBuffer():
+	/**
+	 * This method returns a buffer (plus byte offset) for the child to serialize.
+	 * If a buffer (and optionally a byte offset) is given, this method will verify
+	 * whether the serialized content can fit into it and will throw otherwise.
+	 */
+	protected getSerializationBuffer(buffer?: ArrayBuffer, byteOffset?: number):
 	{
 		buffer: ArrayBuffer;
 		byteOffset: number;
@@ -167,28 +155,16 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 		// eslint-disable-next-line indent
 	}
 	{
+		byteOffset ??= 0;
+
 		const byteLength = this.getByteLength();
 
-		let buffer: ArrayBuffer | undefined;
-		let byteOffset = 0;
-
-		this.emit('will-serialize', byteLength, (userBuffer, userByteOffset) =>
-		{
-			buffer = userBuffer;
-
-			if (userByteOffset !== undefined)
-			{
-				byteOffset = userByteOffset;
-			}
-		});
-
-		// The user called the callback and passed a buffer and optional byteOffset.
 		if (buffer)
 		{
 			if (buffer.byteLength - byteOffset < byteLength)
 			{
 				throw new RangeError(
-					`given buffer available space (${buffer.byteLength - byteOffset} bytes) is less than content length (${byteLength} bytes)`
+					`given buffer available space (${buffer.byteLength - byteOffset} bytes) is less than length required for serialization (${byteLength} bytes)`
 				);
 			}
 
@@ -199,17 +175,23 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 		}
 		else
 		{
+			// The buffer is guaranteed to be filled with zeros.
 			buffer = new ArrayBuffer(byteLength);
 		}
 
 		return { buffer, byteOffset, byteLength };
 	}
 
-	protected cloneInternal(buffer?: ArrayBuffer, byteOffset?: number): DataView
+	protected cloneInternal(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): DataView
 	{
 		if (this.needsSerialization())
 		{
-			this.serialize();
+			this.serialize(serializationBuffer, serializationByteOffset);
 		}
 
 		let view: DataView;
@@ -218,12 +200,12 @@ export abstract class Serializable extends EnhancedEventEmitter<SerializableEven
 		// content.
 		if (buffer)
 		{
-			byteOffset = byteOffset ?? 0;
+			byteOffset ??= 0;
 
 			if (buffer.byteLength - byteOffset < this.view.byteLength)
 			{
 				throw new RangeError(
-					`given buffer available space (${buffer.byteLength - byteOffset} bytes) is less than required length (${this.view.byteLength} bytes)`
+					`given buffer available space (${buffer.byteLength - byteOffset} bytes) is less than length required for clonation (${this.view.byteLength} bytes)`
 				);
 			}
 

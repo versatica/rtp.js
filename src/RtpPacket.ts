@@ -62,9 +62,6 @@ export function isRtp(view: DataView): boolean
  * @see
  * - [RFC 3550 section 5.1](https://datatracker.ietf.org/doc/html/rfc3550#section-5.1)
  * - [RFC 5285 section 4](https://datatracker.ietf.org/doc/html/rfc5285#section-4)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class RtpPacket extends Packet
 {
@@ -406,12 +403,16 @@ export class RtpPacket extends Packet
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const { buffer, byteOffset, byteLength } = this.getSerializationBuffer();
+		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
-		const view = new DataView(buffer, byteOffset, byteLength);
+		const view = new DataView(
+			bufferData.buffer,
+			bufferData.byteOffset,
+			bufferData.byteLength
+		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -646,9 +647,19 @@ export class RtpPacket extends Packet
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): RtpPacket
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): RtpPacket
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new RtpPacket(view);
 	}
