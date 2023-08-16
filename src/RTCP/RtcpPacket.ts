@@ -130,7 +130,10 @@ function setRtcpLength(view: DataView, byteLength: number): void
 	view.setUint16(2, length);
 }
 
-function packetTypeToString(packetType: RtcpPacketType): string
+/**
+ * @hidden
+ */
+export function packetTypeToString(packetType: RtcpPacketType): string
 {
 	switch (packetType)
 	{

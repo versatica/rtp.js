@@ -96,6 +96,9 @@ export function setExtendedReportLength(view: DataView, byteLength: number): voi
 	view.setUint16(2, length);
 }
 
+/**
+ * @hidden
+ */
 export function reportTypeToString(reportType: ExtendedReportType): string
 {
 	switch (reportType)
