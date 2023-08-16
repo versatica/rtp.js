@@ -70,9 +70,6 @@ export type SenderReportPacketDump = RtcpPacketDump &
  *
  * @see
  * - [RFC 3550 section 6.4.1](https://datatracker.ietf.org/doc/html/rfc3550#section-6.4.1)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class SenderReportPacket extends RtcpPacket
 {
@@ -185,9 +182,9 @@ export class SenderReportPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const view = super.serializeBase();
+		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -216,21 +213,9 @@ export class SenderReportPacket extends RtcpPacket
 		// Write Reception Reports.
 		for (const report of this.#reports)
 		{
-			// NOTE: ReceptionReport class has fixed length so we don't need to deal
-			// with calls to serialize() on it.
+			report.serialize(view.buffer, view.byteOffset + pos);
 
-			const reportView = report.getView();
-
-			uint8Array.set(
-				new Uint8Array(
-					reportView.buffer,
-					reportView.byteOffset,
-					RECEPTION_REPORT_LENGTH
-				),
-				pos
-			);
-
-			pos += RECEPTION_REPORT_LENGTH;
+			pos += report.getByteLength();
 		}
 
 		pos += this.padding;
@@ -252,11 +237,21 @@ export class SenderReportPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): SenderReportPacket
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): SenderReportPacket
 	{
-		const destPacketView = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
-		return new SenderReportPacket(destPacketView);
+		return new SenderReportPacket(view);
 	}
 
 	/**

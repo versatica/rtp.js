@@ -28,9 +28,6 @@ export type PliPacketDump = FeedbackPacketDump;
  *
  * @see
  * - [RFC 4585 section 6.3.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.3.1)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class PliPacket extends FeedbackPacket
 {
@@ -100,9 +97,9 @@ export class PliPacket extends FeedbackPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const view = super.serializeBase();
+		const view = this.serializeBase(buffer, byteOffset);
 
 		// Nothing else to do.
 
@@ -115,9 +112,19 @@ export class PliPacket extends FeedbackPacket
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): PliPacket
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): PliPacket
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new PliPacket(view);
 	}

@@ -97,9 +97,6 @@ export type SdesChunkDump = SerializableDump &
  *
  * @see
  * - [RFC 3550 section 6.5](https://datatracker.ietf.org/doc/html/rfc3550#section-6.5)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class SdesPacket extends RtcpPacket
 {
@@ -258,9 +255,9 @@ export class SdesPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const view = super.serializeBase();
+		const view = this.serializeBase(buffer, byteOffset);
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
@@ -271,15 +268,9 @@ export class SdesPacket extends RtcpPacket
 		// Write chunks.
 		for (const chunk of this.#chunks)
 		{
-			// Serialize the chunk into the current position.
-			chunk.prependOnceListener('will-serialize', (length, cb) =>
-			{
-				cb(view.buffer, view.byteOffset + pos);
+			chunk.serialize(view.buffer, view.byteOffset + pos);
 
-				pos += length;
-			});
-
-			chunk.serialize();
+			pos += chunk.getByteLength();
 		}
 
 		pos += this.padding;
@@ -301,9 +292,19 @@ export class SdesPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): SdesPacket
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): SdesPacket
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new SdesPacket(view);
 	}
@@ -351,9 +352,6 @@ export class SdesPacket extends RtcpPacket
 
 /**
  * SDES Chunk.
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class SdesChunk extends Serializable
 {
@@ -487,10 +485,16 @@ export class SdesChunk extends Serializable
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const { buffer, byteOffset, byteLength } = this.getSerializationBuffer();
-		const view = new DataView(buffer, byteOffset, byteLength);
+		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
+
+		// Create new DataView with new buffer.
+		const view = new DataView(
+			bufferData.buffer,
+			bufferData.byteOffset,
+			bufferData.byteLength
+		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -531,9 +535,19 @@ export class SdesChunk extends Serializable
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): SdesChunk
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): SdesChunk
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new SdesChunk(view);
 	}

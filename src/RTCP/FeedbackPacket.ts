@@ -129,9 +129,6 @@ function messageTypeToString(
  *
  * @see
  * - [RFC 4585 section 6.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.1)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export abstract class FeedbackPacket extends RtcpPacket
 {
@@ -225,9 +222,9 @@ export abstract class FeedbackPacket extends RtcpPacket
 	/**
 	 * Serialize base RTCP Feedback packet into a new buffer.
 	 */
-	protected serializeBase(): DataView
+	protected serializeBase(buffer?: ArrayBuffer, byteOffset?: number): DataView
 	{
-		const view = super.serializeBase();
+		const view = super.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,

@@ -67,9 +67,6 @@ export type ReceptionReportDump = SerializableDump &
  *
  * @see
  * - [RFC 3550 section 6.4.2](https://datatracker.ietf.org/doc/html/rfc3550#section-6.4.2)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class ReceiverReportPacket extends RtcpPacket
 {
@@ -177,9 +174,9 @@ export class ReceiverReportPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const view = super.serializeBase();
+		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -208,21 +205,9 @@ export class ReceiverReportPacket extends RtcpPacket
 		// Write Reception Reports.
 		for (const report of this.#reports)
 		{
-			// NOTE: ReceptionReport class has fixed length so we don't need to deal
-			// with calls to serialize() on it.
+			report.serialize(view.buffer, view.byteOffset + pos);
 
-			const reportView = report.getView();
-
-			uint8Array.set(
-				new Uint8Array(
-					reportView.buffer,
-					reportView.byteOffset,
-					RECEPTION_REPORT_LENGTH
-				),
-				pos
-			);
-
-			pos += RECEPTION_REPORT_LENGTH;
+			pos += report.getByteLength();
 		}
 
 		pos += this.padding;
@@ -244,9 +229,19 @@ export class ReceiverReportPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): ReceiverReportPacket
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): ReceiverReportPacket
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new ReceiverReportPacket(view);
 	}
@@ -362,9 +357,31 @@ export class ReceptionReport extends Serializable
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		// Nothing to do.
+		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
+
+		// Create new DataView with new buffer.
+		const view = new DataView(
+			bufferData.buffer,
+			bufferData.byteOffset,
+			bufferData.byteLength
+		);
+		const uint8Array = new Uint8Array(
+			view.buffer,
+			view.byteOffset,
+			view.byteLength
+		);
+
+		// Copy the entire report into the new buffer.
+		uint8Array.set(
+			new Uint8Array(
+				this.view.buffer,
+				this.view.byteOffset,
+				RECEPTION_REPORT_LENGTH
+			),
+			0
+		);
 
 		this.setSerializationNeeded(false);
 	}
@@ -372,9 +389,19 @@ export class ReceptionReport extends Serializable
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): ReceptionReport
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): ReceptionReport
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new ReceptionReport(view);
 	}

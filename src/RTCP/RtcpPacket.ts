@@ -197,9 +197,6 @@ export function packetTypeToString(packetType: RtcpPacketType): string
  *
  * @see
  * - [RFC 3550 section 6.1](https://datatracker.ietf.org/doc/html/rfc3550#section-6.1)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export abstract class RtcpPacket extends Packet
 {
@@ -306,12 +303,16 @@ export abstract class RtcpPacket extends Packet
 	/**
 	 * Serialize base RTCP packet into a new buffer.
 	 */
-	protected serializeBase(): DataView
+	protected serializeBase(buffer?: ArrayBuffer, byteOffset?: number): DataView
 	{
-		const { buffer, byteOffset, byteLength } = this.getSerializationBuffer();
+		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
-		const view = new DataView(buffer, byteOffset, byteLength);
+		const view = new DataView(
+			bufferData.buffer,
+			bufferData.byteOffset,
+			bufferData.byteLength
+		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -329,7 +330,7 @@ export abstract class RtcpPacket extends Packet
 		);
 
 		// Update the length field in the RTCP header.
-		setRtcpLength(view, byteLength);
+		setRtcpLength(view, view.byteLength);
 
 		// Write padding.
 		if (this.padding > 0)
@@ -341,7 +342,7 @@ export abstract class RtcpPacket extends Packet
 				);
 			}
 
-			view.setUint8(byteLength - 1, this.padding);
+			view.setUint8(view.byteLength - 1, this.padding);
 		}
 
 		return view;

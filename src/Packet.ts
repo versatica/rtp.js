@@ -21,9 +21,6 @@ export type PacketDump = SerializableDump &
 
 /**
  * Parent class of all RTP and RTCP packets.
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export abstract class Packet extends Serializable
 {

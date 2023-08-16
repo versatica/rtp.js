@@ -35,9 +35,6 @@ export type CompoundPacketDump = PacketDump &
  *
  * @see
  * - [RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class CompoundPacket extends Packet
 {
@@ -249,27 +246,25 @@ export class CompoundPacket extends Packet
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const { buffer, byteOffset, byteLength } = this.getSerializationBuffer();
+		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
-		const view = new DataView(buffer, byteOffset, byteLength);
+		const view = new DataView(
+			bufferData.buffer,
+			bufferData.byteOffset,
+			bufferData.byteLength
+		);
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
 
 		for (const packet of this.#packets)
 		{
-			// Serialize the RTCP packet into the current position.
-			packet.prependOnceListener('will-serialize', (length, cb) =>
-			{
-				cb(view.buffer, view.byteOffset + pos);
+			packet.serialize(view.buffer, view.byteOffset + pos);
 
-				pos += length;
-			});
-
-			packet.serialize();
+			pos += packet.getByteLength();
 		}
 
 		// Assert that current position is equal than new buffer length.
@@ -289,9 +284,19 @@ export class CompoundPacket extends Packet
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): CompoundPacket
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): CompoundPacket
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new CompoundPacket(view);
 	}

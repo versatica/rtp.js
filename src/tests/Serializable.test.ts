@@ -13,12 +13,16 @@ export class Foo extends Serializable
 		return this.view.byteLength;
 	}
 
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const { buffer, byteOffset, byteLength } = this.getSerializationBuffer();
+		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
-		const view = new DataView(buffer, byteOffset, byteLength);
+		const view = new DataView(
+			bufferData.buffer,
+			bufferData.byteOffset,
+			bufferData.byteLength
+		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -41,9 +45,19 @@ export class Foo extends Serializable
 		this.setSerializationNeeded(false);
 	}
 
-	clone(buffer?: ArrayBuffer, byteOffset?: number): Foo
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): Foo
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new Foo(view);
 	}
@@ -94,12 +108,7 @@ describe('parse Foo 1', () =>
 		const buffer = new ArrayBuffer(10);
 		const byteOffset = 0;
 
-		foo.once('will-serialize', (length, cb) =>
-		{
-			cb(buffer, byteOffset);
-		});
-
-		foo.serialize();
+		foo.serialize(buffer, byteOffset);
 
 		expect(foo.getByteLength()).toBe(10);
 		expect(foo.needsSerialization()).toBe(false);
@@ -109,15 +118,7 @@ describe('parse Foo 1', () =>
 
 	test('serialize() fails if current buffer is given and it collides', () =>
 	{
-		foo.once('will-serialize', (length, cb) =>
-		{
-			// Given buffer is the object's current one with byte offset 9, which
-			// is the last byte of the object's DataView, so it will be wronly
-			// overwritten.
-			cb(view.buffer, /* byteOffset */ 9);
-		});
-
-		foo.serialize();
+		foo.serialize(view.buffer, /* byteOffset */ 9);
 
 		expect(foo.getByteLength()).toBe(10);
 		expect(foo.needsSerialization()).toBe(false);
@@ -153,14 +154,14 @@ describe('parse Foo 1', () =>
 		// @ts-ignore
 		foo.setSerializationNeeded(true);
 
-		foo.once('will-serialize', (length, cb) =>
-		{
-			cb(view.buffer, /* byteOffset */ 9);
-		});
-
 		const buffer = new ArrayBuffer(10);
 		const byteOffset = 0;
-		const clonedFoo = foo.clone(buffer, byteOffset);
+		const clonedFoo = foo.clone(
+			buffer,
+			byteOffset,
+			/* serializationBuffer */ view.buffer,
+			/* byteOffset */ 9
+		);
 
 		expect(clonedFoo.getByteLength()).toBe(10);
 		expect(clonedFoo.needsSerialization()).toBe(false);

@@ -35,9 +35,6 @@ export type NackPacketDump = FeedbackPacketDump &
  *
  * @see
  * - [RFC 4585 section 6.2.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.2.1)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class NackPacket extends FeedbackPacket
 {
@@ -126,9 +123,9 @@ export class NackPacket extends FeedbackPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const view = super.serializeBase();
+		const view = this.serializeBase(buffer, byteOffset);
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
@@ -167,9 +164,19 @@ export class NackPacket extends FeedbackPacket
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): NackPacket
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): NackPacket
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new NackPacket(view);
 	}

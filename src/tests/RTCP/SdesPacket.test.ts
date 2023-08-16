@@ -431,14 +431,14 @@ describe('create SDES Chunk', () =>
 		const cloningBuffer = new ArrayBuffer(1000);
 		const cloningByteOffset = 123;
 
-		chunk.on('will-serialize', (length, cb) =>
-		{
-			cb(serializationBuffer, serializationByteOffset);
-		});
-
 		// Clone the chunk instead of just serializing it since clone() will
 		// serialize it anyway.
-		const clonedChunk = chunk.clone(cloningBuffer, cloningByteOffset);
+		const clonedChunk = chunk.clone(
+			cloningBuffer,
+			cloningByteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		expect(chunk.needsSerialization()).toBe(false);
 		expect(chunk.getView().buffer === serializationBuffer).toBe(true);

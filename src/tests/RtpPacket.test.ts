@@ -624,12 +624,7 @@ describe('serialize packet into a given buffer', () =>
 		const buffer = new ArrayBuffer(2000);
 		const byteOffset = 135;
 
-		packet.on('will-serialize', (length, cb) =>
-		{
-			cb(buffer, byteOffset);
-		});
-
-		packet.serialize();
+		packet.serialize(buffer, byteOffset);
 
 		// Packet and payload views must be the same.
 		expect(areDataViewsEqual(packet.getView(), packetView)).toBe(true);
@@ -637,8 +632,6 @@ describe('serialize packet into a given buffer', () =>
 		expect(packet.getView().buffer === buffer).toBe(true);
 		expect(packet.getView().byteOffset).toBe(byteOffset);
 		expect(packet.dump()).toEqual(packetDump);
-
-		packet.removeAllListeners('will-serialize');
 	});
 
 	test('serialization fails if given buffer do not have enough space', () =>
@@ -647,16 +640,9 @@ describe('serialize packet into a given buffer', () =>
 		const buffer = new ArrayBuffer(16);
 		const byteOffset = 1;
 
-		packet.on('will-serialize', (length, cb) =>
-		{
-			cb(buffer, byteOffset);
-		});
-
 		expect(
-			() => packet.serialize()
+			() => packet.serialize(buffer, byteOffset)
 		).toThrow(RangeError);
-
-		packet.removeAllListeners('will-serialize');
 	});
 });
 

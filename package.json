@@ -56,7 +56,6 @@
       ]
     },
     "coveragePathIgnorePatterns": [
-      "src/EnhancedEventEmitter.ts",
       "src/Logger.ts",
       "src/utils.ts",
       "src/tests"
@@ -65,12 +64,10 @@
   },
   "dependencies": {
     "debug": "^4.3.4",
-    "events": "^3.3.0",
     "supports-color": "^9.4.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.8",
-    "@types/events": "^3.0.0",
     "@types/jest": "^29.5.3",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.4.0",
@@ -80,7 +77,6 @@
     "open-cli": "^7.2.0",
     "ts-jest": "^29.1.1",
     "typedoc": "^0.24.8",
-    "typedoc-plugin-no-inherit": "^1.4.0",
     "typescript": "~5.1.6"
   }
 }

@@ -55,9 +55,6 @@ export type DLRRSubReport =
  *
  * @see
  * - [RFC 3611 section 4.5](https://datatracker.ietf.org/doc/html/rfc3611#section-4.5)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class ExtendedReportDLRR extends ExtendedReport
 {
@@ -145,9 +142,9 @@ export class ExtendedReportDLRR extends ExtendedReport
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const view = super.serializeBase();
+		const view = this.serializeBase(buffer, byteOffset);
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
@@ -187,9 +184,19 @@ export class ExtendedReportDLRR extends ExtendedReport
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): ExtendedReportDLRR
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): ExtendedReportDLRR
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new ExtendedReportDLRR(view);
 	}

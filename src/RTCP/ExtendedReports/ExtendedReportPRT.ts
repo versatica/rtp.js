@@ -46,9 +46,6 @@ export type ExtendedReportPRTDump = ExtendedReportDump &
  *
  * @see
  * - [RFC 3611 section 4.3](https://datatracker.ietf.org/doc/html/rfc3611#section-4.3)
- *
- * @emits
- * - will-serialize: {@link WillSerializeEvent}
  */
 export class ExtendedReportPRT extends ExtendedReport
 {
@@ -135,9 +132,9 @@ export class ExtendedReportPRT extends ExtendedReport
 	/**
 	 * @inheritDoc
 	 */
-	serialize(): void
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
 	{
-		const view = super.serializeBase();
+		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
@@ -187,9 +184,19 @@ export class ExtendedReportPRT extends ExtendedReport
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer?: ArrayBuffer, byteOffset?: number): ExtendedReportPRT
+	clone(
+		buffer?: ArrayBuffer,
+		byteOffset?: number,
+		serializationBuffer?: ArrayBuffer,
+		serializationByteOffset?: number
+	): ExtendedReportPRT
 	{
-		const view = this.cloneInternal(buffer, byteOffset);
+		const view = this.cloneInternal(
+			buffer,
+			byteOffset,
+			serializationBuffer,
+			serializationByteOffset
+		);
 
 		return new ExtendedReportPRT(view);
 	}
