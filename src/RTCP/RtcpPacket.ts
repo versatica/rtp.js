@@ -222,9 +222,11 @@ export abstract class RtcpPacket extends Packet
 					`RTCP packet byte length must be multiple of 4 but given buffer view is ${this.view.byteLength} bytes`
 				);
 			}
-			else if (getRtcpPacketType(this.view) !== packetType)
+			else if (getRtcpPacketType(this.view) !== this.#packetType)
 			{
-				throw new TypeError(`not a RTCP ${packetTypeToString(packetType)} packet`);
+				throw new TypeError(
+					`not a RTCP ${packetTypeToString(this.#packetType)} packet`
+				);
 			}
 			else if (getRtcpLength(this.view) !== this.view.byteLength)
 			{
