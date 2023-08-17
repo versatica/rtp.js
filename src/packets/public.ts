@@ -66,7 +66,9 @@ export {
 
 export {
 	NackPacket,
-	NackPacketDump
+	NackPacketDump,
+	parseNackItem,
+	createNackItem
 } from './RTCP/NackPacket';
 
 export {

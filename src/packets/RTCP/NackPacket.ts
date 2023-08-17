@@ -5,6 +5,7 @@ import {
 	FeedbackPacketDump,
 	FIXED_HEADER_LENGTH
 } from './FeedbackPacket';
+import { readBit, writeBit } from '../../utils/bitOps';
 
 /**
  * RTCP NACK packet info dump.
@@ -218,4 +219,57 @@ export class NackPacket extends FeedbackPacket
 
 		this.setSerializationNeeded(true);
 	}
+}
+
+/**
+ * Parse a NACK item. It returns an array with RTP sequence numbers that are
+ * included in the item (lost packets).
+ *
+ * @category RTCP
+ */
+export function parseNackItem(pid: number, bitmask: number): number[]
+{
+	const lostSeqs: number[] = [ pid ];
+
+	for (let i = 0; i <= 15; ++i)
+	{
+		if (readBit({ value: bitmask, bit: i }))
+		{
+			lostSeqs.push(pid + i + 1);
+		}
+	}
+
+	return lostSeqs;
+}
+
+/**
+ * Create a NACK item.
+ *
+ * @param seqs - RTP sequence number of lost packets. As per NACK rules, there
+ *   can be up to 17 seq numbers and max diff between any two of them must be 17.
+ *
+ * @category RTCP
+ */
+export function createNackItem(
+	lostSeqs: number[]
+): { pid: number; bitmask: number }
+{
+	const orderedLostSeqs = [ ...lostSeqs ].sort();
+	const pid = orderedLostSeqs[0];
+	let bitmask: number = 0;
+
+	for (let i = 1; i < orderedLostSeqs.length; ++i)
+	{
+		const seq = orderedLostSeqs[i];
+		const diff = (seq + 65536 - pid) % 65536;
+
+		if (diff > 16)
+		{
+			throw new RangeError('cannot create a NACK bitmask with given seq numbers');
+		}
+
+		bitmask = writeBit({ value: bitmask, bit: diff - 1, flag: true });
+	}
+
+	return { pid, bitmask };
 }
