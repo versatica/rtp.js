@@ -8,7 +8,7 @@ RTP stack for Node.js and browser written in TypeScript. **rtp.js** provides wit
 
 ## Installation
 
-```bash
+```text
 npm install rtp.js
 ```
 
@@ -49,8 +49,8 @@ npm install rtp.js
 
 ## Authors
 
-* Iñaki Baz Castillo [[website](https://inakibaz.me)|[github](https://github.com/ibc/)]
-* José Luis Millán [[github](https://github.com/jmillan/)]
+* Iñaki Baz Castillo [[ website ](https://inakibaz.me)|[ github ](https://github.com/ibc/)]
+* José Luis Millán [[ github ](https://github.com/jmillan/)]
 
 
 ## License

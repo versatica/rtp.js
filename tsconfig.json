@@ -36,6 +36,7 @@
 		},
 		"navigationLinks": {
 			"GitHub": "https://github.com/versatica/rtp.js"
-		}
+		},
+		"customCss": "./docs-assets/custom-styles.css"
 	}
 }
