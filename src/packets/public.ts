@@ -77,6 +77,11 @@ export {
 } from './RTCP/PliPacket';
 
 export {
+	SliPacket,
+	SliPacketDump
+} from './RTCP/SliPacket';
+
+export {
 	GenericFeedbackPacket,
 	GenericFeedbackPacketDump
 } from './RTCP/GenericFeedbackPacket';
