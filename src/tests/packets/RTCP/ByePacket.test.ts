@@ -2,7 +2,7 @@ import { ByePacket } from '../../../packets/RTCP/ByePacket';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
 import { areDataViewsEqual } from '../../../utils/helpers';
 
-describe('parse RTCP Bye packet', () =>
+describe('parse RTCP BYE packet', () =>
 {
 	const ssrc1 = 0x624276e0;
 	const ssrc2 = 0x2624670e;
@@ -10,7 +10,7 @@ describe('parse RTCP Bye packet', () =>
 
 	const array = new Uint8Array(
 		[
-			0x82, 0xcb, 0x00, 0x06, // Type: 203 (Bye), Count: 2, length: 6
+			0x82, 0xcb, 0x00, 0x06, // Type: 203 (BYE), Count: 2, length: 6
 			0x62, 0x42, 0x76, 0xe0, // SSRC: 0x624276e0
 			0x26, 0x24, 0x67, 0x0e, // SSRC: 0x2624670e
 			0x0e, 0x48, 0x61, 0x73, // Length: 14, Text: "Hasta la vista"
@@ -49,7 +49,7 @@ describe('parse RTCP Bye packet', () =>
 	{
 		const array2 = new Uint8Array(
 			[
-				0xa2, 0xcb, 0x00, 0x07, // Padding, Type: 203 (Bye), Count: 2, length: 7
+				0xa2, 0xcb, 0x00, 0x07, // Padding, Type: 203 (BYE), Count: 2, length: 7
 				0x62, 0x42, 0x76, 0xe0, // SSRC: 0x624276e0
 				0x26, 0x24, 0x67, 0x0e, // SSRC: 0x2624670e
 				0x0e, 0x48, 0x61, 0x73, // Length: 14, Text: "Hasta la vista"
@@ -96,7 +96,7 @@ describe('parse RTCP Bye packet', () =>
 	{
 		const array3 = new Uint8Array(
 			[
-				0xa2, 0xcb, 0x00, 0x03, // Padding, Type: 203 (Bye), Count: 2, length: 3
+				0xa2, 0xcb, 0x00, 0x03, // Padding, Type: 203 (BYE), Count: 2, length: 3
 				0x62, 0x42, 0x76, 0xe0, // SSRC: 0x624276e0
 				0x26, 0x24, 0x67, 0x0e, // SSRC: 0x2624670e
 				0x00, 0x00, 0x00, 0x04 // Padding (4 bytes)
@@ -150,9 +150,9 @@ describe('parse RTCP Bye packet', () =>
 	});
 });
 
-describe('create RTCP Bye packet', () =>
+describe('create RTCP BYE packet', () =>
 {
-	test('creating a Bye packet with padding succeeds', () =>
+	test('creating a BYE packet with padding succeeds', () =>
 	{
 		const ssrc1 = 0x624276e0;
 		const ssrc2 = 0x2624670e;
@@ -212,7 +212,7 @@ describe('create RTCP Bye packet', () =>
 	{
 		const array = new Uint8Array(
 			[
-				0x82, 0xcb, 0x00, 0x06, // Type: 203 (Bye), Count: 2, length: 6
+				0x82, 0xcb, 0x00, 0x06, // Type: 203 (BYE), Count: 2, length: 6
 				0x62, 0x42, 0x76, 0xe0, // SSRC: 0x624276e0
 				0x26, 0x24, 0x67, 0x0e, // SSRC: 0x2624670e
 				0x0e, 0x48, 0x61, 0x73, // Length: 14, Text: "Hasta la vista"

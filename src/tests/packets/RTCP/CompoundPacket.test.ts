@@ -51,7 +51,7 @@ describe('parse RTCP Compound packet', () =>
 			0x00, 0x00, 0x20, 0x2a, // Last SR: 8234
 			0x00, 0x00, 0x00, 0x05, // DLSR: 5
 			/* (packet 3) BYE packet */
-			0xa2, 0xcb, 0x00, 0x07, // Padding, Type: 203 (Bye), Count: 2, length: 7
+			0xa2, 0xcb, 0x00, 0x07, // Padding, Type: 203 (BYE), Count: 2, length: 7
 			0x62, 0x42, 0x76, 0xe0, // SSRC: 0x624276e0
 			0x26, 0x24, 0x67, 0x0e, // SSRC: 0x2624670e
 			0x0e, 0x48, 0x61, 0x73, // Length: 14, Text: "Hasta la vista"
@@ -301,7 +301,7 @@ describe('parse RTCP Compound packet', () =>
 				]
 			});
 
-		// Modify Bye packet.
+		// Modify BYE packet.
 		packet3.addSsrc(666);
 
 		expect(compoundPacket.needsSerialization()).toBe(true);
