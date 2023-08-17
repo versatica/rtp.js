@@ -187,7 +187,10 @@ export class NackPacket extends FeedbackPacket
 	}
 
 	/**
-	 * Get NACK items values.
+	 * Get NACK items.
+	 *
+	 * @remarks
+	 * - Use {@link parseNackItem} to parse returned NACK items.
 	 */
 	getItems(): { pid: number; bitmask: number }[]
 	{
@@ -195,9 +198,10 @@ export class NackPacket extends FeedbackPacket
 	}
 
 	/**
-	 * Set NACK item values.
+	 * Set NACK items.
 	 *
 	 * @remarks
+	 * - Use {@link createNackItem} to create NACK items.
 	 * - Serialization is needed after calling this method.
 	 */
 	setItems(items: { pid: number; bitmask: number }[]): void
@@ -211,6 +215,7 @@ export class NackPacket extends FeedbackPacket
 	 * Add NACK item value.
 	 *
 	 * @remarks
+	 * - Use {@link createNackItem} to create the NACK item.
 	 * - Serialization is needed after calling this method.
 	 */
 	addItem(pid: number, bitmask: number): void
@@ -229,38 +234,39 @@ export class NackPacket extends FeedbackPacket
  */
 export function parseNackItem(pid: number, bitmask: number): number[]
 {
-	const lostSeqs: number[] = [ pid ];
+	const seqs: number[] = [ pid ];
 
 	for (let i = 0; i <= 15; ++i)
 	{
 		if (readBit({ value: bitmask, bit: i }))
 		{
-			lostSeqs.push(pid + i + 1);
+			seqs.push(pid + i + 1);
 		}
 	}
 
-	return lostSeqs;
+	return seqs;
 }
 
 /**
  * Create a NACK item.
  *
  * @param seqs - RTP sequence number of lost packets. As per NACK rules, there
- *   can be up to 17 seq numbers and max diff between any two of them must be 17.
+ *   can be up to 17 seq numbers and max diff between lowest and highest must
+ *   be 17.
  *
  * @category RTCP
  */
 export function createNackItem(
-	lostSeqs: number[]
+	seqs: number[]
 ): { pid: number; bitmask: number }
 {
-	const orderedLostSeqs = [ ...lostSeqs ].sort();
-	const pid = orderedLostSeqs[0];
+	const orderedSeqs = [ ...seqs ].sort();
+	const pid = orderedSeqs[0];
 	let bitmask: number = 0;
 
-	for (let i = 1; i < orderedLostSeqs.length; ++i)
+	for (let i = 1; i < orderedSeqs.length; ++i)
 	{
-		const seq = orderedLostSeqs[i];
+		const seq = orderedSeqs[i];
 		const diff = (seq + 65536 - pid) % 65536;
 
 		if (diff > 16)
