@@ -15,6 +15,8 @@ const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 24;
 
 /**
  * RTCP Sender Report packet info dump.
+ *
+ * @category RTCP
  */
 export type SenderReportPacketDump = RtcpPacketDump &
 {
@@ -67,6 +69,8 @@ export type SenderReportPacketDump = RtcpPacketDump &
  *        |                  profile-specific extensions                  |
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3550 section 6.4.1](https://datatracker.ietf.org/doc/html/rfc3550#section-6.4.1)

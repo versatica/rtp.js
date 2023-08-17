@@ -17,6 +17,8 @@ const SDES_CHUNK_MIN_LENGTH = 8;
 
 /**
  * SDES Chunk Item types.
+ *
+ * @category RTCP
  */
 // ESLint absurdly complains about "'SdesItemType' is already declared in the
 // upper scope".
@@ -59,6 +61,8 @@ export enum SdesItemType
 
 /**
  * RTCP SDES packet info dump.
+ *
+ * @category RTCP
  */
 export type SdesPacketDump = RtcpPacketDump &
 {
@@ -67,6 +71,8 @@ export type SdesPacketDump = RtcpPacketDump &
 
 /**
  * SDES Chunk dump.
+ *
+ * @category RTCP
  */
 export type SdesChunkDump = SerializableDump &
 {
@@ -94,6 +100,8 @@ export type SdesChunkDump = SerializableDump &
  *        |                              ...                              |
  *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3550 section 6.5](https://datatracker.ietf.org/doc/html/rfc3550#section-6.5)
@@ -352,6 +360,8 @@ export class SdesPacket extends RtcpPacket
 
 /**
  * SDES Chunk.
+ *
+ * @category RTCP
  */
 export class SdesChunk extends Serializable
 {

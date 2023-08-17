@@ -13,6 +13,8 @@ export const RECEPTION_REPORT_LENGTH = 24;
 
 /**
  * RTCP Receiver Report packet info dump.
+ *
+ * @category RTCP
  */
 export type ReceiverReportPacketDump = RtcpPacketDump &
 {
@@ -22,6 +24,8 @@ export type ReceiverReportPacketDump = RtcpPacketDump &
 
 /**
  * Reception Report dump.
+ *
+ * @category RTCP
  */
 export type ReceptionReportDump = SerializableDump &
 {
@@ -64,6 +68,8 @@ export type ReceptionReportDump = SerializableDump &
  *        |                  profile-specific extensions                  |
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3550 section 6.4.2](https://datatracker.ietf.org/doc/html/rfc3550#section-6.4.2)
@@ -305,6 +311,8 @@ export class ReceiverReportPacket extends RtcpPacket
 
 /**
  * RTCP Reception Report.
+ *
+ * @category RTCP
  */
 export class ReceptionReport extends Serializable
 {

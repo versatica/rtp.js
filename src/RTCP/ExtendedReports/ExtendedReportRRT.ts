@@ -10,6 +10,8 @@ const EXTENDED_REPORT_RRT_LENGTH = COMMON_HEADER_LENGTH + 8;
 
 /**
  * Receiver Reference Time Extended Report dump.
+ *
+ * @category RTCP
  */
 export type ExtendedReportRRTDump = ExtendedReportDump &
 {
@@ -31,6 +33,8 @@ export type ExtendedReportRRTDump = ExtendedReportDump &
  * |             NTP timestamp, least significant word             |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3611 section 4.4](https://datatracker.ietf.org/doc/html/rfc3611#section-4.4)

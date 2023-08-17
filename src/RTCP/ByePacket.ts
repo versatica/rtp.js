@@ -12,6 +12,8 @@ import {
 
 /**
  * RTCP BYE packet info dump.
+ *
+ * @category RTCP
  */
 export type ByePacketDump = RtcpPacketDump &
 {
@@ -35,6 +37,8 @@ export type ByePacketDump = RtcpPacketDump &
  * (opt)  |     length    |               reason for leaving            ...
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3550 section 6.6](https://datatracker.ietf.org/doc/html/rfc3550#section-6.6)

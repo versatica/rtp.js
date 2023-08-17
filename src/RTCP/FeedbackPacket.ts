@@ -14,6 +14,8 @@ export const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 8;
 
 /**
  * RTCP Feedback transport layer message types.
+ *
+ * @category RTCP
  */
 // ESLint absurdly complains about "'RtpFeedbackMessageType' is already declared
 // in the upper scope".
@@ -28,6 +30,8 @@ export enum RtpFeedbackMessageType
 
 /**
  * RTCP Feedback payload specific message types.
+ *
+ * @category RTCP
  */
 // ESLint absurdly complains about "'PsFeedbackMessageType' is already declared
 // in the upper scope".
@@ -54,6 +58,8 @@ export enum PsFeedbackMessageType
 
 /**
  * RTCP Feedback packet info dump.
+ *
+ * @category RTCP
  */
 export type FeedbackPacketDump = RtcpPacketDump &
 {
@@ -126,6 +132,8 @@ function messageTypeToString(
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * :            Feedback Control Information (FCI)                 :
  * :                                                               :
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 4585 section 6.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.1)

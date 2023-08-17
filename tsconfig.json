@@ -13,7 +13,9 @@
 	},
 	"include": [ "src" ],
 	"typedocOptions": {
-		"entryPoints": [ "src/index.ts" ],
+		"entryPoints": [
+			"src/index.ts"
+		],
 		"out": "docs",
 		"excludePrivate": true,
 		"excludeProtected": true,
@@ -23,6 +25,10 @@
 		"gitRemote": "origin",
 		"hideGenerator": false,
 		"titleLink": "https://versatica.github.io/rtp.js",
+		"treatWarningsAsErrors": true,
+		"cacheBust": false,
+		"categorizeByGroup": false,
+		"categoryOrder": [ "RTP", "RTCP", "Helpers", "*" ],
 		"navigationLinks": {
 			"GitHub": "https://github.com/versatica/rtp.js",
 			"NPM": "https://www.npmjs.com/package/rtp.js"

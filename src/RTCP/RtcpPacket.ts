@@ -14,6 +14,8 @@ export const COMMON_HEADER_LENGTH = 4;
 
 /**
  * RTCP packet types.
+ *
+ * @category RTCP
  */
 // ESLint absurdly complains about "'RtcpPacketType' is already declared in the
 // upper scope".
@@ -56,6 +58,8 @@ export enum RtcpPacketType
 
 /**
  * Base RTCP packet info dump.
+ *
+ * @category RTCP
  */
 export type RtcpPacketDump = PacketDump &
 {
@@ -65,6 +69,8 @@ export type RtcpPacketDump = PacketDump &
 
 /**
  * Whether the given buffer view could be a valid RTCP packet or not.
+ *
+ * @category RTCP
  */
 export function isRtcp(view: DataView): boolean
 {
@@ -194,6 +200,8 @@ export function packetTypeToString(packetType: RtcpPacketType): string
  * header |V=2|P|    SC   |      PT       |             length            |
  *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3550 section 6.1](https://datatracker.ietf.org/doc/html/rfc3550#section-6.1)

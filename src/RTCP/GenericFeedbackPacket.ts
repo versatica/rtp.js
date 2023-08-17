@@ -10,6 +10,8 @@ import {
 
 /**
  * RTCP generic Feedback packet info.
+ *
+ * @category RTCP
  */
 export type GenericFeedbackPacketDump = FeedbackPacketDump &
 {
@@ -30,6 +32,8 @@ export type GenericFeedbackPacketDump = FeedbackPacketDump &
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * :            Feedback Control Information (FCI)                 :
  * :                                                               :
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 4585 section 6.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.1)

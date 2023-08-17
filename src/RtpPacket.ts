@@ -11,6 +11,8 @@ const FIXED_HEADER_LENGTH = 12;
 
 /**
  * RTP packet info dump.
+ *
+ * @category RTP
  */
 export type RtpPacketDump = PacketDump &
 {
@@ -27,6 +29,8 @@ export type RtpPacketDump = PacketDump &
 
 /**
  * Whether the given buffer view could be a valid RTP packet or not.
+ *
+ * @category RTP
  */
 export function isRtp(view: DataView): boolean
 {
@@ -58,6 +62,8 @@ export function isRtp(view: DataView): boolean
  * |                             ....                              |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTP
  *
  * @see
  * - [RFC 3550 section 5.1](https://datatracker.ietf.org/doc/html/rfc3550#section-5.1)

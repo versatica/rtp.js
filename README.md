@@ -17,7 +17,7 @@ npm install rtp.js
 
 ## Usage
 
-* [API documentation](https://versatica.github.io/rtp.js/)
+* [API documentation](https://versatica.github.io/rtp.js/modules.html)
 
 * All core classes and functions are exported by the main module. Example:
   ```ts

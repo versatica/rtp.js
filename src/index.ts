@@ -150,6 +150,8 @@ import {
 
 /**
  * Utils module.
+ *
+ * @category Helpers
  */
 export const utils =
 {

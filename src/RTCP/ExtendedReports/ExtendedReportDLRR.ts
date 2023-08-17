@@ -7,6 +7,8 @@ import {
 
 /**
  * DLRR Extended Report dump.
+ *
+ * @category RTCP
  */
 export type ExtendedReportDLRRDump = ExtendedReportDump &
 {
@@ -15,6 +17,8 @@ export type ExtendedReportDLRRDump = ExtendedReportDump &
 
 /**
  * DLRR Sub-Report.
+ *
+ * @category RTCP
  */
 export type DLRRSubReport =
 {
@@ -52,6 +56,8 @@ export type DLRRSubReport =
  * :                               ...                             :   2
  * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3611 section 4.5](https://datatracker.ietf.org/doc/html/rfc3611#section-4.5)

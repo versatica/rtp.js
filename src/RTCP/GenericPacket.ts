@@ -8,6 +8,8 @@ import {
 
 /**
  * RTCP generic packet info dump.
+ *
+ * @category RTCP
  */
 export type GenericPacketDump = RtcpPacketDump &
 {
@@ -28,6 +30,8 @@ export type GenericPacketDump = RtcpPacketDump &
  *        :                              ...                              :
  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)

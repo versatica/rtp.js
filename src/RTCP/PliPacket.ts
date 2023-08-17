@@ -8,6 +8,8 @@ import {
 
 /**
  * RTCP PLI packet info dump.
+ *
+ * @category RTCP
  */
 export type PliPacketDump = FeedbackPacketDump;
 
@@ -25,6 +27,8 @@ export type PliPacketDump = FeedbackPacketDump;
  * |                  SSRC of media source                         |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 4585 section 6.3.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.3.1)

@@ -24,6 +24,8 @@ import { GenericPacket } from './GenericPacket';
 
 /**
  * RTCP Compound packet info dump.
+ *
+ * @category RTCP
  */
 export type CompoundPacketDump = PacketDump &
 {
@@ -32,6 +34,8 @@ export type CompoundPacketDump = PacketDump &
 
 /**
  * RTCP Compound packet.
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)

@@ -15,6 +15,8 @@ const EXTENDED_REPORT_SS_LENGTH = COMMON_HEADER_LENGTH + 36;
 
 /**
  * Statistics Summary Extended Report dump.
+ *
+ * @category RTCP
  */
 export type ExtendedReportSSDump = ExtendedReportDump &
 {
@@ -62,6 +64,8 @@ export type ExtendedReportSSDump = ExtendedReportDump &
  * | min_ttl_or_hl | max_ttl_or_hl |mean_ttl_or_hl | dev_ttl_or_hl |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3611 section 4.6](https://datatracker.ietf.org/doc/html/rfc3611#section-4.6)

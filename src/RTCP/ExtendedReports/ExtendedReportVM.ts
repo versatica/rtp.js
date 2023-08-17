@@ -10,6 +10,8 @@ const EXTENDED_REPORT_VM_LENGTH = COMMON_HEADER_LENGTH + 32;
 
 /**
  * VoIP Metrics Extended Report dump.
+ *
+ * @category RTCP
  */
 export type ExtendedReportVMDump = ExtendedReportDump &
 {
@@ -64,6 +66,8 @@ export type ExtendedReportVMDump = ExtendedReportDump &
    |          JB maximum           |          JB abs max           |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3611 section 4.7](https://datatracker.ietf.org/doc/html/rfc3611#section-4.7)

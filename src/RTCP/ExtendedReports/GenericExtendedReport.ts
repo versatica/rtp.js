@@ -8,6 +8,8 @@ import {
 
 /**
  * Generic Extended Report dump.
+ *
+ * @category RTCP
  */
 export type GenericExtendedReportDump = ExtendedReportDump;
 
@@ -25,6 +27,8 @@ export type GenericExtendedReportDump = ExtendedReportDump;
  * :                              ...                              :
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3611 section 3](https://datatracker.ietf.org/doc/html/rfc3611#section-3)

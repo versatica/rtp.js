@@ -25,6 +25,8 @@ const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 4;
 
 /**
  * RTCP XR packet info dump.
+ *
+ * @category RTCP
  */
 export type XrPacketDump = RtcpPacketDump &
 {
@@ -47,6 +49,8 @@ export type XrPacketDump = RtcpPacketDump &
  * report :                         report blocks                         :
  * blocks +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3611 section 2](https://datatracker.ietf.org/doc/html/rfc3611#section-2)

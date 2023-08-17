@@ -8,6 +8,8 @@ import {
 
 /**
  * RTCP NACK packet info dump.
+ *
+ * @category RTCP
  */
 export type NackPacketDump = FeedbackPacketDump &
 {
@@ -32,6 +34,8 @@ export type NackPacketDump = FeedbackPacketDump &
  * :                              ...                              :
  * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 4585 section 6.2.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.2.1)

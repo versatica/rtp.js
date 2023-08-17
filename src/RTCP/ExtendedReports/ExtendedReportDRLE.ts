@@ -12,6 +12,8 @@ const EXTENDED_REPORT_DRLE_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
 
 /**
  * Duplicate RLE Extended Report dump.
+ *
+ * @category RTCP
  */
 export type ExtendedReportDRLEDump = ExtendedReportDump &
 {
@@ -42,6 +44,8 @@ export type ExtendedReportDRLEDump = ExtendedReportDump &
  * |          chunk n-1            |             chunk n           |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3611 section 4.2](https://datatracker.ietf.org/doc/html/rfc3611#section-4.2)

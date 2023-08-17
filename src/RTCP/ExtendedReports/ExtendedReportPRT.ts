@@ -11,6 +11,8 @@ const EXTENDED_REPORT_PRT_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
 
 /**
  * Packet Receipt Times Extended Report dump.
+ *
+ * @category RTCP
  */
 export type ExtendedReportPRTDump = ExtendedReportDump &
 {
@@ -43,6 +45,8 @@ export type ExtendedReportPRTDump = ExtendedReportDump &
  * |       Receipt time of packet (end_seq - 1) mod 65536          |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
+ *
+ * @category RTCP
  *
  * @see
  * - [RFC 3611 section 4.3](https://datatracker.ietf.org/doc/html/rfc3611#section-4.3)
