@@ -15,7 +15,6 @@
 	"typedocOptions": {
 		"entryPoints": [ "src/index.ts" ],
 		"out": "docs",
-		"exclude": [],
 		"excludePrivate": true,
 		"excludeProtected": true,
 		"excludeNotDocumented": true,
