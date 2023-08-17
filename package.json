@@ -1,6 +1,6 @@
 {
   "name": "rtp.js",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "RTP stack for Node.js and browser written in TypeScript",
   "contributors": [
     "Iñaki Baz Castillo <ibc@aliax.net> (https://inakibaz.me)",
