@@ -57,7 +57,7 @@
     },
     "coveragePathIgnorePatterns": [
       "src/Logger.ts",
-      "src/utils.ts",
+      "src/utils",
       "src/tests"
     ],
     "cacheDirectory": ".cache/jest"

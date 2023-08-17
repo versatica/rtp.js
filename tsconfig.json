@@ -14,7 +14,8 @@
 	"include": [ "src" ],
 	"typedocOptions": {
 		"entryPoints": [
-			"src/index.ts"
+			"src/packets/public.ts",
+			"src/utils/public.ts"
 		],
 		"out": "docs",
 		"excludePrivate": true,
@@ -28,7 +29,7 @@
 		"treatWarningsAsErrors": true,
 		"cacheBust": false,
 		"categorizeByGroup": false,
-		"categoryOrder": [ "RTP", "RTCP", "Helpers", "*" ],
+		"categoryOrder": [ "RTP", "RTCP", "Utils", "*" ],
 		"navigationLinks": {
 			"GitHub": "https://github.com/versatica/rtp.js",
 			"NPM": "https://www.npmjs.com/package/rtp.js"

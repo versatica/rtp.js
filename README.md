@@ -5,8 +5,6 @@
 
 RTP stack for Node.js and browser written in TypeScript. **rtp.js** provides with an API to parse, generate and modify RTP and RTCP packets.
 
-_NOTE:_ Work in progress. Many more RTCP packets will be added along with new features.
-
 
 ## Installation
 
@@ -17,11 +15,13 @@ npm install rtp.js
 
 ## Usage
 
-* [API documentation](https://versatica.github.io/rtp.js/modules.html)
+* [API documentation](https://versatica.github.io/rtp.js)
 
-* All core classes and functions are exported by the main module. Example:
+* All RTP and RTCP classes, types and packet related helpers are exported by the `packets` module.
   ```ts
-  import {
+  import { packets } from 'rtp.js';
+  
+  const {
     isRtp,
     isRtcp,
     RtpPacket,
@@ -35,10 +35,11 @@ npm install rtp.js
     PliPacket,
     XrPacket,
     GenericPacket,
-    // etc
-  } from 'rtp.js';
+    // etc.
+  } = packets;
   ```
-* The main module also exports a `utils` module with some helpers and utilities. Example:
+
+* The `utils` module exports some generic helpers and utilities.
   ```ts
   import { utils } from 'rtp.js';
   
