@@ -34,6 +34,7 @@ npm install rtp.js
     NackPacket,
     PliPacket,
     SliPacket,
+    RpsiPacket,
     XrPacket,
     GenericPacket,
     // etc.
