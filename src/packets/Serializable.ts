@@ -125,8 +125,8 @@ export abstract class Serializable
 	 * @throws
 	 * - If serialization is needed and it fails.
 	 * - If given `buffer` doesn't have space enough to clone the content.
-	 * - If given `serializationBuffer` doesn't have space enough to clone the
-	 *   content.
+	 * - If given `serializationBuffer` doesn't have space enough to serialize
+	 *   the content.
 	 */
 	abstract clone(
 		buffer?: ArrayBuffer,
