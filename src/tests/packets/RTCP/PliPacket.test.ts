@@ -59,7 +59,7 @@ describe('parse RTCP PLI packet', () =>
 
 describe('create RTCP PLI packet', () =>
 {
-	test.only('creating a PLI packet with padding succeeds', () =>
+	test('creating a PLI packet with padding succeeds', () =>
 	{
 		const packet = new PliPacket();
 

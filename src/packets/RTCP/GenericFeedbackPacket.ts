@@ -83,7 +83,7 @@ export class GenericFeedbackPacket extends FeedbackPacket
 			this.#bodyView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + FIXED_HEADER_LENGTH,
-				this.view.byteLength - FIXED_HEADER_LENGTH - this.padding
+				0
 			);
 
 			return;

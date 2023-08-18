@@ -69,7 +69,7 @@ export class GenericPacket extends RtcpPacket
 			this.#bodyView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + COMMON_HEADER_LENGTH,
-				this.view.byteLength - COMMON_HEADER_LENGTH - this.padding
+				0
 			);
 
 			return;
