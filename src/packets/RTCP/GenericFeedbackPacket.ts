@@ -19,7 +19,7 @@ export type GenericFeedbackPacketDump = FeedbackPacketDump &
 };
 
 /**
- * RTCP Feedback generic packet.
+ * RTCP generic Feedback packet.
  *
  * ```text
  *  0                   1                   2                   3
@@ -104,7 +104,7 @@ export class GenericFeedbackPacket extends FeedbackPacket
 			bodyLength
 		);
 
-		pos += this.padding;
+		pos += (bodyLength + this.padding);
 
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength)

@@ -22,24 +22,24 @@ const sliPacketDump: SliPacketDump =
 	]
 };
 
+const array = new Uint8Array(
+	[
+		0x82, 0xce, 0x00, 0x04, // FMT: 2 (SLI), Type: 206 (PSFB), Length: 4
+		0x11, 0x22, 0x33, 0x44, // Sender SSRC: 0x11223344
+		0x55, 0x66, 0x77, 0x88, // Media SSRC: 0x55667788
+		0b11000000, 0b00011111, 0b10000011, 0b11101010, // Item
+		0b01000000, 0b00011011, 0b10000011, 0b11001010 // Item
+	]
+);
+
+const view = new DataView(
+	array.buffer,
+	array.byteOffset,
+	array.byteLength
+);
+
 describe('parse RTCP SLI packet', () =>
 {
-	const array = new Uint8Array(
-		[
-			0x82, 0xce, 0x00, 0x04, // FMT: 2 (SLI), Type: 206 (PSFB), Count: 0, length: 4
-			0x11, 0x22, 0x33, 0x44, // Sender SSRC: 0x11223344
-			0x55, 0x66, 0x77, 0x88, // Media SSRC: 0x55667788
-			0b11000000, 0b00011111, 0b10000011, 0b11101010, // Item
-			0b01000000, 0b00011011, 0b10000011, 0b11001010 // Item
-		]
-	);
-
-	const view = new DataView(
-		array.buffer,
-		array.byteOffset,
-		array.byteLength
-	);
-
 	test('buffer view is RTCP', () =>
 	{
 		expect(isRtcp(view)).toBe(true);
@@ -79,15 +79,18 @@ describe('create RTCP SLI packet', () =>
 
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.dump()).toEqual(sliPacketDump);
+		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
 
 		packet.serialize();
 
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.dump()).toEqual(sliPacketDump);
+		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
 
 		const clonedPacket = packet.clone();
 
 		expect(clonedPacket.needsSerialization()).toBe(false);
 		expect(clonedPacket.dump()).toEqual(sliPacketDump);
+		expect(areDataViewsEqual(clonedPacket.getView(), view)).toBe(true);
 	});
 });

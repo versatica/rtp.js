@@ -228,6 +228,9 @@ export abstract class ExtendedReport extends Serializable
 	protected writeCommonHeader(): void
 	{
 		this.setReportType(this.#reportType);
+
+		// Update the report length field in the report header.
+		setExtendedReportLength(this.view, this.view.byteLength);
 	}
 
 	/**

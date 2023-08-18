@@ -290,6 +290,9 @@ export abstract class RtcpPacket extends Packet
 	{
 		this.setVersion();
 		this.setPacketType();
+
+		// Update the length field in the RTCP header.
+		setRtcpLength(this.view, this.view.byteLength);
 	}
 
 	/**
