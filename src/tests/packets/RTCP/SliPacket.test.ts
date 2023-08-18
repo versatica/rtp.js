@@ -69,10 +69,15 @@ describe('parse RTCP SLI packet', () =>
 
 describe('create RTCP SLI packet', () =>
 {
-	test('creating a SLI packet with padding succeeds', () =>
-	{
-		const packet = new SliPacket();
+	const packet = new SliPacket();
 
+	test('packet view is RTCP', () =>
+	{
+		expect(isRtcp(packet.getView())).toBe(true);
+	});
+
+	test('packet processing succeeds', () =>
+	{
 		// First just fill mandatory fields so serialization should not be needed.
 		packet.setSenderSsrc(sliPacketDump.senderSsrc);
 		packet.setMediaSsrc(sliPacketDump.mediaSsrc);

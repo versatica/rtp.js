@@ -37,6 +37,12 @@ const view = new DataView(
 	array.byteLength
 );
 
+const bodyView = new DataView(
+	array.buffer,
+	array.byteOffset + 12,
+	7
+);
+
 describe('parse RTCP generic Feedback packet', () =>
 {
 	test('buffer view is RTCP', () =>
@@ -51,31 +57,39 @@ describe('parse RTCP generic Feedback packet', () =>
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.dump()).toEqual(genericFeedbackPacket);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		expect(areDataViewsEqual(packet.getBody(), bodyView)).toBe(true);
 
 		packet.serialize();
 
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.dump()).toEqual(genericFeedbackPacket);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		expect(areDataViewsEqual(packet.getBody(), bodyView)).toBe(true);
 
 		const clonedPacket = packet.clone();
 
 		expect(clonedPacket.needsSerialization()).toBe(false);
 		expect(clonedPacket.dump()).toEqual(genericFeedbackPacket);
 		expect(areDataViewsEqual(clonedPacket.getView(), view)).toBe(true);
+		expect(areDataViewsEqual(clonedPacket.getBody(), bodyView)).toBe(true);
 	});
 });
 
 describe('create RTCP generic Feedback packet', () =>
 {
-	test('creating a generic Feedback packet with padding succeeds', () =>
-	{
-		const packet = new GenericFeedbackPacket(
-			undefined,
-			RtcpPacketType.PSFB,
-			PsFeedbackMessageType.AFB
-		);
+	const packet = new GenericFeedbackPacket(
+		undefined,
+		RtcpPacketType.PSFB,
+		PsFeedbackMessageType.AFB
+	);
 
+	test('packet view is RTCP', () =>
+	{
+		expect(isRtcp(packet.getView())).toBe(true);
+	});
+
+	test('packet processing succeeds', () =>
+	{
 		packet.setSenderSsrc(genericFeedbackPacket.senderSsrc);
 		packet.setMediaSsrc(genericFeedbackPacket.mediaSsrc);
 		// Let's set body with 7 bytes length so it should be internally padded
@@ -87,17 +101,20 @@ describe('create RTCP generic Feedback packet', () =>
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.dump()).toEqual(genericFeedbackPacket);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		expect(areDataViewsEqual(packet.getBody(), bodyView)).toBe(true);
 
 		packet.serialize();
 
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.dump()).toEqual(genericFeedbackPacket);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		expect(areDataViewsEqual(packet.getBody(), bodyView)).toBe(true);
 
 		const clonedPacket = packet.clone();
 
 		expect(clonedPacket.needsSerialization()).toBe(false);
 		expect(clonedPacket.dump()).toEqual(genericFeedbackPacket);
 		expect(areDataViewsEqual(clonedPacket.getView(), view)).toBe(true);
+		expect(areDataViewsEqual(clonedPacket.getBody(), bodyView)).toBe(true);
 	});
 });

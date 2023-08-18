@@ -127,7 +127,7 @@ export class ByePacket extends RtcpPacket
 		return {
 			...super.dump(),
 			ssrcs  : this.getSsrcs(),
-			reason : this.#reason
+			reason : this.getReason()
 		};
 	}
 

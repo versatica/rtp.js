@@ -71,10 +71,15 @@ describe('parse RTCP NACK packet', () =>
 
 describe('create RTCP NACK packet', () =>
 {
-	test('creating a NACK packet with padding succeeds', () =>
-	{
-		const packet = new NackPacket();
+	const packet = new NackPacket();
 
+	test('packet view is RTCP', () =>
+	{
+		expect(isRtcp(packet.getView())).toBe(true);
+	});
+
+	test('packet processing succeeds', () =>
+	{
 		// First just fill mandatory fields so serialization should not be needed.
 		packet.setSenderSsrc(nackPacketDump.senderSsrc);
 		packet.setMediaSsrc(nackPacketDump.mediaSsrc);
