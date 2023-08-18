@@ -213,7 +213,7 @@ export abstract class ExtendedReport extends Serializable
 	{
 		return {
 			...super.dump(),
-			reportType : this.#reportType
+			reportType : this.getReportType()
 		};
 	}
 
