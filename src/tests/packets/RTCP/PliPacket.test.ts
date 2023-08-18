@@ -63,6 +63,7 @@ describe('create RTCP PLI packet', () =>
 	{
 		const packet = new PliPacket();
 
+		// No optional fields in this packet so serialization is never needed.
 		packet.setSenderSsrc(pliPacketDump.senderSsrc);
 		packet.setMediaSsrc(pliPacketDump.mediaSsrc);
 

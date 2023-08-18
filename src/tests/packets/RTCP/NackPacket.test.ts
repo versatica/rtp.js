@@ -75,8 +75,20 @@ describe('create RTCP NACK packet', () =>
 	{
 		const packet = new NackPacket();
 
+		// First just fill mandatory fields so serialization should not be needed.
 		packet.setSenderSsrc(nackPacketDump.senderSsrc);
 		packet.setMediaSsrc(nackPacketDump.mediaSsrc);
+
+		expect(packet.needsSerialization()).toBe(false);
+		expect(packet.dump()).toEqual(
+			{
+				...nackPacketDump,
+				byteLength : 12,
+				items      : []
+			}
+		);
+
+		// Fill optional fields so serialization should be needed.
 		packet.setItems(nackPacketDump.items);
 
 		expect(packet.needsSerialization()).toBe(true);

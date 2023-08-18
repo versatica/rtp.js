@@ -73,8 +73,20 @@ describe('create RTCP SLI packet', () =>
 	{
 		const packet = new SliPacket();
 
+		// First just fill mandatory fields so serialization should not be needed.
 		packet.setSenderSsrc(sliPacketDump.senderSsrc);
 		packet.setMediaSsrc(sliPacketDump.mediaSsrc);
+
+		expect(packet.needsSerialization()).toBe(false);
+		expect(packet.dump()).toEqual(
+			{
+				...sliPacketDump,
+				byteLength : 12,
+				items      : []
+			}
+		);
+
+		// Fill optional fields so serialization should be needed.
 		packet.setItems(sliPacketDump.items);
 
 		expect(packet.needsSerialization()).toBe(true);
