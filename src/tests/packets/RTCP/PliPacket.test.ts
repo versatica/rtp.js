@@ -41,15 +41,17 @@ describe('parse RTCP PLI packet', () =>
 
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.dump()).toEqual(pliPacketDump);
-		expect(packet.needsSerialization()).toBe(false);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
 
 		packet.serialize();
+
+		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.dump()).toEqual(pliPacketDump);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
 
 		const clonedPacket = packet.clone();
 
+		expect(clonedPacket.needsSerialization()).toBe(false);
 		expect(clonedPacket.dump()).toEqual(pliPacketDump);
 		expect(areDataViewsEqual(clonedPacket.getView(), view)).toBe(true);
 	});
@@ -64,13 +66,17 @@ describe('create RTCP PLI packet', () =>
 		packet.setSenderSsrc(pliPacketDump.senderSsrc);
 		packet.setMediaSsrc(pliPacketDump.mediaSsrc);
 
+		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.dump()).toEqual(pliPacketDump);
 
 		packet.serialize();
+
+		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.dump()).toEqual(pliPacketDump);
 
 		const clonedPacket = packet.clone();
 
+		expect(clonedPacket.needsSerialization()).toBe(false);
 		expect(clonedPacket.dump()).toEqual(pliPacketDump);
 	});
 });

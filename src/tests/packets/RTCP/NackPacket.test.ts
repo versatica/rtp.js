@@ -53,15 +53,17 @@ describe('parse RTCP NACK packet', () =>
 
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.dump()).toEqual(nackPacketDump);
-		expect(packet.needsSerialization()).toBe(false);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
 
 		packet.serialize();
+
+		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.dump()).toEqual(nackPacketDump);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
 
 		const clonedPacket = packet.clone();
 
+		expect(clonedPacket.needsSerialization()).toBe(false);
 		expect(clonedPacket.dump()).toEqual(nackPacketDump);
 		expect(areDataViewsEqual(clonedPacket.getView(), view)).toBe(true);
 	});
@@ -77,13 +79,17 @@ describe('create RTCP NACK packet', () =>
 		packet.setMediaSsrc(nackPacketDump.mediaSsrc);
 		packet.setItems(nackPacketDump.items);
 
+		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.dump()).toEqual(nackPacketDump);
 
 		packet.serialize();
+
+		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.dump()).toEqual(nackPacketDump);
 
 		const clonedPacket = packet.clone();
 
+		expect(clonedPacket.needsSerialization()).toBe(false);
 		expect(clonedPacket.dump()).toEqual(nackPacketDump);
 	});
 });
