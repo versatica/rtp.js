@@ -12,7 +12,6 @@
 .tsd-comment > pre {
 	white-space: pre;
 	overflow: scroll;
-  /*text-align: center;*/
 }
 
 /* Remove ugly border radius in code. */
