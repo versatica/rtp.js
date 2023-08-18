@@ -18,6 +18,8 @@ import {
 } from './FeedbackPacket';
 import { NackPacket } from './NackPacket';
 import { PliPacket } from './PliPacket';
+import { SliPacket } from './SliPacket';
+import { RpsiPacket } from './RpsiPacket';
 import { GenericFeedbackPacket } from './GenericFeedbackPacket';
 import { XrPacket } from './XrPacket';
 import { GenericPacket } from './GenericPacket';
@@ -147,6 +149,20 @@ export class CompoundPacket extends Packet
 						case PsFeedbackMessageType.PLI:
 						{
 							packet = new PliPacket(packetView);
+
+							break;
+						}
+
+						case PsFeedbackMessageType.SLI:
+						{
+							packet = new SliPacket(packetView);
+
+							break;
+						}
+
+						case PsFeedbackMessageType.RPSI:
+						{
+							packet = new RpsiPacket(packetView);
 
 							break;
 						}

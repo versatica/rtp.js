@@ -82,6 +82,11 @@ export {
 } from './RTCP/SliPacket';
 
 export {
+	RpsiPacket,
+	RpsiPacketDump
+} from './RTCP/RpsiPacket';
+
+export {
 	GenericFeedbackPacket,
 	GenericFeedbackPacketDump
 } from './RTCP/GenericFeedbackPacket';
