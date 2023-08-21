@@ -366,7 +366,7 @@ export class SdesPacket extends RtcpPacket
 export class SdesChunk extends Serializable
 {
 	// SDES Items indexed by type with text as value.
-	readonly #items: Map<SdesItemType, string> = new Map();
+	#items: { type: SdesItemType; text: string }[] = [];
 
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP SDES
@@ -425,7 +425,7 @@ export class SdesChunk extends Serializable
 
 			pos += itemLength;
 
-			this.#items.set(itemType, dataViewToString(itemView));
+			this.#items.push({ type: itemType, text: dataViewToString(itemView) });
 		}
 
 		// There must be a null octet at the end of the items and up to 3 more null
@@ -443,19 +443,10 @@ export class SdesChunk extends Serializable
 	 */
 	dump(): SdesChunkDump
 	{
-		const items = Array.from(this.#items)
-			.map(([ itemType, itemText ]) =>
-			{
-				return {
-					type : itemType,
-					text : itemText
-				};
-			});
-
 		return {
 			...super.dump(),
 			ssrc  : this.getSsrc(),
-			items : items
+			items : this.getItems()
 		};
 	}
 
@@ -472,9 +463,9 @@ export class SdesChunk extends Serializable
 		// SSRC (4 bytes).
 		let chunkLength = 4;
 
-		chunkLength += Array.from(this.#items.values())
+		chunkLength += this.#items
 			.reduce(
-				(sum, text) =>
+				(sum, { text }) =>
 				{
 					// Item type field + item length field + text length.
 					return sum + 2 + getStringByteLength(text);
@@ -519,11 +510,11 @@ export class SdesChunk extends Serializable
 		// Move to items.
 		pos += 4;
 
-		for (const [ itemType, itemText ] of this.#items)
+		for (const { type, text } of this.#items)
 		{
-			const itemUint8Array = stringToUint8Array(itemText);
+			const itemUint8Array = stringToUint8Array(text);
 
-			view.setUint8(pos, itemType);
+			view.setUint8(pos, type);
 			view.setUint8(pos + 1, itemUint8Array.byteLength);
 
 			pos += 2;
@@ -581,55 +572,29 @@ export class SdesChunk extends Serializable
 	}
 
 	/**
-	 * Get the value of the SDES Item with given `type`.
+	 * Get SDES Items.
 	 */
-	getItem(type: SdesItemType): string | undefined
+	getItems(): { type: SdesItemType; text: string }[]
 	{
-		return this.#items.get(type);
+		return Array.from(this.#items);
 	}
 
 	/**
-	 * Get a map with all the SDES Items indexed by their type.
+	 * Set SDES Items.
 	 */
-	getItems(): Map<SdesItemType, string>
+	setItems(items: { type: SdesItemType; text: string }[]): void
 	{
-		return new Map(this.#items);
-	}
-
-	/**
-	 * Set the value of the SDES Item with given `type`.
-	 */
-	setItem(type: SdesItemType, text: string): void
-	{
-		this.#items.set(type, text);
+		this.#items = Array.from(items);
 
 		this.setSerializationNeeded(true);
 	}
 
 	/**
-	 * Delete the SDES Item with given `type`.
+	 * Add SDES Item.
 	 */
-	deleteItem(type: SdesItemType): void
+	addItem(type: SdesItemType, text: string): void
 	{
-		if (!this.#items.delete(type))
-		{
-			return;
-		}
-
-		this.setSerializationNeeded(true);
-	}
-
-	/**
-	 * Clear all SDES Items.
-	 */
-	clearItems(): void
-	{
-		if (this.#items.size === 0)
-		{
-			return;
-		}
-
-		this.#items.clear();
+		this.#items.push({ type, text });
 
 		this.setSerializationNeeded(true);
 	}
