@@ -17,6 +17,7 @@ import {
 	getRtcpFeedbackMessageType
 } from './FeedbackPacket';
 import { NackPacket } from './NackPacket';
+import { SrReqPacket } from './SrReqPacket';
 import { PliPacket } from './PliPacket';
 import { SliPacket } from './SliPacket';
 import { RpsiPacket } from './RpsiPacket';
@@ -129,6 +130,13 @@ export class CompoundPacket extends Packet
 						case RtpFeedbackMessageType.NACK:
 						{
 							packet = new NackPacket(packetView);
+
+							break;
+						}
+
+						case RtpFeedbackMessageType.SR_REQ:
+						{
+							packet = new SrReqPacket(packetView);
 
 							break;
 						}

@@ -25,7 +25,11 @@ export enum RtpFeedbackMessageType
 	/**
 	 * Generic NACK.
 	 */
-	NACK = 1
+	NACK = 1,
+	/**
+	 * Rapid Resynchronisation Request.
+	 */
+	SR_REQ = 5
 }
 
 /**
@@ -89,6 +93,11 @@ function messageTypeToString(
 		case RtpFeedbackMessageType.NACK:
 		{
 			return 'Generic NACK';
+		}
+
+		case RtpFeedbackMessageType.SR_REQ:
+		{
+			return 'Rapid Resynchronisation Request';
 		}
 
 		case PsFeedbackMessageType.PLI:

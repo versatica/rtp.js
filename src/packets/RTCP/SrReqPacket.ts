@@ -1,26 +1,26 @@
 import { RtcpPacketType } from './RtcpPacket';
 import {
 	FeedbackPacket,
-	PsFeedbackMessageType,
+	RtpFeedbackMessageType,
 	FeedbackPacketDump,
 	FIXED_HEADER_LENGTH
 } from './FeedbackPacket';
 
 /**
- * RTCP PLI packet info dump.
+ * RTCP SR REQ packet info dump.
  *
  * @category RTCP
  */
-export type PliPacketDump = FeedbackPacketDump;
+export type SrReqPacketDump = FeedbackPacketDump;
 
 /**
- * RTCP PLI packet (RTCP Payload Specific Feedback).
+ * RTCP SR REQ packet (RTCP Transport Layer Feedback).
  *
  * ```text
  *  0                   1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |V=2|P|  FMT=1  |  PT=PSFB=206  |          length               |
+ * |V=2|P|  FMT=5  |  PT=RTPFB=205 |          length=2             |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |                  SSRC of packet sender                        |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -31,20 +31,20 @@ export type PliPacketDump = FeedbackPacketDump;
  * @category RTCP
  *
  * @see
- * - [RFC 4585 section 6.3.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.3.1)
+ * - [RFC 6051](https://datatracker.ietf.org/doc/html/rfc6051)
  */
-export class PliPacket extends FeedbackPacket
+export class SrReqPacket extends FeedbackPacket
 {
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTCP PLI
+	 * @param view - If given it will be parsed. Otherwise an empty RTCP SR REQ
 	 *   packet will be created.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid RTCP PLI packet.
+	 * - If given `view` does not contain a valid RTCP SR REQ packet.
 	 */
 	constructor(view?: DataView)
 	{
-		super(RtcpPacketType.PSFB, PsFeedbackMessageType.PLI, view);
+		super(RtcpPacketType.RTPFB, RtpFeedbackMessageType.SR_REQ, view);
 
 		if (!this.view)
 		{
@@ -74,9 +74,9 @@ export class PliPacket extends FeedbackPacket
 	}
 
 	/**
-	 * Dump RTCP PLI packet info.
+	 * Dump RTCP SR REQ packet info.
 	 */
-	dump(): PliPacketDump
+	dump(): SrReqPacketDump
 	{
 		return super.dump();
 	}
@@ -119,7 +119,7 @@ export class PliPacket extends FeedbackPacket
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
-	): PliPacket
+	): SrReqPacket
 	{
 		const view = this.cloneInternal(
 			buffer,
@@ -128,6 +128,6 @@ export class PliPacket extends FeedbackPacket
 			serializationByteOffset
 		);
 
-		return new PliPacket(view);
+		return new SrReqPacket(view);
 	}
 }

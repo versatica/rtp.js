@@ -72,6 +72,11 @@ export {
 } from './RTCP/NackPacket';
 
 export {
+	SrReqPacket,
+	SrReqPacketDump
+} from './RTCP/SrReqPacket';
+
+export {
 	PliPacket,
 	PliPacketDump
 } from './RTCP/PliPacket';
