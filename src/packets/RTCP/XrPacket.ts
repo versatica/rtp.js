@@ -5,13 +5,13 @@ import {
 	getExtendedReportType,
 	getExtendedReportLength
 } from './ExtendedReports/ExtendedReport';
-import { ExtendedReportLRLE } from './ExtendedReports/ExtendedReportLRLE';
-import { ExtendedReportDRLE } from './ExtendedReports/ExtendedReportDRLE';
-import { ExtendedReportPRT } from './ExtendedReports/ExtendedReportPRT';
-import { ExtendedReportRRT } from './ExtendedReports/ExtendedReportRRT';
-import { ExtendedReportDLRR } from './ExtendedReports/ExtendedReportDLRR';
-import { ExtendedReportSS } from './ExtendedReports/ExtendedReportSS';
-import { ExtendedReportVM } from './ExtendedReports/ExtendedReportVM';
+import { LRLEExtendedReport } from './ExtendedReports/LRLEExtendedReport';
+import { DRLEExtendedReport } from './ExtendedReports/DRLEExtendedReport';
+import { PRTExtendedReport } from './ExtendedReports/PRTExtendedReport';
+import { RRTExtendedReport } from './ExtendedReports/RRTExtendedReport';
+import { DLRRExtendedReport } from './ExtendedReports/DLRRExtendedReport';
+import { SSExtendedReport } from './ExtendedReports/SSExtendedReport';
+import { VMExtendedReport } from './ExtendedReports/VMExtendedReport';
 import { GenericExtendedReport } from './ExtendedReports/GenericExtendedReport';
 import {
 	RtcpPacket,
@@ -109,49 +109,49 @@ export class XrPacket extends RtcpPacket
 			{
 				case ExtendedReportType.LRLE:
 				{
-					report = new ExtendedReportLRLE(reportView);
+					report = new LRLEExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.DRLE:
 				{
-					report = new ExtendedReportDRLE(reportView);
+					report = new DRLEExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.PRT:
 				{
-					report = new ExtendedReportPRT(reportView);
+					report = new PRTExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.RRT:
 				{
-					report = new ExtendedReportRRT(reportView);
+					report = new RRTExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.DLRR:
 				{
-					report = new ExtendedReportDLRR(reportView);
+					report = new DLRRExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.SS:
 				{
-					report = new ExtendedReportSS(reportView);
+					report = new SSExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.VM:
 				{
-					report = new ExtendedReportVM(reportView);
+					report = new VMExtendedReport(reportView);
 
 					break;
 				}

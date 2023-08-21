@@ -4,72 +4,73 @@ import {
 	ExtendedReportDump,
 	COMMON_HEADER_LENGTH
 } from './ExtendedReport';
-import { padTo4Bytes } from '../../../utils/helpers';
 import {
 	readBitsInDataView,
 	writeBitsInDataView
 } from '../../../utils/bitOps';
 
 // Common header + SSRC of source + begin seq + end seq.
-const EXTENDED_REPORT_DRLE_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
+const PRT_EXTENDED_REPORT_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
 
 /**
- * Duplicate RLE Extended Report dump.
+ * Packet Receipt Times Extended Report dump.
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  */
-export type ExtendedReportDRLEDump = ExtendedReportDump &
+export type PRTExtendedReportDump = ExtendedReportDump &
 {
 	thinning: number;
 	ssrc: number;
 	beginSeq: number;
 	endSeq: number;
-	chunks: number[];
+	receiptTimes: number[];
 };
 
 /**
- * Duplicate RLE Extended Report.
+ * Packet Receipt Times Extended Report.
  *
  * ```text
  *  0                   1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |     BT=2      | rsvd. |   T   |         block length          |
+ * |     BT=3      | rsvd. |   T   |         block length          |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |                        SSRC of source                         |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |          begin_seq            |             end_seq           |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |          chunk 1              |             chunk 2           |
+ * |       Receipt time of packet begin_seq                        |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |       Receipt time of packet (begin_seq + 1) mod 65536        |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * :                              ...                              :
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |          chunk n-1            |             chunk n           |
+ * |       Receipt time of packet (end_seq - 1) mod 65536          |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  *
  * @see
- * - [RFC 3611 section 4.2](https://datatracker.ietf.org/doc/html/rfc3611#section-4.2)
+ * - [RFC 3611 section 4.3](https://datatracker.ietf.org/doc/html/rfc3611#section-4.3)
  */
-export class ExtendedReportDRLE extends ExtendedReport
+export class PRTExtendedReport extends ExtendedReport
 {
-	// Chunks (2 bytes numbers, unparsed).
-	#chunks: number[] = [];
+	// Receipt times (4 bytes numbers, unparsed).
+	#receiptTimes: number[] = [];
 
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty Duplicate RLE
-	 *   Extended Report will be created.
+	 * @param view - If given it will be parsed. Otherwise an empty Packet Receipt
+	 *   Times Extended Report will be created.
 	 */
 	constructor(view?: DataView)
 	{
-		super(ExtendedReportType.DRLE, view);
+		super(ExtendedReportType.PRT, view);
 
 		if (!this.view)
 		{
 			this.view = new DataView(
-				new ArrayBuffer(EXTENDED_REPORT_DRLE_MIN_LENGTH)
+				new ArrayBuffer(PRT_EXTENDED_REPORT_MIN_LENGTH)
 			);
 
 			// Write report type.
@@ -78,46 +79,41 @@ export class ExtendedReportDRLE extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength < EXTENDED_REPORT_DRLE_MIN_LENGTH)
+		if (this.view.byteLength < PRT_EXTENDED_REPORT_MIN_LENGTH)
 		{
 			throw new TypeError(
-				'wrong byte length for a Duplicate RLE Extended Report'
+				'wrong byte length for a Packet Receipt Times Extended Report'
 			);
 		}
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
 
-		// Move to chunks.
-		pos += EXTENDED_REPORT_DRLE_MIN_LENGTH;
+		// Move to receipt times.
+		pos += PRT_EXTENDED_REPORT_MIN_LENGTH;
 
 		while (pos < this.view.byteLength)
 		{
-			const chunk = this.view.getUint16(pos);
+			const receiptTime = this.view.getUint32(pos);
 
-			if (chunk === 0)
-			{
-				break;
-			}
+			this.#receiptTimes.push(receiptTime);
 
-			this.#chunks.push(chunk);
-
-			pos += 2;
+			pos += 4;
 		}
 	}
 
 	/**
-	 * Dump Duplicate RLE Extended Report info.
+	 * Dump Packet Receipt Times Extended Report info.
 	 */
-	dump(): ExtendedReportDRLEDump
+	dump(): PRTExtendedReportDump
 	{
 		return {
 			...super.dump(),
-			thinning : this.getThinning(),
-			ssrc     : this.getSsrc(),
-			beginSeq : this.getBeginSeq(),
-			endSeq   : this.getEndSeq(),
-			chunks   : this.getChunks()
+			thinning     : this.getThinning(),
+			ssrc         : this.getSsrc(),
+			beginSeq     : this.getBeginSeq(),
+			endSeq       : this.getEndSeq(),
+			receiptTimes : this.getReceiptTimes()
 		};
 	}
 
@@ -132,14 +128,10 @@ export class ExtendedReportDRLE extends ExtendedReport
 		}
 
 		// Common header + SSRC + begin seq + end seq.
-		let reportLength = EXTENDED_REPORT_DRLE_MIN_LENGTH;
+		let reportLength = PRT_EXTENDED_REPORT_MIN_LENGTH;
 
-		// Add chunks.
-		reportLength += this.#chunks.length * 2;
-
-		// The list of chunks must terminate in terminating null chunks, which
-		// basically means padding them to 4 bytes.
-		reportLength = padTo4Bytes(reportLength);
+		// Add receipt times.
+		reportLength += this.#receiptTimes.length * 4;
 
 		return reportLength;
 	}
@@ -167,24 +159,21 @@ export class ExtendedReportDRLE extends ExtendedReport
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				EXTENDED_REPORT_DRLE_MIN_LENGTH - COMMON_HEADER_LENGTH
+				PRT_EXTENDED_REPORT_MIN_LENGTH - COMMON_HEADER_LENGTH
 			),
 			pos
 		);
 
-		// Move to chunks.
-		pos += EXTENDED_REPORT_DRLE_MIN_LENGTH - COMMON_HEADER_LENGTH;
+		// Move to receipt times.
+		pos += PRT_EXTENDED_REPORT_MIN_LENGTH - COMMON_HEADER_LENGTH;
 
-		// Copy chunks.
-		for (const chunk of this.#chunks)
+		// Copy receipt times.
+		for (const receiptTime of this.#receiptTimes)
 		{
-			view.setUint16(pos, chunk);
+			view.setUint32(pos, receiptTime);
 
-			pos += 2;
+			pos += 4;
 		}
-
-		// NOTE: Must pad the content to 4 bytes.
-		pos = padTo4Bytes(pos);
 
 		if (pos !== view.byteLength)
 		{
@@ -207,7 +196,7 @@ export class ExtendedReportDRLE extends ExtendedReport
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
-	): ExtendedReportDRLE
+	): PRTExtendedReport
 	{
 		const view = this.cloneInternal(
 			buffer,
@@ -216,7 +205,7 @@ export class ExtendedReportDRLE extends ExtendedReport
 			serializationByteOffset
 		);
 
-		return new ExtendedReportDRLE(view);
+		return new PRTExtendedReport(view);
 	}
 
 	/**
@@ -294,49 +283,38 @@ export class ExtendedReportDRLE extends ExtendedReport
 	}
 
 	/**
-	 * Get chunks.
+	 * Get receipt times.
 	 *
 	 * @remarks
-	 * - Chunks are given as a list of 2 byte integers.
-	 * - Use {@link parseExtendedReportChunk} to parse them.
+	 * - Receipt times are given as a list of 4 byte integers.
 	 */
-	getChunks(): number[]
+	getReceiptTimes(): number[]
 	{
-		return Array.from(this.#chunks);
+		return Array.from(this.#receiptTimes);
 	}
 
 	/**
-	 * Set chunks.
+	 * Set receipt times.
 	 *
 	 * @remarks
-	 * - Chunks must be given as a list of 2 byte integers.
-	 * - Use {@link createExtendedReportRunLengthChunk} or
-	 *   {@link createExtendedReportBitVectorChunk} to create them.
+	 * - Receipt times must be given as a list of 4 byte integers.
 	 */
-	setChunks(chunks: number[]): void
+	setReceiptTimes(receiptTimes: number[]): void
 	{
-		this.#chunks = Array.from(chunks);
+		this.#receiptTimes = Array.from(receiptTimes);
 
 		this.setSerializationNeeded(true);
 	}
 
 	/**
-	 * Add chunk.
+	 * Add receipt time.
 	 *
 	 * @remarks
-	 * - Chunk must be given as 2 byte integer.
-	 * - Use {@link createExtendedReportRunLengthChunk} or
-	 *   {@link createExtendedReportBitVectorChunk} to create it.
-	 * - Given chunk cannot be a terminating null chunk (0 number).
+	 * - Receipt time must be given as 4 byte integer.
 	 */
-	addChunk(chunk: number): void
+	addReceiptTime(receiptTime: number): void
 	{
-		if (chunk === 0)
-		{
-			throw new TypeError('cannot add terminating null chunks');
-		}
-
-		this.#chunks.push(chunk);
+		this.#receiptTimes.push(receiptTime);
 
 		this.setSerializationNeeded(true);
 	}

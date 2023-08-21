@@ -11,14 +11,14 @@ import {
 	writeBitsInDataView
 } from '../../../utils/bitOps';
 
-const EXTENDED_REPORT_SS_LENGTH = COMMON_HEADER_LENGTH + 36;
+const SS_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 36;
 
 /**
  * Statistics Summary Extended Report dump.
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  */
-export type ExtendedReportSSDump = ExtendedReportDump &
+export type SSExtendedReportDump = ExtendedReportDump &
 {
 	ssrc: number;
 	beginSeq: number;
@@ -65,12 +65,12 @@ export type ExtendedReportSSDump = ExtendedReportDump &
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  *
  * @see
  * - [RFC 3611 section 4.6](https://datatracker.ietf.org/doc/html/rfc3611#section-4.6)
  */
-export class ExtendedReportSS extends ExtendedReport
+export class SSExtendedReport extends ExtendedReport
 {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty Statistics
@@ -82,7 +82,7 @@ export class ExtendedReportSS extends ExtendedReport
 
 		if (!this.view)
 		{
-			this.view = new DataView(new ArrayBuffer(EXTENDED_REPORT_SS_LENGTH));
+			this.view = new DataView(new ArrayBuffer(SS_EXTENDED_REPORT_LENGTH));
 
 			// Write report type.
 			this.writeCommonHeader();
@@ -90,7 +90,7 @@ export class ExtendedReportSS extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength !== EXTENDED_REPORT_SS_LENGTH)
+		if (this.view.byteLength !== SS_EXTENDED_REPORT_LENGTH)
 		{
 			throw new TypeError(
 				'wrong byte length for a Statistics Summary Extended Report'
@@ -101,7 +101,7 @@ export class ExtendedReportSS extends ExtendedReport
 	/**
 	 * Dump Statistics Summary Extended Report info.
 	 */
-	dump(): ExtendedReportSSDump
+	dump(): SSExtendedReportDump
 	{
 		return {
 			...super.dump(),
@@ -127,7 +127,7 @@ export class ExtendedReportSS extends ExtendedReport
 	 */
 	getByteLength(): number
 	{
-		return EXTENDED_REPORT_SS_LENGTH;
+		return SS_EXTENDED_REPORT_LENGTH;
 	}
 
 	/**
@@ -153,13 +153,13 @@ export class ExtendedReportSS extends ExtendedReport
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				EXTENDED_REPORT_SS_LENGTH - COMMON_HEADER_LENGTH
+				SS_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH
 			),
 			pos
 		);
 
 		// Move to the end.
-		pos += EXTENDED_REPORT_SS_LENGTH - COMMON_HEADER_LENGTH;
+		pos += SS_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH;
 
 		if (pos !== view.byteLength)
 		{
@@ -182,7 +182,7 @@ export class ExtendedReportSS extends ExtendedReport
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
-	): ExtendedReportSS
+	): SSExtendedReport
 	{
 		const view = this.cloneInternal(
 			buffer,
@@ -191,7 +191,7 @@ export class ExtendedReportSS extends ExtendedReport
 			serializationByteOffset
 		);
 
-		return new ExtendedReportSS(view);
+		return new SSExtendedReport(view);
 	}
 
 	/**

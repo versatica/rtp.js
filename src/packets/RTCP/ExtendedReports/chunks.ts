@@ -3,7 +3,7 @@ import { readBit,	writeBit } from '../../../utils/bitOps';
 /**
  * Loss RLE and Duplicate RLE Extended Report chunk info.
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  *
  * @see
  * - [RFC 3611 section 4.1](https://datatracker.ietf.org/doc/html/rfc3611#section-4.1)
@@ -31,7 +31,7 @@ export type ExtendedReportChunk =
 /**
  * Parse given 2 bytes number as a Extended Report chunk.
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  *
  * @see
  * - [RFC 3611 section 4.1](https://datatracker.ietf.org/doc/html/rfc3611#section-4.1)
@@ -70,7 +70,7 @@ export function parseExtendedReportChunk(chunk: number): ExtendedReportChunk
 /**
  * Create a Run Length Chunk and return a 2 bytes number representing it.
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  *
  * @see
  * - [RFC 3611 section 4.1.1](https://datatracker.ietf.org/doc/html/rfc3611#section-4.1.1)
@@ -98,7 +98,7 @@ export function createExtendedReportRunLengthChunk(
 /**
  * Create a Bit Vector Chunk and return a 2 bytes number representing it.
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  *
  * @see
  * - [RFC 3611 section 4.1.2](https://datatracker.ietf.org/doc/html/rfc3611#section-4.1.2)

@@ -29,7 +29,13 @@
 		"treatWarningsAsErrors": true,
 		"cacheBust": false,
 		"categorizeByGroup": false,
-		"categoryOrder": [ "RTP", "RTCP", "Utils", "*" ],
+		"categoryOrder": [
+			"RTP",
+			"RTCP",
+			"RTCP Extended Reports",
+			"Utils",
+			"*"
+		],
 		"navigationLinks": {
 			"GitHub": "https://github.com/versatica/rtp.js",
 			"NPM": "https://www.npmjs.com/package/rtp.js"

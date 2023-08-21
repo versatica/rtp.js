@@ -9,14 +9,14 @@ import {
 	writeBitsInDataView
 } from '../../../utils/bitOps';
 
-const EXTENDED_REPORT_VM_LENGTH = COMMON_HEADER_LENGTH + 32;
+const VM_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 32;
 
 /**
  * VoIP Metrics Extended Report dump.
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  */
-export type ExtendedReportVMDump = ExtendedReportDump &
+export type VMExtendedReportDump = ExtendedReportDump &
 {
 	ssrc: number;
 	lossRate: number;
@@ -70,12 +70,12 @@ export type ExtendedReportVMDump = ExtendedReportDump &
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  *
  * @see
  * - [RFC 3611 section 4.7](https://datatracker.ietf.org/doc/html/rfc3611#section-4.7)
  */
-export class ExtendedReportVM extends ExtendedReport
+export class VMExtendedReport extends ExtendedReport
 {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty VoIP Metrics
@@ -87,7 +87,7 @@ export class ExtendedReportVM extends ExtendedReport
 
 		if (!this.view)
 		{
-			this.view = new DataView(new ArrayBuffer(EXTENDED_REPORT_VM_LENGTH));
+			this.view = new DataView(new ArrayBuffer(VM_EXTENDED_REPORT_LENGTH));
 
 			// Write report type.
 			this.writeCommonHeader();
@@ -95,7 +95,7 @@ export class ExtendedReportVM extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength !== EXTENDED_REPORT_VM_LENGTH)
+		if (this.view.byteLength !== VM_EXTENDED_REPORT_LENGTH)
 		{
 			throw new TypeError(
 				'wrong byte length for a VoIP Metrics Extended Report'
@@ -106,7 +106,7 @@ export class ExtendedReportVM extends ExtendedReport
 	/**
 	 * Dump VoIP Metrics Extended Report info.
 	 */
-	dump(): ExtendedReportVMDump
+	dump(): VMExtendedReportDump
 	{
 		return {
 			...super.dump(),
@@ -141,7 +141,7 @@ export class ExtendedReportVM extends ExtendedReport
 	 */
 	getByteLength(): number
 	{
-		return EXTENDED_REPORT_VM_LENGTH;
+		return VM_EXTENDED_REPORT_LENGTH;
 	}
 
 	/**
@@ -167,13 +167,13 @@ export class ExtendedReportVM extends ExtendedReport
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				EXTENDED_REPORT_VM_LENGTH - COMMON_HEADER_LENGTH
+				VM_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH
 			),
 			pos
 		);
 
 		// Move to the end.
-		pos += EXTENDED_REPORT_VM_LENGTH - COMMON_HEADER_LENGTH;
+		pos += VM_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH;
 
 		if (pos !== view.byteLength)
 		{
@@ -196,7 +196,7 @@ export class ExtendedReportVM extends ExtendedReport
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
-	): ExtendedReportVM
+	): VMExtendedReport
 	{
 		const view = this.cloneInternal(
 			buffer,
@@ -205,7 +205,7 @@ export class ExtendedReportVM extends ExtendedReport
 			serializationByteOffset
 		);
 
-		return new ExtendedReportVM(view);
+		return new VMExtendedReport(view);
 	}
 
 	/**

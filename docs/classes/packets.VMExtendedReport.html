@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>ExtendedReportVM | rtp.js - v0.10.0</title><meta name="description" content="Documentation for rtp.js"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><link rel="stylesheet" href="../assets/custom.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>VMExtendedReport | rtp.js - v0.10.0</title><meta name="description" content="Documentation for rtp.js"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><link rel="stylesheet" href="../assets/custom.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -14,8 +14,8 @@
 <ul class="tsd-breadcrumb">
 <li><a href="../index.html">rtp.js</a></li>
 <li><a href="../modules/packets.html">packets</a></li>
-<li><a href="packets.ExtendedReportVM.html">ExtendedReportVM</a></li></ul>
-<h1>Class ExtendedReportVM</h1></div>
+<li><a href="packets.VMExtendedReport.html">VMExtendedReport</a></li></ul>
+<h1>Class VMExtendedReport</h1></div>
 <section class="tsd-panel tsd-comment">
 <div class="tsd-comment tsd-typography"><p>VoIP Metrics Extended Report.</p>
 <pre><code class="language-text"> 0                   1                   2                   3
@@ -51,9 +51,9 @@
 <ul class="tsd-hierarchy">
 <li><a href="packets.ExtendedReport.html" class="tsd-signature-type tsd-kind-class">ExtendedReport</a>
 <ul class="tsd-hierarchy">
-<li><span class="target">ExtendedReportVM</span></li></ul></li></ul></section><aside class="tsd-sources">
+<li><span class="target">VMExtendedReport</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L78">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:78</a></li></ul></aside>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:78</li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -61,70 +61,70 @@
 <div class="tsd-accordion-details">
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Constructors</h3>
-<div class="tsd-index-list"><a href="packets.ExtendedReportVM.html#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-512"><rect fill="var(--color-icon-background)" stroke="#4D7FFF" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)"></path></g></svg><span>constructor</span></a>
+<div class="tsd-index-list"><a href="packets.VMExtendedReport.html#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-512"><rect fill="var(--color-icon-background)" stroke="#4D7FFF" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)"></path></g></svg><span>constructor</span></a>
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Methods</h3>
-<div class="tsd-index-list"><a href="packets.ExtendedReportVM.html#clone" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-2048"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)"></path></g></svg><span>clone</span></a>
-<a href="packets.ExtendedReportVM.html#dump" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>dump</span></a>
-<a href="packets.ExtendedReportVM.html#getBurstDensity" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Burst<wbr/>Density</span></a>
-<a href="packets.ExtendedReportVM.html#getBurstDuration" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Burst<wbr/>Duration</span></a>
-<a href="packets.ExtendedReportVM.html#getByteLength" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Byte<wbr/>Length</span></a>
-<a href="packets.ExtendedReportVM.html#getDiscardRate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Discard<wbr/>Rate</span></a>
-<a href="packets.ExtendedReportVM.html#getEndSystemDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>End<wbr/>System<wbr/>Delay</span></a>
-<a href="packets.ExtendedReportVM.html#getExternalRFactor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>ExternalRFactor</span></a>
-<a href="packets.ExtendedReportVM.html#getGapDensity" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Gap<wbr/>Density</span></a>
-<a href="packets.ExtendedReportVM.html#getGapDuration" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Gap<wbr/>Duration</span></a>
-<a href="packets.ExtendedReportVM.html#getGmin" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Gmin</span></a>
-<a href="packets.ExtendedReportVM.html#getJitterBufferAbsoluteMaximumDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Absolute<wbr/>Maximum<wbr/>Delay</span></a>
-<a href="packets.ExtendedReportVM.html#getJitterBufferAdaptive" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Adaptive</span></a>
-<a href="packets.ExtendedReportVM.html#getJitterBufferMaximumDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Maximum<wbr/>Delay</span></a>
-<a href="packets.ExtendedReportVM.html#getJitterBufferNominalDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Nominal<wbr/>Delay</span></a>
-<a href="packets.ExtendedReportVM.html#getJitterBufferRate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Rate</span></a>
-<a href="packets.ExtendedReportVM.html#getLossRate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Loss<wbr/>Rate</span></a>
-<a href="packets.ExtendedReportVM.html#getMosCQ" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>MosCQ</span></a>
-<a href="packets.ExtendedReportVM.html#getMosLQ" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>MosLQ</span></a>
-<a href="packets.ExtendedReportVM.html#getNoiseLevel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Noise<wbr/>Level</span></a>
-<a href="packets.ExtendedReportVM.html#getPacketLossConcealment" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Packet<wbr/>Loss<wbr/>Concealment</span></a>
-<a href="packets.ExtendedReportVM.html#getRFactor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>getRFactor</span></a>
-<a href="packets.ExtendedReportVM.html#getReportType" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Report<wbr/>Type</span></a>
-<a href="packets.ExtendedReportVM.html#getResidualEchoReturnLoss" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Residual<wbr/>Echo<wbr/>Return<wbr/>Loss</span></a>
-<a href="packets.ExtendedReportVM.html#getRoundTripDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Round<wbr/>Trip<wbr/>Delay</span></a>
-<a href="packets.ExtendedReportVM.html#getSignalLevel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Signal<wbr/>Level</span></a>
-<a href="packets.ExtendedReportVM.html#getSsrc" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ssrc</span></a>
-<a href="packets.ExtendedReportVM.html#getView" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>View</span></a>
-<a href="packets.ExtendedReportVM.html#needsSerialization" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>needs<wbr/>Serialization</span></a>
-<a href="packets.ExtendedReportVM.html#serialize" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>serialize</span></a>
-<a href="packets.ExtendedReportVM.html#setBurstDensity" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Burst<wbr/>Density</span></a>
-<a href="packets.ExtendedReportVM.html#setBurstDuration" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Burst<wbr/>Duration</span></a>
-<a href="packets.ExtendedReportVM.html#setDiscardRate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Discard<wbr/>Rate</span></a>
-<a href="packets.ExtendedReportVM.html#setEndSystemDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>End<wbr/>System<wbr/>Delay</span></a>
-<a href="packets.ExtendedReportVM.html#setExternalRFactor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>ExternalRFactor</span></a>
-<a href="packets.ExtendedReportVM.html#setGapDensity" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Gap<wbr/>Density</span></a>
-<a href="packets.ExtendedReportVM.html#setGapDuration" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Gap<wbr/>Duration</span></a>
-<a href="packets.ExtendedReportVM.html#setGmin" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Gmin</span></a>
-<a href="packets.ExtendedReportVM.html#setJitterBufferAbsoluteMaximumDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Absolute<wbr/>Maximum<wbr/>Delay</span></a>
-<a href="packets.ExtendedReportVM.html#setJitterBufferAdaptive" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Adaptive</span></a>
-<a href="packets.ExtendedReportVM.html#setJitterBufferMaximumDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Maximum<wbr/>Delay</span></a>
-<a href="packets.ExtendedReportVM.html#setJitterBufferNominalDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Nominal<wbr/>Delay</span></a>
-<a href="packets.ExtendedReportVM.html#setJitterBufferRate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Rate</span></a>
-<a href="packets.ExtendedReportVM.html#setLossRate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Loss<wbr/>Rate</span></a>
-<a href="packets.ExtendedReportVM.html#setMosCQ" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>MosCQ</span></a>
-<a href="packets.ExtendedReportVM.html#setMosLQ" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>MosLQ</span></a>
-<a href="packets.ExtendedReportVM.html#setNoiseLevel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Noise<wbr/>Level</span></a>
-<a href="packets.ExtendedReportVM.html#setPacketLossConcealment" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Packet<wbr/>Loss<wbr/>Concealment</span></a>
-<a href="packets.ExtendedReportVM.html#setRFactor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>setRFactor</span></a>
-<a href="packets.ExtendedReportVM.html#setResidualEchoReturnLoss" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Residual<wbr/>Echo<wbr/>Return<wbr/>Loss</span></a>
-<a href="packets.ExtendedReportVM.html#setRoundTripDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Round<wbr/>Trip<wbr/>Delay</span></a>
-<a href="packets.ExtendedReportVM.html#setSignalLevel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Signal<wbr/>Level</span></a>
-<a href="packets.ExtendedReportVM.html#setSsrc" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ssrc</span></a>
+<div class="tsd-index-list"><a href="packets.VMExtendedReport.html#clone" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-2048"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)"></path></g></svg><span>clone</span></a>
+<a href="packets.VMExtendedReport.html#dump" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>dump</span></a>
+<a href="packets.VMExtendedReport.html#getBurstDensity" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Burst<wbr/>Density</span></a>
+<a href="packets.VMExtendedReport.html#getBurstDuration" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Burst<wbr/>Duration</span></a>
+<a href="packets.VMExtendedReport.html#getByteLength" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Byte<wbr/>Length</span></a>
+<a href="packets.VMExtendedReport.html#getDiscardRate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Discard<wbr/>Rate</span></a>
+<a href="packets.VMExtendedReport.html#getEndSystemDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>End<wbr/>System<wbr/>Delay</span></a>
+<a href="packets.VMExtendedReport.html#getExternalRFactor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>ExternalRFactor</span></a>
+<a href="packets.VMExtendedReport.html#getGapDensity" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Gap<wbr/>Density</span></a>
+<a href="packets.VMExtendedReport.html#getGapDuration" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Gap<wbr/>Duration</span></a>
+<a href="packets.VMExtendedReport.html#getGmin" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Gmin</span></a>
+<a href="packets.VMExtendedReport.html#getJitterBufferAbsoluteMaximumDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Absolute<wbr/>Maximum<wbr/>Delay</span></a>
+<a href="packets.VMExtendedReport.html#getJitterBufferAdaptive" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Adaptive</span></a>
+<a href="packets.VMExtendedReport.html#getJitterBufferMaximumDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Maximum<wbr/>Delay</span></a>
+<a href="packets.VMExtendedReport.html#getJitterBufferNominalDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Nominal<wbr/>Delay</span></a>
+<a href="packets.VMExtendedReport.html#getJitterBufferRate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Rate</span></a>
+<a href="packets.VMExtendedReport.html#getLossRate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Loss<wbr/>Rate</span></a>
+<a href="packets.VMExtendedReport.html#getMosCQ" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>MosCQ</span></a>
+<a href="packets.VMExtendedReport.html#getMosLQ" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>MosLQ</span></a>
+<a href="packets.VMExtendedReport.html#getNoiseLevel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Noise<wbr/>Level</span></a>
+<a href="packets.VMExtendedReport.html#getPacketLossConcealment" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Packet<wbr/>Loss<wbr/>Concealment</span></a>
+<a href="packets.VMExtendedReport.html#getRFactor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>getRFactor</span></a>
+<a href="packets.VMExtendedReport.html#getReportType" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Report<wbr/>Type</span></a>
+<a href="packets.VMExtendedReport.html#getResidualEchoReturnLoss" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Residual<wbr/>Echo<wbr/>Return<wbr/>Loss</span></a>
+<a href="packets.VMExtendedReport.html#getRoundTripDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Round<wbr/>Trip<wbr/>Delay</span></a>
+<a href="packets.VMExtendedReport.html#getSignalLevel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Signal<wbr/>Level</span></a>
+<a href="packets.VMExtendedReport.html#getSsrc" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ssrc</span></a>
+<a href="packets.VMExtendedReport.html#getView" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>View</span></a>
+<a href="packets.VMExtendedReport.html#needsSerialization" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>needs<wbr/>Serialization</span></a>
+<a href="packets.VMExtendedReport.html#serialize" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>serialize</span></a>
+<a href="packets.VMExtendedReport.html#setBurstDensity" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Burst<wbr/>Density</span></a>
+<a href="packets.VMExtendedReport.html#setBurstDuration" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Burst<wbr/>Duration</span></a>
+<a href="packets.VMExtendedReport.html#setDiscardRate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Discard<wbr/>Rate</span></a>
+<a href="packets.VMExtendedReport.html#setEndSystemDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>End<wbr/>System<wbr/>Delay</span></a>
+<a href="packets.VMExtendedReport.html#setExternalRFactor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>ExternalRFactor</span></a>
+<a href="packets.VMExtendedReport.html#setGapDensity" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Gap<wbr/>Density</span></a>
+<a href="packets.VMExtendedReport.html#setGapDuration" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Gap<wbr/>Duration</span></a>
+<a href="packets.VMExtendedReport.html#setGmin" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Gmin</span></a>
+<a href="packets.VMExtendedReport.html#setJitterBufferAbsoluteMaximumDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Absolute<wbr/>Maximum<wbr/>Delay</span></a>
+<a href="packets.VMExtendedReport.html#setJitterBufferAdaptive" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Adaptive</span></a>
+<a href="packets.VMExtendedReport.html#setJitterBufferMaximumDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Maximum<wbr/>Delay</span></a>
+<a href="packets.VMExtendedReport.html#setJitterBufferNominalDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Nominal<wbr/>Delay</span></a>
+<a href="packets.VMExtendedReport.html#setJitterBufferRate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Rate</span></a>
+<a href="packets.VMExtendedReport.html#setLossRate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Loss<wbr/>Rate</span></a>
+<a href="packets.VMExtendedReport.html#setMosCQ" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>MosCQ</span></a>
+<a href="packets.VMExtendedReport.html#setMosLQ" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>MosLQ</span></a>
+<a href="packets.VMExtendedReport.html#setNoiseLevel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Noise<wbr/>Level</span></a>
+<a href="packets.VMExtendedReport.html#setPacketLossConcealment" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Packet<wbr/>Loss<wbr/>Concealment</span></a>
+<a href="packets.VMExtendedReport.html#setRFactor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>setRFactor</span></a>
+<a href="packets.VMExtendedReport.html#setResidualEchoReturnLoss" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Residual<wbr/>Echo<wbr/>Return<wbr/>Loss</span></a>
+<a href="packets.VMExtendedReport.html#setRoundTripDelay" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Round<wbr/>Trip<wbr/>Delay</span></a>
+<a href="packets.VMExtendedReport.html#setSignalLevel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Signal<wbr/>Level</span></a>
+<a href="packets.VMExtendedReport.html#setSsrc" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ssrc</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Constructors</h2>
 <section class="tsd-panel tsd-member"><a id="constructor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="constructor.new_ExtendedReportVM"><span class="tsd-kind-constructor-signature">new <wbr/>Extended<wbr/>ReportVM</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">view</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="packets.ExtendedReportVM.html" class="tsd-signature-type tsd-kind-class">ExtendedReportVM</a><a href="#constructor.new_ExtendedReportVM" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_VMExtendedReport"><span class="tsd-kind-constructor-signature">new VMExtended<wbr/>Report</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">view</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="packets.VMExtendedReport.html" class="tsd-signature-type tsd-kind-class">VMExtendedReport</a><a href="#constructor.new_VMExtendedReport" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -135,17 +135,17 @@
      Extended Report will be created.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="packets.ExtendedReportVM.html" class="tsd-signature-type tsd-kind-class">ExtendedReportVM</a></h4>
+<h4 class="tsd-returns-title">Returns <a href="packets.VMExtendedReport.html" class="tsd-signature-type tsd-kind-class">VMExtendedReport</a></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides ExtendedReport.constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L84">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:84</a></li></ul></aside></li></ul></section></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:84</li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member"><a id="clone" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>clone</span><a href="#clone" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="clone.clone-1"><span class="tsd-kind-call-signature">clone</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">buffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">byteOffset</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationBuffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationByteOffset</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="packets.ExtendedReportVM.html" class="tsd-signature-type tsd-kind-class">ExtendedReportVM</a><a href="#clone.clone-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="clone.clone-1"><span class="tsd-kind-call-signature">clone</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">buffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">byteOffset</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationBuffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationByteOffset</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="packets.VMExtendedReport.html" class="tsd-signature-type tsd-kind-class">VMExtendedReport</a><a href="#clone.clone-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Clone the content. The cloned instance does not share any memory with the
 original one.</p>
@@ -178,7 +178,7 @@ original one.</p>
   <code>serializationBuffer</code> where serialization (if needed) will start.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="packets.ExtendedReportVM.html" class="tsd-signature-type tsd-kind-class">ExtendedReportVM</a></h4>
+<h4 class="tsd-returns-title">Returns <a href="packets.VMExtendedReport.html" class="tsd-signature-type tsd-kind-class">VMExtendedReport</a></h4>
 <div class="tsd-comment tsd-typography">
 <h4>Remarks</h4><ul>
 <li>The buffer is serialized if needed (to apply pending modifications).</li>
@@ -193,19 +193,19 @@ the content.</li>
 </div><aside class="tsd-sources">
 <p>Overrides <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#clone">clone</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L194">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:194</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:194</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="dump" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>dump</span><a href="#dump" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="dump.dump-1"><span class="tsd-kind-call-signature">dump</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/packets.ExtendedReportVMDump.html" class="tsd-signature-type tsd-kind-type-alias">ExtendedReportVMDump</a><a href="#dump.dump-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="dump.dump-1"><span class="tsd-kind-call-signature">dump</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/packets.VMExtendedReportDump.html" class="tsd-signature-type tsd-kind-type-alias">VMExtendedReportDump</a><a href="#dump.dump-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Dump VoIP Metrics Extended Report info.</p>
 </div>
-<h4 class="tsd-returns-title">Returns <a href="../types/packets.ExtendedReportVMDump.html" class="tsd-signature-type tsd-kind-type-alias">ExtendedReportVMDump</a></h4>
+<h4 class="tsd-returns-title">Returns <a href="../types/packets.VMExtendedReportDump.html" class="tsd-signature-type tsd-kind-type-alias">VMExtendedReportDump</a></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#dump">dump</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L109">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:109</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:109</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getBurstDensity" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Burst<wbr/>Density</span><a href="#getBurstDensity" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -216,7 +216,7 @@ the content.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L268">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:268</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:268</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getBurstDuration" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Burst<wbr/>Duration</span><a href="#getBurstDuration" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -227,7 +227,7 @@ the content.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L304">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:304</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:304</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getByteLength" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Byte<wbr/>Length</span><a href="#getByteLength" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -245,7 +245,7 @@ before.</li>
 </div><aside class="tsd-sources">
 <p>Overrides <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#getByteLength">getByteLength</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L142">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:142</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:142</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getDiscardRate" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Discard<wbr/>Rate</span><a href="#getDiscardRate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -256,7 +256,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L250">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:250</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:250</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getEndSystemDelay" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>End<wbr/>System<wbr/>Delay</span><a href="#getEndSystemDelay" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -267,7 +267,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L358">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:358</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:358</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getExternalRFactor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>ExternalRFactor</span><a href="#getExternalRFactor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -278,7 +278,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L466">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:466</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:466</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getGapDensity" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Gap<wbr/>Density</span><a href="#getGapDensity" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -289,7 +289,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L286">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:286</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:286</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getGapDuration" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Gap<wbr/>Duration</span><a href="#getGapDuration" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -300,7 +300,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L322">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:322</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:322</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getGmin" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Gmin</span><a href="#getGmin" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -311,7 +311,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L430">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:430</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:430</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getJitterBufferAbsoluteMaximumDelay" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Absolute<wbr/>Maximum<wbr/>Delay</span><a href="#getJitterBufferAbsoluteMaximumDelay" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -322,7 +322,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L622">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:622</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:622</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getJitterBufferAdaptive" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Adaptive</span><a href="#getJitterBufferAdaptive" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -333,7 +333,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L542">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:542</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:542</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getJitterBufferMaximumDelay" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Maximum<wbr/>Delay</span><a href="#getJitterBufferMaximumDelay" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -344,7 +344,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L604">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:604</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:604</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getJitterBufferNominalDelay" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Nominal<wbr/>Delay</span><a href="#getJitterBufferNominalDelay" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -355,7 +355,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L586">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:586</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:586</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getJitterBufferRate" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Jitter<wbr/>Buffer<wbr/>Rate</span><a href="#getJitterBufferRate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -366,7 +366,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L564">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:564</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:564</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getLossRate" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Loss<wbr/>Rate</span><a href="#getLossRate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -377,7 +377,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L232">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:232</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:232</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getMosCQ" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>MosCQ</span><a href="#getMosCQ" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -388,7 +388,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L502">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:502</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:502</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getMosLQ" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>MosLQ</span><a href="#getMosLQ" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -399,7 +399,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L484">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:484</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:484</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getNoiseLevel" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Noise<wbr/>Level</span><a href="#getNoiseLevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -410,7 +410,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L394">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:394</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:394</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getPacketLossConcealment" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Packet<wbr/>Loss<wbr/>Concealment</span><a href="#getPacketLossConcealment" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -421,7 +421,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L520">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:520</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:520</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getRFactor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>getRFactor</span><a href="#getRFactor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -432,7 +432,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L448">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:448</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:448</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getReportType" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Report<wbr/>Type</span><a href="#getReportType" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -444,7 +444,7 @@ before.</li>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#getReportType">getReportType</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReport.ts#L223">packets/RTCP/ExtendedReports/ExtendedReport.ts:223</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/dab973f/src/packets/RTCP/ExtendedReports/ExtendedReport.ts#L223">packets/RTCP/ExtendedReports/ExtendedReport.ts:223</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getResidualEchoReturnLoss" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Residual<wbr/>Echo<wbr/>Return<wbr/>Loss</span><a href="#getResidualEchoReturnLoss" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -455,7 +455,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L412">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:412</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:412</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getRoundTripDelay" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Round<wbr/>Trip<wbr/>Delay</span><a href="#getRoundTripDelay" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -466,7 +466,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L340">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:340</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:340</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getSignalLevel" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Signal<wbr/>Level</span><a href="#getSignalLevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -477,7 +477,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L376">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:376</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:376</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getSsrc" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Ssrc</span><a href="#getSsrc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -488,7 +488,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L214">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:214</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:214</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getView" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>View</span><a href="#getView" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -526,7 +526,7 @@ content.</li>
 </div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#getView">getView</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/Serializable.ts#L57">packets/Serializable.ts:57</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/dab973f/src/packets/Serializable.ts#L57">packets/Serializable.ts:57</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="needsSerialization" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>needs<wbr/>Serialization</span><a href="#needsSerialization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -539,7 +539,7 @@ yet applied into the buffer.</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#needsSerialization">needsSerialization</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/Serializable.ts#L84">packets/Serializable.ts:84</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/dab973f/src/packets/Serializable.ts#L84">packets/Serializable.ts:84</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="serialize" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>serialize</span><a href="#serialize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -577,7 +577,7 @@ methods apply changes within the current buffer. To be sure, check
 </div><aside class="tsd-sources">
 <p>Overrides <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#serialize">serialize</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L150">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:150</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:150</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setBurstDensity" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Burst<wbr/>Density</span><a href="#setBurstDensity" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -593,7 +593,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L276">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:276</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:276</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setBurstDuration" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Burst<wbr/>Duration</span><a href="#setBurstDuration" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -609,7 +609,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L312">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:312</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:312</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setDiscardRate" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Discard<wbr/>Rate</span><a href="#setDiscardRate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -625,7 +625,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L258">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:258</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:258</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setEndSystemDelay" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>End<wbr/>System<wbr/>Delay</span><a href="#setEndSystemDelay" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -641,7 +641,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L366">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:366</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:366</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setExternalRFactor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>ExternalRFactor</span><a href="#setExternalRFactor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -657,7 +657,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L474">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:474</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:474</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setGapDensity" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Gap<wbr/>Density</span><a href="#setGapDensity" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -673,7 +673,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L294">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:294</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:294</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setGapDuration" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Gap<wbr/>Duration</span><a href="#setGapDuration" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -689,7 +689,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L330">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:330</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:330</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setGmin" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Gmin</span><a href="#setGmin" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -705,7 +705,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L438">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:438</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:438</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setJitterBufferAbsoluteMaximumDelay" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Absolute<wbr/>Maximum<wbr/>Delay</span><a href="#setJitterBufferAbsoluteMaximumDelay" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -721,7 +721,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L630">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:630</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:630</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setJitterBufferAdaptive" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Adaptive</span><a href="#setJitterBufferAdaptive" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -737,7 +737,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L552">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:552</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:552</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setJitterBufferMaximumDelay" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Maximum<wbr/>Delay</span><a href="#setJitterBufferMaximumDelay" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -753,7 +753,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L612">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:612</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:612</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setJitterBufferNominalDelay" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Nominal<wbr/>Delay</span><a href="#setJitterBufferNominalDelay" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -769,7 +769,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L594">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:594</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:594</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setJitterBufferRate" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Jitter<wbr/>Buffer<wbr/>Rate</span><a href="#setJitterBufferRate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -785,7 +785,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L574">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:574</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:574</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setLossRate" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Loss<wbr/>Rate</span><a href="#setLossRate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -801,7 +801,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L240">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:240</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:240</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setMosCQ" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>MosCQ</span><a href="#setMosCQ" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -817,7 +817,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L510">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:510</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:510</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setMosLQ" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>MosLQ</span><a href="#setMosLQ" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -833,7 +833,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L492">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:492</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:492</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setNoiseLevel" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Noise<wbr/>Level</span><a href="#setNoiseLevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -849,7 +849,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L402">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:402</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:402</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setPacketLossConcealment" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Packet<wbr/>Loss<wbr/>Concealment</span><a href="#setPacketLossConcealment" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -865,7 +865,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L530">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:530</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:530</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setRFactor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>setRFactor</span><a href="#setRFactor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -881,7 +881,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L456">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:456</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:456</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setResidualEchoReturnLoss" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Residual<wbr/>Echo<wbr/>Return<wbr/>Loss</span><a href="#setResidualEchoReturnLoss" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -897,7 +897,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L420">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:420</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:420</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setRoundTripDelay" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Round<wbr/>Trip<wbr/>Delay</span><a href="#setRoundTripDelay" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -913,7 +913,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L348">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:348</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:348</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setSignalLevel" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Signal<wbr/>Level</span><a href="#setSignalLevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -929,7 +929,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L384">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:384</a></li></ul></aside></li></ul></section>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:384</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setSsrc" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Ssrc</span><a href="#setSsrc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -945,7 +945,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d965967/src/packets/RTCP/ExtendedReports/ExtendedReportVM.ts#L222">packets/RTCP/ExtendedReports/ExtendedReportVM.ts:222</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in packets/RTCP/ExtendedReports/VMExtendedReport.ts:222</li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -1031,61 +1031,61 @@ methods apply changes within the current buffer. To be sure, check
 <li><a href="../enums/packets.SdesItemType.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg><span>Sdes<wbr/>Item<wbr/>Type</span></a></li>
 <li><a href="packets.ByePacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-128"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-class)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)"></path></g></svg><span>Bye<wbr/>Packet</span></a></li>
 <li><a href="packets.CompoundPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Compound<wbr/>Packet</span></a></li>
+<li><a href="packets.DLRRExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>DLRRExtended<wbr/>Report</span></a></li>
+<li><a href="packets.DRLEExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>DRLEExtended<wbr/>Report</span></a></li>
 <li><a href="packets.ExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Extended<wbr/>Report</span></a></li>
-<li><a href="packets.ExtendedReportDLRR.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Extended<wbr/>ReportDLRR</span></a></li>
-<li><a href="packets.ExtendedReportDRLE.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Extended<wbr/>ReportDRLE</span></a></li>
-<li><a href="packets.ExtendedReportLRLE.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Extended<wbr/>ReportLRLE</span></a></li>
-<li><a href="packets.ExtendedReportPRT.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Extended<wbr/>ReportPRT</span></a></li>
-<li><a href="packets.ExtendedReportRRT.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Extended<wbr/>ReportRRT</span></a></li>
-<li><a href="packets.ExtendedReportSS.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Extended<wbr/>ReportSS</span></a></li>
-<li><a href="packets.ExtendedReportVM.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Extended<wbr/>ReportVM</span></a></li>
 <li><a href="packets.FeedbackPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Feedback<wbr/>Packet</span></a></li>
 <li><a href="packets.GenericExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Generic<wbr/>Extended<wbr/>Report</span></a></li>
 <li><a href="packets.GenericFeedbackPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Generic<wbr/>Feedback<wbr/>Packet</span></a></li>
 <li><a href="packets.GenericPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Generic<wbr/>Packet</span></a></li>
+<li><a href="packets.LRLEExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>LRLEExtended<wbr/>Report</span></a></li>
 <li><a href="packets.NackPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Nack<wbr/>Packet</span></a></li>
+<li><a href="packets.PRTExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>PRTExtended<wbr/>Report</span></a></li>
 <li><a href="packets.Packet.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Packet</span></a></li>
 <li><a href="packets.PliPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Pli<wbr/>Packet</span></a></li>
+<li><a href="packets.RRTExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>RRTExtended<wbr/>Report</span></a></li>
 <li><a href="packets.ReceiverReportPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Receiver<wbr/>Report<wbr/>Packet</span></a></li>
 <li><a href="packets.ReceptionReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Reception<wbr/>Report</span></a></li>
 <li><a href="packets.RpsiPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Rpsi<wbr/>Packet</span></a></li>
 <li><a href="packets.RtcpPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Rtcp<wbr/>Packet</span></a></li>
 <li><a href="packets.RtpPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Rtp<wbr/>Packet</span></a></li>
+<li><a href="packets.SSExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>SSExtended<wbr/>Report</span></a></li>
 <li><a href="packets.SdesChunk.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Sdes<wbr/>Chunk</span></a></li>
 <li><a href="packets.SdesPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Sdes<wbr/>Packet</span></a></li>
 <li><a href="packets.SenderReportPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Sender<wbr/>Report<wbr/>Packet</span></a></li>
 <li><a href="packets.Serializable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Serializable</span></a></li>
 <li><a href="packets.SliPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Sli<wbr/>Packet</span></a></li>
+<li><a href="packets.VMExtendedReport.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>VMExtended<wbr/>Report</span></a></li>
 <li><a href="packets.XrPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Xr<wbr/>Packet</span></a></li>
 <li><a href="../types/packets.ByePacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4194304"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-type-alias)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)"></path></g></svg><span>Bye<wbr/>Packet<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.CompoundPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Compound<wbr/>Packet<wbr/>Dump</span></a></li>
+<li><a href="../types/packets.DLRRExtendedReportDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>DLRRExtended<wbr/>Report<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.DLRRSubReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>DLRRSub<wbr/>Report</span></a></li>
+<li><a href="../types/packets.DRLEExtendedReportDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>DRLEExtended<wbr/>Report<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.ExtendedReportChunk.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Extended<wbr/>Report<wbr/>Chunk</span></a></li>
-<li><a href="../types/packets.ExtendedReportDLRRDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Extended<wbr/>ReportDLRRDump</span></a></li>
-<li><a href="../types/packets.ExtendedReportDRLEDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Extended<wbr/>ReportDRLEDump</span></a></li>
 <li><a href="../types/packets.ExtendedReportDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Extended<wbr/>Report<wbr/>Dump</span></a></li>
-<li><a href="../types/packets.ExtendedReportLRLEDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Extended<wbr/>ReportLRLEDump</span></a></li>
-<li><a href="../types/packets.ExtendedReportPRTDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Extended<wbr/>ReportPRTDump</span></a></li>
-<li><a href="../types/packets.ExtendedReportRRTDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Extended<wbr/>ReportRRTDump</span></a></li>
-<li><a href="../types/packets.ExtendedReportSSDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Extended<wbr/>ReportSSDump</span></a></li>
-<li><a href="../types/packets.ExtendedReportVMDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Extended<wbr/>ReportVMDump</span></a></li>
 <li><a href="../types/packets.FeedbackPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Feedback<wbr/>Packet<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.GenericExtendedReportDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Generic<wbr/>Extended<wbr/>Report<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.GenericFeedbackPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Generic<wbr/>Feedback<wbr/>Packet<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.GenericPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Generic<wbr/>Packet<wbr/>Dump</span></a></li>
+<li><a href="../types/packets.LRLEExtendedReportDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>LRLEExtended<wbr/>Report<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.NackPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Nack<wbr/>Packet<wbr/>Dump</span></a></li>
+<li><a href="../types/packets.PRTExtendedReportDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>PRTExtended<wbr/>Report<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.PacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Packet<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.PliPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Pli<wbr/>Packet<wbr/>Dump</span></a></li>
+<li><a href="../types/packets.RRTExtendedReportDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>RRTExtended<wbr/>Report<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.ReceiverReportPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Receiver<wbr/>Report<wbr/>Packet<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.ReceptionReportDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Reception<wbr/>Report<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.RpsiPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Rpsi<wbr/>Packet<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.RtcpPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Rtcp<wbr/>Packet<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.RtpPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Rtp<wbr/>Packet<wbr/>Dump</span></a></li>
+<li><a href="../types/packets.SSExtendedReportDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>SSExtended<wbr/>Report<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.SdesChunkDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Sdes<wbr/>Chunk<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.SdesPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Sdes<wbr/>Packet<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.SenderReportPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Sender<wbr/>Report<wbr/>Packet<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.SerializableDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Serializable<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.SliPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Sli<wbr/>Packet<wbr/>Dump</span></a></li>
+<li><a href="../types/packets.VMExtendedReportDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>VMExtended<wbr/>Report<wbr/>Dump</span></a></li>
 <li><a href="../types/packets.XrPacketDump.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Xr<wbr/>Packet<wbr/>Dump</span></a></li>
 <li><a href="../functions/packets.createExtendedReportBitVectorChunk.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-64"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)"></path></g></svg><span>create<wbr/>Extended<wbr/>Report<wbr/>Bit<wbr/>Vector<wbr/>Chunk</span></a></li>
 <li><a href="../functions/packets.createExtendedReportRunLengthChunk.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>create<wbr/>Extended<wbr/>Report<wbr/>Run<wbr/>Length<wbr/>Chunk</span></a></li>

@@ -8,9 +8,9 @@ import {
 /**
  * DLRR Extended Report dump.
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  */
-export type ExtendedReportDLRRDump = ExtendedReportDump &
+export type DLRRExtendedReportDump = ExtendedReportDump &
 {
 	subReports: DLRRSubReport[];
 };
@@ -18,7 +18,7 @@ export type ExtendedReportDLRRDump = ExtendedReportDump &
 /**
  * DLRR Sub-Report.
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  */
 export type DLRRSubReport =
 {
@@ -57,12 +57,12 @@ export type DLRRSubReport =
  * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  * ```
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  *
  * @see
  * - [RFC 3611 section 4.5](https://datatracker.ietf.org/doc/html/rfc3611#section-4.5)
  */
-export class ExtendedReportDLRR extends ExtendedReport
+export class DLRRExtendedReport extends ExtendedReport
 {
 	// Sub-reports.
 	#subReports: DLRRSubReport[] = [];
@@ -119,7 +119,7 @@ export class ExtendedReportDLRR extends ExtendedReport
 	/**
 	 * Dump DLRR Extended Report info.
 	 */
-	dump(): ExtendedReportDLRRDump
+	dump(): DLRRExtendedReportDump
 	{
 		return {
 			...super.dump(),
@@ -195,7 +195,7 @@ export class ExtendedReportDLRR extends ExtendedReport
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
-	): ExtendedReportDLRR
+	): DLRRExtendedReport
 	{
 		const view = this.cloneInternal(
 			buffer,
@@ -204,7 +204,7 @@ export class ExtendedReportDLRR extends ExtendedReport
 			serializationByteOffset
 		);
 
-		return new ExtendedReportDLRR(view);
+		return new DLRRExtendedReport(view);
 	}
 
 	/**

@@ -6,7 +6,7 @@ export const COMMON_HEADER_LENGTH = 4;
 /**
  * Extended Report types.
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  */
 // ESLint absurdly complains about "'ExtendedReportType' is already declared in
 // the upper scope".
@@ -46,7 +46,7 @@ export enum ExtendedReportType
 /**
  * Extended Report dump.
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  */
 export type ExtendedReportDump = SerializableDump &
 {
@@ -162,7 +162,7 @@ export function reportTypeToString(reportType: ExtendedReportType): string
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  *
  * @see
  * - [RFC 3611 section 3](https://datatracker.ietf.org/doc/html/rfc3611#section-3)

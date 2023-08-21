@@ -6,14 +6,14 @@ import {
 } from './ExtendedReport';
 
 // Common header + NTP timestamp.
-const EXTENDED_REPORT_RRT_LENGTH = COMMON_HEADER_LENGTH + 8;
+const RRT_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 8;
 
 /**
  * Receiver Reference Time Extended Report dump.
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  */
-export type ExtendedReportRRTDump = ExtendedReportDump &
+export type RRTExtendedReportDump = ExtendedReportDump &
 {
 	ntpSeq: number;
 	ntpFraction: number;
@@ -34,12 +34,12 @@ export type ExtendedReportRRTDump = ExtendedReportDump &
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
  *
- * @category RTCP
+ * @category RTCP Extended Reports
  *
  * @see
  * - [RFC 3611 section 4.4](https://datatracker.ietf.org/doc/html/rfc3611#section-4.4)
  */
-export class ExtendedReportRRT extends ExtendedReport
+export class RRTExtendedReport extends ExtendedReport
 {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty Receiver
@@ -51,7 +51,7 @@ export class ExtendedReportRRT extends ExtendedReport
 
 		if (!this.view)
 		{
-			this.view = new DataView(new ArrayBuffer(EXTENDED_REPORT_RRT_LENGTH));
+			this.view = new DataView(new ArrayBuffer(RRT_EXTENDED_REPORT_LENGTH));
 
 			// Write report type.
 			this.writeCommonHeader();
@@ -59,7 +59,7 @@ export class ExtendedReportRRT extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength !== EXTENDED_REPORT_RRT_LENGTH)
+		if (this.view.byteLength !== RRT_EXTENDED_REPORT_LENGTH)
 		{
 			throw new TypeError(
 				'wrong byte length for a Receiver Reference Time Extended Report'
@@ -70,7 +70,7 @@ export class ExtendedReportRRT extends ExtendedReport
 	/**
 	 * Dump Receiver Reference Time Extended Report info.
 	 */
-	dump(): ExtendedReportRRTDump
+	dump(): RRTExtendedReportDump
 	{
 		return {
 			...super.dump(),
@@ -84,7 +84,7 @@ export class ExtendedReportRRT extends ExtendedReport
 	 */
 	getByteLength(): number
 	{
-		return EXTENDED_REPORT_RRT_LENGTH;
+		return RRT_EXTENDED_REPORT_LENGTH;
 	}
 
 	/**
@@ -110,13 +110,13 @@ export class ExtendedReportRRT extends ExtendedReport
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				EXTENDED_REPORT_RRT_LENGTH - COMMON_HEADER_LENGTH
+				RRT_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH
 			),
 			pos
 		);
 
 		// Move to the end.
-		pos += EXTENDED_REPORT_RRT_LENGTH - COMMON_HEADER_LENGTH;
+		pos += RRT_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH;
 
 		if (pos !== view.byteLength)
 		{
@@ -139,7 +139,7 @@ export class ExtendedReportRRT extends ExtendedReport
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
-	): ExtendedReportRRT
+	): RRTExtendedReport
 	{
 		const view = this.cloneInternal(
 			buffer,
@@ -148,7 +148,7 @@ export class ExtendedReportRRT extends ExtendedReport
 			serializationByteOffset
 		);
 
-		return new ExtendedReportRRT(view);
+		return new RRTExtendedReport(view);
 	}
 
 	/**
