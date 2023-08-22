@@ -18,7 +18,13 @@ export {
 	isRtp,
 	RtpPacket,
 	RtpPacketDump
-} from './RtpPacket';
+} from './RTP/RtpPacket';
+
+export {
+	RtpExtensionType,
+	RtpExtensionMapping,
+	rtpExtensionUriToType
+} from './RTP/rtpExtensions';
 
 export {
 	isRtcp,

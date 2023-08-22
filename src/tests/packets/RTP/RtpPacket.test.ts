@@ -4,19 +4,19 @@ import {
 	isRtp,
 	RtpPacket,
 	RtpPacketDump
-} from '../../packets/RtpPacket';
+} from '../../../packets/RTP/RtpPacket';
 import {
 	clone,
 	areDataViewsEqual,
 	nodeBufferToDataView,
 	numericArrayToDataView,
 	stringToDataView
-} from '../../utils/helpers';
+} from '../../../utils/helpers';
 
 describe('parse RTP packet 1', () =>
 {
 	const view = nodeBufferToDataView(
-		fs.readFileSync(path.join(__dirname, '..', 'data', 'rtppacket1.raw'))
+		fs.readFileSync(path.join(__dirname, '..', '..', 'data', 'rtppacket1.raw'))
 	);
 
 	let packet: RtpPacket;
@@ -55,7 +55,7 @@ describe('parse RTP packet 1', () =>
 describe('parse RTP packet 2', () =>
 {
 	const view = nodeBufferToDataView(
-		fs.readFileSync(path.join(__dirname, '..', 'data', 'rtppacket2.raw'))
+		fs.readFileSync(path.join(__dirname, '..', '..', 'data', 'rtppacket2.raw'))
 	);
 
 	let packet: RtpPacket;

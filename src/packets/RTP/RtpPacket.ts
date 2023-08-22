@@ -1,11 +1,17 @@
-import { RTP_VERSION, Packet, PacketDump } from './Packet';
-import { clone, padTo4Bytes } from '../utils/helpers';
+import { RTP_VERSION, Packet, PacketDump } from '../Packet';
+import { RtpExtensionType, RtpExtensionMapping } from './rtpExtensions';
+import {
+	clone,
+	padTo4Bytes,
+	dataViewToString,
+	stringToDataView
+} from '../../utils/helpers';
 import {
 	readBitInDataView,
 	writeBitInDataView,
 	readBitsInDataView,
 	writeBitsInDataView
-} from '../utils/bitOps';
+} from '../../utils/bitOps';
 
 const FIXED_HEADER_LENGTH = 12;
 
@@ -24,6 +30,9 @@ export type RtpPacketDump = PacketDump &
 	marker: boolean;
 	headerExtensionId?: number;
 	extensions: { id: number; length: number }[];
+	midExtension?: string;
+	ridExtension?: string;
+	repairedRidExtension?: string;
 	payloadLength: number;
 };
 
@@ -85,6 +94,8 @@ export class RtpPacket extends Packet
 	#headerExtensionView?: DataView;
 	// One-Byte or Two-Bytes extensions indexed by id.
 	readonly #extensions: Map<number, DataView> = new Map();
+	// Mapping of RTP extension types and their corresponding RTP extension ids.
+	#extensionMapping: RtpExtensionMapping = {};
 	// Buffer view holding the entire RTP payload.
 	#payloadView: DataView;
 
@@ -329,15 +340,18 @@ export class RtpPacket extends Packet
 
 		return {
 			...super.dump(),
-			payloadType       : this.getPayloadType(),
-			sequenceNumber    : this.getSequenceNumber(),
-			timestamp         : this.getTimestamp(),
-			ssrc              : this.getSsrc(),
-			csrcs             : this.getCsrcs(),
-			marker            : this.getMarker(),
-			headerExtensionId : this.#headerExtensionId,
-			extensions        : extensions,
-			payloadLength     : this.#payloadView.byteLength
+			payloadType          : this.getPayloadType(),
+			sequenceNumber       : this.getSequenceNumber(),
+			timestamp            : this.getTimestamp(),
+			ssrc                 : this.getSsrc(),
+			csrcs                : this.getCsrcs(),
+			marker               : this.getMarker(),
+			headerExtensionId    : this.#headerExtensionId,
+			extensions           : extensions,
+			midExtension         : this.getMidExtension(),
+			ridExtension         : this.getRidExtension(),
+			repairedRidExtension : this.getRepairedRidExtension(),
+			payloadLength        : this.#payloadView.byteLength
 		};
 	}
 
@@ -672,7 +686,11 @@ export class RtpPacket extends Packet
 			serializationByteOffset
 		);
 
-		return new RtpPacket(view);
+		const clonedPacket = new RtpPacket(view);
+
+		clonedPacket.setExtensionMapping(this.getExtensionMapping());
+
+		return clonedPacket;
 	}
 
 	/**
@@ -839,14 +857,6 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Get the value of the extension with given `id` (RFC 5285).
-	 */
-	getExtension(id: number): DataView | undefined
-	{
-		return this.#extensions.get(id);
-	}
-
-	/**
 	 * Get a map with all the extensions indexed by their extension id (RFC 5285).
 	 */
 	getExtensions(): Map<number, DataView>
@@ -855,7 +865,15 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Set the value of the extension with given `id` (RFC 5285).
+	 * Get the value of the extension with given id (RFC 5285).
+	 */
+	getExtension(id: number): DataView | undefined
+	{
+		return this.#extensions.get(id);
+	}
+
+	/**
+	 * Set the value of the extension with given id (RFC 5285).
 	 *
 	 * @remarks
 	 * - Serialization is needed after calling this method.
@@ -880,7 +898,7 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Delete the extension with given `id` (RFC 5285).
+	 * Delete the extension with given id (RFC 5285).
 	 *
 	 * @remarks
 	 * - Serialization maybe needed after calling this method.
@@ -920,6 +938,150 @@ export class RtpPacket extends Packet
 		this.setHeaderExtensionBit(false);
 
 		this.setSerializationNeeded(true);
+	}
+
+	/**
+	 * Get RTP extension mapping (association of RTP extension types and their
+	 * numeric ids in this RTP packet).
+	 */
+	getExtensionMapping(): RtpExtensionMapping
+	{
+		return clone(this.#extensionMapping);
+	}
+
+	/**
+	 * Set RTP extension mapping (association of RTP extension types and their
+	 * numeric ids in this RTP packet).
+	 *
+	 * @remarks
+	 * - Calling this method is needed before using other methods that read or
+	 *   write specific RTP extensions.
+	 */
+	setExtensionMapping(extensionMapping: RtpExtensionMapping): void
+	{
+		this.#extensionMapping = clone(extensionMapping);
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.MID} RTP extension.
+	 */
+	getMidExtension(): string | undefined
+	{
+		const value = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.MID]!
+		);
+
+		if (!value)
+		{
+			return;
+		}
+
+		return dataViewToString(value);
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.MID} RTP extension.
+	 */
+	setMidExtension(mid: string | undefined): void
+	{
+		const extId = this.#extensionMapping[RtpExtensionType.MID];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (mid)
+		{
+			this.setExtension(extId, stringToDataView(mid));
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.RTP_STREAM_ID} RTP
+	 * extension.
+	 */
+	getRidExtension(): string | undefined
+	{
+		const value = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.RTP_STREAM_ID]!
+		);
+
+		if (!value)
+		{
+			return;
+		}
+
+		return dataViewToString(value);
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.RTP_STREAM_ID} RTP
+	 * extension.
+	 */
+	setRidExtension(mid: string | undefined): void
+	{
+		const extId = this.#extensionMapping[RtpExtensionType.RTP_STREAM_ID];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (mid)
+		{
+			this.setExtension(extId, stringToDataView(mid));
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.RTP_REPAIRED_STREAM_ID} RTP
+	 * extension.
+	 */
+	getRepairedRidExtension(): string | undefined
+	{
+		const value = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.RTP_REPAIRED_STREAM_ID]!
+		);
+
+		if (!value)
+		{
+			return;
+		}
+
+		return dataViewToString(value);
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.RTP_REPAIRED_STREAM_ID} RTP
+	 * extension.
+	 */
+	setRepairedRidExtension(mid: string | undefined): void
+	{
+		const extId =
+			this.#extensionMapping[RtpExtensionType.RTP_REPAIRED_STREAM_ID];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (mid)
+		{
+			this.setExtension(extId, stringToDataView(mid));
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
 	}
 
 	/**
