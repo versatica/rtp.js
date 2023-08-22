@@ -45,6 +45,7 @@ export type RtpPacketDump = PacketDump &
 	transportWideSeqNumberExt?: number;
 	ssrcAudioLevelExt?: SsrcAudioLevelExtension;
 	videoOrientationExt?: VideoOrientationExtension;
+	transmissionOffsetExt?: number;
 	payloadLength: number;
 };
 
@@ -367,6 +368,7 @@ export class RtpPacket extends Packet
 			transportWideSeqNumberExt : this.getTransportWideSeqNumberExtension(),
 			ssrcAudioLevelExt         : this.getSsrcAudioLevelExtension(),
 			videoOrientationExt       : this.getVideoOrientationExtension(),
+			transmissionOffsetExt     : this.getTransmissionOffsetExtension(),
 			payloadLength             : this.getPayload().byteLength
 		};
 	}
@@ -1132,8 +1134,7 @@ export class RtpPacket extends Packet
 	 */
 	setAbsSendTimeExtension(absSendTime?: number): void
 	{
-		const extId =
-			this.#extensionMapping[RtpExtensionType.ABS_SEND_TIME];
+		const extId = this.#extensionMapping[RtpExtensionType.ABS_SEND_TIME];
 
 		if (!extId)
 		{
@@ -1223,8 +1224,7 @@ export class RtpPacket extends Packet
 	 */
 	setSsrcAudioLevelExtension(ssrcAudioLevel?: SsrcAudioLevelExtension): void
 	{
-		const extId =
-			this.#extensionMapping[RtpExtensionType.SSRC_AUDIO_LEVEL];
+		const extId = this.#extensionMapping[RtpExtensionType.SSRC_AUDIO_LEVEL];
 
 		if (!extId)
 		{
@@ -1276,8 +1276,7 @@ export class RtpPacket extends Packet
 	 */
 	setVideoOrientationExtension(videoOrientation?: VideoOrientationExtension): void
 	{
-		const extId =
-			this.#extensionMapping[RtpExtensionType.VIDEO_ORIENTATION];
+		const extId = this.#extensionMapping[RtpExtensionType.VIDEO_ORIENTATION];
 
 		if (!extId)
 		{
@@ -1293,6 +1292,49 @@ export class RtpPacket extends Packet
 			writeBitsInDataView(
 				{ view, pos: 0, mask: 0b00000011, value: videoOrientation.rotation }
 			);
+
+			this.setExtension(extId, view);
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.TOFFSET} RTP extension.
+	 */
+	getTransmissionOffsetExtension(): number | undefined
+	{
+		const view = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.TOFFSET]!
+		);
+
+		if (!view)
+		{
+			return;
+		}
+
+		return read3BytesInDataView({ view, pos: 0 });
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.TOFFSET} RTP extension.
+	 */
+	setTransmissionOffsetExtension(offset?: number): void
+	{
+		const extId = this.#extensionMapping[RtpExtensionType.TOFFSET];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (offset !== undefined)
+		{
+			const view = new DataView(new ArrayBuffer(3));
+
+			write3BytesInDataView({ view, pos: 0, value: offset });
 
 			this.setExtension(extId, view);
 		}

@@ -12,7 +12,8 @@ const rtpPacketDump: Partial<RtpPacketDump> =
 	absSendTimeExt            : 999444,
 	transportWideSeqNumberExt : 12345,
 	ssrcAudioLevelExt         : { volume: 55, voice: true },
-	videoOrientationExt       : { camera: true, flip: false, rotation: 1 }
+	videoOrientationExt       : { camera: true, flip: false, rotation: 1 },
+	transmissionOffsetExt     : 1234
 };
 
 const packet = new RtpPacket();
@@ -25,7 +26,8 @@ packet.setExtensionMapping(
 		[RtpExtensionType.ABS_SEND_TIME]             : 4,
 		[RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER] : 5,
 		[RtpExtensionType.SSRC_AUDIO_LEVEL]          : 6,
-		[RtpExtensionType.VIDEO_ORIENTATION]         : 7
+		[RtpExtensionType.VIDEO_ORIENTATION]         : 7,
+		[RtpExtensionType.TOFFSET]                   : 8
 	}
 );
 
@@ -40,6 +42,7 @@ test('set RTP extension mapping and get/set specific RTP extensions', () =>
 	);
 	packet.setSsrcAudioLevelExtension(rtpPacketDump.ssrcAudioLevelExt);
 	packet.setVideoOrientationExtension(rtpPacketDump.videoOrientationExt);
+	packet.setTransmissionOffsetExtension(rtpPacketDump.transmissionOffsetExt);
 
 	expect(packet.dump()).toEqual(expect.objectContaining(rtpPacketDump));
 });
@@ -89,6 +92,10 @@ test('rtpExtensionUriToType()', () =>
 	expect(
 		rtpExtensionUriToType('urn:3gpp:video-orientation')
 	).toBe(RtpExtensionType.VIDEO_ORIENTATION);
+
+	expect(
+		rtpExtensionUriToType('urn:ietf:params:rtp-hdrext:toffset')
+	).toBe(RtpExtensionType.TOFFSET);
 
 	expect(rtpExtensionUriToType('foo')).toBe(undefined);
 });

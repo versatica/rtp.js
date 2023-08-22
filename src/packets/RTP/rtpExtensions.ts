@@ -70,7 +70,15 @@ export enum RtpExtensionType
 	 * @see
 	 * - [3GPP TS 26.114 V12.7.0](https://www.etsi.org/deliver/etsi_ts/126100_126199/126114/13.02.00_60/ts_126114v130200p.pdf)
 	 */
-	VIDEO_ORIENTATION
+	VIDEO_ORIENTATION,
+	/**
+	 * Transmission Time Offsets.
+	 *
+	 * URI: `urn:ietf:params:rtp-hdrext:toffset`
+	 *
+	 * @see [RFC 5450](https://datatracker.ietf.org/doc/html/rfc5450)
+	 */
+	TOFFSET
 }
 
 /**
@@ -130,6 +138,11 @@ export function rtpExtensionUriToType(uri: string): RtpExtensionType | undefined
 		case 'urn:3gpp:video-orientation':
 		{
 			return RtpExtensionType.VIDEO_ORIENTATION;
+		}
+
+		case 'urn:ietf:params:rtp-hdrext:toffset':
+		{
+			return RtpExtensionType.TOFFSET;
 		}
 	}
 }
