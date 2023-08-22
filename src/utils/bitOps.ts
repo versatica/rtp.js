@@ -79,73 +79,102 @@ export function writeBits(
 }
 
 /**
- * Read the value of `bit` position` of byte `byte` in `view`.
+ * Read the value of `bit` position` of byte `pos` in `view`.
  *
  * @category Utils
  * @hidden
  */
 export function readBitInDataView(
-	{ view, byte, bit }:
-	{ view: DataView; byte: number; bit: number }
+	{ view, pos, bit }:
+	{ view: DataView; pos: number; bit: number }
 ): boolean
 {
-	return readBit({ value: view.getUint8(byte), bit });
+	return readBit({ value: view.getUint8(pos), bit });
 }
 
 /**
- * Write `flag` in `bit` position` of byte `byte` in `view`.
+ * Write `flag` in `bit` position` of byte `pos` in `view`.
  *
  * @category Utils
  * @hidden
  */
 export function writeBitInDataView(
-	{ view, byte, bit, flag }:
-	{ view: DataView; byte: number; bit: number; flag: boolean }
+	{ view, pos, bit, flag }:
+	{ view: DataView; pos: number; bit: number; flag: boolean }
 ): void
 {
-	view.setUint8(byte, writeBit({ value: view.getUint8(byte), bit, flag }));
+	view.setUint8(pos, writeBit({ value: view.getUint8(pos), bit, flag }));
 }
 
 /**
- * Toggle value of `bit` position` of byte `byte` in `view`.
+ * Toggle value of `bit` position` of byte `pos` in `view`.
  *
  * @category Utils
  * @hidden
  */
 export function toggleBitInDataView(
-	{ view, byte, bit }:
-	{ view: DataView; byte: number; bit: number }
+	{ view, pos, bit }:
+	{ view: DataView; pos: number; bit: number }
 ): void
 {
-	view.setUint8(byte, toggleBit({ value: view.getUint8(byte), bit }));
+	view.setUint8(pos, toggleBit({ value: view.getUint8(pos), bit }));
 }
 
 /**
- * Read the value of the enabled bits of `mask` of byte `byte` in `view`.
+ * Read the value of the enabled bits of `mask` of byte `pos` in `view`.
  *
  * @category Utils
  * @hidden
  */
 export function readBitsInDataView(
-	{ view, byte, mask }:
-	{ view: DataView; byte: number; mask: number }
+	{ view, pos, mask }:
+	{ view: DataView; pos: number; mask: number }
 ): number
 {
-	return readBits({ byte: view.getUint8(byte), mask });
+	return readBits({ byte: view.getUint8(pos), mask });
 }
 
 /**
- * Write `value` in the enabled bits of `mask` of byte `byte` in `view`.
+ * Write `value` in the enabled bits of `mask` of byte `pos` in `view`.
  *
  * @category Utils
  * @hidden
  */
 export function writeBitsInDataView(
-	{ view, byte, mask, value }:
-	{ view: DataView; byte: number; mask: number; value: number }
+	{ view, pos, mask, value }:
+	{ view: DataView; pos: number; mask: number; value: number }
 ): void
 {
-	view.setUint8(byte, writeBits({ byte: view.getUint8(byte), mask, value }));
+	view.setUint8(pos, writeBits({ byte: view.getUint8(pos), mask, value }));
+}
+
+/**
+ * Read 3 bytes starting from byte `pos` in `view`.
+ *
+ * @category Utils
+ * @hidden
+ */
+export function read3BytesInDataView(
+	{ view, pos }:
+	{ view: DataView; pos: number }
+): number
+{
+	return (view.getUint8(pos) << 16) + view.getUint16(pos + 1);
+}
+
+/**
+ * Write 3 bytes starting from byte `pos` in `view`.
+ *
+ * @category Utils
+ * @hidden
+ */
+export function write3BytesInDataView(
+	{ view, pos, value }:
+	{ view: DataView; pos: number; value: number }
+): void
+{
+	view.setUint8(pos, value >> 16);
+	view.setUint16(pos + 1, value);
 }
 
 function getFirstEnabledBitInMask(mask: number): number

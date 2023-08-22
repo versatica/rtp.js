@@ -133,7 +133,7 @@ export class RpsiPacket extends FeedbackPacket
 		return {
 			...super.dump(),
 			payloadType     : this.getPayloadType(),
-			bitStringLength : this.#bitStringView.byteLength,
+			bitStringLength : this.getBitString().byteLength,
 			paddingBits     : this.getFciPaddingBits()
 		};
 	}
@@ -262,7 +262,7 @@ export class RpsiPacket extends FeedbackPacket
 	 */
 	getPayloadType(): number
 	{
-		return readBitsInDataView({ view: this.view, byte: 13, mask: 0b01111111 });
+		return readBitsInDataView({ view: this.view, pos: 13, mask: 0b01111111 });
 	}
 
 	/**
@@ -271,7 +271,7 @@ export class RpsiPacket extends FeedbackPacket
 	setPayloadType(payloadType: number): void
 	{
 		writeBitsInDataView(
-			{ view: this.view, byte: 13, mask: 0b01111111, value: payloadType }
+			{ view: this.view, pos: 13, mask: 0b01111111, value: payloadType }
 		);
 	}
 

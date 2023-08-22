@@ -162,6 +162,33 @@ export function numericArrayToDataView(array: number[]): DataView
 }
 
 /**
+ * Convert number to DataView.
+ *
+ * @category Utils
+ */
+export function numberToDataView(number: number): DataView
+{
+	const array: number[] = [];
+
+	array.unshift(number & 255);
+
+	while (number >= 256)
+	{
+		number = number >>> 8;
+
+		array.unshift(number & 255);
+	}
+
+	const uint8Array = new Uint8Array(array);
+
+	return new DataView(
+		uint8Array.buffer,
+		uint8Array.byteOffset,
+		uint8Array.byteLength
+	);
+}
+
+/**
  * Convert DataView to string.
  *
  * @category Utils

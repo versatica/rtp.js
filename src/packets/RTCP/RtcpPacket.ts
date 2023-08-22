@@ -283,7 +283,7 @@ export abstract class RtcpPacket extends Packet
 	 */
 	getCount(): number
 	{
-		return readBitsInDataView({ view: this.view, byte: 0, mask: 0b00011111 });
+		return readBitsInDataView({ view: this.view, pos: 0, mask: 0b00011111 });
 	}
 
 	protected writeCommonHeader(): void
@@ -307,7 +307,7 @@ export abstract class RtcpPacket extends Packet
 	protected setCount(count: number): void
 	{
 		writeBitsInDataView(
-			{ view: this.view, byte: 0, mask: 0b00011111, value: count }
+			{ view: this.view, pos: 0, mask: 0b00011111, value: count }
 		);
 	}
 

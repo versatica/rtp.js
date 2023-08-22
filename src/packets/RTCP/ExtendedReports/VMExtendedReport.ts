@@ -520,7 +520,7 @@ export class VMExtendedReport extends ExtendedReport
 	getPacketLossConcealment(): number
 	{
 		return readBitsInDataView(
-			{ view: this.view, byte: 28, mask: 0b11000000 }
+			{ view: this.view, pos: 28, mask: 0b11000000 }
 		);
 	}
 
@@ -530,7 +530,7 @@ export class VMExtendedReport extends ExtendedReport
 	setPacketLossConcealment(value: number): void
 	{
 		writeBitsInDataView(
-			{ view: this.view, byte: 28, mask: 0b11000000, value: value }
+			{ view: this.view, pos: 28, mask: 0b11000000, value: value }
 		);
 
 		this.setSerializationNeeded(true);
@@ -542,7 +542,7 @@ export class VMExtendedReport extends ExtendedReport
 	getJitterBufferAdaptive(): number
 	{
 		return readBitsInDataView(
-			{ view: this.view, byte: 28, mask: 0b00110000 }
+			{ view: this.view, pos: 28, mask: 0b00110000 }
 		);
 	}
 
@@ -552,7 +552,7 @@ export class VMExtendedReport extends ExtendedReport
 	setJitterBufferAdaptive(value: number): void
 	{
 		writeBitsInDataView(
-			{ view: this.view, byte: 28, mask: 0b00110000, value: value }
+			{ view: this.view, pos: 28, mask: 0b00110000, value: value }
 		);
 
 		this.setSerializationNeeded(true);
@@ -564,7 +564,7 @@ export class VMExtendedReport extends ExtendedReport
 	getJitterBufferRate(): number
 	{
 		return readBitsInDataView(
-			{ view: this.view, byte: 28, mask: 0b00001111 }
+			{ view: this.view, pos: 28, mask: 0b00001111 }
 		);
 	}
 
@@ -574,7 +574,7 @@ export class VMExtendedReport extends ExtendedReport
 	setJitterBufferRate(value: number): void
 	{
 		writeBitsInDataView(
-			{ view: this.view, byte: 28, mask: 0b00001111, value: value }
+			{ view: this.view, pos: 28, mask: 0b00001111, value: value }
 		);
 
 		this.setSerializationNeeded(true);

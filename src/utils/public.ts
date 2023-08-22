@@ -7,6 +7,7 @@ export {
 	nodeBufferToDataView,
 	nodeBufferToArrayBuffer,
 	numericArrayToDataView,
+	numberToDataView,
 	dataViewToString,
 	arrayBufferToString,
 	stringToDataView,

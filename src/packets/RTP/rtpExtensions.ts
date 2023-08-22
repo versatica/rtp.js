@@ -13,8 +13,6 @@ export enum RtpExtensionType
 	 *
 	 * URI: `urn:ietf:params:rtp-hdrext:sdes:mid`
 	 *
-	 * @category RTP
-	 *
 	 * @see
    * - [RFC 9143](https://datatracker.ietf.org/doc/html/rfc9143)
 	 */
@@ -23,8 +21,6 @@ export enum RtpExtensionType
 	 * RTP Stream Identifier.
 	 *
 	 * URI: `urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id`
-	 *
-	 * @category RTP
 	 *
 	 * @see
    * - [RFC 8852](https://datatracker.ietf.org/doc/html/rfc8852)
@@ -35,12 +31,28 @@ export enum RtpExtensionType
 	 *
 	 * URI: `urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id`
 	 *
-	 * @category RTP
-	 *
 	 * @see
    * - [RFC 8852](https://datatracker.ietf.org/doc/html/rfc8852)
 	 */
-	RTP_REPAIRED_STREAM_ID
+	RTP_REPAIRED_STREAM_ID,
+	/**
+	 * Absolute Send Time.
+	 *
+	 * URI: `http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time`
+	 *
+	 * @see
+   * - [Google Source](https://webrtc.googlesource.com/src/+/refs/heads/main/docs/native-code/rtp-hdrext/abs-send-time)
+	 */
+	ABS_SEND_TIME,
+	/**
+	 * Transport-wide Sequence Number.
+	 *
+	 * URI: `http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01`
+	 *
+	 * @see
+	 * - [draft-holmer-rmcat-transport-wide-cc-extensions-01](https://datatracker.ietf.org/doc/html/draft-holmer-rmcat-transport-wide-cc-extensions-01)
+	 */
+	TRANSPORT_WIDE_SEQ_NUMBER
 }
 
 /**
@@ -81,5 +93,28 @@ export function rtpExtensionUriToType(uri: string): RtpExtensionType | undefined
 		{
 			return RtpExtensionType.RTP_REPAIRED_STREAM_ID;
 		}
+
+		case 'http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time':
+		{
+			return RtpExtensionType.ABS_SEND_TIME;
+		}
+
+		case 'http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01':
+		{
+			return RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER;
+		}
 	}
+}
+
+/**
+ * Convert Unix epoch timestamp in milliseconds to "Absolute Send Time" format.
+ *
+ * @category RTP
+ *
+ * @see
+ * - [Google Source](https://webrtc.googlesource.com/src/+/refs/heads/main/docs/native-code/rtp-hdrext/abs-send-time)
+ */
+export function timeMsToAbsSendTime(timeMs: number): number
+{
+	return (((timeMs << 18) + 500) / 1000) & 0x00FFFFFF;
 }
