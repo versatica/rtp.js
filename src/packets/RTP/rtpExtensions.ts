@@ -52,7 +52,25 @@ export enum RtpExtensionType
 	 * @see
 	 * - [draft-holmer-rmcat-transport-wide-cc-extensions-01](https://datatracker.ietf.org/doc/html/draft-holmer-rmcat-transport-wide-cc-extensions-01)
 	 */
-	TRANSPORT_WIDE_SEQ_NUMBER
+	TRANSPORT_WIDE_SEQ_NUMBER,
+	/**
+	 * Audio Level
+	 *
+	 * URI: `urn:ietf:params:rtp-hdrext:ssrc-audio-level`
+	 *
+	 * @see
+	 * - [RFC 6464](https://datatracker.ietf.org/doc/html/rfc6464)
+	 */
+	SSRC_AUDIO_LEVEL,
+	/**
+	 * Video Orientation.
+	 *
+	 * URI: `urn:3gpp:video-orientation`
+	 *
+	 * @see
+	 * - [3GPP TS 26.114 V12.7.0](https://www.etsi.org/deliver/etsi_ts/126100_126199/126114/13.02.00_60/ts_126114v130200p.pdf)
+	 */
+	VIDEO_ORIENTATION
 }
 
 /**
@@ -103,8 +121,60 @@ export function rtpExtensionUriToType(uri: string): RtpExtensionType | undefined
 		{
 			return RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER;
 		}
+
+		case 'urn:ietf:params:rtp-hdrext:ssrc-audio-level':
+		{
+			return RtpExtensionType.SSRC_AUDIO_LEVEL;
+		}
+
+		case 'urn:3gpp:video-orientation':
+		{
+			return RtpExtensionType.VIDEO_ORIENTATION;
+		}
 	}
 }
+
+/**
+ * SSRC Audio Level data.
+ *
+ * @category RTP
+ *
+ * @see
+ * - [RFC 6464](https://datatracker.ietf.org/doc/html/rfc6464)
+ */
+export type SsrcAudioLevelExtension =
+{
+	/**
+	 * Audio level expressed in -dBov, with values from 0 to 127 representing 0
+	 * to -127 dBov.
+	 */
+	volume: number;
+	/**
+	 * Whether the encoder believes the audio packet contains voice activity.
+	 */
+	voice: boolean;
+};
+
+/**
+ * Video Orientation data.
+ *
+ * @category RTP
+ *
+ * @see
+ * - [3GPP TS 26.114 V12.7.0](https://www.etsi.org/deliver/etsi_ts/126100_126199/126114/13.02.00_60/ts_126114v130200p.pdf)
+ */
+export type VideoOrientationExtension =
+{
+	camera: boolean;
+	flip: boolean;
+	/**
+	 * 0: no rotation.
+	 * 1: rotation is 90º.
+	 * 2: rotation is 180º.
+	 * 3: rotation is 270º.
+	 */
+	rotation: number;
+};
 
 /**
  * Convert Unix epoch timestamp in milliseconds to "Absolute Send Time" format.

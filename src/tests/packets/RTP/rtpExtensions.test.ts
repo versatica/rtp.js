@@ -10,7 +10,9 @@ const rtpPacketDump: Partial<RtpPacketDump> =
 	ridExt                    : 'qweasd',
 	repairedRidExt            : '44444444',
 	absSendTimeExt            : 999444,
-	transportWideSeqNumberExt : 12345
+	transportWideSeqNumberExt : 12345,
+	ssrcAudioLevelExt         : { volume: 55, voice: true },
+	videoOrientationExt       : { camera: true, flip: false, rotation: 1 }
 };
 
 const packet = new RtpPacket();
@@ -21,7 +23,9 @@ packet.setExtensionMapping(
 		[RtpExtensionType.RTP_STREAM_ID]             : 2,
 		[RtpExtensionType.RTP_REPAIRED_STREAM_ID]    : 3,
 		[RtpExtensionType.ABS_SEND_TIME]             : 4,
-		[RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER] : 5
+		[RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER] : 5,
+		[RtpExtensionType.SSRC_AUDIO_LEVEL]          : 6,
+		[RtpExtensionType.VIDEO_ORIENTATION]         : 7
 	}
 );
 
@@ -34,6 +38,8 @@ test('set RTP extension mapping and get/set specific RTP extensions', () =>
 	packet.setTransportWideSeqNumberExtension(
 		rtpPacketDump.transportWideSeqNumberExt
 	);
+	packet.setSsrcAudioLevelExtension(rtpPacketDump.ssrcAudioLevelExt);
+	packet.setVideoOrientationExtension(rtpPacketDump.videoOrientationExt);
 
 	expect(packet.dump()).toEqual(expect.objectContaining(rtpPacketDump));
 });
@@ -75,6 +81,14 @@ test('rtpExtensionUriToType()', () =>
 	expect(
 		rtpExtensionUriToType('http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01')
 	).toBe(RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER);
+
+	expect(
+		rtpExtensionUriToType('urn:ietf:params:rtp-hdrext:ssrc-audio-level')
+	).toBe(RtpExtensionType.SSRC_AUDIO_LEVEL);
+
+	expect(
+		rtpExtensionUriToType('urn:3gpp:video-orientation')
+	).toBe(RtpExtensionType.VIDEO_ORIENTATION);
 
 	expect(rtpExtensionUriToType('foo')).toBe(undefined);
 });

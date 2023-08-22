@@ -1,5 +1,10 @@
 import { RTP_VERSION, Packet, PacketDump } from '../Packet';
-import { RtpExtensionType, RtpExtensionMapping } from './rtpExtensions';
+import {
+	RtpExtensionType,
+	RtpExtensionMapping,
+	SsrcAudioLevelExtension,
+	VideoOrientationExtension
+} from './rtpExtensions';
 import {
 	clone,
 	padTo4Bytes,
@@ -36,8 +41,10 @@ export type RtpPacketDump = PacketDump &
 	midExt?: string;
 	ridExt?: string;
 	repairedRidExt?: string;
-	transportWideSeqNumberExt?: number;
 	absSendTimeExt?: number;
+	transportWideSeqNumberExt?: number;
+	ssrcAudioLevelExt?: SsrcAudioLevelExtension;
+	videoOrientationExt?: VideoOrientationExtension;
 	payloadLength: number;
 };
 
@@ -358,6 +365,8 @@ export class RtpPacket extends Packet
 			repairedRidExt            : this.getRepairedRidExtension(),
 			absSendTimeExt            : this.getAbsSendTimeExtension(),
 			transportWideSeqNumberExt : this.getTransportWideSeqNumberExtension(),
+			ssrcAudioLevelExt         : this.getSsrcAudioLevelExtension(),
+			videoOrientationExt       : this.getVideoOrientationExtension(),
 			payloadLength             : this.getPayload().byteLength
 		};
 	}
@@ -1164,8 +1173,8 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER} RTP
-	 * extension.
+	 * Set the value of the {@link RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER}
+	 * RTP extension.
 	 */
 	setTransportWideSeqNumberExtension(sequenceNumber?: number): void
 	{
@@ -1180,6 +1189,112 @@ export class RtpPacket extends Packet
 		if (sequenceNumber !== undefined)
 		{
 			this.setExtension(extId, numberToDataView(sequenceNumber));
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.SSRC_AUDIO_LEVEL} RTP
+	 * extension.
+	 */
+	getSsrcAudioLevelExtension(): SsrcAudioLevelExtension | undefined
+	{
+		const view = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.SSRC_AUDIO_LEVEL]!
+		);
+
+		if (!view)
+		{
+			return;
+		}
+
+		const voice = readBitInDataView({ view, pos: 0, bit: 7 });
+		const volume = readBitsInDataView({ view, pos: 0, mask: 0b01111111 });
+
+		return { volume, voice };
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.SSRC_AUDIO_LEVEL} RTP
+	 * extension.
+	 */
+	setSsrcAudioLevelExtension(ssrcAudioLevel?: SsrcAudioLevelExtension): void
+	{
+		const extId =
+			this.#extensionMapping[RtpExtensionType.SSRC_AUDIO_LEVEL];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (ssrcAudioLevel)
+		{
+			const view = new DataView(new ArrayBuffer(1));
+
+			writeBitInDataView({ view, pos: 0, bit: 7, flag: ssrcAudioLevel.voice });
+			writeBitsInDataView(
+				{ view, pos: 0, mask: 0b01111111, value: ssrcAudioLevel.volume }
+			);
+
+			this.setExtension(extId, view);
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.VIDEO_ORIENTATION} RTP
+	 * extension.
+	 */
+	getVideoOrientationExtension(): VideoOrientationExtension | undefined
+	{
+		const view = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.VIDEO_ORIENTATION]!
+		);
+
+		if (!view)
+		{
+			return;
+		}
+
+		const camera = readBitInDataView({ view, pos: 0, bit: 3 });
+		const flip = readBitInDataView({ view, pos: 0, bit: 2 });
+		const rotation = readBitsInDataView({ view, pos: 0, mask: 0b00000011 });
+
+		return { camera, flip, rotation };
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.VIDEO_ORIENTATION} RTP
+	 * extension.
+	 */
+	setVideoOrientationExtension(videoOrientation?: VideoOrientationExtension): void
+	{
+		const extId =
+			this.#extensionMapping[RtpExtensionType.VIDEO_ORIENTATION];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (videoOrientation)
+		{
+			const view = new DataView(new ArrayBuffer(1));
+
+			writeBitInDataView({ view, pos: 0, bit: 3, flag: videoOrientation.camera });
+			writeBitInDataView({ view, pos: 0, bit: 2, flag: videoOrientation.flip });
+			writeBitsInDataView(
+				{ view, pos: 0, mask: 0b00000011, value: videoOrientation.rotation }
+			);
+
+			this.setExtension(extId, view);
 		}
 		else
 		{
