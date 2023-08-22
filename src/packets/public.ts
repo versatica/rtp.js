@@ -25,7 +25,8 @@ export {
 	RtpExtensionMapping,
 	rtpExtensionUriToType,
 	SsrcAudioLevelExtension,
-	VideoOrientationExtension
+	VideoOrientationExtension,
+	timeMsToAbsSendTime
 } from './RTP/rtpExtensions';
 
 export {

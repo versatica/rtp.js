@@ -14,7 +14,7 @@ export enum RtpExtensionType
 	 * URI: `urn:ietf:params:rtp-hdrext:sdes:mid`
 	 *
 	 * @see
-   * - [RFC 9143](https://datatracker.ietf.org/doc/html/rfc9143)
+	 * - [RFC 9143](https://datatracker.ietf.org/doc/html/rfc9143)
 	 */
 	MID,
 	/**
@@ -23,7 +23,7 @@ export enum RtpExtensionType
 	 * URI: `urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id`
 	 *
 	 * @see
-   * - [RFC 8852](https://datatracker.ietf.org/doc/html/rfc8852)
+	 * - [RFC 8852](https://datatracker.ietf.org/doc/html/rfc8852)
 	 */
 	RTP_STREAM_ID,
 	/**
@@ -32,7 +32,7 @@ export enum RtpExtensionType
 	 * URI: `urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id`
 	 *
 	 * @see
-   * - [RFC 8852](https://datatracker.ietf.org/doc/html/rfc8852)
+	 * - [RFC 8852](https://datatracker.ietf.org/doc/html/rfc8852)
 	 */
 	RTP_REPAIRED_STREAM_ID,
 	/**
@@ -41,7 +41,7 @@ export enum RtpExtensionType
 	 * URI: `http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time`
 	 *
 	 * @see
-   * - [Google Source](https://webrtc.googlesource.com/src/+/refs/heads/main/docs/native-code/rtp-hdrext/abs-send-time)
+	 * - [Google Source](https://webrtc.googlesource.com/src/+/refs/heads/main/docs/native-code/rtp-hdrext/abs-send-time)
 	 */
 	ABS_SEND_TIME,
 	/**
@@ -76,7 +76,8 @@ export enum RtpExtensionType
 	 *
 	 * URI: `urn:ietf:params:rtp-hdrext:toffset`
 	 *
-	 * @see [RFC 5450](https://datatracker.ietf.org/doc/html/rfc5450)
+	 * @see
+	 * - [RFC 5450](https://datatracker.ietf.org/doc/html/rfc5450)
 	 */
 	TOFFSET
 }
