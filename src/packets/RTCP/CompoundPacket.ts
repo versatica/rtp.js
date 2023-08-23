@@ -22,8 +22,8 @@ import { PliPacket } from './PliPacket';
 import { SliPacket } from './SliPacket';
 import { RpsiPacket } from './RpsiPacket';
 import { GenericFeedbackPacket } from './GenericFeedbackPacket';
-import { ExtendedJitterReportsPacket } from './ExtendedJitterReportsPacket';
 import { XrPacket } from './XrPacket';
+import { ExtendedJitterReportsPacket } from './ExtendedJitterReportsPacket';
 import { GenericPacket } from './GenericPacket';
 
 /**

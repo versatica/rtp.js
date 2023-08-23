@@ -106,11 +106,6 @@ export {
 } from './RTCP/GenericFeedbackPacket';
 
 export {
-	ExtendedJitterReportsPacket,
-	ExtendedJitterReportsPacketDump
-} from './RTCP/ExtendedJitterReportsPacket';
-
-export {
 	XrPacket,
 	XrPacketDump
 } from './RTCP/XrPacket';
@@ -168,6 +163,11 @@ export {
 	createExtendedReportRunLengthChunk,
 	createExtendedReportBitVectorChunk
 } from './RTCP/ExtendedReports/chunks';
+
+export {
+	ExtendedJitterReportsPacket,
+	ExtendedJitterReportsPacketDump
+} from './RTCP/ExtendedJitterReportsPacket';
 
 export {
 	GenericPacket,
