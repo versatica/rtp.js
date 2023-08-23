@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>PRTExtendedReport | rtp.js - v0.11.2</title><meta name="description" content="Documentation for rtp.js"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><link rel="stylesheet" href="../assets/custom.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>ECNExtendedReport | rtp.js - v0.11.2</title><meta name="description" content="Documentation for rtp.js"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><link rel="stylesheet" href="../assets/custom.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -14,32 +14,30 @@
 <ul class="tsd-breadcrumb">
 <li><a href="../index.html">rtp.js</a></li>
 <li><a href="../modules/packets.html">packets</a></li>
-<li><a href="packets.PRTExtendedReport.html">PRTExtendedReport</a></li></ul>
-<h1>Class PRTExtendedReport</h1></div>
+<li><a href="packets.ECNExtendedReport.html">ECNExtendedReport</a></li></ul>
+<h1>Class ECNExtendedReport</h1></div>
 <section class="tsd-panel tsd-comment">
-<div class="tsd-comment tsd-typography"><p>Packet Receipt Times Extended Report.</p>
+<div class="tsd-comment tsd-typography"><p>ECN Summary Extended Report.</p>
 <pre><code class="language-text"> 0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|     BT=3      | rsvd. |   T   |         block length          |
+|     BT=13     |   reserved    |       block length = 5        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                        SSRC of source                         |
+| SSRC of Media Sender                                          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|          begin_seq            |             end_seq           |
+| ECT (0) Counter                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|       Receipt time of packet begin_seq                        |
+| ECT (1) Counter                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|       Receipt time of packet (begin_seq + 1) mod 65536        |
+| ECN-CE Counter                | not-ECT Counter               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-:                              ...                              :
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|       Receipt time of packet (end_seq - 1) mod 65536          |
+| Lost Packets Counter          | Duplication Counter           |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </code><button>Copy</button></pre>
 </div>
 <div class="tsd-comment tsd-typography">
 <h4>See</h4><ul>
-<li><a href="https://datatracker.ietf.org/doc/html/rfc3611#section-4.3">RFC 3611 section 4.3</a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc6679#section-5.2">RFC 6679 section 5.2</a></li>
 </ul>
 </div></section>
 <section class="tsd-panel tsd-hierarchy">
@@ -47,9 +45,9 @@
 <ul class="tsd-hierarchy">
 <li><a href="packets.ExtendedReport.html" class="tsd-signature-type tsd-kind-class">ExtendedReport</a>
 <ul class="tsd-hierarchy">
-<li><span class="target">PRTExtendedReport</span></li></ul></li></ul></section><aside class="tsd-sources">
+<li><span class="target">ECNExtendedReport</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L57">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:57</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L52">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:52</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -57,76 +55,59 @@
 <div class="tsd-accordion-details">
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Constructors</h3>
-<div class="tsd-index-list"><a href="packets.PRTExtendedReport.html#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-512"><rect fill="var(--color-icon-background)" stroke="#4D7FFF" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)"></path></g></svg><span>constructor</span></a>
+<div class="tsd-index-list"><a href="packets.ECNExtendedReport.html#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-512"><rect fill="var(--color-icon-background)" stroke="#4D7FFF" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)"></path></g></svg><span>constructor</span></a>
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Methods</h3>
-<div class="tsd-index-list"><a href="packets.PRTExtendedReport.html#addReceiptTime" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-2048"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)"></path></g></svg><span>add<wbr/>Receipt<wbr/>Time</span></a>
-<a href="packets.PRTExtendedReport.html#clone" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>clone</span></a>
-<a href="packets.PRTExtendedReport.html#dump" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>dump</span></a>
-<a href="packets.PRTExtendedReport.html#getBeginSeq" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Begin<wbr/>Seq</span></a>
-<a href="packets.PRTExtendedReport.html#getByteLength" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Byte<wbr/>Length</span></a>
-<a href="packets.PRTExtendedReport.html#getEndSeq" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>End<wbr/>Seq</span></a>
-<a href="packets.PRTExtendedReport.html#getReceiptTimes" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Receipt<wbr/>Times</span></a>
-<a href="packets.PRTExtendedReport.html#getReportType" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Report<wbr/>Type</span></a>
-<a href="packets.PRTExtendedReport.html#getSsrc" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ssrc</span></a>
-<a href="packets.PRTExtendedReport.html#getThinning" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Thinning</span></a>
-<a href="packets.PRTExtendedReport.html#getView" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>View</span></a>
-<a href="packets.PRTExtendedReport.html#needsSerialization" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>needs<wbr/>Serialization</span></a>
-<a href="packets.PRTExtendedReport.html#serialize" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>serialize</span></a>
-<a href="packets.PRTExtendedReport.html#setBeginSeq" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Begin<wbr/>Seq</span></a>
-<a href="packets.PRTExtendedReport.html#setEndSeq" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>End<wbr/>Seq</span></a>
-<a href="packets.PRTExtendedReport.html#setReceiptTimes" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Receipt<wbr/>Times</span></a>
-<a href="packets.PRTExtendedReport.html#setSsrc" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ssrc</span></a>
-<a href="packets.PRTExtendedReport.html#setThinning" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Thinning</span></a>
+<div class="tsd-index-list"><a href="packets.ECNExtendedReport.html#clone" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-2048"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)"></path></g></svg><span>clone</span></a>
+<a href="packets.ECNExtendedReport.html#dump" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>dump</span></a>
+<a href="packets.ECNExtendedReport.html#getByteLength" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Byte<wbr/>Length</span></a>
+<a href="packets.ECNExtendedReport.html#getDuplicationCounter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Duplication<wbr/>Counter</span></a>
+<a href="packets.ECNExtendedReport.html#getEcnCeCounter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ecn<wbr/>Ce<wbr/>Counter</span></a>
+<a href="packets.ECNExtendedReport.html#getEct0Counter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ect0<wbr/>Counter</span></a>
+<a href="packets.ECNExtendedReport.html#getEct1Counter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ect1<wbr/>Counter</span></a>
+<a href="packets.ECNExtendedReport.html#getLostPacketsCounter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Lost<wbr/>Packets<wbr/>Counter</span></a>
+<a href="packets.ECNExtendedReport.html#getNonEctCounter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Non<wbr/>Ect<wbr/>Counter</span></a>
+<a href="packets.ECNExtendedReport.html#getReportType" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Report<wbr/>Type</span></a>
+<a href="packets.ECNExtendedReport.html#getSsrc" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ssrc</span></a>
+<a href="packets.ECNExtendedReport.html#getView" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>View</span></a>
+<a href="packets.ECNExtendedReport.html#needsSerialization" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>needs<wbr/>Serialization</span></a>
+<a href="packets.ECNExtendedReport.html#serialize" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>serialize</span></a>
+<a href="packets.ECNExtendedReport.html#setDuplicationCounter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Duplication<wbr/>Counter</span></a>
+<a href="packets.ECNExtendedReport.html#setEcnCeCounter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ecn<wbr/>Ce<wbr/>Counter</span></a>
+<a href="packets.ECNExtendedReport.html#setEct0Counter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ect0<wbr/>Counter</span></a>
+<a href="packets.ECNExtendedReport.html#setEct1Counter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ect1<wbr/>Counter</span></a>
+<a href="packets.ECNExtendedReport.html#setLostPacketsCounter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Lost<wbr/>Packets<wbr/>Counter</span></a>
+<a href="packets.ECNExtendedReport.html#setNonEctCounter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Non<wbr/>Ect<wbr/>Counter</span></a>
+<a href="packets.ECNExtendedReport.html#setSsrc" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ssrc</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Constructors</h2>
 <section class="tsd-panel tsd-member"><a id="constructor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="constructor.new_PRTExtendedReport"><span class="tsd-kind-constructor-signature">new PRTExtended<wbr/>Report</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">view</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="packets.PRTExtendedReport.html" class="tsd-signature-type tsd-kind-class">PRTExtendedReport</a><a href="#constructor.new_PRTExtendedReport" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_ECNExtendedReport"><span class="tsd-kind-constructor-signature">new ECNExtended<wbr/>Report</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">view</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="packets.ECNExtendedReport.html" class="tsd-signature-type tsd-kind-class">ECNExtendedReport</a><a href="#constructor.new_ECNExtendedReport" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">view</span>: <span class="tsd-signature-type ">DataView</span></h5>
-<div class="tsd-comment tsd-typography"><p>If given it will be parsed. Otherwise an empty Packet Receipt
-  Times Extended Report will be created.</p>
+<div class="tsd-comment tsd-typography"><p>If given it will be parsed. Otherwise an empty ECN Summary
+  Extended Report will be created.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="packets.PRTExtendedReport.html" class="tsd-signature-type tsd-kind-class">PRTExtendedReport</a></h4>
+<h4 class="tsd-returns-title">Returns <a href="packets.ECNExtendedReport.html" class="tsd-signature-type tsd-kind-class">ECNExtendedReport</a></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides ExtendedReport.constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L66">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:66</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L61">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:61</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
-<section class="tsd-panel tsd-member"><a id="addReceiptTime" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>add<wbr/>Receipt<wbr/>Time</span><a href="#addReceiptTime" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="addReceiptTime.addReceiptTime-1"><span class="tsd-kind-call-signature">add<wbr/>Receipt<wbr/>Time</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">receiptTime</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#addReceiptTime.addReceiptTime-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
-<li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Add receipt time.</p>
-</div>
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5><span class="tsd-kind-parameter">receiptTime</span>: <span class="tsd-signature-type">number</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-<div class="tsd-comment tsd-typography">
-<h4>Remarks</h4><ul>
-<li>Receipt time must be given as 4 byte integer.</li>
-</ul>
-</div><aside class="tsd-sources">
-<ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L315">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:315</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="clone" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>clone</span><a href="#clone" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="clone.clone-1"><span class="tsd-kind-call-signature">clone</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">buffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">byteOffset</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationBuffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationByteOffset</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="packets.PRTExtendedReport.html" class="tsd-signature-type tsd-kind-class">PRTExtendedReport</a><a href="#clone.clone-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="clone.clone-1"><span class="tsd-kind-call-signature">clone</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">buffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">byteOffset</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationBuffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationByteOffset</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="packets.ECNExtendedReport.html" class="tsd-signature-type tsd-kind-class">ECNExtendedReport</a><a href="#clone.clone-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Clone the packet or item. The cloned instance does not share any memory
 with the original one. The cloned instance is a new class instance
@@ -160,7 +141,7 @@ referencing a different buffer.</p>
   <code>serializationBuffer</code> where serialization (if needed) will start.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="packets.PRTExtendedReport.html" class="tsd-signature-type tsd-kind-class">PRTExtendedReport</a></h4>
+<h4 class="tsd-returns-title">Returns <a href="packets.ECNExtendedReport.html" class="tsd-signature-type tsd-kind-class">ECNExtendedReport</a></h4>
 <div class="tsd-comment tsd-typography">
 <h4>Remarks</h4><ul>
 <li>The buffer is serialized if needed (to apply pending modifications) by
@@ -176,30 +157,19 @@ the content.</li>
 </div><aside class="tsd-sources">
 <p>Overrides <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#clone">clone</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L194">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:194</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L155">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:155</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="dump" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>dump</span><a href="#dump" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="dump.dump-1"><span class="tsd-kind-call-signature">dump</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/packets.PRTExtendedReportDump.html" class="tsd-signature-type tsd-kind-type-alias">PRTExtendedReportDump</a><a href="#dump.dump-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="dump.dump-1"><span class="tsd-kind-call-signature">dump</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/packets.ECNExtendedReportDump.html" class="tsd-signature-type tsd-kind-type-alias">ECNExtendedReportDump</a><a href="#dump.dump-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Dump Packet Receipt Times Extended Report info.</p>
+<div class="tsd-comment tsd-typography"><p>Dump ECN Summary Extended Report info.</p>
 </div>
-<h4 class="tsd-returns-title">Returns <a href="../types/packets.PRTExtendedReportDump.html" class="tsd-signature-type tsd-kind-type-alias">PRTExtendedReportDump</a></h4>
+<h4 class="tsd-returns-title">Returns <a href="../types/packets.ECNExtendedReportDump.html" class="tsd-signature-type tsd-kind-type-alias">ECNExtendedReportDump</a></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#dump">dump</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L108">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:108</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="getBeginSeq" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>get<wbr/>Begin<wbr/>Seq</span><a href="#getBeginSeq" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="getBeginSeq.getBeginSeq-1"><span class="tsd-kind-call-signature">get<wbr/>Begin<wbr/>Seq</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getBeginSeq.getBeginSeq-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
-<li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Get begin sequence number.</p>
-</div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L252">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:252</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L86">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:86</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getByteLength" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Byte<wbr/>Length</span><a href="#getByteLength" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -217,33 +187,73 @@ before.</li>
 </div><aside class="tsd-sources">
 <p>Overrides <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#getByteLength">getByteLength</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L123">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:123</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="getEndSeq" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>get<wbr/>End<wbr/>Seq</span><a href="#getEndSeq" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L103">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:103</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getDuplicationCounter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Duplication<wbr/>Counter</span><a href="#getDuplicationCounter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="getEndSeq.getEndSeq-1"><span class="tsd-kind-call-signature">get<wbr/>End<wbr/>Seq</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getEndSeq.getEndSeq-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="getDuplicationCounter.getDuplicationCounter-1"><span class="tsd-kind-call-signature">get<wbr/>Duplication<wbr/>Counter</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getDuplicationCounter.getDuplicationCounter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Get end sequence number.</p>
+<div class="tsd-comment tsd-typography"><p>Get Duplication Counter.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L270">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:270</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="getReceiptTimes" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>get<wbr/>Receipt<wbr/>Times</span><a href="#getReceiptTimes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L283">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:283</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getEcnCeCounter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Ecn<wbr/>Ce<wbr/>Counter</span><a href="#getEcnCeCounter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="getReceiptTimes.getReceiptTimes-1"><span class="tsd-kind-call-signature">get<wbr/>Receipt<wbr/>Times</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><a href="#getReceiptTimes.getReceiptTimes-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="getEcnCeCounter.getEcnCeCounter-1"><span class="tsd-kind-call-signature">get<wbr/>Ecn<wbr/>Ce<wbr/>Counter</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getEcnCeCounter.getEcnCeCounter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Get receipt times.</p>
+<div class="tsd-comment tsd-typography"><p>Get ECN-CE Counter.</p>
 </div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h4>
-<div class="tsd-comment tsd-typography">
-<h4>Remarks</h4><ul>
-<li>Receipt times are given as a list of 4 byte integers.</li>
-</ul>
-</div><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L291">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:291</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L229">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:229</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getEct0Counter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Ect0<wbr/>Counter</span><a href="#getEct0Counter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="getEct0Counter.getEct0Counter-1"><span class="tsd-kind-call-signature">get<wbr/>Ect0<wbr/>Counter</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getEct0Counter.getEct0Counter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get ECT (0) Counter.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L193">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:193</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getEct1Counter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Ect1<wbr/>Counter</span><a href="#getEct1Counter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="getEct1Counter.getEct1Counter-1"><span class="tsd-kind-call-signature">get<wbr/>Ect1<wbr/>Counter</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getEct1Counter.getEct1Counter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get ECT (1) Counter.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L211">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:211</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getLostPacketsCounter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Lost<wbr/>Packets<wbr/>Counter</span><a href="#getLostPacketsCounter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="getLostPacketsCounter.getLostPacketsCounter-1"><span class="tsd-kind-call-signature">get<wbr/>Lost<wbr/>Packets<wbr/>Counter</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getLostPacketsCounter.getLostPacketsCounter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get Lost Packets Counter.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L265">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:265</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getNonEctCounter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Non<wbr/>Ect<wbr/>Counter</span><a href="#getNonEctCounter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="getNonEctCounter.getNonEctCounter-1"><span class="tsd-kind-call-signature">get<wbr/>Non<wbr/>Ect<wbr/>Counter</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getNonEctCounter.getNonEctCounter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Get not-ECT Counter.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L247">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:247</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getReportType" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Report<wbr/>Type</span><a href="#getReportType" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -261,23 +271,12 @@ before.</li>
 <ul class="tsd-signatures">
 <li class="tsd-signature tsd-anchor-link" id="getSsrc.getSsrc-1"><span class="tsd-kind-call-signature">get<wbr/>Ssrc</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getSsrc.getSsrc-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Get SSRC of source.</p>
+<div class="tsd-comment tsd-typography"><p>Get SSRC of media sender.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L234">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:234</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="getThinning" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>get<wbr/>Thinning</span><a href="#getThinning" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="getThinning.getThinning-1"><span class="tsd-kind-call-signature">get<wbr/>Thinning</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getThinning.getThinning-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
-<li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Get thinning.</p>
-</div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L214">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:214</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L175">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:175</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getView" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>View</span><a href="#getView" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -369,65 +368,109 @@ methods apply changes within the current buffer. To be sure, check
 </div><aside class="tsd-sources">
 <p>Overrides <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#serialize">serialize</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L142">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:142</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="setBeginSeq" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>set<wbr/>Begin<wbr/>Seq</span><a href="#setBeginSeq" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L111">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:111</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="setDuplicationCounter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>set<wbr/>Duplication<wbr/>Counter</span><a href="#setDuplicationCounter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="setBeginSeq.setBeginSeq-1"><span class="tsd-kind-call-signature">set<wbr/>Begin<wbr/>Seq</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">seq</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setBeginSeq.setBeginSeq-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="setDuplicationCounter.setDuplicationCounter-1"><span class="tsd-kind-call-signature">set<wbr/>Duplication<wbr/>Counter</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">counter</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setDuplicationCounter.setDuplicationCounter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Set begin sequence number.</p>
+<div class="tsd-comment tsd-typography"><p>Set Duplication Counter.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">seq</span>: <span class="tsd-signature-type">number</span></h5></li></ul></div>
+<h5><span class="tsd-kind-parameter">counter</span>: <span class="tsd-signature-type">number</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L260">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:260</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="setEndSeq" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>set<wbr/>End<wbr/>Seq</span><a href="#setEndSeq" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L291">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:291</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="setEcnCeCounter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>set<wbr/>Ecn<wbr/>Ce<wbr/>Counter</span><a href="#setEcnCeCounter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="setEndSeq.setEndSeq-1"><span class="tsd-kind-call-signature">set<wbr/>End<wbr/>Seq</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">seq</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setEndSeq.setEndSeq-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="setEcnCeCounter.setEcnCeCounter-1"><span class="tsd-kind-call-signature">set<wbr/>Ecn<wbr/>Ce<wbr/>Counter</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">counter</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setEcnCeCounter.setEcnCeCounter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Set end sequence number.</p>
+<div class="tsd-comment tsd-typography"><p>Set ECN-CE Counter.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">seq</span>: <span class="tsd-signature-type">number</span></h5></li></ul></div>
+<h5><span class="tsd-kind-parameter">counter</span>: <span class="tsd-signature-type">number</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L278">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:278</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="setReceiptTimes" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>set<wbr/>Receipt<wbr/>Times</span><a href="#setReceiptTimes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L237">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:237</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="setEct0Counter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>set<wbr/>Ect0<wbr/>Counter</span><a href="#setEct0Counter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="setReceiptTimes.setReceiptTimes-1"><span class="tsd-kind-call-signature">set<wbr/>Receipt<wbr/>Times</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">receiptTimes</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setReceiptTimes.setReceiptTimes-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="setEct0Counter.setEct0Counter-1"><span class="tsd-kind-call-signature">set<wbr/>Ect0<wbr/>Counter</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">counter</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setEct0Counter.setEct0Counter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Set receipt times.</p>
+<div class="tsd-comment tsd-typography"><p>Set ECT (0) Counter.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">receiptTimes</span>: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5></li></ul></div>
+<h5><span class="tsd-kind-parameter">counter</span>: <span class="tsd-signature-type">number</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-<div class="tsd-comment tsd-typography">
-<h4>Remarks</h4><ul>
-<li>Receipt times must be given as a list of 4 byte integers.</li>
-</ul>
-</div><aside class="tsd-sources">
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L302">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:302</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L201">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:201</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="setEct1Counter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>set<wbr/>Ect1<wbr/>Counter</span><a href="#setEct1Counter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="setEct1Counter.setEct1Counter-1"><span class="tsd-kind-call-signature">set<wbr/>Ect1<wbr/>Counter</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">counter</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setEct1Counter.setEct1Counter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Set ECT (1) Counter.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">counter</span>: <span class="tsd-signature-type">number</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L219">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:219</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="setLostPacketsCounter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>set<wbr/>Lost<wbr/>Packets<wbr/>Counter</span><a href="#setLostPacketsCounter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="setLostPacketsCounter.setLostPacketsCounter-1"><span class="tsd-kind-call-signature">set<wbr/>Lost<wbr/>Packets<wbr/>Counter</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">counter</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setLostPacketsCounter.setLostPacketsCounter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Set Lost Packets Counter.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">counter</span>: <span class="tsd-signature-type">number</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L273">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:273</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="setNonEctCounter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>set<wbr/>Non<wbr/>Ect<wbr/>Counter</span><a href="#setNonEctCounter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="setNonEctCounter.setNonEctCounter-1"><span class="tsd-kind-call-signature">set<wbr/>Non<wbr/>Ect<wbr/>Counter</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">counter</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setNonEctCounter.setNonEctCounter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Set not-ECT Counter.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">counter</span>: <span class="tsd-signature-type">number</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L255">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:255</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setSsrc" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Ssrc</span><a href="#setSsrc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="tsd-signature tsd-anchor-link" id="setSsrc.setSsrc-1"><span class="tsd-kind-call-signature">set<wbr/>Ssrc</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">ssrc</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setSsrc.setSsrc-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Set SSRC of source.</p>
+<div class="tsd-comment tsd-typography"><p>Set SSRC of media sender.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -437,23 +480,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L242">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:242</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="setThinning" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>set<wbr/>Thinning</span><a href="#setThinning" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="setThinning.setThinning-1"><span class="tsd-kind-call-signature">set<wbr/>Thinning</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">thinning</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#setThinning.setThinning-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
-<li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Set thinning.</p>
-</div>
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5><span class="tsd-kind-parameter">thinning</span>: <span class="tsd-signature-type">number</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
-<ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/PRTExtendedReport.ts#L222">packets/RTCP/ExtendedReports/PRTExtendedReport.ts:222</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/a251a69/src/packets/RTCP/ExtendedReports/ECNExtendedReport.ts#L183">packets/RTCP/ExtendedReports/ECNExtendedReport.ts:183</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -472,24 +499,27 @@ methods apply changes within the current buffer. To be sure, check
 <div class="tsd-accordion-details">
 <ul>
 <li><a href="#constructor" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-512"></use></svg><span>constructor</span></a></li>
-<li><a href="#addReceiptTime" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>add<wbr/>Receipt<wbr/>Time</span></a></li>
 <li><a href="#clone" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>clone</span></a></li>
 <li><a href="#dump" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>dump</span></a></li>
-<li><a href="#getBeginSeq" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Begin<wbr/>Seq</span></a></li>
 <li><a href="#getByteLength" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Byte<wbr/>Length</span></a></li>
-<li><a href="#getEndSeq" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>End<wbr/>Seq</span></a></li>
-<li><a href="#getReceiptTimes" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Receipt<wbr/>Times</span></a></li>
+<li><a href="#getDuplicationCounter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Duplication<wbr/>Counter</span></a></li>
+<li><a href="#getEcnCeCounter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ecn<wbr/>Ce<wbr/>Counter</span></a></li>
+<li><a href="#getEct0Counter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ect0<wbr/>Counter</span></a></li>
+<li><a href="#getEct1Counter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ect1<wbr/>Counter</span></a></li>
+<li><a href="#getLostPacketsCounter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Lost<wbr/>Packets<wbr/>Counter</span></a></li>
+<li><a href="#getNonEctCounter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Non<wbr/>Ect<wbr/>Counter</span></a></li>
 <li><a href="#getReportType" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Report<wbr/>Type</span></a></li>
 <li><a href="#getSsrc" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Ssrc</span></a></li>
-<li><a href="#getThinning" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Thinning</span></a></li>
 <li><a href="#getView" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>View</span></a></li>
 <li><a href="#needsSerialization" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>needs<wbr/>Serialization</span></a></li>
 <li><a href="#serialize" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>serialize</span></a></li>
-<li><a href="#setBeginSeq" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Begin<wbr/>Seq</span></a></li>
-<li><a href="#setEndSeq" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>End<wbr/>Seq</span></a></li>
-<li><a href="#setReceiptTimes" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Receipt<wbr/>Times</span></a></li>
-<li><a href="#setSsrc" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ssrc</span></a></li>
-<li><a href="#setThinning" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Thinning</span></a></li></ul></div></details></div>
+<li><a href="#setDuplicationCounter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Duplication<wbr/>Counter</span></a></li>
+<li><a href="#setEcnCeCounter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ecn<wbr/>Ce<wbr/>Counter</span></a></li>
+<li><a href="#setEct0Counter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ect0<wbr/>Counter</span></a></li>
+<li><a href="#setEct1Counter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ect1<wbr/>Counter</span></a></li>
+<li><a href="#setLostPacketsCounter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Lost<wbr/>Packets<wbr/>Counter</span></a></li>
+<li><a href="#setNonEctCounter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Non<wbr/>Ect<wbr/>Counter</span></a></li>
+<li><a href="#setSsrc" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>set<wbr/>Ssrc</span></a></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../index.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>rtp.js -<wbr/> v0.11.2</span></a>
 <ul class="tsd-small-nested-navigation">
@@ -507,7 +537,7 @@ methods apply changes within the current buffer. To be sure, check
 <li><a href="packets.CompoundPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Compound<wbr/>Packet</span></a></li>
 <li><a href="packets.DLRRExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>DLRRExtended<wbr/>Report</span></a></li>
 <li><a href="packets.DRLEExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>DRLEExtended<wbr/>Report</span></a></li>
-<li><a href="packets.ECNExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>ECNExtended<wbr/>Report</span></a></li>
+<li><a href="packets.ECNExtendedReport.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>ECNExtended<wbr/>Report</span></a></li>
 <li><a href="packets.EcnPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Ecn<wbr/>Packet</span></a></li>
 <li><a href="packets.ExtendedJitterReportsPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Extended<wbr/>Jitter<wbr/>Reports<wbr/>Packet</span></a></li>
 <li><a href="packets.ExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Extended<wbr/>Report</span></a></li>
@@ -517,7 +547,7 @@ methods apply changes within the current buffer. To be sure, check
 <li><a href="packets.GenericPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Generic<wbr/>Packet</span></a></li>
 <li><a href="packets.LRLEExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>LRLEExtended<wbr/>Report</span></a></li>
 <li><a href="packets.NackPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Nack<wbr/>Packet</span></a></li>
-<li><a href="packets.PRTExtendedReport.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>PRTExtended<wbr/>Report</span></a></li>
+<li><a href="packets.PRTExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>PRTExtended<wbr/>Report</span></a></li>
 <li><a href="packets.Packet.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Packet</span></a></li>
 <li><a href="packets.PliPacket.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Pli<wbr/>Packet</span></a></li>
 <li><a href="packets.RRTExtendedReport.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>RRTExtended<wbr/>Report</span></a></li>
