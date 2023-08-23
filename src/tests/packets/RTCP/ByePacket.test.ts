@@ -4,12 +4,12 @@ import { areDataViewsEqual } from '../../../utils/helpers';
 
 const byePacketDump: ByePacketDump =
 {
-	byteLength  : 44,
-	padding     : 0,
-	packetType  : RtcpPacketType.BYE,
-	count       : 2,
-	ssrcs       : [ 0x624276e0, 0x2624670e ],
-	reason      : 'Hasta la vista! œæ€å∫'
+	byteLength : 44,
+	padding    : 0,
+	packetType : RtcpPacketType.BYE,
+	count      : 2,
+	ssrcs      : [ 0x624276e0, 0x2624670e ],
+	reason     : 'Hasta la vista! œæ€å∫'
 };
 
 const array = new Uint8Array(

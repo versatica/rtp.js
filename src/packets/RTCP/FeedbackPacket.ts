@@ -81,7 +81,7 @@ export function getRtcpFeedbackMessageType(
 	view: DataView
 ): RtpFeedbackMessageType | PsFeedbackMessageType
 {
-	return readBitsInDataView({ view, byte: 0, mask: 0b00011111 });
+	return readBitsInDataView({ view, pos: 0, mask: 0b00011111 });
 }
 
 function messageTypeToString(
@@ -196,7 +196,7 @@ export abstract class FeedbackPacket extends RtcpPacket
 	 */
 	getMessageType(): RtpFeedbackMessageType | PsFeedbackMessageType
 	{
-		return readBitsInDataView({ view: this.view, byte: 0, mask: 0b00011111 });
+		return readBitsInDataView({ view: this.view, pos: 0, mask: 0b00011111 });
 	}
 
 	/**
@@ -279,7 +279,7 @@ export abstract class FeedbackPacket extends RtcpPacket
 	private setMessageType(): void
 	{
 		writeBitsInDataView(
-			{ view: this.view, byte: 0, mask: 0b00011111, value: this.#messageType }
+			{ view: this.view, pos: 0, mask: 0b00011111, value: this.#messageType }
 		);
 	}
 }

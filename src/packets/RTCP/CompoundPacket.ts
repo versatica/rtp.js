@@ -22,6 +22,7 @@ import { PliPacket } from './PliPacket';
 import { SliPacket } from './SliPacket';
 import { RpsiPacket } from './RpsiPacket';
 import { GenericFeedbackPacket } from './GenericFeedbackPacket';
+import { ExtendedJitterReportsPacket } from './ExtendedJitterReportsPacket';
 import { XrPacket } from './XrPacket';
 import { GenericPacket } from './GenericPacket';
 
@@ -191,6 +192,13 @@ export class CompoundPacket extends Packet
 					break;
 				}
 
+				case RtcpPacketType.IJ:
+				{
+					packet = new ExtendedJitterReportsPacket(packetView);
+
+					break;
+				}
+
 				default:
 				{
 					packet = new GenericPacket(packetView);
@@ -339,6 +347,9 @@ export class CompoundPacket extends Packet
 
 	/**
 	 * Set the {@link RtcpPacket} entries in this RTCP Compound packet.
+	 *
+	 * * @remarks
+	 * - Serialization is needed after calling this method.
 	 */
 	setPackets(packets: RtcpPacket[]): void
 	{
@@ -349,6 +360,9 @@ export class CompoundPacket extends Packet
 
 	/**
 	 * Add a new {@link RtcpPacket} at the end of this RTCP Compound packet.
+	 *
+	 * * @remarks
+	 * - Serialization is needed after calling this method.
 	 */
 	addPacket(packet: RtcpPacket): void
 	{

@@ -18,7 +18,16 @@ export {
 	isRtp,
 	RtpPacket,
 	RtpPacketDump
-} from './RtpPacket';
+} from './RTP/RtpPacket';
+
+export {
+	RtpExtensionType,
+	RtpExtensionMapping,
+	rtpExtensionUriToType,
+	SsrcAudioLevelExtension,
+	VideoOrientationExtension,
+	timeMsToAbsSendTime
+} from './RTP/rtpExtensions';
 
 export {
 	isRtcp,
@@ -95,6 +104,11 @@ export {
 	GenericFeedbackPacket,
 	GenericFeedbackPacketDump
 } from './RTCP/GenericFeedbackPacket';
+
+export {
+	ExtendedJitterReportsPacket,
+	ExtendedJitterReportsPacketDump
+} from './RTCP/ExtendedJitterReportsPacket';
 
 export {
 	XrPacket,

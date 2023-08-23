@@ -80,18 +80,18 @@ export abstract class Packet extends Serializable
 	protected setVersion(): void
 	{
 		writeBitsInDataView(
-			{ view: this.view, byte: 0, mask: 0b11000000, value: RTP_VERSION }
+			{ view: this.view, pos: 0, mask: 0b11000000, value: RTP_VERSION }
 		);
 	}
 
 	protected hasPaddingBit(): boolean
 	{
-		return readBitInDataView({ view: this.view, byte: 0, bit: 5 });
+		return readBitInDataView({ view: this.view, pos: 0, bit: 5 });
 	}
 
 	protected setPaddingBit(flag: boolean): void
 	{
-		writeBitInDataView({ view: this.view, byte: 0, bit: 5, flag });
+		writeBitInDataView({ view: this.view, pos: 0, bit: 5, flag });
 	}
 
 	protected setPadding(padding: number): void

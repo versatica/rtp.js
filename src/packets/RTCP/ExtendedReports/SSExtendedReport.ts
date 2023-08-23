@@ -613,7 +613,7 @@ export class SSExtendedReport extends ExtendedReport
 	getTtlOrHopLimitMode(): 'ipv4-ttl' | 'ipv6-hop-limit' | undefined
 	{
 		const value = readBitsInDataView(
-			{ view: this.view, byte: 1, mask: 0b00011000 }
+			{ view: this.view, pos: 1, mask: 0b00011000 }
 		);
 
 		if (value === 1)
@@ -635,19 +635,19 @@ export class SSExtendedReport extends ExtendedReport
 		if (mode === 'ipv4-ttl')
 		{
 			writeBitsInDataView(
-				{ view: this.view, byte: 1, mask: 0b00011000, value: 1 }
+				{ view: this.view, pos: 1, mask: 0b00011000, value: 1 }
 			);
 		}
 		else if (mode === 'ipv6-hop-limit')
 		{
 			writeBitsInDataView(
-				{ view: this.view, byte: 1, mask: 0b00011000, value: 2 }
+				{ view: this.view, pos: 1, mask: 0b00011000, value: 2 }
 			);
 		}
 		else
 		{
 			writeBitsInDataView(
-				{ view: this.view, byte: 1, mask: 0b00011000, value: 0 }
+				{ view: this.view, pos: 1, mask: 0b00011000, value: 0 }
 			);
 
 			this.view.setUint8(36, 0);
@@ -661,12 +661,12 @@ export class SSExtendedReport extends ExtendedReport
 
 	private hasLostPacketsBit()
 	{
-		return readBitInDataView({ view: this.view, byte: 1, bit: 7 });
+		return readBitInDataView({ view: this.view, pos: 1, bit: 7 });
 	}
 
 	private setLostPacketsBit(flag: boolean): void
 	{
-		writeBitInDataView({ view: this.view, byte: 1, bit: 1, flag });
+		writeBitInDataView({ view: this.view, pos: 1, bit: 1, flag });
 
 		if (!flag)
 		{
@@ -676,12 +676,12 @@ export class SSExtendedReport extends ExtendedReport
 
 	private hasDuplicatePacketsBit()
 	{
-		return readBitInDataView({ view: this.view, byte: 1, bit: 6 });
+		return readBitInDataView({ view: this.view, pos: 1, bit: 6 });
 	}
 
 	private setDuplicatePacketsBit(flag: boolean): void
 	{
-		writeBitInDataView({ view: this.view, byte: 1, bit: 6, flag });
+		writeBitInDataView({ view: this.view, pos: 1, bit: 6, flag });
 
 		if (!flag)
 		{
@@ -691,12 +691,12 @@ export class SSExtendedReport extends ExtendedReport
 
 	private hasJitterBit()
 	{
-		return readBitInDataView({ view: this.view, byte: 1, bit: 5 });
+		return readBitInDataView({ view: this.view, pos: 1, bit: 5 });
 	}
 
 	private setJitterBit(flag: boolean): void
 	{
-		writeBitInDataView({ view: this.view, byte: 1, bit: 5, flag });
+		writeBitInDataView({ view: this.view, pos: 1, bit: 5, flag });
 
 		if (!flag)
 		{

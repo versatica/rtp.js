@@ -23,6 +23,10 @@ export const COMMON_HEADER_LENGTH = 4;
 export enum RtcpPacketType
 {
 	/**
+	 * Extended Jitter Reports packet.
+	 */
+	IJ = 195,
+	/**
 	 * RTCP Sender Report packet.
 	 */
 	SR = 200,
@@ -183,6 +187,11 @@ export function packetTypeToString(packetType: RtcpPacketType): string
 			return 'Extended Report';
 		}
 
+		case RtcpPacketType.IJ:
+		{
+			return 'Extended Jitter Reports';
+		}
+
 		default:
 		{
 			assertUnreachable(packetType);
@@ -283,7 +292,7 @@ export abstract class RtcpPacket extends Packet
 	 */
 	getCount(): number
 	{
-		return readBitsInDataView({ view: this.view, byte: 0, mask: 0b00011111 });
+		return readBitsInDataView({ view: this.view, pos: 0, mask: 0b00011111 });
 	}
 
 	protected writeCommonHeader(): void
@@ -307,7 +316,7 @@ export abstract class RtcpPacket extends Packet
 	protected setCount(count: number): void
 	{
 		writeBitsInDataView(
-			{ view: this.view, byte: 0, mask: 0b00011111, value: count }
+			{ view: this.view, pos: 0, mask: 0b00011111, value: count }
 		);
 	}
 

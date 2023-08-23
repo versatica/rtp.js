@@ -213,7 +213,7 @@ export class PRTExtendedReport extends ExtendedReport
 	 */
 	getThinning(): number
 	{
-		return readBitsInDataView({ view: this.view, byte: 1, mask: 0x0F });
+		return readBitsInDataView({ view: this.view, pos: 1, mask: 0x0F });
 	}
 
 	/**
@@ -222,7 +222,7 @@ export class PRTExtendedReport extends ExtendedReport
 	setThinning(thinning: number): void
 	{
 		writeBitsInDataView(
-			{ view: this.view, byte: 1, mask: 0x0F, value: thinning }
+			{ view: this.view, pos: 1, mask: 0x0F, value: thinning }
 		);
 
 		this.setSerializationNeeded(true);

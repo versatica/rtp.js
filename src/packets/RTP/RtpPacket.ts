@@ -1,11 +1,25 @@
-import { RTP_VERSION, Packet, PacketDump } from './Packet';
-import { clone, padTo4Bytes } from '../utils/helpers';
+import { RTP_VERSION, Packet, PacketDump } from '../Packet';
+import {
+	RtpExtensionType,
+	RtpExtensionMapping,
+	SsrcAudioLevelExtension,
+	VideoOrientationExtension
+} from './rtpExtensions';
+import {
+	clone,
+	padTo4Bytes,
+	numberToDataView,
+	dataViewToString,
+	stringToDataView
+} from '../../utils/helpers';
 import {
 	readBitInDataView,
 	writeBitInDataView,
 	readBitsInDataView,
-	writeBitsInDataView
-} from '../utils/bitOps';
+	writeBitsInDataView,
+	read3BytesInDataView,
+	write3BytesInDataView
+} from '../../utils/bitOps';
 
 const FIXED_HEADER_LENGTH = 12;
 
@@ -24,6 +38,14 @@ export type RtpPacketDump = PacketDump &
 	marker: boolean;
 	headerExtensionId?: number;
 	extensions: { id: number; length: number }[];
+	midExt?: string;
+	ridExt?: string;
+	repairedRidExt?: string;
+	absSendTimeExt?: number;
+	transportWideSeqNumberExt?: number;
+	ssrcAudioLevelExt?: SsrcAudioLevelExtension;
+	videoOrientationExt?: VideoOrientationExtension;
+	transmissionOffsetExt?: number;
 	payloadLength: number;
 };
 
@@ -85,6 +107,8 @@ export class RtpPacket extends Packet
 	#headerExtensionView?: DataView;
 	// One-Byte or Two-Bytes extensions indexed by id.
 	readonly #extensions: Map<number, DataView> = new Map();
+	// Mapping of RTP extension types and their corresponding RTP extension ids.
+	#extensionMapping: RtpExtensionMapping = {};
 	// Buffer view holding the entire RTP payload.
 	#payloadView: DataView;
 
@@ -172,11 +196,11 @@ export class RtpPacket extends Packet
 			while (extPos < headerExtensionView.byteLength)
 			{
 				const extId = readBitsInDataView(
-					{ view: headerExtensionView, byte: extPos, mask: 0xF0 }
+					{ view: headerExtensionView, pos: extPos, mask: 0xF0 }
 				);
 
 				const extLength = readBitsInDataView(
-					{ view: headerExtensionView, byte: extPos, mask: 0x0F }
+					{ view: headerExtensionView, pos: extPos, mask: 0x0F }
 				) + 1;
 
 				// id=15 in One-Byte extensions means "stop parsing here".
@@ -329,15 +353,23 @@ export class RtpPacket extends Packet
 
 		return {
 			...super.dump(),
-			payloadType       : this.getPayloadType(),
-			sequenceNumber    : this.getSequenceNumber(),
-			timestamp         : this.getTimestamp(),
-			ssrc              : this.getSsrc(),
-			csrcs             : this.getCsrcs(),
-			marker            : this.getMarker(),
-			headerExtensionId : this.#headerExtensionId,
-			extensions        : extensions,
-			payloadLength     : this.#payloadView.byteLength
+			payloadType               : this.getPayloadType(),
+			sequenceNumber            : this.getSequenceNumber(),
+			timestamp                 : this.getTimestamp(),
+			ssrc                      : this.getSsrc(),
+			csrcs                     : this.getCsrcs(),
+			marker                    : this.getMarker(),
+			headerExtensionId         : this.#headerExtensionId,
+			extensions                : extensions,
+			midExt                    : this.getMidExtension(),
+			ridExt                    : this.getRidExtension(),
+			repairedRidExt            : this.getRepairedRidExtension(),
+			absSendTimeExt            : this.getAbsSendTimeExtension(),
+			transportWideSeqNumberExt : this.getTransportWideSeqNumberExtension(),
+			ssrcAudioLevelExt         : this.getSsrcAudioLevelExtension(),
+			videoOrientationExt       : this.getVideoOrientationExtension(),
+			transmissionOffsetExt     : this.getTransmissionOffsetExtension(),
+			payloadLength             : this.getPayload().byteLength
 		};
 	}
 
@@ -501,10 +533,10 @@ export class RtpPacket extends Packet
 					}
 
 					writeBitsInDataView(
-						{ view: view, byte: pos, mask: 0xF0, value: extId }
+						{ view: view, pos: pos, mask: 0xF0, value: extId }
 					);
 					writeBitsInDataView(
-						{ view: view, byte: pos, mask: 0x0F, value: extView.byteLength - 1 }
+						{ view: view, pos: pos, mask: 0x0F, value: extView.byteLength - 1 }
 					);
 
 					pos += 1;
@@ -672,7 +704,11 @@ export class RtpPacket extends Packet
 			serializationByteOffset
 		);
 
-		return new RtpPacket(view);
+		const clonedPacket = new RtpPacket(view);
+
+		clonedPacket.setExtensionMapping(this.getExtensionMapping());
+
+		return clonedPacket;
 	}
 
 	/**
@@ -680,7 +716,7 @@ export class RtpPacket extends Packet
 	 */
 	getPayloadType(): number
 	{
-		return readBitsInDataView({ view: this.view, byte: 1, mask: 0b01111111 });
+		return readBitsInDataView({ view: this.view, pos: 1, mask: 0b01111111 });
 	}
 
 	/**
@@ -689,7 +725,7 @@ export class RtpPacket extends Packet
 	setPayloadType(payloadType: number): void
 	{
 		writeBitsInDataView(
-			{ view: this.view, byte: 1, mask: 0b01111111, value: payloadType }
+			{ view: this.view, pos: 1, mask: 0b01111111, value: payloadType }
 		);
 	}
 
@@ -771,7 +807,7 @@ export class RtpPacket extends Packet
 	 */
 	getMarker(): boolean
 	{
-		return readBitInDataView({ view: this.view, byte: 1, bit: 7 });
+		return readBitInDataView({ view: this.view, pos: 1, bit: 7 });
 	}
 
 	/**
@@ -779,7 +815,7 @@ export class RtpPacket extends Packet
 	 */
 	setMarker(flag: boolean): void
 	{
-		writeBitInDataView({ view: this.view, byte: 1, bit: 7, flag });
+		writeBitInDataView({ view: this.view, pos: 1, bit: 7, flag });
 	}
 
 	/**
@@ -839,14 +875,6 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Get the value of the extension with given `id` (RFC 5285).
-	 */
-	getExtension(id: number): DataView | undefined
-	{
-		return this.#extensions.get(id);
-	}
-
-	/**
 	 * Get a map with all the extensions indexed by their extension id (RFC 5285).
 	 */
 	getExtensions(): Map<number, DataView>
@@ -855,7 +883,15 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Set the value of the extension with given `id` (RFC 5285).
+	 * Get the value of the extension with given id (RFC 5285).
+	 */
+	getExtension(id: number): DataView | undefined
+	{
+		return this.#extensions.get(id);
+	}
+
+	/**
+	 * Set the value of the extension with given id (RFC 5285).
 	 *
 	 * @remarks
 	 * - Serialization is needed after calling this method.
@@ -880,7 +916,7 @@ export class RtpPacket extends Packet
 	}
 
 	/**
-	 * Delete the extension with given `id` (RFC 5285).
+	 * Delete the extension with given id (RFC 5285).
 	 *
 	 * @remarks
 	 * - Serialization maybe needed after calling this method.
@@ -920,6 +956,392 @@ export class RtpPacket extends Packet
 		this.setHeaderExtensionBit(false);
 
 		this.setSerializationNeeded(true);
+	}
+
+	/**
+	 * Get RTP extension mapping (association of RTP extension types and their
+	 * numeric ids in this RTP packet).
+	 */
+	getExtensionMapping(): RtpExtensionMapping
+	{
+		return clone(this.#extensionMapping);
+	}
+
+	/**
+	 * Set RTP extension mapping (association of RTP extension types and their
+	 * numeric ids in this RTP packet).
+	 *
+	 * @remarks
+	 * - Calling this method is needed before using other methods that read or
+	 *   write specific RTP extensions.
+	 */
+	setExtensionMapping(extensionMapping: RtpExtensionMapping): void
+	{
+		this.#extensionMapping = clone(extensionMapping);
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.MID} RTP extension.
+	 */
+	getMidExtension(): string | undefined
+	{
+		const view = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.MID]!
+		);
+
+		if (!view)
+		{
+			return;
+		}
+
+		return dataViewToString(view);
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.MID} RTP extension.
+	 */
+	setMidExtension(mid?: string): void
+	{
+		const extId = this.#extensionMapping[RtpExtensionType.MID];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (mid)
+		{
+			this.setExtension(extId, stringToDataView(mid));
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.RTP_STREAM_ID} RTP
+	 * extension.
+	 */
+	getRidExtension(): string | undefined
+	{
+		const view = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.RTP_STREAM_ID]!
+		);
+
+		if (!view)
+		{
+			return;
+		}
+
+		return dataViewToString(view);
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.RTP_STREAM_ID} RTP
+	 * extension.
+	 */
+	setRidExtension(rid?: string): void
+	{
+		const extId = this.#extensionMapping[RtpExtensionType.RTP_STREAM_ID];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (rid)
+		{
+			this.setExtension(extId, stringToDataView(rid));
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.RTP_REPAIRED_STREAM_ID} RTP
+	 * extension.
+	 */
+	getRepairedRidExtension(): string | undefined
+	{
+		const view = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.RTP_REPAIRED_STREAM_ID]!
+		);
+
+		if (!view)
+		{
+			return;
+		}
+
+		return dataViewToString(view);
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.RTP_REPAIRED_STREAM_ID} RTP
+	 * extension.
+	 */
+	setRepairedRidExtension(rrid?: string): void
+	{
+		const extId =
+			this.#extensionMapping[RtpExtensionType.RTP_REPAIRED_STREAM_ID];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (rrid)
+		{
+			this.setExtension(extId, stringToDataView(rrid));
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.ABS_SEND_TIME} RTP
+	 * extension.
+	 *
+	 * @remarks
+	 * - Returned value is "Absolute Send Time" format. See
+	 *   {@link timeMsToAbsSendTime}.
+	 */
+	getAbsSendTimeExtension(): number | undefined
+	{
+		const view = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.ABS_SEND_TIME]!
+		);
+
+		if (!view)
+		{
+			return;
+		}
+
+		return read3BytesInDataView({ view, pos: 0 });
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.ABS_SEND_TIME} RTP
+	 * extension.
+	 *
+	 * @remarks
+	 * - Given `absSendTime` must be in "Absolute Send Time" format. See
+	 *   {@link timeMsToAbsSendTime}.
+	 */
+	setAbsSendTimeExtension(absSendTime?: number): void
+	{
+		const extId = this.#extensionMapping[RtpExtensionType.ABS_SEND_TIME];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (absSendTime !== undefined)
+		{
+			const view = new DataView(new ArrayBuffer(3));
+
+			write3BytesInDataView({ view, pos: 0, value: absSendTime });
+
+			this.setExtension(extId, view);
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER}
+	 * RTP extension.
+	 */
+	getTransportWideSeqNumberExtension(): number | undefined
+	{
+		const view = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER]!
+		);
+
+		if (!view)
+		{
+			return;
+		}
+
+		return view.getUint16(0);
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER}
+	 * RTP extension.
+	 */
+	setTransportWideSeqNumberExtension(sequenceNumber?: number): void
+	{
+		const extId =
+			this.#extensionMapping[RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (sequenceNumber !== undefined)
+		{
+			this.setExtension(extId, numberToDataView(sequenceNumber));
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.SSRC_AUDIO_LEVEL} RTP
+	 * extension.
+	 */
+	getSsrcAudioLevelExtension(): SsrcAudioLevelExtension | undefined
+	{
+		const view = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.SSRC_AUDIO_LEVEL]!
+		);
+
+		if (!view)
+		{
+			return;
+		}
+
+		const voice = readBitInDataView({ view, pos: 0, bit: 7 });
+		const volume = readBitsInDataView({ view, pos: 0, mask: 0b01111111 });
+
+		return { volume, voice };
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.SSRC_AUDIO_LEVEL} RTP
+	 * extension.
+	 */
+	setSsrcAudioLevelExtension(ssrcAudioLevel?: SsrcAudioLevelExtension): void
+	{
+		const extId = this.#extensionMapping[RtpExtensionType.SSRC_AUDIO_LEVEL];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (ssrcAudioLevel)
+		{
+			const view = new DataView(new ArrayBuffer(1));
+
+			writeBitInDataView({ view, pos: 0, bit: 7, flag: ssrcAudioLevel.voice });
+			writeBitsInDataView(
+				{ view, pos: 0, mask: 0b01111111, value: ssrcAudioLevel.volume }
+			);
+
+			this.setExtension(extId, view);
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.VIDEO_ORIENTATION} RTP
+	 * extension.
+	 */
+	getVideoOrientationExtension(): VideoOrientationExtension | undefined
+	{
+		const view = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.VIDEO_ORIENTATION]!
+		);
+
+		if (!view)
+		{
+			return;
+		}
+
+		const camera = readBitInDataView({ view, pos: 0, bit: 3 });
+		const flip = readBitInDataView({ view, pos: 0, bit: 2 });
+		const rotation = readBitsInDataView({ view, pos: 0, mask: 0b00000011 });
+
+		return { camera, flip, rotation };
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.VIDEO_ORIENTATION} RTP
+	 * extension.
+	 */
+	setVideoOrientationExtension(videoOrientation?: VideoOrientationExtension): void
+	{
+		const extId = this.#extensionMapping[RtpExtensionType.VIDEO_ORIENTATION];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (videoOrientation)
+		{
+			const view = new DataView(new ArrayBuffer(1));
+
+			writeBitInDataView({ view, pos: 0, bit: 3, flag: videoOrientation.camera });
+			writeBitInDataView({ view, pos: 0, bit: 2, flag: videoOrientation.flip });
+			writeBitsInDataView(
+				{ view, pos: 0, mask: 0b00000011, value: videoOrientation.rotation }
+			);
+
+			this.setExtension(extId, view);
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
+	}
+
+	/**
+	 * Read the value of the {@link RtpExtensionType.TOFFSET} RTP extension.
+	 */
+	getTransmissionOffsetExtension(): number | undefined
+	{
+		const view = this.getExtension(
+			this.#extensionMapping[RtpExtensionType.TOFFSET]!
+		);
+
+		if (!view)
+		{
+			return;
+		}
+
+		return read3BytesInDataView({ view, pos: 0 });
+	}
+
+	/**
+	 * Set the value of the {@link RtpExtensionType.TOFFSET} RTP extension.
+	 */
+	setTransmissionOffsetExtension(offset?: number): void
+	{
+		const extId = this.#extensionMapping[RtpExtensionType.TOFFSET];
+
+		if (!extId)
+		{
+			return;
+		}
+
+		if (offset !== undefined)
+		{
+			const view = new DataView(new ArrayBuffer(3));
+
+			write3BytesInDataView({ view, pos: 0, value: offset });
+
+			this.setExtension(extId, view);
+		}
+		else
+		{
+			this.deleteExtension(extId);
+		}
 	}
 
 	/**
@@ -1037,12 +1459,12 @@ export class RtpPacket extends Packet
 
 	private hasHeaderExtensionBit(): boolean
 	{
-		return readBitInDataView({ view: this.view, byte: 0, bit: 4 });
+		return readBitInDataView({ view: this.view, pos: 0, bit: 4 });
 	}
 
 	private setHeaderExtensionBit(flag: boolean): void
 	{
-		writeBitInDataView({ view: this.view, byte: 0, bit: 4, flag });
+		writeBitInDataView({ view: this.view, pos: 0, bit: 4, flag });
 	}
 
 	private getCsrcCount(): number
@@ -1053,7 +1475,7 @@ export class RtpPacket extends Packet
 	private setCsrcCount(count: number): void
 	{
 		writeBitsInDataView(
-			{ view: this.view, byte: 0, mask: 0b00001111, value: count }
+			{ view: this.view, pos: 0, mask: 0b00001111, value: count }
 		);
 	}
 }

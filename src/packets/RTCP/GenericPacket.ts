@@ -108,7 +108,7 @@ export class GenericPacket extends RtcpPacket
 	{
 		return {
 			...super.dump(),
-			bodyLength : this.#bodyView.byteLength
+			bodyLength : this.getBody().byteLength
 		};
 	}
 
