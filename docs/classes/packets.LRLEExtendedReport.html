@@ -47,7 +47,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">LRLEExtendedReport</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L56">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:56</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L56">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:56</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -98,7 +98,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides ExtendedReport.constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L65">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:65</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L65">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:65</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member"><a id="addChunk" class="tsd-anchor"></a>
@@ -123,14 +123,15 @@
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L330">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:330</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L330">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:330</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="clone" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>clone</span><a href="#clone" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="tsd-signature tsd-anchor-link" id="clone.clone-1"><span class="tsd-kind-call-signature">clone</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">buffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">byteOffset</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationBuffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationByteOffset</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="packets.LRLEExtendedReport.html" class="tsd-signature-type tsd-kind-class">LRLEExtendedReport</a><a href="#clone.clone-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Clone the content. The cloned instance does not share any memory with the
-original one.</p>
+<div class="tsd-comment tsd-typography"><p>Clone the packet or item. The cloned instance does not share any memory
+with the original one. The cloned instance is a new class instance
+referencing a different buffer.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -163,7 +164,8 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <a href="packets.LRLEExtendedReport.html" class="tsd-signature-type tsd-kind-class">LRLEExtendedReport</a></h4>
 <div class="tsd-comment tsd-typography">
 <h4>Remarks</h4><ul>
-<li>The buffer is serialized if needed (to apply pending modifications).</li>
+<li>The buffer is serialized if needed (to apply pending modifications) by
+internally calling <a href="packets.Serializable.html#serialize" class="tsd-kind-method">serialize</a>.</li>
 </ul>
 
 <h4>Throws</h4><ul>
@@ -175,7 +177,7 @@ the content.</li>
 </div><aside class="tsd-sources">
 <p>Overrides <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#clone">clone</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L203">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:203</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L203">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:203</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="dump" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>dump</span><a href="#dump" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -187,7 +189,7 @@ the content.</li>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#dump">dump</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L110">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:110</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L110">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:110</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getBeginSeq" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Begin<wbr/>Seq</span><a href="#getBeginSeq" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -198,7 +200,7 @@ the content.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L261">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:261</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L261">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:261</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getByteLength" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Byte<wbr/>Length</span><a href="#getByteLength" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -216,7 +218,7 @@ before.</li>
 </div><aside class="tsd-sources">
 <p>Overrides <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#getByteLength">getByteLength</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L125">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:125</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L125">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:125</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getChunks" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Chunks</span><a href="#getChunks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -232,7 +234,7 @@ before.</li>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L301">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:301</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L301">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:301</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getEndSeq" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>End<wbr/>Seq</span><a href="#getEndSeq" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -243,7 +245,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L279">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:279</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L279">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:279</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getReportType" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Report<wbr/>Type</span><a href="#getReportType" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -255,7 +257,7 @@ before.</li>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#getReportType">getReportType</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/ExtendedReport.ts#L223">packets/RTCP/ExtendedReports/ExtendedReport.ts:223</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/ExtendedReport.ts#L223">packets/RTCP/ExtendedReports/ExtendedReport.ts:223</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getSsrc" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Ssrc</span><a href="#getSsrc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -266,7 +268,7 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L243">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:243</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L243">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:243</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getThinning" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Thinning</span><a href="#getThinning" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -277,13 +279,13 @@ before.</li>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L223">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:223</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L223">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:223</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getView" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>View</span><a href="#getView" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
 <li class="tsd-signature tsd-anchor-link" id="getView.getView-1"><span class="tsd-kind-call-signature">get<wbr/>View</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">serializationBuffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationByteOffset</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">DataView</span><a href="#getView.getView-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Get a buffer view containing the serialized content.</p>
+<div class="tsd-comment tsd-typography"><p>Get a buffer view containing the serialized content of the packet or item.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -305,7 +307,7 @@ before.</li>
 <div class="tsd-comment tsd-typography">
 <h4>Remarks</h4><ul>
 <li>The internal buffer is serialized if needed (to apply pending
-   modifications).</li>
+   modifications) by internally calling <a href="packets.Serializable.html#serialize" class="tsd-kind-method">serialize</a>.</li>
 </ul>
 
 <h4>Throws</h4><ul>
@@ -315,26 +317,29 @@ content.</li>
 </div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#getView">getView</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/Serializable.ts#L57">packets/Serializable.ts:57</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/Serializable.ts#L58">packets/Serializable.ts:58</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="needsSerialization" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>needs<wbr/>Serialization</span><a href="#needsSerialization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
 <li class="tsd-signature tsd-anchor-link" id="needsSerialization.needsSerialization-1"><span class="tsd-kind-call-signature">needs<wbr/>Serialization</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#needsSerialization.needsSerialization-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Whether <a href="packets.Serializable.html#serialize" class="tsd-kind-method">serialize</a> should be called due to modifications not being
-yet applied into the buffer.</p>
+<div class="tsd-comment tsd-typography"><p>Whether serialization is needed, meaning that the current buffer view
+doesn&#39;t represent the current content of the packet or item (due to
+modifications not applied yet). Calling <a href="packets.Serializable.html#serialize" class="tsd-kind-method">serialize</a> or <a href="packets.Serializable.html#getView" class="tsd-kind-method">getView</a>
+will serialize the packet or the item.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#needsSerialization">needsSerialization</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/Serializable.ts#L84">packets/Serializable.ts:84</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/Serializable.ts#L87">packets/Serializable.ts:87</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="serialize" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>serialize</span><a href="#serialize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
 <li class="tsd-signature tsd-anchor-link" id="serialize.serialize-1"><span class="tsd-kind-call-signature">serialize</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">buffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">byteOffset</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#serialize.serialize-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Apply pending changes and serialize the content into a new buffer.</p>
+<div class="tsd-comment tsd-typography"><p>Apply pending changes and serialize the content of the packet or item into
+a new buffer.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -366,7 +371,7 @@ methods apply changes within the current buffer. To be sure, check
 </div><aside class="tsd-sources">
 <p>Overrides <a href="packets.ExtendedReport.html">ExtendedReport</a>.<a href="packets.ExtendedReport.html#serialize">serialize</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L148">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:148</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L148">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:148</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setBeginSeq" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Begin<wbr/>Seq</span><a href="#setBeginSeq" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -382,7 +387,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L269">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:269</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L269">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:269</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setChunks" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Chunks</span><a href="#setChunks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -404,7 +409,7 @@ methods apply changes within the current buffer. To be sure, check
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L314">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:314</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L314">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:314</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setEndSeq" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>End<wbr/>Seq</span><a href="#setEndSeq" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -420,7 +425,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L287">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:287</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L287">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:287</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setSsrc" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Ssrc</span><a href="#setSsrc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -436,7 +441,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L251">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:251</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L251">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:251</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="setThinning" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Thinning</span><a href="#setThinning" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -452,7 +457,7 @@ methods apply changes within the current buffer. To be sure, check
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L231">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:231</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/ExtendedReports/LRLEExtendedReport.ts#L231">packets/RTCP/ExtendedReports/LRLEExtendedReport.ts:231</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

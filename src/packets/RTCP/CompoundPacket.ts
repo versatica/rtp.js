@@ -339,6 +339,37 @@ export class CompoundPacket extends Packet
 
 	/**
 	 * Return the {@link RtcpPacket} entries in this RTCP Compound packet.
+	 *
+	 * @remarks
+	 * - The returned value is an array of {@link RtcpPacket}, which is an
+	 *   abstract class.
+	 * - By inspecting {@link RtcpPacket.getPacketType} we can cast each packet
+	 *   to its specific class.
+	 *
+	 * @example
+	 * ```ts
+	 * import { packets } from 'rtp.js';
+	 * const { CompoundPacket, RtcpPacketType, SdesPacket } = packets;
+	 *
+	 * const compoundPacket = new CompoundPacket(view);
+	 *
+	 * for (const packet of compoundPacket.getPackets())
+	 * {
+	 *   switch (packet.getPacketType())
+	 *   {
+	 *     case RtcpPacketType.SDES:
+	 *     {
+	 *       const sdesPacket = packet as SdesPacket;
+	 *
+	 *       console.log(sdesPacket.getChunks());
+	 *
+	 *       break;
+	 *     }
+	 *
+	 *     // etc.
+	 *   }
+	 * }
+	 * ```
 	 */
 	getPackets(): RtcpPacket[]
 	{
@@ -348,7 +379,7 @@ export class CompoundPacket extends Packet
 	/**
 	 * Set the {@link RtcpPacket} entries in this RTCP Compound packet.
 	 *
-	 * * @remarks
+	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
 	setPackets(packets: RtcpPacket[]): void
@@ -361,7 +392,7 @@ export class CompoundPacket extends Packet
 	/**
 	 * Add a new {@link RtcpPacket} at the end of this RTCP Compound packet.
 	 *
-	 * * @remarks
+	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
 	addPacket(packet: RtcpPacket): void

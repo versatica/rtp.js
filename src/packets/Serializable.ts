@@ -9,11 +9,12 @@ export type SerializableDump =
 };
 
 /**
- * Class holding a serializable buffer view.
+ * Class holding a serializable buffer view. All RTP and RTCP packets inherit
+ * from this class, and also items in some RTCP packets.
  */
 export abstract class Serializable
 {
-	// Buffer view holding the content.
+	// Buffer view holding the packet or item content.
 	// @ts-ignore ('view' has not initializer and is not assigned in constructor).
 	protected view: DataView;
 	// Whether serialization is needed due to recent modifications.
@@ -38,7 +39,7 @@ export abstract class Serializable
 	}
 
 	/**
-	 * Get a buffer view containing the serialized content.
+	 * Get a buffer view containing the serialized content of the packet or item.
 	 *
 	 * @param serializationBuffer - Buffer in which the content will be serialized
 	 *   in case serialization is needed. If not given, a new one will internally
@@ -48,7 +49,7 @@ export abstract class Serializable
 	 *
 	 * @remarks
 	 * - The internal buffer is serialized if needed (to apply pending
-	 * 	 modifications).
+	 * 	 modifications) by internally calling {@link serialize}.
 	 *
 	 * @throws
 	 * - If buffer serialization is needed and it fails due to invalid
@@ -78,8 +79,10 @@ export abstract class Serializable
 	abstract getByteLength(): number;
 
 	/**
-	 * Whether {@link serialize} should be called due to modifications not being
-	 * yet applied into the buffer.
+	 * Whether serialization is needed, meaning that the current buffer view
+	 * doesn't represent the current content of the packet or item (due to
+	 * modifications not applied yet). Calling {@link serialize} or {@link getView}
+	 * will serialize the packet or the item.
 	 */
 	needsSerialization(): boolean
 	{
@@ -87,7 +90,8 @@ export abstract class Serializable
 	}
 
 	/**
-	 * Apply pending changes and serialize the content into a new buffer.
+	 * Apply pending changes and serialize the content of the packet or item into
+	 * a new buffer.
 	 *
 	 * @param buffer - Buffer in which the content will be serialized. If not
 	 *   given, a new one will internally allocated.
@@ -106,8 +110,9 @@ export abstract class Serializable
 	abstract serialize(buffer?: ArrayBuffer, byteOffset?: number): void;
 
 	/**
-	 * Clone the content. The cloned instance does not share any memory with the
-	 * original one.
+	 * Clone the packet or item. The cloned instance does not share any memory
+	 * with the original one. The cloned instance is a new class instance
+	 * referencing a different buffer.
 	 *
 	 * @param buffer - Buffer in which the content will be cloned. If not given, a
 	 *   new one will internally allocated.
@@ -120,7 +125,8 @@ export abstract class Serializable
 	 *   `serializationBuffer` where serialization (if needed) will start.
 	 *
 	 * @remarks
-	 * - The buffer is serialized if needed (to apply pending modifications).
+	 * - The buffer is serialized if needed (to apply pending modifications) by
+	 *   internally calling {@link serialize}.
 	 *
 	 * @throws
 	 * - If serialization is needed and it fails.

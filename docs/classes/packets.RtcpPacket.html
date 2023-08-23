@@ -46,7 +46,7 @@ header |V=2|P|    SC   |      PT       |             length            |
 <li><a href="packets.ExtendedJitterReportsPacket.html" class="tsd-signature-type tsd-kind-class">ExtendedJitterReportsPacket</a></li>
 <li><a href="packets.GenericPacket.html" class="tsd-signature-type tsd-kind-class">GenericPacket</a></li></ul></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/RtcpPacket.ts#L218">packets/RTCP/RtcpPacket.ts:218</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/RtcpPacket.ts#L218">packets/RTCP/RtcpPacket.ts:218</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -72,8 +72,9 @@ header |V=2|P|    SC   |      PT       |             length            |
 <ul class="tsd-signatures tsd-is-inherited">
 <li class="tsd-signature tsd-anchor-link" id="clone.clone-1"><span class="tsd-kind-call-signature">clone</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">buffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">byteOffset</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationBuffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationByteOffset</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="packets.Serializable.html" class="tsd-signature-type tsd-kind-class">Serializable</a><a href="#clone.clone-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Clone the content. The cloned instance does not share any memory with the
-original one.</p>
+<div class="tsd-comment tsd-typography"><p>Clone the packet or item. The cloned instance does not share any memory
+with the original one. The cloned instance is a new class instance
+referencing a different buffer.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -106,7 +107,8 @@ original one.</p>
 <h4 class="tsd-returns-title">Returns <a href="packets.Serializable.html" class="tsd-signature-type tsd-kind-class">Serializable</a></h4>
 <div class="tsd-comment tsd-typography">
 <h4>Remarks</h4><ul>
-<li>The buffer is serialized if needed (to apply pending modifications).</li>
+<li>The buffer is serialized if needed (to apply pending modifications) by
+internally calling <a href="packets.Serializable.html#serialize" class="tsd-kind-method">serialize</a>.</li>
 </ul>
 
 <h4>Throws</h4><ul>
@@ -118,7 +120,7 @@ the content.</li>
 </div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.Packet.html">Packet</a>.<a href="packets.Packet.html#clone">clone</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/Serializable.ts#L131">packets/Serializable.ts:131</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/Serializable.ts#L137">packets/Serializable.ts:137</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="dump" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>dump</span><a href="#dump" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -134,7 +136,7 @@ the content.</li>
 </div><aside class="tsd-sources">
 <p>Overrides <a href="packets.Packet.html">Packet</a>.<a href="packets.Packet.html#dump">dump</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/RtcpPacket.ts#L269">packets/RTCP/RtcpPacket.ts:269</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/RtcpPacket.ts#L269">packets/RTCP/RtcpPacket.ts:269</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getByteLength" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagAbstract">Abstract</code> <span>get<wbr/>Byte<wbr/>Length</span><a href="#getByteLength" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -152,7 +154,7 @@ before.</li>
 </div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.Packet.html">Packet</a>.<a href="packets.Packet.html#getByteLength">getByteLength</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/Serializable.ts#L78">packets/Serializable.ts:78</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/Serializable.ts#L79">packets/Serializable.ts:79</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getCount" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Count</span><a href="#getCount" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -168,7 +170,7 @@ RTCP header) for counting chunks or items.</li>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/RtcpPacket.ts#L293">packets/RTCP/RtcpPacket.ts:293</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/RtcpPacket.ts#L293">packets/RTCP/RtcpPacket.ts:293</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="getPacketType" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Packet<wbr/>Type</span><a href="#getPacketType" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -179,7 +181,7 @@ RTCP header) for counting chunks or items.</li>
 <h4 class="tsd-returns-title">Returns <a href="../enums/packets.RtcpPacketType.html" class="tsd-signature-type tsd-kind-enum">RtcpPacketType</a></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/RTCP/RtcpPacket.ts#L281">packets/RTCP/RtcpPacket.ts:281</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/RTCP/RtcpPacket.ts#L281">packets/RTCP/RtcpPacket.ts:281</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getPadding" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Padding</span><a href="#getPadding" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -191,13 +193,13 @@ RTCP header) for counting chunks or items.</li>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.Packet.html">Packet</a>.<a href="packets.Packet.html#getPadding">getPadding</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/Packet.ts#L52">packets/Packet.ts:52</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/Packet.ts#L52">packets/Packet.ts:52</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getView" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>View</span><a href="#getView" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
 <li class="tsd-signature tsd-anchor-link" id="getView.getView-1"><span class="tsd-kind-call-signature">get<wbr/>View</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">serializationBuffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">serializationByteOffset</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">DataView</span><a href="#getView.getView-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Get a buffer view containing the serialized content.</p>
+<div class="tsd-comment tsd-typography"><p>Get a buffer view containing the serialized content of the packet or item.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -219,7 +221,7 @@ RTCP header) for counting chunks or items.</li>
 <div class="tsd-comment tsd-typography">
 <h4>Remarks</h4><ul>
 <li>The internal buffer is serialized if needed (to apply pending
-   modifications).</li>
+   modifications) by internally calling <a href="packets.Serializable.html#serialize" class="tsd-kind-method">serialize</a>.</li>
 </ul>
 
 <h4>Throws</h4><ul>
@@ -229,20 +231,22 @@ content.</li>
 </div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.Packet.html">Packet</a>.<a href="packets.Packet.html#getView">getView</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/Serializable.ts#L57">packets/Serializable.ts:57</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/Serializable.ts#L58">packets/Serializable.ts:58</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="needsSerialization" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>needs<wbr/>Serialization</span><a href="#needsSerialization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
 <li class="tsd-signature tsd-anchor-link" id="needsSerialization.needsSerialization-1"><span class="tsd-kind-call-signature">needs<wbr/>Serialization</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#needsSerialization.needsSerialization-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Whether <a href="packets.Serializable.html#serialize" class="tsd-kind-method">serialize</a> should be called due to modifications not being
-yet applied into the buffer.</p>
+<div class="tsd-comment tsd-typography"><p>Whether serialization is needed, meaning that the current buffer view
+doesn&#39;t represent the current content of the packet or item (due to
+modifications not applied yet). Calling <a href="packets.Serializable.html#serialize" class="tsd-kind-method">serialize</a> or <a href="packets.Serializable.html#getView" class="tsd-kind-method">getView</a>
+will serialize the packet or the item.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.Packet.html">Packet</a>.<a href="packets.Packet.html#needsSerialization">needsSerialization</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/Serializable.ts#L84">packets/Serializable.ts:84</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/Serializable.ts#L87">packets/Serializable.ts:87</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="padTo4Bytes" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>pad<wbr/>To4<wbr/>Bytes</span><a href="#padTo4Bytes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -259,13 +263,14 @@ or remove bytes of padding.</p>
 </div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.Packet.html">Packet</a>.<a href="packets.Packet.html#padTo4Bytes">padTo4Bytes</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/Packet.ts#L64">packets/Packet.ts:64</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/Packet.ts#L64">packets/Packet.ts:64</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="serialize" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagAbstract">Abstract</code> <span>serialize</span><a href="#serialize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
 <li class="tsd-signature tsd-anchor-link" id="serialize.serialize-1"><span class="tsd-kind-call-signature">serialize</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">buffer</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">byteOffset</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#serialize.serialize-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Apply pending changes and serialize the content into a new buffer.</p>
+<div class="tsd-comment tsd-typography"><p>Apply pending changes and serialize the content of the packet or item into
+a new buffer.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -297,7 +302,7 @@ methods apply changes within the current buffer. To be sure, check
 </div><aside class="tsd-sources">
 <p>Inherited from <a href="packets.Packet.html">Packet</a>.<a href="packets.Packet.html#serialize">serialize</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/edd0847/src/packets/Serializable.ts#L106">packets/Serializable.ts:106</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/versatica/rtp.js/blob/d87c5b0/src/packets/Serializable.ts#L110">packets/Serializable.ts:110</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

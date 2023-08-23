@@ -316,6 +316,37 @@ export class XrPacket extends RtcpPacket
 
 	/**
 	 * Get Extended Reports.
+	 *
+	 * @remarks
+	 * - The returned value is an array of {@link ExtendedReport}, which is an
+	 *   abstract class.
+	 * - By inspecting {@link ExtendedReport.getReportType} we can cast each
+	 *   extended report to its specific class.
+	 *
+	 * @example
+	 * ```ts
+	 * import { packets } from 'rtp.js';
+	 * const { XrPacket, ExtendedReportType, LRLEExtendedReport } = packets;
+	 *
+	 * const packet = new XrPacket(view);
+	 *
+	 * for (const extendedReport of packet.getReports())
+	 * {
+	 *   switch (extendedReport.getReportType())
+	 *   {
+	 *     case ExtendedReportType.LRLE:
+	 *     {
+	 *       const lrleExtendedReport = extendedReport as LRLEExtendedReport;
+	 *
+	 *       console.log(lrleExtendedReport.getThinning());
+	 *
+	 *       break;
+	 *     }
+	 *
+	 *     // etc.
+	 *   }
+	 * }
+	 * ```
 	 */
 	getReports(): ExtendedReport[]
 	{
