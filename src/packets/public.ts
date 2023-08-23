@@ -106,6 +106,11 @@ export {
 } from './RTCP/GenericFeedbackPacket';
 
 export {
+	ExtendedJitterReportsPacket,
+	ExtendedJitterReportsPacketDump
+} from './RTCP/ExtendedJitterReportsPacket';
+
+export {
 	XrPacket,
 	XrPacketDump
 } from './RTCP/XrPacket';

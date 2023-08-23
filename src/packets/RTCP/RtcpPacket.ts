@@ -23,6 +23,10 @@ export const COMMON_HEADER_LENGTH = 4;
 export enum RtcpPacketType
 {
 	/**
+	 * Extended Jitter Reports packet.
+	 */
+	IJ = 195,
+	/**
 	 * RTCP Sender Report packet.
 	 */
 	SR = 200,
@@ -181,6 +185,11 @@ export function packetTypeToString(packetType: RtcpPacketType): string
 		case RtcpPacketType.XR:
 		{
 			return 'Extended Report';
+		}
+
+		case RtcpPacketType.IJ:
+		{
+			return 'Extended Jitter Reports';
 		}
 
 		default:
