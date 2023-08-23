@@ -158,6 +158,11 @@ export {
 } from './RTCP/ExtendedReports/VMExtendedReport';
 
 export {
+	ECNExtendedReport,
+	ECNExtendedReportDump
+} from './RTCP/ExtendedReports/ECNExtendedReport';
+
+export {
 	GenericExtendedReport,
 	GenericExtendedReportDump
 } from './RTCP/ExtendedReports/GenericExtendedReport';

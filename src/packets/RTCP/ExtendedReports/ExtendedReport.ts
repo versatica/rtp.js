@@ -40,7 +40,11 @@ export enum ExtendedReportType
 	/**
 	 * VoIP Metrics Report.
 	 */
-	VM = 7
+	VM = 7,
+	/**
+	 * ECN Summary Report.
+	 */
+	ECN = 13
 }
 
 /**
@@ -140,6 +144,11 @@ export function reportTypeToString(reportType: ExtendedReportType): string
 		case ExtendedReportType.VM:
 		{
 			return 'VoIP Metrics';
+		}
+
+		case ExtendedReportType.ECN:
+		{
+			return 'ECN Summary';
 		}
 
 		default:

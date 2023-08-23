@@ -12,6 +12,7 @@ import { RRTExtendedReport } from './ExtendedReports/RRTExtendedReport';
 import { DLRRExtendedReport } from './ExtendedReports/DLRRExtendedReport';
 import { SSExtendedReport } from './ExtendedReports/SSExtendedReport';
 import { VMExtendedReport } from './ExtendedReports/VMExtendedReport';
+import { ECNExtendedReport } from './ExtendedReports/ECNExtendedReport';
 import { GenericExtendedReport } from './ExtendedReports/GenericExtendedReport';
 import {
 	RtcpPacket,
@@ -152,6 +153,13 @@ export class XrPacket extends RtcpPacket
 				case ExtendedReportType.VM:
 				{
 					report = new VMExtendedReport(reportView);
+
+					break;
+				}
+
+				case ExtendedReportType.ECN:
+				{
+					report = new ECNExtendedReport(reportView);
 
 					break;
 				}
