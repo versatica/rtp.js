@@ -29,7 +29,11 @@ export enum RtpFeedbackMessageType
 	/**
 	 * Rapid Resynchronisation Request.
 	 */
-	SR_REQ = 5
+	SR_REQ = 5,
+	/**
+	 * Explicit Congestion Notification (ECN).
+	 */
+	ECN = 8
 }
 
 /**
@@ -98,6 +102,11 @@ function messageTypeToString(
 		case RtpFeedbackMessageType.SR_REQ:
 		{
 			return 'Rapid Resynchronisation Request';
+		}
+
+		case RtpFeedbackMessageType.ECN:
+		{
+			return 'Explicit Congestion Notification (ECN)';
 		}
 
 		case PsFeedbackMessageType.PLI:

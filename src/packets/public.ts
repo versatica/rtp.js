@@ -86,6 +86,11 @@ export {
 } from './RTCP/SrReqPacket';
 
 export {
+	EcnPacket,
+	EcnPacketDump
+} from './RTCP/EcnPacket';
+
+export {
 	PliPacket,
 	PliPacketDump
 } from './RTCP/PliPacket';

@@ -18,6 +18,7 @@ import {
 } from './FeedbackPacket';
 import { NackPacket } from './NackPacket';
 import { SrReqPacket } from './SrReqPacket';
+import { EcnPacket } from './EcnPacket';
 import { PliPacket } from './PliPacket';
 import { SliPacket } from './SliPacket';
 import { RpsiPacket } from './RpsiPacket';
@@ -138,6 +139,13 @@ export class CompoundPacket extends Packet
 						case RtpFeedbackMessageType.SR_REQ:
 						{
 							packet = new SrReqPacket(packetView);
+
+							break;
+						}
+
+						case RtpFeedbackMessageType.ECN:
+						{
+							packet = new EcnPacket(packetView);
 
 							break;
 						}
