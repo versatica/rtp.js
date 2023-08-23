@@ -27,7 +27,7 @@
 		"hideGenerator": false,
 		"titleLink": "https://versatica.github.io/rtp.js",
 		"treatWarningsAsErrors": true,
-		"cacheBust": false,
+		"cacheBust": true,
 		"categorizeByGroup": false,
 		"categoryOrder": [
 			"RTP",
