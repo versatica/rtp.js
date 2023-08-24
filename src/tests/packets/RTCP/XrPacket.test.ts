@@ -4,9 +4,9 @@ import {
 	ExtendedReportType
 } from '../../../packets/RTCP/ExtendedReports/ExtendedReport';
 import {
-	LRLEExtendedReport,
-	LRLEExtendedReportDump
-} from '../../../packets/RTCP/ExtendedReports/LRLEExtendedReport';
+	LrleExtendedReport,
+	LrleExtendedReportDump
+} from '../../../packets/RTCP/ExtendedReports/LrleExtendedReport';
 import {
 	parseExtendedReportChunk,
 	createExtendedReportRunLengthChunk,
@@ -19,7 +19,7 @@ const runLengthOnesChunk = 0b0110101010101010;
 const bitVectorChunk = 0b1110101010101010;
 const terminatingNullChunk = 0b0000000000000000;
 
-const report1Dump: LRLEExtendedReportDump =
+const report1Dump: LrleExtendedReportDump =
 {
 	byteLength : 20,
 	reportType : ExtendedReportType.LRLE,
@@ -84,7 +84,7 @@ describe('parse RTCP Receiver Report packet', () =>
 		expect(packet.dump()).toEqual(packetDump);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
 
-		const report1 = packet.getReports()[0] as LRLEExtendedReport;
+		const report1 = packet.getReports()[0] as LrleExtendedReport;
 
 		expect(report1.needsSerialization()).toBe(false);
 		expect(report1.getByteLength()).toBe(20);
@@ -121,7 +121,7 @@ describe('create RTCP XR packet', () =>
 		packet.setSsrc(0x5d931534);
 		expect(packet.needsSerialization()).toBe(false);
 
-		const report1 = new LRLEExtendedReport();
+		const report1 = new LrleExtendedReport();
 
 		expect(report1.needsSerialization()).toBe(false);
 		expect(report1.getByteLength()).toBe(12);

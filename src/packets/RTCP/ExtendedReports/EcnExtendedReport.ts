@@ -12,7 +12,7 @@ const ECN_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 20;
  *
  * @category RTCP Extended Reports
  */
-export type ECNExtendedReportDump = ExtendedReportDump &
+export type EcnExtendedReportDump = ExtendedReportDump &
 {
 	ssrc: number;
 	ect0Counter: number;
@@ -49,7 +49,7 @@ export type ECNExtendedReportDump = ExtendedReportDump &
  * @see
  * - [RFC 6679 section 5.2](https://datatracker.ietf.org/doc/html/rfc6679#section-5.2)
  */
-export class ECNExtendedReport extends ExtendedReport
+export class EcnExtendedReport extends ExtendedReport
 {
 	// Chunks (2 bytes numbers, unparsed).
 	#chunks: number[] = [];
@@ -83,7 +83,7 @@ export class ECNExtendedReport extends ExtendedReport
 	/**
 	 * Dump ECN Summary Extended Report info.
 	 */
-	dump(): ECNExtendedReportDump
+	dump(): EcnExtendedReportDump
 	{
 		return {
 			...super.dump(),
@@ -157,7 +157,7 @@ export class ECNExtendedReport extends ExtendedReport
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
-	): ECNExtendedReport
+	): EcnExtendedReport
 	{
 		const view = this.cloneInternal(
 			buffer,
@@ -166,7 +166,7 @@ export class ECNExtendedReport extends ExtendedReport
 			serializationByteOffset
 		);
 
-		return new ECNExtendedReport(view);
+		return new EcnExtendedReport(view);
 	}
 
 	/**

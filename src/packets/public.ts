@@ -122,45 +122,45 @@ export {
 } from './RTCP/ExtendedReports/ExtendedReport';
 
 export {
-	LRLEExtendedReport,
-	LRLEExtendedReportDump
-} from './RTCP/ExtendedReports/LRLEExtendedReport';
+	LrleExtendedReport,
+	LrleExtendedReportDump
+} from './RTCP/ExtendedReports/LrleExtendedReport';
 
 export {
-	DRLEExtendedReport,
-	DRLEExtendedReportDump
-} from './RTCP/ExtendedReports/DRLEExtendedReport';
+	DrleExtendedReport,
+	DrleExtendedReportDump
+} from './RTCP/ExtendedReports/DrleExtendedReport';
 
 export {
-	PRTExtendedReport,
-	PRTExtendedReportDump
-} from './RTCP/ExtendedReports/PRTExtendedReport';
+	PrtExtendedReport,
+	PrtExtendedReportDump
+} from './RTCP/ExtendedReports/PrtExtendedReport';
 
 export {
-	RRTExtendedReport,
-	RRTExtendedReportDump
-} from './RTCP/ExtendedReports/RRTExtendedReport';
+	RrtExtendedReport,
+	RrtExtendedReportDump
+} from './RTCP/ExtendedReports/RrtExtendedReport';
 
 export {
-	DLRRExtendedReport,
-	DLRRExtendedReportDump,
-	DLRRSubReport
-} from './RTCP/ExtendedReports/DLRRExtendedReport';
+	DlrrExtendedReport,
+	DlrrExtendedReportDump,
+	DlrrSubReport
+} from './RTCP/ExtendedReports/DlrrExtendedReport';
 
 export {
-	SSExtendedReport,
-	SSExtendedReportDump
-} from './RTCP/ExtendedReports/SSExtendedReport';
+	SsExtendedReport,
+	SsExtendedReportDump
+} from './RTCP/ExtendedReports/SsExtendedReport';
 
 export {
-	VMExtendedReport,
-	VMExtendedReportDump
-} from './RTCP/ExtendedReports/VMExtendedReport';
+	VmExtendedReport,
+	VmExtendedReportDump
+} from './RTCP/ExtendedReports/VmExtendedReport';
 
 export {
-	ECNExtendedReport,
-	ECNExtendedReportDump
-} from './RTCP/ExtendedReports/ECNExtendedReport';
+	EcnExtendedReport,
+	EcnExtendedReportDump
+} from './RTCP/ExtendedReports/EcnExtendedReport';
 
 export {
 	GenericExtendedReport,

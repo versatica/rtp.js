@@ -5,14 +5,14 @@ import {
 	getExtendedReportType,
 	getExtendedReportLength
 } from './ExtendedReports/ExtendedReport';
-import { LRLEExtendedReport } from './ExtendedReports/LRLEExtendedReport';
-import { DRLEExtendedReport } from './ExtendedReports/DRLEExtendedReport';
-import { PRTExtendedReport } from './ExtendedReports/PRTExtendedReport';
-import { RRTExtendedReport } from './ExtendedReports/RRTExtendedReport';
-import { DLRRExtendedReport } from './ExtendedReports/DLRRExtendedReport';
-import { SSExtendedReport } from './ExtendedReports/SSExtendedReport';
-import { VMExtendedReport } from './ExtendedReports/VMExtendedReport';
-import { ECNExtendedReport } from './ExtendedReports/ECNExtendedReport';
+import { LrleExtendedReport } from './ExtendedReports/LrleExtendedReport';
+import { DrleExtendedReport } from './ExtendedReports/DrleExtendedReport';
+import { PrtExtendedReport } from './ExtendedReports/PrtExtendedReport';
+import { RrtExtendedReport } from './ExtendedReports/RrtExtendedReport';
+import { DlrrExtendedReport } from './ExtendedReports/DlrrExtendedReport';
+import { SsExtendedReport } from './ExtendedReports/SsExtendedReport';
+import { VmExtendedReport } from './ExtendedReports/VmExtendedReport';
+import { EcnExtendedReport } from './ExtendedReports/EcnExtendedReport';
 import { GenericExtendedReport } from './ExtendedReports/GenericExtendedReport';
 import {
 	RtcpPacket,
@@ -110,56 +110,56 @@ export class XrPacket extends RtcpPacket
 			{
 				case ExtendedReportType.LRLE:
 				{
-					report = new LRLEExtendedReport(reportView);
+					report = new LrleExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.DRLE:
 				{
-					report = new DRLEExtendedReport(reportView);
+					report = new DrleExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.PRT:
 				{
-					report = new PRTExtendedReport(reportView);
+					report = new PrtExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.RRT:
 				{
-					report = new RRTExtendedReport(reportView);
+					report = new RrtExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.DLRR:
 				{
-					report = new DLRRExtendedReport(reportView);
+					report = new DlrrExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.SS:
 				{
-					report = new SSExtendedReport(reportView);
+					report = new SsExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.VM:
 				{
-					report = new VMExtendedReport(reportView);
+					report = new VmExtendedReport(reportView);
 
 					break;
 				}
 
 				case ExtendedReportType.ECN:
 				{
-					report = new ECNExtendedReport(reportView);
+					report = new EcnExtendedReport(reportView);
 
 					break;
 				}
@@ -334,7 +334,7 @@ export class XrPacket extends RtcpPacket
 	 * @example
 	 * ```ts
 	 * import { packets } from 'rtp.js';
-	 * const { XrPacket, ExtendedReportType, LRLEExtendedReport } = packets;
+	 * const { XrPacket, ExtendedReportType, LrleExtendedReport } = packets;
 	 *
 	 * const packet = new XrPacket(view);
 	 *
@@ -344,7 +344,7 @@ export class XrPacket extends RtcpPacket
 	 *   {
 	 *     case ExtendedReportType.LRLE:
 	 *     {
-	 *       const lrleExtendedReport = extendedReport as LRLEExtendedReport;
+	 *       const lrleExtendedReport = extendedReport as LrleExtendedReport;
 	 *
 	 *       console.log(lrleExtendedReport.getThinning());
 	 *

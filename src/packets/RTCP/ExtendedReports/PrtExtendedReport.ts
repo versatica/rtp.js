@@ -17,7 +17,7 @@ const PRT_EXTENDED_REPORT_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
  *
  * @category RTCP Extended Reports
  */
-export type PRTExtendedReportDump = ExtendedReportDump &
+export type PrtExtendedReportDump = ExtendedReportDump &
 {
 	thinning: number;
 	ssrc: number;
@@ -54,7 +54,7 @@ export type PRTExtendedReportDump = ExtendedReportDump &
  * @see
  * - [RFC 3611 section 4.3](https://datatracker.ietf.org/doc/html/rfc3611#section-4.3)
  */
-export class PRTExtendedReport extends ExtendedReport
+export class PrtExtendedReport extends ExtendedReport
 {
 	// Receipt times (4 bytes numbers, unparsed).
 	#receiptTimes: number[] = [];
@@ -105,7 +105,7 @@ export class PRTExtendedReport extends ExtendedReport
 	/**
 	 * Dump Packet Receipt Times Extended Report info.
 	 */
-	dump(): PRTExtendedReportDump
+	dump(): PrtExtendedReportDump
 	{
 		return {
 			...super.dump(),
@@ -196,7 +196,7 @@ export class PRTExtendedReport extends ExtendedReport
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
-	): PRTExtendedReport
+	): PrtExtendedReport
 	{
 		const view = this.cloneInternal(
 			buffer,
@@ -205,7 +205,7 @@ export class PRTExtendedReport extends ExtendedReport
 			serializationByteOffset
 		);
 
-		return new PRTExtendedReport(view);
+		return new PrtExtendedReport(view);
 	}
 
 	/**

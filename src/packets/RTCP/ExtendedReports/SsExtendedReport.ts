@@ -18,7 +18,7 @@ const SS_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 36;
  *
  * @category RTCP Extended Reports
  */
-export type SSExtendedReportDump = ExtendedReportDump &
+export type SsExtendedReportDump = ExtendedReportDump &
 {
 	ssrc: number;
 	beginSeq: number;
@@ -70,7 +70,7 @@ export type SSExtendedReportDump = ExtendedReportDump &
  * @see
  * - [RFC 3611 section 4.6](https://datatracker.ietf.org/doc/html/rfc3611#section-4.6)
  */
-export class SSExtendedReport extends ExtendedReport
+export class SsExtendedReport extends ExtendedReport
 {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty Statistics
@@ -101,7 +101,7 @@ export class SSExtendedReport extends ExtendedReport
 	/**
 	 * Dump Statistics Summary Extended Report info.
 	 */
-	dump(): SSExtendedReportDump
+	dump(): SsExtendedReportDump
 	{
 		return {
 			...super.dump(),
@@ -182,7 +182,7 @@ export class SSExtendedReport extends ExtendedReport
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
-	): SSExtendedReport
+	): SsExtendedReport
 	{
 		const view = this.cloneInternal(
 			buffer,
@@ -191,7 +191,7 @@ export class SSExtendedReport extends ExtendedReport
 			serializationByteOffset
 		);
 
-		return new SSExtendedReport(view);
+		return new SsExtendedReport(view);
 	}
 
 	/**

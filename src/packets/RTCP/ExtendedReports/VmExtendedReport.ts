@@ -16,7 +16,7 @@ const VM_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 32;
  *
  * @category RTCP Extended Reports
  */
-export type VMExtendedReportDump = ExtendedReportDump &
+export type VmExtendedReportDump = ExtendedReportDump &
 {
 	ssrc: number;
 	lossRate: number;
@@ -75,7 +75,7 @@ export type VMExtendedReportDump = ExtendedReportDump &
  * @see
  * - [RFC 3611 section 4.7](https://datatracker.ietf.org/doc/html/rfc3611#section-4.7)
  */
-export class VMExtendedReport extends ExtendedReport
+export class VmExtendedReport extends ExtendedReport
 {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty VoIP Metrics
@@ -106,7 +106,7 @@ export class VMExtendedReport extends ExtendedReport
 	/**
 	 * Dump VoIP Metrics Extended Report info.
 	 */
-	dump(): VMExtendedReportDump
+	dump(): VmExtendedReportDump
 	{
 		return {
 			...super.dump(),
@@ -196,7 +196,7 @@ export class VMExtendedReport extends ExtendedReport
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
-	): VMExtendedReport
+	): VmExtendedReport
 	{
 		const view = this.cloneInternal(
 			buffer,
@@ -205,7 +205,7 @@ export class VMExtendedReport extends ExtendedReport
 			serializationByteOffset
 		);
 
-		return new VMExtendedReport(view);
+		return new VmExtendedReport(view);
 	}
 
 	/**

@@ -13,7 +13,7 @@ const RRT_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 8;
  *
  * @category RTCP Extended Reports
  */
-export type RRTExtendedReportDump = ExtendedReportDump &
+export type RrtExtendedReportDump = ExtendedReportDump &
 {
 	ntpSeq: number;
 	ntpFraction: number;
@@ -39,7 +39,7 @@ export type RRTExtendedReportDump = ExtendedReportDump &
  * @see
  * - [RFC 3611 section 4.4](https://datatracker.ietf.org/doc/html/rfc3611#section-4.4)
  */
-export class RRTExtendedReport extends ExtendedReport
+export class RrtExtendedReport extends ExtendedReport
 {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty Receiver
@@ -70,7 +70,7 @@ export class RRTExtendedReport extends ExtendedReport
 	/**
 	 * Dump Receiver Reference Time Extended Report info.
 	 */
-	dump(): RRTExtendedReportDump
+	dump(): RrtExtendedReportDump
 	{
 		return {
 			...super.dump(),
@@ -139,7 +139,7 @@ export class RRTExtendedReport extends ExtendedReport
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
-	): RRTExtendedReport
+	): RrtExtendedReport
 	{
 		const view = this.cloneInternal(
 			buffer,
@@ -148,7 +148,7 @@ export class RRTExtendedReport extends ExtendedReport
 			serializationByteOffset
 		);
 
-		return new RRTExtendedReport(view);
+		return new RrtExtendedReport(view);
 	}
 
 	/**

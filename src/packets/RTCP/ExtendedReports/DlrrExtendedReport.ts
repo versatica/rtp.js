@@ -10,9 +10,9 @@ import {
  *
  * @category RTCP Extended Reports
  */
-export type DLRRExtendedReportDump = ExtendedReportDump &
+export type DlrrExtendedReportDump = ExtendedReportDump &
 {
-	subReports: DLRRSubReport[];
+	subReports: DlrrSubReport[];
 };
 
 /**
@@ -20,7 +20,7 @@ export type DLRRExtendedReportDump = ExtendedReportDump &
  *
  * @category RTCP Extended Reports
  */
-export type DLRRSubReport =
+export type DlrrSubReport =
 {
 	/**
 	 * SSRC of receiver.
@@ -62,10 +62,10 @@ export type DLRRSubReport =
  * @see
  * - [RFC 3611 section 4.5](https://datatracker.ietf.org/doc/html/rfc3611#section-4.5)
  */
-export class DLRRExtendedReport extends ExtendedReport
+export class DlrrExtendedReport extends ExtendedReport
 {
 	// Sub-reports.
-	#subReports: DLRRSubReport[] = [];
+	#subReports: DlrrSubReport[] = [];
 
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty DLRR Extended
@@ -119,7 +119,7 @@ export class DLRRExtendedReport extends ExtendedReport
 	/**
 	 * Dump DLRR Extended Report info.
 	 */
-	dump(): DLRRExtendedReportDump
+	dump(): DlrrExtendedReportDump
 	{
 		return {
 			...super.dump(),
@@ -195,7 +195,7 @@ export class DLRRExtendedReport extends ExtendedReport
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
-	): DLRRExtendedReport
+	): DlrrExtendedReport
 	{
 		const view = this.cloneInternal(
 			buffer,
@@ -204,13 +204,13 @@ export class DLRRExtendedReport extends ExtendedReport
 			serializationByteOffset
 		);
 
-		return new DLRRExtendedReport(view);
+		return new DlrrExtendedReport(view);
 	}
 
 	/**
 	 * Get sub-reports.
 	 */
-	getSubReports(): DLRRSubReport[]
+	getSubReports(): DlrrSubReport[]
 	{
 		return Array.from(this.#subReports);
 	}
@@ -218,7 +218,7 @@ export class DLRRExtendedReport extends ExtendedReport
 	/**
 	 * Set sub-reports.
 	 */
-	setSubReports(subReports: DLRRSubReport[]): void
+	setSubReports(subReports: DlrrSubReport[]): void
 	{
 		this.#subReports = Array.from(subReports);
 
@@ -228,7 +228,7 @@ export class DLRRExtendedReport extends ExtendedReport
 	/**
 	 * Add sub-report.
 	 */
-	addSubReport(subReport: DLRRSubReport): void
+	addSubReport(subReport: DlrrSubReport): void
 	{
 		this.#subReports.push(subReport);
 
