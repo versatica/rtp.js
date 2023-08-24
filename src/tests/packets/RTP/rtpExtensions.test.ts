@@ -1,6 +1,7 @@
 import { RtpPacket,	RtpPacketDump } from '../../../packets/RTP/RtpPacket';
 import {
 	RtpExtensionType,
+	RtpExtensionMapping,
 	rtpExtensionUriToType
 } from '../../../packets/RTP/rtpExtensions';
 
@@ -16,20 +17,30 @@ const rtpPacketDump: Partial<RtpPacketDump> =
 	transmissionOffsetExt     : 1234
 };
 
+const extensionMapping: RtpExtensionMapping =
+{
+	[RtpExtensionType.MID]                       : 1,
+	[RtpExtensionType.RTP_STREAM_ID]             : 2,
+	[RtpExtensionType.RTP_REPAIRED_STREAM_ID]    : 3,
+	[RtpExtensionType.ABS_SEND_TIME]             : 4,
+	[RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER] : 5,
+	[RtpExtensionType.SSRC_AUDIO_LEVEL]          : 6,
+	[RtpExtensionType.VIDEO_ORIENTATION]         : 7,
+	[RtpExtensionType.TOFFSET]                   : 8
+};
+
 const packet = new RtpPacket();
 
-packet.setExtensionMapping(
-	{
-		[RtpExtensionType.MID]                       : 1,
-		[RtpExtensionType.RTP_STREAM_ID]             : 2,
-		[RtpExtensionType.RTP_REPAIRED_STREAM_ID]    : 3,
-		[RtpExtensionType.ABS_SEND_TIME]             : 4,
-		[RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER] : 5,
-		[RtpExtensionType.SSRC_AUDIO_LEVEL]          : 6,
-		[RtpExtensionType.VIDEO_ORIENTATION]         : 7,
-		[RtpExtensionType.TOFFSET]                   : 8
-	}
-);
+packet.setExtensionMapping(extensionMapping);
+
+test('packet.getExtensionMapping() returns given extension mapping object', () =>
+{
+	// It's the same content.
+	expect(packet.getExtensionMapping()).toEqual(extensionMapping);
+
+	// But it's not the same object (but a cloned one).
+	expect(packet.getExtensionMapping() === extensionMapping).toBe(false);
+});
 
 test('set RTP extension mapping and get/set specific RTP extensions', () =>
 {
