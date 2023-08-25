@@ -2,9 +2,7 @@ import {
 	readBitInDataView,
 	writeBitInDataView,
 	readBitsInDataView,
-	writeBitsInDataView,
-	read3BytesInDataView,
-	write3BytesInDataView
+	writeBitsInDataView
 } from '../../utils/bitOps';
 
 let view: DataView;
@@ -109,16 +107,4 @@ test('writeBitsInDataView()', () =>
 
 	writeBitsInDataView({ view, pos: 6, mask: 0b11000000, value: 0b00000010 });
 	expect(view.getUint8(6)).toBe(0b10100000);
-});
-
-test('read3BytesInDataView()', () =>
-{
-	// Bytes 4,5 and 6 in the array are number 8405024.
-	expect(read3BytesInDataView({ view, pos: 4 })).toBe(8405024);
-});
-
-test('write3BytesInDataView()', () =>
-{
-	write3BytesInDataView({ view, pos: 1, value: 8405024 });
-	expect(read3BytesInDataView({ view, pos: 1 })).toBe(8405024);
 });

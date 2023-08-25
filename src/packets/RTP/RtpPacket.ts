@@ -16,10 +16,12 @@ import {
 	readBitInDataView,
 	writeBitInDataView,
 	readBitsInDataView,
-	writeBitsInDataView,
+	writeBitsInDataView
+} from '../../utils/bitOps';
+import {
 	read3BytesInDataView,
 	write3BytesInDataView
-} from '../../utils/bitOps';
+} from '../../utils/byteOps';
 
 const FIXED_HEADER_LENGTH = 12;
 
