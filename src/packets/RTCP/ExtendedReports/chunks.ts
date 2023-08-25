@@ -3,6 +3,29 @@ import { readBit,	writeBit } from '../../../utils/bitOps';
 /**
  * Loss RLE and Duplicate RLE Extended Report chunk info.
  *
+ * ```text
+ * Run Length Chunk
+ *  0                   1
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |C|R|        run length         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ * Bit Vector Chunk
+ *  0                   1
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |C|        bit vector           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ * Terminating Null Chunk
+ *  0                   1
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0|
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * ```
+ *
  * @category RTCP Extended Reports
  *
  * @see
@@ -70,6 +93,14 @@ export function parseExtendedReportChunk(chunk: number): ExtendedReportChunk
 /**
  * Create a Run Length Chunk and return a 2 bytes number representing it.
  *
+ * ```text
+ *  0                   1
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |C|R|        run length         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * ```
+ *
  * @category RTCP Extended Reports
  *
  * @see
@@ -97,6 +128,14 @@ export function createExtendedReportRunLengthChunk(
 
 /**
  * Create a Bit Vector Chunk and return a 2 bytes number representing it.
+ *
+ * ```text
+ *  0                   1
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |C|        bit vector           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * ```
  *
  * @category RTCP Extended Reports
  *
