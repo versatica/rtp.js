@@ -33,7 +33,11 @@ export enum RtpFeedbackMessageType
 	/**
 	 * Explicit Congestion Notification (ECN).
 	 */
-	ECN = 8
+	ECN = 8,
+	/**
+	 * Google Transport-wide Congestion Control.
+	 */
+	TCC = 15
 }
 
 /**
@@ -107,6 +111,11 @@ function messageTypeToString(
 		case RtpFeedbackMessageType.ECN:
 		{
 			return 'Explicit Congestion Notification (ECN)';
+		}
+
+		case RtpFeedbackMessageType.TCC:
+		{
+			return 'Google Transport-wide Congestion Control';
 		}
 
 		case PsFeedbackMessageType.PLI:
