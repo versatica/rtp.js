@@ -124,10 +124,10 @@ export class TccPacket extends FeedbackPacket
 	{
 		return {
 			...super.dump(),
-			baseSequenceNumber  : this.getBaseSequenceNumber();
-			packetStatusCount   : this.getPacketStatusCount();
-			referenceTime       : this.getReferenceTime();
-			feedbackPacketCount : this.getFeedbackPacketCount();
+			baseSequenceNumber  : this.getBaseSequenceNumber(),
+			packetStatusCount   : this.getPacketStatusCount(),
+			referenceTime       : this.getReferenceTime(),
+			feedbackPacketCount : this.getFeedbackPacketCount()
 		};
 	}
 
