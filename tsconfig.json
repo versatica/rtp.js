@@ -4,8 +4,8 @@
 	{
 		"lib": [ "es2020" ],
 		"target": "es2020",
-		"module": "es2020",
-		"moduleResolution": "nodenext",
+		"module": "commonjs",
+		"moduleResolution": "node",
 		"strict": true,
 		"outDir": "lib",
 		"declaration": true,
