@@ -7,7 +7,7 @@ const PKG = JSON.parse(fs.readFileSync('./package.json').toString());
 const RELEASE_BRANCH = 'master';
 const IS_WINDOWS = os.platform() === 'win32';
 
-const task = process.argv.slice(2).join(' ');
+const task = process.argv[2];
 
 run();
 
