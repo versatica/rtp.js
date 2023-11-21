@@ -40,7 +40,7 @@ const packetDump: XrPacketDump =
 	reports    : [ report1Dump ]
 };
 
-describe('parse RTCP Receiver Report packet', () =>
+describe('parse RTCP XR packet', () =>
 {
 	const array = new Uint8Array(
 		[
