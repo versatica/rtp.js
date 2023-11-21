@@ -8,6 +8,10 @@ import {
 	LrleExtendedReportDump
 } from '../../../packets/RTCP/ExtendedReports/LrleExtendedReport';
 import {
+	DlrrExtendedReport,
+	DlrrExtendedReportDump
+} from '../../../packets/RTCP/ExtendedReports/DlrrExtendedReport';
+import {
 	parseExtendedReportChunk,
 	createExtendedReportRunLengthChunk,
 	createExtendedReportBitVectorChunk
@@ -30,21 +34,32 @@ const report1Dump: LrleExtendedReportDump =
 	chunks     : [ runLengthZerosChunk, runLengthOnesChunk, bitVectorChunk ]
 };
 
+const report2Dump: DlrrExtendedReportDump =
+{
+	byteLength : 28,
+	reportType : ExtendedReportType.DLRR,
+	subReports :
+	[
+		{ ssrc: 0x11121314, lrr: 0x00110011, dlrr: 0x11001100 },
+		{ ssrc: 0x21222324, lrr: 0x00220022, dlrr: 0x22002200 }
+	]
+};
+
 const packetDump: XrPacketDump =
 {
-	byteLength : 32,
+	byteLength : 60,
 	padding    : 4,
 	packetType : RtcpPacketType.XR,
 	count      : 0, // No count field in XR packets.
 	ssrc       : 0x5d931534,
-	reports    : [ report1Dump ]
+	reports    : [ report1Dump, report2Dump ]
 };
 
 describe('parse RTCP XR packet', () =>
 {
 	const array = new Uint8Array(
 		[
-			0xa0, 0xcf, 0x00, 0x07, // Padding, Type: 207 (XR), Length: 7
+			0xa0, 0xcf, 0x00, 0x0E, // Padding, Type: 207 (XR), Length: 14
 			0x5d, 0x93, 0x15, 0x34, // Sender SSRC: 0x5d931534
 			// Extended Report LRLE
 			0x01, 0x09, 0x00, 0x04, // BT: 1 (LRLE), T: 9, Block Length: 4
@@ -54,6 +69,14 @@ describe('parse RTCP XR packet', () =>
 			0b01101010, 0b10101010, // Run Lengh Chunk (ones)
 			0b11101010, 0b10101010, // Bit Vector Chunk
 			0b00000000, 0b00000000, // Terminating Null Chunk
+			// Extended Report DLRR
+			0x05, 0x00, 0x00, 0x06, // BT: 5 (DLRR), Block Length: 6
+			0x11, 0x12, 0x13, 0x14, // SSRC 1
+			0x00, 0x11, 0x00, 0x11, // LRR 1
+			0x11, 0x00, 0x11, 0x00, // DLRR 1
+			0x21, 0x22, 0x23, 0x24, // SSRC 2
+			0x00, 0x22, 0x00, 0x22, // LRR 2
+			0x22, 0x00, 0x22, 0x00, // DLRR 2
 			0x00, 0x00, 0x00, 0x04 // Padding (4 bytes)
 		]
 	);
@@ -74,13 +97,13 @@ describe('parse RTCP XR packet', () =>
 		const packet = new XrPacket(view);
 
 		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.getByteLength()).toBe(32);
+		expect(packet.getByteLength()).toBe(60);
 		expect(packet.getPacketType()).toBe(RtcpPacketType.XR);
 		// No count field in XR packetd, so this must be 0.
 		expect(packet.getCount()).toBe(0);
 		expect(packet.getPadding()).toBe(4);
 		expect(packet.getSsrc()).toBe(0x5d931534);
-		expect(packet.getReports().length).toBe(1);
+		expect(packet.getReports().length).toBe(2);
 		expect(packet.dump()).toEqual(packetDump);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
 
@@ -97,6 +120,19 @@ describe('parse RTCP XR packet', () =>
 			[ runLengthZerosChunk, runLengthOnesChunk, bitVectorChunk ]
 		);
 		expect(report1.dump()).toEqual(report1Dump);
+
+		const report2 = packet.getReports()[1] as DlrrExtendedReport;
+
+		expect(report2.needsSerialization()).toBe(false);
+		expect(report2.getByteLength()).toBe(28);
+		expect(report2.getReportType()).toBe(ExtendedReportType.DLRR);
+		expect(report2.getSubReports()).toEqual(
+			[
+				{ ssrc: 0x11121314, lrr: 0x00110011, dlrr: 0x11001100 },
+				{ ssrc: 0x21222324, lrr: 0x00220022, dlrr: 0x22002200 }
+			]
+		);
+		expect(report2.dump()).toEqual(report2Dump);
 	});
 });
 
@@ -143,22 +179,37 @@ describe('create RTCP XR packet', () =>
 		expect(report1.needsSerialization()).toBe(true);
 
 		packet.addReport(report1);
+
+		const report2 = new DlrrExtendedReport();
+
+		expect(report2.needsSerialization()).toBe(false);
+		expect(report2.getByteLength()).toBe(4);
+		expect(report2.getReportType()).toBe(ExtendedReportType.DLRR);
+		expect(report2.getSubReports()).toEqual([]);
+
+		report2.setSubReports(report2Dump.subReports);
+		expect(report2.dump()).toEqual(report2Dump);
+		expect(report2.needsSerialization()).toBe(true);
+
+		packet.addReport(report2);
+
 		// We cannot add padding to RTCP packets so fix the dump.
 		expect(packet.dump()).toEqual(
 			{
 				...packetDump,
-				byteLength : 28,
+				byteLength : 56,
 				padding    : 0
 			});
 
 		packet.serialize();
 		expect(packet.needsSerialization()).toBe(false);
 		expect(report1.needsSerialization()).toBe(false);
+		expect(report2.needsSerialization()).toBe(false);
 		// We cannot add padding to RTCP packets so fix the dump.
 		expect(packet.dump()).toEqual(
 			{
 				...packetDump,
-				byteLength : 28,
+				byteLength : 56,
 				padding    : 0
 			});
 
@@ -167,7 +218,7 @@ describe('create RTCP XR packet', () =>
 		expect(clonedPacket.dump()).toEqual(
 			{
 				...packetDump,
-				byteLength : 28,
+				byteLength : 56,
 				padding    : 0
 			});
 		expect(
