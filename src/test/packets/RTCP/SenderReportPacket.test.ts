@@ -1,25 +1,23 @@
 import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket';
 import {
 	ReceptionReport,
-	ReceptionReportDump
+	ReceptionReportDump,
 } from '../../../packets/RTCP/ReceiverReportPacket';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
 import { areDataViewsEqual } from '../../../utils/helpers';
 
-const receptionReportDump1: ReceptionReportDump =
-{
-	byteLength   : 24,
-	ssrc         : 0x01932db4,
-	fractionLost : 80,
-	totalLost    : 216,
-	highestSeq   : 342342,
-	jitter       : 0,
-	lsr          : 8234,
-	dlsr         : 5
+const receptionReportDump1: ReceptionReportDump = {
+	byteLength: 24,
+	ssrc: 0x01932db4,
+	fractionLost: 80,
+	totalLost: 216,
+	highestSeq: 342342,
+	jitter: 0,
+	lsr: 8234,
+	dlsr: 5,
 };
 
-describe('parse RTCP Sender Report packet', () =>
-{
+describe('parse RTCP Sender Report packet', () => {
 	// Sender info.
 	const ssrc = 0x5d931534;
 	const ntpSeconds = 3711615412;
@@ -28,38 +26,69 @@ describe('parse RTCP Sender Report packet', () =>
 	const packetCount = 3608;
 	const octetCount = 577280;
 
-	const array = new Uint8Array(
-		[
-			0x81, 0xc8, 0x00, 0x0c, // Type: 200 (Sender Report), Count: 1, Length: 12
-			0x5d, 0x93, 0x15, 0x34, // SSRC: 0x5d931534
-			0xdd, 0x3a, 0xc1, 0xb4, // NTP Sec: 3711615412
-			0x76, 0x54, 0x71, 0x71, // NTP Frac: 1985245553
-			0x00, 0x08, 0xcf, 0x00, // RTP timestamp: 577280
-			0x00, 0x00, 0x0e, 0x18, // Packet count: 3608
-			0x00, 0x08, 0xcf, 0x00, // Octet count: 577280
-			// Reception Report
-			0x01, 0x93, 0x2d, 0xb4, // SSRC: 0x01932db4
-			0x50, 0x00, 0x00, 0xd8, // Fraction lost: 0, Total lost: 1
-			0x00, 0x05, 0x39, 0x46, // Extended highest sequence number: 0
-			0x00, 0x00, 0x00, 0x00, // Jitter: 0
-			0x00, 0x00, 0x20, 0x2a, // Last SR: 8234
-			0x00, 0x00, 0x00, 0x05 // DLSR: 5
-		]
-	);
+	const array = new Uint8Array([
+		0x81,
+		0xc8,
+		0x00,
+		0x0c, // Type: 200 (Sender Report), Count: 1, Length: 12
+		0x5d,
+		0x93,
+		0x15,
+		0x34, // SSRC: 0x5d931534
+		0xdd,
+		0x3a,
+		0xc1,
+		0xb4, // NTP Sec: 3711615412
+		0x76,
+		0x54,
+		0x71,
+		0x71, // NTP Frac: 1985245553
+		0x00,
+		0x08,
+		0xcf,
+		0x00, // RTP timestamp: 577280
+		0x00,
+		0x00,
+		0x0e,
+		0x18, // Packet count: 3608
+		0x00,
+		0x08,
+		0xcf,
+		0x00, // Octet count: 577280
+		// Reception Report
+		0x01,
+		0x93,
+		0x2d,
+		0xb4, // SSRC: 0x01932db4
+		0x50,
+		0x00,
+		0x00,
+		0xd8, // Fraction lost: 0, Total lost: 1
+		0x00,
+		0x05,
+		0x39,
+		0x46, // Extended highest sequence number: 0
+		0x00,
+		0x00,
+		0x00,
+		0x00, // Jitter: 0
+		0x00,
+		0x00,
+		0x20,
+		0x2a, // Last SR: 8234
+		0x00,
+		0x00,
+		0x00,
+		0x05, // DLSR: 5
+	]);
 
-	const view = new DataView(
-		array.buffer,
-		array.byteOffset,
-		array.byteLength
-	);
+	const view = new DataView(array.buffer, array.byteOffset, array.byteLength);
 
-	test('buffer view is RTCP', () =>
-	{
+	test('buffer view is RTCP', () => {
 		expect(isRtcp(view)).toBe(true);
 	});
 
-	test('packet processing succeeds', () =>
-	{
+	test('packet processing succeeds', () => {
 		const packet = new SenderReportPacket(view);
 
 		expect(packet.needsSerialization()).toBe(false);
@@ -114,25 +143,46 @@ describe('parse RTCP Sender Report packet', () =>
 		expect(packet.needsSerialization()).toBe(false);
 	});
 
-	test('packet processing succeeds for a buffer view with padding', () =>
-	{
-		const array2 = new Uint8Array(
-			[
-				0xa0, 0xc8, 0x00, 0x07, // Padding, Type: 200, Count: 0, Length: 7
-				0x5d, 0x93, 0x15, 0x34, // SSRC: 0x5d931534
-				0xdd, 0x3a, 0xc1, 0xb4, // NTP Sec: 3711615412
-				0x76, 0x54, 0x71, 0x71, // NTP Frac: 1985245553
-				0x00, 0x08, 0xcf, 0x00, // RTP timestamp: 577280
-				0x00, 0x00, 0x0e, 0x18, // Packet count: 3608
-				0x00, 0x08, 0xcf, 0x00, // Octet count: 577280
-				0x00, 0x00, 0x00, 0x04 // Padding (4 bytes)
-			]
-		);
+	test('packet processing succeeds for a buffer view with padding', () => {
+		const array2 = new Uint8Array([
+			0xa0,
+			0xc8,
+			0x00,
+			0x07, // Padding, Type: 200, Count: 0, Length: 7
+			0x5d,
+			0x93,
+			0x15,
+			0x34, // SSRC: 0x5d931534
+			0xdd,
+			0x3a,
+			0xc1,
+			0xb4, // NTP Sec: 3711615412
+			0x76,
+			0x54,
+			0x71,
+			0x71, // NTP Frac: 1985245553
+			0x00,
+			0x08,
+			0xcf,
+			0x00, // RTP timestamp: 577280
+			0x00,
+			0x00,
+			0x0e,
+			0x18, // Packet count: 3608
+			0x00,
+			0x08,
+			0xcf,
+			0x00, // Octet count: 577280
+			0x00,
+			0x00,
+			0x00,
+			0x04, // Padding (4 bytes)
+		]);
 
 		const view2 = new DataView(
 			array2.buffer,
 			array2.byteOffset,
-			array2.byteLength
+			array2.byteLength,
 		);
 
 		const packet = new SenderReportPacket(view2);
@@ -152,25 +202,17 @@ describe('parse RTCP Sender Report packet', () =>
 		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
 	});
 
-	test('parsing a buffer view which length does not fit the indicated count throws', () =>
-	{
+	test('parsing a buffer view which length does not fit the indicated count throws', () => {
 		// Parse the first 8 bytes of buffer, indicating 1 Reception Report and
 		// holding no report at all.
-		const view3 = new DataView(
-			array.buffer,
-			array.byteOffset,
-			8
-		);
+		const view3 = new DataView(array.buffer, array.byteOffset, 8);
 
-		expect(() => (new SenderReportPacket(view3)))
-			.toThrowError(RangeError);
+		expect(() => new SenderReportPacket(view3)).toThrowError(RangeError);
 	});
 });
 
-describe('create RTCP Sender Report packet', () =>
-{
-	test('creating a Sender Report packet succeeds', () =>
-	{
+describe('create RTCP Sender Report packet', () => {
+	test('creating a Sender Report packet succeeds', () => {
 		const packet = new SenderReportPacket();
 
 		expect(isRtcp(packet.getView())).toBe(true);
@@ -244,37 +286,59 @@ describe('create RTCP Sender Report packet', () =>
 		report.setLastSRTimestamp(10012312);
 		report.setDelaySinceLastSR(999983432);
 
-		packet.setReports([ report ]);
+		packet.setReports([report]);
 		expect(isRtcp(packet.getView())).toBe(true);
 
 		const clonedPacket = packet.clone();
 
 		expect(isRtcp(clonedPacket.getView())).toBe(true);
 		expect(clonedPacket.dump()).toEqual(packet.dump());
-		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(true);
+		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
+			true,
+		);
 	});
 
-	test('packet.clone() succeeds', () =>
-	{
-		const array = new Uint8Array(
-			[
-				0xa0, 0xc8, 0x00, 0x08, // Padding, Type: 200, Count: 0, Length: 8
-				0x5d, 0x93, 0x15, 0x34, // SSRC: 0x5d931534
-				0xdd, 0x3a, 0xc1, 0xb4, // NTP Sec: 3711615412
-				0x76, 0x54, 0x71, 0x71, // NTP Frac: 1985245553
-				0x00, 0x08, 0xcf, 0x00, // RTP timestamp: 577280
-				0x00, 0x00, 0x0e, 0x18, // Packet count: 3608
-				0x00, 0x08, 0xcf, 0x00, // Octet count: 577280
-				0x00, 0x00, 0x00, 0x00, // Padding (8 bytes)
-				0x00, 0x00, 0x00, 0x08
-			]
-		);
+	test('packet.clone() succeeds', () => {
+		const array = new Uint8Array([
+			0xa0,
+			0xc8,
+			0x00,
+			0x08, // Padding, Type: 200, Count: 0, Length: 8
+			0x5d,
+			0x93,
+			0x15,
+			0x34, // SSRC: 0x5d931534
+			0xdd,
+			0x3a,
+			0xc1,
+			0xb4, // NTP Sec: 3711615412
+			0x76,
+			0x54,
+			0x71,
+			0x71, // NTP Frac: 1985245553
+			0x00,
+			0x08,
+			0xcf,
+			0x00, // RTP timestamp: 577280
+			0x00,
+			0x00,
+			0x0e,
+			0x18, // Packet count: 3608
+			0x00,
+			0x08,
+			0xcf,
+			0x00, // Octet count: 577280
+			0x00,
+			0x00,
+			0x00,
+			0x00, // Padding (8 bytes)
+			0x00,
+			0x00,
+			0x00,
+			0x08,
+		]);
 
-		const view = new DataView(
-			array.buffer,
-			array.byteOffset,
-			array.byteLength
-		);
+		const view = new DataView(array.buffer, array.byteOffset, array.byteLength);
 
 		const packet = new SenderReportPacket(view);
 		const clonedPacket = packet.clone();
@@ -291,6 +355,8 @@ describe('create RTCP Sender Report packet', () =>
 		expect(packet.getPacketCount()).toBe(3608);
 		expect(packet.getOctetCount()).toBe(577280);
 		expect(clonedPacket.dump()).toEqual(packet.dump());
-		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(true);
+		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
+			true,
+		);
 	});
 });

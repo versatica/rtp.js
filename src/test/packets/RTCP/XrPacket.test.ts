@@ -1,20 +1,18 @@
 import { XrPacket, XrPacketDump } from '../../../packets/RTCP/XrPacket';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import {
-	ExtendedReportType
-} from '../../../packets/RTCP/ExtendedReports/ExtendedReport';
+import { ExtendedReportType } from '../../../packets/RTCP/ExtendedReports/ExtendedReport';
 import {
 	LrleExtendedReport,
-	LrleExtendedReportDump
+	LrleExtendedReportDump,
 } from '../../../packets/RTCP/ExtendedReports/LrleExtendedReport';
 import {
 	DlrrExtendedReport,
-	DlrrExtendedReportDump
+	DlrrExtendedReportDump,
 } from '../../../packets/RTCP/ExtendedReports/DlrrExtendedReport';
 import {
 	parseExtendedReportChunk,
 	createExtendedReportRunLengthChunk,
-	createExtendedReportBitVectorChunk
+	createExtendedReportBitVectorChunk,
 } from '../../../packets/RTCP/ExtendedReports/chunks';
 import { areDataViewsEqual } from '../../../utils/helpers';
 
@@ -23,77 +21,107 @@ const runLengthOnesChunk = 0b0110101010101010;
 const bitVectorChunk = 0b1110101010101010;
 const terminatingNullChunk = 0b0000000000000000;
 
-const report1Dump: LrleExtendedReportDump =
-{
-	byteLength : 20,
-	reportType : ExtendedReportType.LRLE,
-	thinning   : 9,
-	ssrc       : 0x03932db4,
-	beginSeq   : 0x11,
-	endSeq     : 0x22,
-	chunks     : [ runLengthZerosChunk, runLengthOnesChunk, bitVectorChunk ]
+const report1Dump: LrleExtendedReportDump = {
+	byteLength: 20,
+	reportType: ExtendedReportType.LRLE,
+	thinning: 9,
+	ssrc: 0x03932db4,
+	beginSeq: 0x11,
+	endSeq: 0x22,
+	chunks: [runLengthZerosChunk, runLengthOnesChunk, bitVectorChunk],
 };
 
-const report2Dump: DlrrExtendedReportDump =
-{
-	byteLength : 28,
-	reportType : ExtendedReportType.DLRR,
-	subReports :
-	[
+const report2Dump: DlrrExtendedReportDump = {
+	byteLength: 28,
+	reportType: ExtendedReportType.DLRR,
+	subReports: [
 		{ ssrc: 0x11121314, lrr: 0x00110011, dlrr: 0x11001100 },
-		{ ssrc: 0x21222324, lrr: 0x00220022, dlrr: 0x22002200 }
-	]
+		{ ssrc: 0x21222324, lrr: 0x00220022, dlrr: 0x22002200 },
+	],
 };
 
-const packetDump: XrPacketDump =
-{
-	byteLength : 60,
-	padding    : 4,
-	packetType : RtcpPacketType.XR,
-	count      : 0, // No count field in XR packets.
-	ssrc       : 0x5d931534,
-	reports    : [ report1Dump, report2Dump ]
+const packetDump: XrPacketDump = {
+	byteLength: 60,
+	padding: 4,
+	packetType: RtcpPacketType.XR,
+	count: 0, // No count field in XR packets.
+	ssrc: 0x5d931534,
+	reports: [report1Dump, report2Dump],
 };
 
-describe('parse RTCP XR packet', () =>
-{
-	const array = new Uint8Array(
-		[
-			0xa0, 0xcf, 0x00, 0x0E, // Padding, Type: 207 (XR), Length: 14
-			0x5d, 0x93, 0x15, 0x34, // Sender SSRC: 0x5d931534
-			// Extended Report LRLE
-			0x01, 0x09, 0x00, 0x04, // BT: 1 (LRLE), T: 9, Block Length: 4
-			0x03, 0x93, 0x2d, 0xb4, // SSRC of source: 0x03932db4
-			0x00, 0x11, 0x00, 0x22, // Begin Seq: 0x11, End Seq: 0x22
-			0b00101010, 0b10101010, // Run Lengh Chunk (zeros)
-			0b01101010, 0b10101010, // Run Lengh Chunk (ones)
-			0b11101010, 0b10101010, // Bit Vector Chunk
-			0b00000000, 0b00000000, // Terminating Null Chunk
-			// Extended Report DLRR
-			0x05, 0x00, 0x00, 0x06, // BT: 5 (DLRR), Block Length: 6
-			0x11, 0x12, 0x13, 0x14, // SSRC 1
-			0x00, 0x11, 0x00, 0x11, // LRR 1
-			0x11, 0x00, 0x11, 0x00, // DLRR 1
-			0x21, 0x22, 0x23, 0x24, // SSRC 2
-			0x00, 0x22, 0x00, 0x22, // LRR 2
-			0x22, 0x00, 0x22, 0x00, // DLRR 2
-			0x00, 0x00, 0x00, 0x04 // Padding (4 bytes)
-		]
-	);
+describe('parse RTCP XR packet', () => {
+	const array = new Uint8Array([
+		0xa0,
+		0xcf,
+		0x00,
+		0x0e, // Padding, Type: 207 (XR), Length: 14
+		0x5d,
+		0x93,
+		0x15,
+		0x34, // Sender SSRC: 0x5d931534
+		// Extended Report LRLE
+		0x01,
+		0x09,
+		0x00,
+		0x04, // BT: 1 (LRLE), T: 9, Block Length: 4
+		0x03,
+		0x93,
+		0x2d,
+		0xb4, // SSRC of source: 0x03932db4
+		0x00,
+		0x11,
+		0x00,
+		0x22, // Begin Seq: 0x11, End Seq: 0x22
+		0b00101010,
+		0b10101010, // Run Lengh Chunk (zeros)
+		0b01101010,
+		0b10101010, // Run Lengh Chunk (ones)
+		0b11101010,
+		0b10101010, // Bit Vector Chunk
+		0b00000000,
+		0b00000000, // Terminating Null Chunk
+		// Extended Report DLRR
+		0x05,
+		0x00,
+		0x00,
+		0x06, // BT: 5 (DLRR), Block Length: 6
+		0x11,
+		0x12,
+		0x13,
+		0x14, // SSRC 1
+		0x00,
+		0x11,
+		0x00,
+		0x11, // LRR 1
+		0x11,
+		0x00,
+		0x11,
+		0x00, // DLRR 1
+		0x21,
+		0x22,
+		0x23,
+		0x24, // SSRC 2
+		0x00,
+		0x22,
+		0x00,
+		0x22, // LRR 2
+		0x22,
+		0x00,
+		0x22,
+		0x00, // DLRR 2
+		0x00,
+		0x00,
+		0x00,
+		0x04, // Padding (4 bytes)
+	]);
 
-	const view = new DataView(
-		array.buffer,
-		array.byteOffset,
-		array.byteLength
-	);
+	const view = new DataView(array.buffer, array.byteOffset, array.byteLength);
 
-	test('buffer view is RTCP', () =>
-	{
+	test('buffer view is RTCP', () => {
 		expect(isRtcp(view)).toBe(true);
 	});
 
-	test('packet processing succeeds', () =>
-	{
+	test('packet processing succeeds', () => {
 		const packet = new XrPacket(view);
 
 		expect(packet.needsSerialization()).toBe(false);
@@ -116,9 +144,11 @@ describe('parse RTCP XR packet', () =>
 		expect(report1.getSsrc()).toBe(0x03932db4);
 		expect(report1.getBeginSeq()).toBe(0x11);
 		expect(report1.getEndSeq()).toBe(0x22);
-		expect(report1.getChunks()).toEqual(
-			[ runLengthZerosChunk, runLengthOnesChunk, bitVectorChunk ]
-		);
+		expect(report1.getChunks()).toEqual([
+			runLengthZerosChunk,
+			runLengthOnesChunk,
+			bitVectorChunk,
+		]);
 		expect(report1.dump()).toEqual(report1Dump);
 
 		const report2 = packet.getReports()[1] as DlrrExtendedReport;
@@ -126,20 +156,16 @@ describe('parse RTCP XR packet', () =>
 		expect(report2.needsSerialization()).toBe(false);
 		expect(report2.getByteLength()).toBe(28);
 		expect(report2.getReportType()).toBe(ExtendedReportType.DLRR);
-		expect(report2.getSubReports()).toEqual(
-			[
-				{ ssrc: 0x11121314, lrr: 0x00110011, dlrr: 0x11001100 },
-				{ ssrc: 0x21222324, lrr: 0x00220022, dlrr: 0x22002200 }
-			]
-		);
+		expect(report2.getSubReports()).toEqual([
+			{ ssrc: 0x11121314, lrr: 0x00110011, dlrr: 0x11001100 },
+			{ ssrc: 0x21222324, lrr: 0x00220022, dlrr: 0x22002200 },
+		]);
 		expect(report2.dump()).toEqual(report2Dump);
 	});
 });
 
-describe('create RTCP XR packet', () =>
-{
-	test('creating a XR packet succeeds', () =>
-	{
+describe('create RTCP XR packet', () => {
+	test('creating a XR packet succeeds', () => {
 		const packet = new XrPacket();
 
 		expect(isRtcp(packet.getView())).toBe(true);
@@ -194,83 +220,73 @@ describe('create RTCP XR packet', () =>
 		packet.addReport(report2);
 
 		// We cannot add padding to RTCP packets so fix the dump.
-		expect(packet.dump()).toEqual(
-			{
-				...packetDump,
-				byteLength : 56,
-				padding    : 0
-			});
+		expect(packet.dump()).toEqual({
+			...packetDump,
+			byteLength: 56,
+			padding: 0,
+		});
 
 		packet.serialize();
 		expect(packet.needsSerialization()).toBe(false);
 		expect(report1.needsSerialization()).toBe(false);
 		expect(report2.needsSerialization()).toBe(false);
 		// We cannot add padding to RTCP packets so fix the dump.
-		expect(packet.dump()).toEqual(
-			{
-				...packetDump,
-				byteLength : 56,
-				padding    : 0
-			});
+		expect(packet.dump()).toEqual({
+			...packetDump,
+			byteLength: 56,
+			padding: 0,
+		});
 
 		const clonedPacket = packet.clone();
 
-		expect(clonedPacket.dump()).toEqual(
-			{
-				...packetDump,
-				byteLength : 56,
-				padding    : 0
-			});
-		expect(
-			areDataViewsEqual(clonedPacket.getView(), packet.getView())
-		).toBe(true);
+		expect(clonedPacket.dump()).toEqual({
+			...packetDump,
+			byteLength: 56,
+			padding: 0,
+		});
+		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
+			true,
+		);
 	});
 });
 
-describe('chunks parsing and creation', () =>
-{
-	test('parseExtendedReportChunk()', () =>
-	{
-		expect(parseExtendedReportChunk(runLengthZerosChunk)).toEqual(
-			{
-				chunkType : 'run-length',
-				runType   : 'zeros',
-				runLength : 0b10101010101010
-			}
+describe('chunks parsing and creation', () => {
+	test('parseExtendedReportChunk()', () => {
+		expect(parseExtendedReportChunk(runLengthZerosChunk)).toEqual({
+			chunkType: 'run-length',
+			runType: 'zeros',
+			runLength: 0b10101010101010,
+		});
+
+		expect(parseExtendedReportChunk(runLengthOnesChunk)).toEqual({
+			chunkType: 'run-length',
+			runType: 'ones',
+			runLength: 0b10101010101010,
+		});
+
+		expect(parseExtendedReportChunk(bitVectorChunk)).toEqual({
+			chunkType: 'bit-vector',
+			bitVector: 0b110101010101010,
+		});
+
+		expect(parseExtendedReportChunk(terminatingNullChunk)).toEqual({
+			chunkType: 'terminating-null',
+		});
+	});
+
+	test('createExtendedReportRunLengthChunk()', () => {
+		expect(createExtendedReportRunLengthChunk('zeros', 0b10101010101010)).toBe(
+			runLengthZerosChunk,
 		);
 
-		expect(parseExtendedReportChunk(runLengthOnesChunk)).toEqual(
-			{
-				chunkType : 'run-length',
-				runType   : 'ones',
-				runLength : 0b10101010101010
-			}
-		);
-
-		expect(parseExtendedReportChunk(bitVectorChunk)).toEqual(
-			{
-				chunkType : 'bit-vector',
-				bitVector : 0b110101010101010
-			}
-		);
-
-		expect(parseExtendedReportChunk(terminatingNullChunk)).toEqual(
-			{ chunkType: 'terminating-null' }
+		expect(createExtendedReportRunLengthChunk('ones', 0b10101010101010)).toBe(
+			runLengthOnesChunk,
 		);
 	});
 
-	test('createExtendedReportRunLengthChunk()', () =>
-	{
-		expect(createExtendedReportRunLengthChunk('zeros', 0b10101010101010))
-			.toBe(runLengthZerosChunk);
-
-		expect(createExtendedReportRunLengthChunk('ones', 0b10101010101010))
-			.toBe(runLengthOnesChunk);
-	});
-
-	test('createExtendedReportBitVectorChunk()', () =>
-	{
-		expect(createExtendedReportBitVectorChunk(0b110101010101010))
-			.toBe(bitVectorChunk);
+	test('createExtendedReportBitVectorChunk()', () => {
+		expect(createExtendedReportBitVectorChunk(0b110101010101010)).toBe(
+			bitVectorChunk,
+		);
 	});
 });

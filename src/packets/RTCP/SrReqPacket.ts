@@ -3,7 +3,7 @@ import {
 	FeedbackPacket,
 	RtpFeedbackMessageType,
 	FeedbackPacketDump,
-	FIXED_HEADER_LENGTH
+	FIXED_HEADER_LENGTH,
 } from './FeedbackPacket';
 
 /**
@@ -33,8 +33,7 @@ export type SrReqPacketDump = FeedbackPacketDump;
  * @see
  * - [RFC 6051](https://datatracker.ietf.org/doc/html/rfc6051)
  */
-export class SrReqPacket extends FeedbackPacket
-{
+export class SrReqPacket extends FeedbackPacket {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP SR REQ
 	 *   packet will be created.
@@ -42,12 +41,10 @@ export class SrReqPacket extends FeedbackPacket
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP SR REQ packet.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(RtcpPacketType.RTPFB, RtpFeedbackMessageType.SR_REQ, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
 			// Write version, packet type and feedback message type.
@@ -65,10 +62,9 @@ export class SrReqPacket extends FeedbackPacket
 		pos += this.padding;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -76,18 +72,15 @@ export class SrReqPacket extends FeedbackPacket
 	/**
 	 * Dump RTCP SR REQ packet info.
 	 */
-	dump(): SrReqPacketDump
-	{
+	dump(): SrReqPacketDump {
 		return super.dump();
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
@@ -99,8 +92,7 @@ export class SrReqPacket extends FeedbackPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 
 		// Nothing else to do.
@@ -118,14 +110,13 @@ export class SrReqPacket extends FeedbackPacket
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): SrReqPacket
-	{
+		serializationByteOffset?: number,
+	): SrReqPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new SrReqPacket(view);

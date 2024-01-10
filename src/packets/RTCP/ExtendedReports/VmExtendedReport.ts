@@ -2,12 +2,9 @@ import {
 	ExtendedReport,
 	ExtendedReportType,
 	ExtendedReportDump,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './ExtendedReport';
-import {
-	readBitsInDataView,
-	writeBitsInDataView
-} from '../../../utils/bitOps';
+import { readBitsInDataView, writeBitsInDataView } from '../../../utils/bitOps';
 
 const VM_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 32;
 
@@ -16,8 +13,7 @@ const VM_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 32;
  *
  * @category RTCP Extended Reports
  */
-export type VmExtendedReportDump = ExtendedReportDump &
-{
+export type VmExtendedReportDump = ExtendedReportDump & {
 	ssrc: number;
 	lossRate: number;
 	discardRate: number;
@@ -75,18 +71,15 @@ export type VmExtendedReportDump = ExtendedReportDump &
  * @see
  * - [RFC 3611 section 4.7](https://datatracker.ietf.org/doc/html/rfc3611#section-4.7)
  */
-export class VmExtendedReport extends ExtendedReport
-{
+export class VmExtendedReport extends ExtendedReport {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty VoIP Metrics
 	 * 	 Extended Report will be created.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(ExtendedReportType.VM, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(VM_EXTENDED_REPORT_LENGTH));
 
 			// Write report type.
@@ -95,10 +88,9 @@ export class VmExtendedReport extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength !== VM_EXTENDED_REPORT_LENGTH)
-		{
+		if (this.view.byteLength !== VM_EXTENDED_REPORT_LENGTH) {
 			throw new TypeError(
-				'wrong byte length for a VoIP Metrics Extended Report'
+				'wrong byte length for a VoIP Metrics Extended Report',
 			);
 		}
 	}
@@ -106,54 +98,51 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Dump VoIP Metrics Extended Report info.
 	 */
-	dump(): VmExtendedReportDump
-	{
+	dump(): VmExtendedReportDump {
 		return {
 			...super.dump(),
-			ssrc           : this.getSsrc(),
-			lossRate       : this.getLossRate(),
-			discardRate    : this.getDiscardRate(),
-			burstDensity   : this.getBurstDensity(),
-			gapDensity     : this.getGapDensity(),
-			burstDuration  : this.getBurstDuration(),
-			gapDuration    : this.getGapDuration(),
-			roundTripDelay : this.getRoundTripDelay(),
-			endSystemDelay : this.getEndSystemDelay(),
-			signalLevel    : this.getSignalLevel(),
-			noiseLevel     : this.getNoiseLevel(),
-			rerl           : this.getResidualEchoReturnLoss(),
-			gmin           : this.getGmin(),
-			rFactor        : this.getRFactor(),
-			extRFactor     : this.getExternalRFactor(),
-			mosLq          : this.getMosLQ(),
-			mosCq          : this.getMosCQ(),
-			plc            : this.getPacketLossConcealment(),
-			jba            : this.getJitterBufferAdaptive(),
-			jbRate         : this.getJitterBufferRate(),
-			jbNominal      : this.getJitterBufferNominalDelay(),
-			jbMax          : this.getJitterBufferMaximumDelay(),
-			jbAbsMax       : this.getJitterBufferAbsoluteMaximumDelay()
+			ssrc: this.getSsrc(),
+			lossRate: this.getLossRate(),
+			discardRate: this.getDiscardRate(),
+			burstDensity: this.getBurstDensity(),
+			gapDensity: this.getGapDensity(),
+			burstDuration: this.getBurstDuration(),
+			gapDuration: this.getGapDuration(),
+			roundTripDelay: this.getRoundTripDelay(),
+			endSystemDelay: this.getEndSystemDelay(),
+			signalLevel: this.getSignalLevel(),
+			noiseLevel: this.getNoiseLevel(),
+			rerl: this.getResidualEchoReturnLoss(),
+			gmin: this.getGmin(),
+			rFactor: this.getRFactor(),
+			extRFactor: this.getExternalRFactor(),
+			mosLq: this.getMosLQ(),
+			mosCq: this.getMosCQ(),
+			plc: this.getPacketLossConcealment(),
+			jba: this.getJitterBufferAdaptive(),
+			jbRate: this.getJitterBufferRate(),
+			jbNominal: this.getJitterBufferNominalDelay(),
+			jbMax: this.getJitterBufferMaximumDelay(),
+			jbAbsMax: this.getJitterBufferAbsoluteMaximumDelay(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
+	getByteLength(): number {
 		return VM_EXTENDED_REPORT_LENGTH;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -167,18 +156,17 @@ export class VmExtendedReport extends ExtendedReport
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				VM_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH
+				VM_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH,
 			),
-			pos
+			pos,
 		);
 
 		// Move to the end.
 		pos += VM_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH;
 
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -195,14 +183,13 @@ export class VmExtendedReport extends ExtendedReport
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): VmExtendedReport
-	{
+		serializationByteOffset?: number,
+	): VmExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new VmExtendedReport(view);
@@ -211,16 +198,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get SSRC of source.
 	 */
-	getSsrc(): number
-	{
+	getSsrc(): number {
 		return this.view.getUint32(4);
 	}
 
 	/**
 	 * Set SSRC of source.
 	 */
-	setSsrc(ssrc: number): void
-	{
+	setSsrc(ssrc: number): void {
 		this.view.setUint32(4, ssrc);
 
 		this.setSerializationNeeded(true);
@@ -229,16 +214,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get loss rate.
 	 */
-	getLossRate(): number
-	{
+	getLossRate(): number {
 		return this.view.getUint8(8);
 	}
 
 	/**
 	 * Set loss rate.
 	 */
-	setLossRate(lossRate: number): void
-	{
+	setLossRate(lossRate: number): void {
 		this.view.setUint8(8, lossRate);
 
 		this.setSerializationNeeded(true);
@@ -247,16 +230,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get discard rate.
 	 */
-	getDiscardRate(): number
-	{
+	getDiscardRate(): number {
 		return this.view.getUint8(9);
 	}
 
 	/**
 	 * Set discard rate.
 	 */
-	setDiscardRate(discardRate: number): void
-	{
+	setDiscardRate(discardRate: number): void {
 		this.view.setUint8(9, discardRate);
 
 		this.setSerializationNeeded(true);
@@ -265,16 +246,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get burst density.
 	 */
-	getBurstDensity(): number
-	{
+	getBurstDensity(): number {
 		return this.view.getUint8(10);
 	}
 
 	/**
 	 * Set burst density.
 	 */
-	setBurstDensity(burstDensity: number): void
-	{
+	setBurstDensity(burstDensity: number): void {
 		this.view.setUint8(10, burstDensity);
 
 		this.setSerializationNeeded(true);
@@ -283,16 +262,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get gap density.
 	 */
-	getGapDensity(): number
-	{
+	getGapDensity(): number {
 		return this.view.getUint8(11);
 	}
 
 	/**
 	 * Set gap density.
 	 */
-	setGapDensity(gapDensity: number): void
-	{
+	setGapDensity(gapDensity: number): void {
 		this.view.setUint8(11, gapDensity);
 
 		this.setSerializationNeeded(true);
@@ -301,16 +278,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get burst duration.
 	 */
-	getBurstDuration(): number
-	{
+	getBurstDuration(): number {
 		return this.view.getUint16(12);
 	}
 
 	/**
 	 * Set burst duration.
 	 */
-	setBurstDuration(burstDuration: number): void
-	{
+	setBurstDuration(burstDuration: number): void {
 		this.view.setUint16(12, burstDuration);
 
 		this.setSerializationNeeded(true);
@@ -319,16 +294,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get gap duration.
 	 */
-	getGapDuration(): number
-	{
+	getGapDuration(): number {
 		return this.view.getUint16(14);
 	}
 
 	/**
 	 * Set gap duration.
 	 */
-	setGapDuration(gapDuration: number): void
-	{
+	setGapDuration(gapDuration: number): void {
 		this.view.setUint16(14, gapDuration);
 
 		this.setSerializationNeeded(true);
@@ -337,16 +310,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get round trip delay.
 	 */
-	getRoundTripDelay(): number
-	{
+	getRoundTripDelay(): number {
 		return this.view.getUint16(16);
 	}
 
 	/**
 	 * Set round trip delay.
 	 */
-	setRoundTripDelay(delay: number): void
-	{
+	setRoundTripDelay(delay: number): void {
 		this.view.setUint16(16, delay);
 
 		this.setSerializationNeeded(true);
@@ -355,16 +326,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get end system delay.
 	 */
-	getEndSystemDelay(): number
-	{
+	getEndSystemDelay(): number {
 		return this.view.getUint16(18);
 	}
 
 	/**
 	 * Set end system delay.
 	 */
-	setEndSystemDelay(delay: number): void
-	{
+	setEndSystemDelay(delay: number): void {
 		this.view.setUint16(18, delay);
 
 		this.setSerializationNeeded(true);
@@ -373,16 +342,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get signal level.
 	 */
-	getSignalLevel(): number
-	{
+	getSignalLevel(): number {
 		return this.view.getUint8(20);
 	}
 
 	/**
 	 * Set signal level.
 	 */
-	setSignalLevel(level: number): void
-	{
+	setSignalLevel(level: number): void {
 		this.view.setUint8(20, level);
 
 		this.setSerializationNeeded(true);
@@ -391,16 +358,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get noise level.
 	 */
-	getNoiseLevel(): number
-	{
+	getNoiseLevel(): number {
 		return this.view.getUint8(21);
 	}
 
 	/**
 	 * Set noise level.
 	 */
-	setNoiseLevel(level: number): void
-	{
+	setNoiseLevel(level: number): void {
 		this.view.setUint8(21, level);
 
 		this.setSerializationNeeded(true);
@@ -409,16 +374,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get residual echo return loss.
 	 */
-	getResidualEchoReturnLoss(): number
-	{
+	getResidualEchoReturnLoss(): number {
 		return this.view.getUint8(22);
 	}
 
 	/**
 	 * Set residual echo return loss.
 	 */
-	setResidualEchoReturnLoss(loss: number): void
-	{
+	setResidualEchoReturnLoss(loss: number): void {
 		this.view.setUint8(22, loss);
 
 		this.setSerializationNeeded(true);
@@ -427,16 +390,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get Gmin.
 	 */
-	getGmin(): number
-	{
+	getGmin(): number {
 		return this.view.getUint8(23);
 	}
 
 	/**
 	 * Set Gmin.
 	 */
-	setGmin(value: number): void
-	{
+	setGmin(value: number): void {
 		this.view.setUint8(23, value);
 
 		this.setSerializationNeeded(true);
@@ -445,16 +406,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get R factor.
 	 */
-	getRFactor(): number
-	{
+	getRFactor(): number {
 		return this.view.getUint8(24);
 	}
 
 	/**
 	 * Set R factor.
 	 */
-	setRFactor(factor: number): void
-	{
+	setRFactor(factor: number): void {
 		this.view.setUint8(24, factor);
 
 		this.setSerializationNeeded(true);
@@ -463,16 +422,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get external R factor.
 	 */
-	getExternalRFactor(): number
-	{
+	getExternalRFactor(): number {
 		return this.view.getUint8(25);
 	}
 
 	/**
 	 * Set external R factor.
 	 */
-	setExternalRFactor(factor: number): void
-	{
+	setExternalRFactor(factor: number): void {
 		this.view.setUint8(25, factor);
 
 		this.setSerializationNeeded(true);
@@ -481,16 +438,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get MOS-LQ.
 	 */
-	getMosLQ(): number
-	{
+	getMosLQ(): number {
 		return this.view.getUint8(26);
 	}
 
 	/**
 	 * Set MOS-LQ.
 	 */
-	setMosLQ(value: number): void
-	{
+	setMosLQ(value: number): void {
 		this.view.setUint8(26, value);
 
 		this.setSerializationNeeded(true);
@@ -499,16 +454,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get MOS-CQ.
 	 */
-	getMosCQ(): number
-	{
+	getMosCQ(): number {
 		return this.view.getUint8(27);
 	}
 
 	/**
 	 * Set MOS-CQ.
 	 */
-	setMosCQ(value: number): void
-	{
+	setMosCQ(value: number): void {
 		this.view.setUint8(27, value);
 
 		this.setSerializationNeeded(true);
@@ -517,21 +470,20 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get packet loss concealment (PLC).
 	 */
-	getPacketLossConcealment(): number
-	{
-		return readBitsInDataView(
-			{ view: this.view, pos: 28, mask: 0b11000000 }
-		);
+	getPacketLossConcealment(): number {
+		return readBitsInDataView({ view: this.view, pos: 28, mask: 0b11000000 });
 	}
 
 	/**
 	 * Set packet loss concealment (PLC).
 	 */
-	setPacketLossConcealment(value: number): void
-	{
-		writeBitsInDataView(
-			{ view: this.view, pos: 28, mask: 0b11000000, value: value }
-		);
+	setPacketLossConcealment(value: number): void {
+		writeBitsInDataView({
+			view: this.view,
+			pos: 28,
+			mask: 0b11000000,
+			value: value,
+		});
 
 		this.setSerializationNeeded(true);
 	}
@@ -539,21 +491,20 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get jitter buffer adaptive (JBA).
 	 */
-	getJitterBufferAdaptive(): number
-	{
-		return readBitsInDataView(
-			{ view: this.view, pos: 28, mask: 0b00110000 }
-		);
+	getJitterBufferAdaptive(): number {
+		return readBitsInDataView({ view: this.view, pos: 28, mask: 0b00110000 });
 	}
 
 	/**
 	 * Set jitter buffer adaptive (JBA).
 	 */
-	setJitterBufferAdaptive(value: number): void
-	{
-		writeBitsInDataView(
-			{ view: this.view, pos: 28, mask: 0b00110000, value: value }
-		);
+	setJitterBufferAdaptive(value: number): void {
+		writeBitsInDataView({
+			view: this.view,
+			pos: 28,
+			mask: 0b00110000,
+			value: value,
+		});
 
 		this.setSerializationNeeded(true);
 	}
@@ -561,21 +512,20 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get jitter buffer rate (JB rate).
 	 */
-	getJitterBufferRate(): number
-	{
-		return readBitsInDataView(
-			{ view: this.view, pos: 28, mask: 0b00001111 }
-		);
+	getJitterBufferRate(): number {
+		return readBitsInDataView({ view: this.view, pos: 28, mask: 0b00001111 });
 	}
 
 	/**
 	 * Set jitter buffer rate (JB rate).
 	 */
-	setJitterBufferRate(value: number): void
-	{
-		writeBitsInDataView(
-			{ view: this.view, pos: 28, mask: 0b00001111, value: value }
-		);
+	setJitterBufferRate(value: number): void {
+		writeBitsInDataView({
+			view: this.view,
+			pos: 28,
+			mask: 0b00001111,
+			value: value,
+		});
 
 		this.setSerializationNeeded(true);
 	}
@@ -583,16 +533,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get jitter buffer nominal delay.
 	 */
-	getJitterBufferNominalDelay(): number
-	{
+	getJitterBufferNominalDelay(): number {
 		return this.view.getUint16(30);
 	}
 
 	/**
 	 * Set jitter buffer nominal delay.
 	 */
-	setJitterBufferNominalDelay(delay: number): void
-	{
+	setJitterBufferNominalDelay(delay: number): void {
 		this.view.setUint16(30, delay);
 
 		this.setSerializationNeeded(true);
@@ -601,16 +549,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get jitter buffer maximum delay.
 	 */
-	getJitterBufferMaximumDelay(): number
-	{
+	getJitterBufferMaximumDelay(): number {
 		return this.view.getUint16(32);
 	}
 
 	/**
 	 * Set jitter buffer maximum delay.
 	 */
-	setJitterBufferMaximumDelay(delay: number): void
-	{
+	setJitterBufferMaximumDelay(delay: number): void {
 		this.view.setUint16(32, delay);
 
 		this.setSerializationNeeded(true);
@@ -619,16 +565,14 @@ export class VmExtendedReport extends ExtendedReport
 	/**
 	 * Get jitter buffer absolute maximum delay.
 	 */
-	getJitterBufferAbsoluteMaximumDelay(): number
-	{
+	getJitterBufferAbsoluteMaximumDelay(): number {
 		return this.view.getUint16(34);
 	}
 
 	/**
 	 * Set jitter buffer absolute maximum delay.
 	 */
-	setJitterBufferAbsoluteMaximumDelay(delay: number): void
-	{
+	setJitterBufferAbsoluteMaximumDelay(delay: number): void {
 		this.view.setUint16(34, delay);
 
 		this.setSerializationNeeded(true);

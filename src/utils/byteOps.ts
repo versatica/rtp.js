@@ -4,11 +4,13 @@
  * @category Utils
  * @hidden
  */
-export function read3BytesInDataView(
-	{ view, pos }:
-	{ view: DataView; pos: number }
-): number
-{
+export function read3BytesInDataView({
+	view,
+	pos,
+}: {
+	view: DataView;
+	pos: number;
+}): number {
 	return (view.getUint8(pos) << 16) + view.getUint16(pos + 1);
 }
 
@@ -18,11 +20,15 @@ export function read3BytesInDataView(
  * @category Utils
  * @hidden
  */
-export function write3BytesInDataView(
-	{ view, pos, value }:
-	{ view: DataView; pos: number; value: number }
-): void
-{
+export function write3BytesInDataView({
+	view,
+	pos,
+	value,
+}: {
+	view: DataView;
+	pos: number;
+	value: number;
+}): void {
 	view.setUint8(pos, value >> 16);
 	view.setUint16(pos + 1, value);
 }
@@ -33,11 +39,13 @@ export function write3BytesInDataView(
  * @category Utils
  * @hidden
  */
-export function readSigned3BytesInDataView(
-	{ view, pos }:
-	{ view: DataView; pos: number }
-): number
-{
+export function readSigned3BytesInDataView({
+	view,
+	pos,
+}: {
+	view: DataView;
+	pos: number;
+}): number {
 	const byte2 = view.getUint8(pos);
 	const byte1 = view.getUint8(pos + 1);
 	const byte0 = view.getUint8(pos + 2);
@@ -54,11 +62,15 @@ export function readSigned3BytesInDataView(
  * @category Utils
  * @hidden
  */
-export function writeSigned3BytesInDataView(
-	{ view, pos, value }:
-	{ view: DataView; pos: number; value: number }
-): void
-{
+export function writeSigned3BytesInDataView({
+	view,
+	pos,
+	value,
+}: {
+	view: DataView;
+	pos: number;
+	value: number;
+}): void {
 	view.setInt8(pos, value >> 16);
 	view.setUint16(pos + 1, value);
 }

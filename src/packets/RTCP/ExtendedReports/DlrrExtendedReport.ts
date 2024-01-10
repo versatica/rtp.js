@@ -2,7 +2,7 @@ import {
 	ExtendedReport,
 	ExtendedReportType,
 	ExtendedReportDump,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './ExtendedReport';
 
 /**
@@ -10,8 +10,7 @@ import {
  *
  * @category RTCP Extended Reports
  */
-export type DlrrExtendedReportDump = ExtendedReportDump &
-{
+export type DlrrExtendedReportDump = ExtendedReportDump & {
 	subReports: DlrrSubReport[];
 };
 
@@ -20,8 +19,7 @@ export type DlrrExtendedReportDump = ExtendedReportDump &
  *
  * @category RTCP Extended Reports
  */
-export type DlrrSubReport =
-{
+export type DlrrSubReport = {
 	/**
 	 * SSRC of receiver.
 	 */
@@ -62,8 +60,7 @@ export type DlrrSubReport =
  * @see
  * - [RFC 3611 section 4.5](https://datatracker.ietf.org/doc/html/rfc3611#section-4.5)
  */
-export class DlrrExtendedReport extends ExtendedReport
-{
+export class DlrrExtendedReport extends ExtendedReport {
 	// Sub-reports.
 	#subReports: DlrrSubReport[] = [];
 
@@ -71,12 +68,10 @@ export class DlrrExtendedReport extends ExtendedReport
 	 * @param view - If given it will be parsed. Otherwise an empty DLRR Extended
 	 *   Report will be created.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(ExtendedReportType.DLRR, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
 
 			// Write report type.
@@ -85,11 +80,8 @@ export class DlrrExtendedReport extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength < COMMON_HEADER_LENGTH)
-		{
-			throw new TypeError(
-				'wrong byte length for a DLRR Extended Report'
-			);
+		if (this.view.byteLength < COMMON_HEADER_LENGTH) {
+			throw new TypeError('wrong byte length for a DLRR Extended Report');
 		}
 
 		// Position relative to the DataView byte offset.
@@ -98,8 +90,7 @@ export class DlrrExtendedReport extends ExtendedReport
 		// Move to sub-reports.
 		pos += COMMON_HEADER_LENGTH;
 
-		while (pos < this.view.byteLength)
-		{
+		while (pos < this.view.byteLength) {
 			const ssrc = this.view.getUint32(pos);
 
 			pos += 4;
@@ -119,21 +110,18 @@ export class DlrrExtendedReport extends ExtendedReport
 	/**
 	 * Dump DLRR Extended Report info.
 	 */
-	dump(): DlrrExtendedReportDump
-	{
+	dump(): DlrrExtendedReportDump {
 		return {
 			...super.dump(),
-			subReports : this.getSubReports()
+			subReports: this.getSubReports(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
@@ -148,8 +136,7 @@ export class DlrrExtendedReport extends ExtendedReport
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 
 		// Position relative to the DataView byte offset.
@@ -159,8 +146,7 @@ export class DlrrExtendedReport extends ExtendedReport
 		pos += COMMON_HEADER_LENGTH;
 
 		// Copy sub-reports.
-		for (const { ssrc, lrr, dlrr } of this.#subReports)
-		{
+		for (const { ssrc, lrr, dlrr } of this.#subReports) {
 			view.setUint32(pos, ssrc);
 
 			pos += 4;
@@ -174,10 +160,9 @@ export class DlrrExtendedReport extends ExtendedReport
 			pos += 4;
 		}
 
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -194,14 +179,13 @@ export class DlrrExtendedReport extends ExtendedReport
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): DlrrExtendedReport
-	{
+		serializationByteOffset?: number,
+	): DlrrExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new DlrrExtendedReport(view);
@@ -210,16 +194,14 @@ export class DlrrExtendedReport extends ExtendedReport
 	/**
 	 * Get sub-reports.
 	 */
-	getSubReports(): DlrrSubReport[]
-	{
+	getSubReports(): DlrrSubReport[] {
 		return Array.from(this.#subReports);
 	}
 
 	/**
 	 * Set sub-reports.
 	 */
-	setSubReports(subReports: DlrrSubReport[]): void
-	{
+	setSubReports(subReports: DlrrSubReport[]): void {
 		this.#subReports = Array.from(subReports);
 
 		this.setSerializationNeeded(true);
@@ -228,8 +210,7 @@ export class DlrrExtendedReport extends ExtendedReport
 	/**
 	 * Add sub-report.
 	 */
-	addSubReport(subReport: DlrrSubReport): void
-	{
+	addSubReport(subReport: DlrrSubReport): void {
 		this.#subReports.push(subReport);
 
 		this.setSerializationNeeded(true);

@@ -3,7 +3,7 @@ import {
 	ExtendedReportType,
 	ExtendedReportDump,
 	getExtendedReportType,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './ExtendedReport';
 
 /**
@@ -33,8 +33,7 @@ export type GenericExtendedReportDump = ExtendedReportDump;
  * @see
  * - [RFC 3611 section 3](https://datatracker.ietf.org/doc/html/rfc3611#section-3)
  */
-export class GenericExtendedReport extends ExtendedReport
-{
+export class GenericExtendedReport extends ExtendedReport {
 	// Buffer view holding the report body.
 	#bodyView: DataView;
 
@@ -46,20 +45,15 @@ export class GenericExtendedReport extends ExtendedReport
 	 * @throws
 	 * - If given `view` does not contain a valid generic Extended Report.
 	 */
-	constructor(view?: DataView, reportType?: ExtendedReportType | number)
-	{
+	constructor(view?: DataView, reportType?: ExtendedReportType | number) {
 		super(view ? getExtendedReportType(view) : reportType!, view);
 
-		if (!view && !reportType)
-		{
+		if (!view && !reportType) {
 			throw new TypeError('view or reportType must be given');
 		}
 
-		if (!this.view)
-		{
-			this.view = new DataView(
-				new ArrayBuffer(COMMON_HEADER_LENGTH)
-			);
+		if (!this.view) {
+			this.view = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
 
 			// Write report type.
 			this.writeCommonHeader();
@@ -68,7 +62,7 @@ export class GenericExtendedReport extends ExtendedReport
 			this.#bodyView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + COMMON_HEADER_LENGTH,
-				0
+				0,
 			);
 
 			return;
@@ -86,16 +80,15 @@ export class GenericExtendedReport extends ExtendedReport
 		this.#bodyView = new DataView(
 			this.view.buffer,
 			this.view.byteOffset + pos,
-			bodyLength
+			bodyLength,
 		);
 
 		pos += bodyLength;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -103,18 +96,15 @@ export class GenericExtendedReport extends ExtendedReport
 	/**
 	 * Dump generic Extended Report info.
 	 */
-	dump(): GenericExtendedReportDump
-	{
+	dump(): GenericExtendedReportDump {
 		return super.dump();
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
@@ -126,13 +116,12 @@ export class GenericExtendedReport extends ExtendedReport
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -146,24 +135,23 @@ export class GenericExtendedReport extends ExtendedReport
 			new Uint8Array(
 				this.#bodyView.buffer,
 				this.#bodyView.byteOffset,
-				this.#bodyView.byteLength
+				this.#bodyView.byteLength,
 			),
-			pos
+			pos,
 		);
 
 		// Create new body DataView.
 		const bodyView = new DataView(
 			view.buffer,
 			view.byteOffset + pos,
-			this.#bodyView.byteLength
+			this.#bodyView.byteLength,
 		);
 
 		pos += bodyView.byteLength;
 
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -183,14 +171,13 @@ export class GenericExtendedReport extends ExtendedReport
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): GenericExtendedReport
-	{
+		serializationByteOffset?: number,
+	): GenericExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new GenericExtendedReport(view);
@@ -200,8 +187,7 @@ export class GenericExtendedReport extends ExtendedReport
 	 * Get the value of the type specific field (second byte in the Extended
 	 * Report common header).
 	 */
-	getTypeSpecific(): number
-	{
+	getTypeSpecific(): number {
 		return this.view.getUint8(1);
 	}
 
@@ -209,8 +195,7 @@ export class GenericExtendedReport extends ExtendedReport
 	 * Set the value of the type specific field (second byte in the Extended
 	 * Report common header).
 	 */
-	setTypeSpecific(typeSpecific: number): void
-	{
+	setTypeSpecific(typeSpecific: number): void {
 		this.view.setUint8(1, typeSpecific);
 
 		this.setSerializationNeeded(true);
@@ -219,8 +204,7 @@ export class GenericExtendedReport extends ExtendedReport
 	/**
 	 * Get the report body.
 	 */
-	getBody(): DataView
-	{
+	getBody(): DataView {
 		return this.#bodyView;
 	}
 
@@ -230,13 +214,11 @@ export class GenericExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - Given `view` must have a byte length multiple of 4 bytes.
 	 */
-	setBody(view: DataView): void
-	{
+	setBody(view: DataView): void {
 		this.#bodyView = view;
 
 		// Ensure body is padded to 4 bytes.
-		if (view.byteLength % 4 !== 0)
-		{
+		if (view.byteLength % 4 !== 0) {
 			throw new TypeError('body byte length must be multiple of 4 bytes');
 		}
 

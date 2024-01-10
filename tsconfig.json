@@ -1,8 +1,7 @@
 {
 	"compileOnSave": true,
-	"compilerOptions":
-	{
-		"lib": [ "es2020" ],
+	"compilerOptions": {
+		"lib": ["es2020"],
 		"target": "es2020",
 		"module": "commonjs",
 		"moduleResolution": "node",
@@ -11,13 +10,10 @@
 		"declaration": true,
 		"declarationMap": true
 	},
-	"include": [ "src" ],
+	"include": ["src"],
 	"typedocOptions": {
-		"entryPoints": [
-			"src/packets/public.ts",
-			"src/utils/public.ts"
-		],
-		"out": "docs",
+		"entryPoints": ["src/packets/public.ts", "src/utils/public.ts"],
+		"out": "doc",
 		"excludePrivate": true,
 		"excludeProtected": true,
 		"excludeNotDocumented": true,
@@ -29,13 +25,7 @@
 		"treatWarningsAsErrors": true,
 		"cacheBust": true,
 		"categorizeByGroup": false,
-		"categoryOrder": [
-			"RTP",
-			"RTCP",
-			"RTCP Extended Reports",
-			"Utils",
-			"*"
-		],
+		"categoryOrder": ["RTP", "RTCP", "RTCP Extended Reports", "Utils", "*"],
 		"navigationLinks": {
 			"GitHub": "https://github.com/versatica/rtp.js",
 			"NPM": "https://www.npmjs.com/package/rtp.js"
@@ -43,6 +33,6 @@
 		"navigationLinks": {
 			"GitHub": "https://github.com/versatica/rtp.js"
 		},
-		"customCss": "./docs-assets/custom-styles.css"
+		"customCss": "./doc-assets/custom-styles.css"
 	}
 }

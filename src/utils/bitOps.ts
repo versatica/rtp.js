@@ -4,9 +4,14 @@
  * @category Utils
  * @hidden
  */
-export function readBit({ value, bit }:{ value: number; bit: number }): boolean
-{
-	return (value & (1 << bit)) ? true : false;
+export function readBit({
+	value,
+	bit,
+}: {
+	value: number;
+	bit: number;
+}): boolean {
+	return value & (1 << bit) ? true : false;
 }
 
 /**
@@ -15,17 +20,18 @@ export function readBit({ value, bit }:{ value: number; bit: number }): boolean
  * @category Utils
  * @hidden
  */
-export function writeBit(
-	{ value, bit, flag }:
-	{ value: number; bit: number; flag: boolean }
-): number
-{
-	if (flag)
-	{
+export function writeBit({
+	value,
+	bit,
+	flag,
+}: {
+	value: number;
+	bit: number;
+	flag: boolean;
+}): number {
+	if (flag) {
 		return value | (1 << bit);
-	}
-	else
-	{
+	} else {
 		return value & ~(1 << bit);
 	}
 }
@@ -36,11 +42,13 @@ export function writeBit(
  * @category Utils
  * @hidden
  */
-export function toggleBit(
-	{ value, bit }:
-	{ value: number; bit: number }
-): number
-{
+export function toggleBit({
+	value,
+	bit,
+}: {
+	value: number;
+	bit: number;
+}): number {
 	return value ^ (1 << bit);
 }
 
@@ -50,11 +58,13 @@ export function toggleBit(
  * @category Utils
  * @hidden
  */
-export function readBits(
-	{ byte, mask }:
-	{ byte: number; mask: number }
-): number
-{
+export function readBits({
+	byte,
+	mask,
+}: {
+	byte: number;
+	mask: number;
+}): number {
 	const bitsToShift = getFirstEnabledBitInMask(mask);
 
 	return (byte & mask) >> bitsToShift;
@@ -67,11 +77,15 @@ export function readBits(
  * @category Utils
  * @hidden
  */
-export function writeBits(
-	{ byte, mask, value }:
-	{ byte: number; mask: number; value: number }
-): number
-{
+export function writeBits({
+	byte,
+	mask,
+	value,
+}: {
+	byte: number;
+	mask: number;
+	value: number;
+}): number {
 	const inverseMask = mask ^ 0b11111111;
 	const bitsToShift = getFirstEnabledBitInMask(mask);
 
@@ -84,11 +98,15 @@ export function writeBits(
  * @category Utils
  * @hidden
  */
-export function readBitInDataView(
-	{ view, pos, bit }:
-	{ view: DataView; pos: number; bit: number }
-): boolean
-{
+export function readBitInDataView({
+	view,
+	pos,
+	bit,
+}: {
+	view: DataView;
+	pos: number;
+	bit: number;
+}): boolean {
 	return readBit({ value: view.getUint8(pos), bit });
 }
 
@@ -98,11 +116,17 @@ export function readBitInDataView(
  * @category Utils
  * @hidden
  */
-export function writeBitInDataView(
-	{ view, pos, bit, flag }:
-	{ view: DataView; pos: number; bit: number; flag: boolean }
-): void
-{
+export function writeBitInDataView({
+	view,
+	pos,
+	bit,
+	flag,
+}: {
+	view: DataView;
+	pos: number;
+	bit: number;
+	flag: boolean;
+}): void {
 	view.setUint8(pos, writeBit({ value: view.getUint8(pos), bit, flag }));
 }
 
@@ -112,11 +136,15 @@ export function writeBitInDataView(
  * @category Utils
  * @hidden
  */
-export function toggleBitInDataView(
-	{ view, pos, bit }:
-	{ view: DataView; pos: number; bit: number }
-): void
-{
+export function toggleBitInDataView({
+	view,
+	pos,
+	bit,
+}: {
+	view: DataView;
+	pos: number;
+	bit: number;
+}): void {
 	view.setUint8(pos, toggleBit({ value: view.getUint8(pos), bit }));
 }
 
@@ -126,11 +154,15 @@ export function toggleBitInDataView(
  * @category Utils
  * @hidden
  */
-export function readBitsInDataView(
-	{ view, pos, mask }:
-	{ view: DataView; pos: number; mask: number }
-): number
-{
+export function readBitsInDataView({
+	view,
+	pos,
+	mask,
+}: {
+	view: DataView;
+	pos: number;
+	mask: number;
+}): number {
 	return readBits({ byte: view.getUint8(pos), mask });
 }
 
@@ -140,25 +172,27 @@ export function readBitsInDataView(
  * @category Utils
  * @hidden
  */
-export function writeBitsInDataView(
-	{ view, pos, mask, value }:
-	{ view: DataView; pos: number; mask: number; value: number }
-): void
-{
+export function writeBitsInDataView({
+	view,
+	pos,
+	mask,
+	value,
+}: {
+	view: DataView;
+	pos: number;
+	mask: number;
+	value: number;
+}): void {
 	view.setUint8(pos, writeBits({ byte: view.getUint8(pos), mask, value }));
 }
 
-function getFirstEnabledBitInMask(mask: number): number
-{
-	if (mask === 0 || mask > 0b11111111)
-	{
+function getFirstEnabledBitInMask(mask: number): number {
+	if (mask === 0 || mask > 0b11111111) {
 		throw new TypeError(`invalid byte mask 0b${mask.toString(2)}`);
 	}
 
-	for (let bit = 0; bit < 8; ++bit)
-	{
-		if (mask & (1 << bit))
-		{
+	for (let bit = 0; bit < 8; ++bit) {
+		if (mask & (1 << bit)) {
 			return bit;
 		}
 	}

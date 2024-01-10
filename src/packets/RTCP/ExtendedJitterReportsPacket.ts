@@ -2,7 +2,7 @@ import {
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './RtcpPacket';
 
 /**
@@ -10,8 +10,7 @@ import {
  *
  * @category RTCP
  */
-export type ExtendedJitterReportsPacketDump = RtcpPacketDump &
-{
+export type ExtendedJitterReportsPacketDump = RtcpPacketDump & {
 	jitters: number[];
 };
 
@@ -35,8 +34,7 @@ export type ExtendedJitterReportsPacketDump = RtcpPacketDump &
  * @see
  * - [RFC 5450 section 4](https://datatracker.ietf.org/doc/html/rfc5450#section-4)
  */
-export class ExtendedJitterReportsPacket extends RtcpPacket
-{
+export class ExtendedJitterReportsPacket extends RtcpPacket {
 	// Inter-arrival jitter values.
 	#jitters: number[] = [];
 
@@ -48,12 +46,10 @@ export class ExtendedJitterReportsPacket extends RtcpPacket
 	 * - If given `view` does not contain a valid RTCP Extended Jitter Reports
 	 *   packet.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(RtcpPacketType.IJ, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
 
 			// Write version and packet type.
@@ -70,8 +66,7 @@ export class ExtendedJitterReportsPacket extends RtcpPacket
 
 		let count = this.getCount();
 
-		while (count-- > 0)
-		{
+		while (count-- > 0) {
 			const jitter = this.view.getUint32(pos);
 
 			this.#jitters.push(jitter);
@@ -82,10 +77,9 @@ export class ExtendedJitterReportsPacket extends RtcpPacket
 		pos += this.padding;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -93,28 +87,23 @@ export class ExtendedJitterReportsPacket extends RtcpPacket
 	/**
 	 * Dump RTCP Extended Jitter Reports packet info.
 	 */
-	dump(): ExtendedJitterReportsPacketDump
-	{
+	dump(): ExtendedJitterReportsPacketDump {
 		return {
 			...super.dump(),
-			jitters : this.getJitters()
+			jitters: this.getJitters(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
 		const packetLength =
-			COMMON_HEADER_LENGTH +
-			(this.#jitters.length * 4) +
-			this.padding;
+			COMMON_HEADER_LENGTH + this.#jitters.length * 4 + this.padding;
 
 		return packetLength;
 	}
@@ -122,8 +111,7 @@ export class ExtendedJitterReportsPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 
 		// Position relative to the DataView byte offset.
@@ -133,8 +121,7 @@ export class ExtendedJitterReportsPacket extends RtcpPacket
 		pos += COMMON_HEADER_LENGTH;
 
 		// Write jitters.
-		for (const jitter of this.#jitters)
-		{
+		for (const jitter of this.#jitters) {
 			view.setUint32(pos, jitter);
 
 			pos += 4;
@@ -143,10 +130,9 @@ export class ExtendedJitterReportsPacket extends RtcpPacket
 		pos += this.padding;
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -163,14 +149,13 @@ export class ExtendedJitterReportsPacket extends RtcpPacket
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): ExtendedJitterReportsPacket
-	{
+		serializationByteOffset?: number,
+	): ExtendedJitterReportsPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new ExtendedJitterReportsPacket(view);
@@ -179,8 +164,7 @@ export class ExtendedJitterReportsPacket extends RtcpPacket
 	/**
 	 * Get inter-arrival jitter values.
 	 */
-	getJitters(): number[]
-	{
+	getJitters(): number[] {
 		return Array.from(this.#jitters);
 	}
 
@@ -190,8 +174,7 @@ export class ExtendedJitterReportsPacket extends RtcpPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setJitters(jitters: number[]): void
-	{
+	setJitters(jitters: number[]): void {
 		this.#jitters = Array.from(jitters);
 
 		// Update RTCP count.
@@ -206,8 +189,7 @@ export class ExtendedJitterReportsPacket extends RtcpPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	addJitter(jitter: number): void
-	{
+	addJitter(jitter: number): void {
 		this.#jitters.push(jitter);
 
 		// Update RTCP count.

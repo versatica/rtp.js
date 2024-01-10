@@ -11,8 +11,7 @@ export const COMMON_HEADER_LENGTH = 4;
 // ESLint absurdly complains about "'ExtendedReportType' is already declared in
 // the upper scope".
 // eslint-disable-next-line no-shadow
-export enum ExtendedReportType
-{
+export enum ExtendedReportType {
 	/**
 	 * Loss RLE Report.
 	 */
@@ -44,7 +43,7 @@ export enum ExtendedReportType
 	/**
 	 * ECN Summary Report.
 	 */
-	ECN = 13
+	ECN = 13,
 }
 
 /**
@@ -52,8 +51,7 @@ export enum ExtendedReportType
  *
  * @category RTCP Extended Reports
  */
-export type ExtendedReportDump = SerializableDump &
-{
+export type ExtendedReportDump = SerializableDump & {
 	reportType: ExtendedReportType;
 };
 
@@ -62,8 +60,7 @@ export type ExtendedReportDump = SerializableDump &
  *
  * @hidden
  */
-export function getExtendedReportType(view: DataView): ExtendedReportType
-{
+export function getExtendedReportType(view: DataView): ExtendedReportType {
 	return view.getUint8(0);
 }
 
@@ -73,8 +70,7 @@ export function getExtendedReportType(view: DataView): ExtendedReportType
  *
  * @hidden
  */
-export function getExtendedReportLength(view: DataView): number
-{
+export function getExtendedReportLength(view: DataView): number {
 	// As per RFC 3611, this is the length of this Extended Report in 32-bit words
 	// minus one, including the header and any padding.
 	const length = view.getUint16(2);
@@ -89,17 +85,18 @@ export function getExtendedReportLength(view: DataView): number
  *
  * @hidden
  */
-export function setExtendedReportLength(view: DataView, byteLength: number): void
-{
+export function setExtendedReportLength(
+	view: DataView,
+	byteLength: number,
+): void {
 	// Report byte length must be multiple of 4.
-	if (byteLength % 4 !== 0)
-	{
+	if (byteLength % 4 !== 0) {
 		throw new RangeError(
-			`Extended Report byte length must be multiple of 4 but given byte length is ${byteLength} bytes`
+			`Extended Report byte length must be multiple of 4 but given byte length is ${byteLength} bytes`,
 		);
 	}
 
-	const length = (byteLength / 4) - 1;
+	const length = byteLength / 4 - 1;
 
 	view.setUint16(2, length);
 }
@@ -107,52 +104,41 @@ export function setExtendedReportLength(view: DataView, byteLength: number): voi
 /**
  * @hidden
  */
-export function reportTypeToString(reportType: ExtendedReportType): string
-{
-	switch (reportType)
-	{
-		case ExtendedReportType.LRLE:
-		{
+export function reportTypeToString(reportType: ExtendedReportType): string {
+	switch (reportType) {
+		case ExtendedReportType.LRLE: {
 			return 'Loss RLE';
 		}
 
-		case ExtendedReportType.DRLE:
-		{
+		case ExtendedReportType.DRLE: {
 			return 'Duplicate RLE';
 		}
 
-		case ExtendedReportType.PRT:
-		{
+		case ExtendedReportType.PRT: {
 			return 'Packet Receipt Times';
 		}
 
-		case ExtendedReportType.RRT:
-		{
+		case ExtendedReportType.RRT: {
 			return 'Receiver Reference Time';
 		}
 
-		case ExtendedReportType.DLRR:
-		{
+		case ExtendedReportType.DLRR: {
 			return 'DLRR';
 		}
 
-		case ExtendedReportType.SS:
-		{
+		case ExtendedReportType.SS: {
 			return 'Statistics Summary';
 		}
 
-		case ExtendedReportType.VM:
-		{
+		case ExtendedReportType.VM: {
 			return 'VoIP Metrics';
 		}
 
-		case ExtendedReportType.ECN:
-		{
+		case ExtendedReportType.ECN: {
 			return 'ECN Summary';
 		}
 
-		default:
-		{
+		default: {
 			assertUnreachable(reportType);
 		}
 	}
@@ -176,37 +162,32 @@ export function reportTypeToString(reportType: ExtendedReportType): string
  * @see
  * - [RFC 3611 section 3](https://datatracker.ietf.org/doc/html/rfc3611#section-3)
  */
-export abstract class ExtendedReport extends Serializable
-{
+export abstract class ExtendedReport extends Serializable {
 	readonly #reportType: ExtendedReportType;
 
-	protected constructor(reportType: ExtendedReportType, view?: DataView)
-	{
+	protected constructor(reportType: ExtendedReportType, view?: DataView) {
 		super(view);
 
 		this.#reportType = reportType;
 
-		if (this.view)
-		{
-			if (this.view.byteLength < COMMON_HEADER_LENGTH)
-			{
+		if (this.view) {
+			if (this.view.byteLength < COMMON_HEADER_LENGTH) {
 				throw new TypeError('too small buffer');
 			}
 			// Extended Report byte length must be multiple of 4.
-			else if (this.view.byteLength % 4 !== 0)
-			{
+			else if (this.view.byteLength % 4 !== 0) {
 				throw new RangeError(
-					`Extended Report byte length must be multiple of 4 but given buffer view is ${this.view.byteLength} bytes`
+					`Extended Report byte length must be multiple of 4 but given buffer view is ${this.view.byteLength} bytes`,
 				);
-			}
-			else if (getExtendedReportType(this.view) !== reportType)
-			{
-				throw new TypeError(`not a ${reportTypeToString(reportType)} Extended Report`);
-			}
-			else if (getExtendedReportLength(this.view) !== this.view.byteLength)
-			{
+			} else if (getExtendedReportType(this.view) !== reportType) {
+				throw new TypeError(
+					`not a ${reportTypeToString(reportType)} Extended Report`,
+				);
+			} else if (getExtendedReportLength(this.view) !== this.view.byteLength) {
 				throw new RangeError(
-					`length in the RTCP header (${getExtendedReportLength(this.view)} bytes) does not match view length (${this.view.byteLength} bytes)`
+					`length in the RTCP header (${getExtendedReportLength(
+						this.view,
+					)} bytes) does not match view length (${this.view.byteLength} bytes)`,
 				);
 			}
 		}
@@ -218,24 +199,21 @@ export abstract class ExtendedReport extends Serializable
 	 * @remarks
 	 * - Read the info dump type of each Extended Report instead.
 	 */
-	dump(): ExtendedReportDump
-	{
+	dump(): ExtendedReportDump {
 		return {
 			...super.dump(),
-			reportType : this.getReportType()
+			reportType: this.getReportType(),
 		};
 	}
 
 	/**
 	 * Get the Extended Report type.
 	 */
-	getReportType(): ExtendedReportType
-	{
+	getReportType(): ExtendedReportType {
 		return this.view.getUint8(0);
 	}
 
-	protected writeCommonHeader(): void
-	{
+	protected writeCommonHeader(): void {
 		this.setReportType(this.#reportType);
 
 		// Update the report length field in the report header.
@@ -245,20 +223,19 @@ export abstract class ExtendedReport extends Serializable
 	/**
 	 * Serialize base RTCP packet into a new buffer.
 	 */
-	protected serializeBase(buffer?: ArrayBuffer, byteOffset?: number): DataView
-	{
+	protected serializeBase(buffer?: ArrayBuffer, byteOffset?: number): DataView {
 		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
 		const view = new DataView(
 			bufferData.buffer,
 			bufferData.byteOffset,
-			bufferData.byteLength
+			bufferData.byteLength,
 		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Copy the common header into the new buffer.
@@ -266,9 +243,9 @@ export abstract class ExtendedReport extends Serializable
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset,
-				COMMON_HEADER_LENGTH
+				COMMON_HEADER_LENGTH,
 			),
-			0
+			0,
 		);
 
 		// Update the report length field in the report header.
@@ -284,8 +261,7 @@ export abstract class ExtendedReport extends Serializable
 	 * - This method is not public since users should not manipulate this field
 	 *   directly.
 	 */
-	private setReportType(reportType: ExtendedReportType): void
-	{
+	private setReportType(reportType: ExtendedReportType): void {
 		this.view.setUint8(0, reportType);
 	}
 }

@@ -3,7 +3,7 @@ import {
 	RtcpPacketType,
 	RtcpPacketDump,
 	getRtcpPacketType,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './RtcpPacket';
 
 /**
@@ -11,8 +11,7 @@ import {
  *
  * @category RTCP
  */
-export type GenericPacketDump = RtcpPacketDump &
-{
+export type GenericPacketDump = RtcpPacketDump & {
 	bodyLength: number;
 };
 
@@ -36,8 +35,7 @@ export type GenericPacketDump = RtcpPacketDump &
  * @see
  * - [RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)
  */
-export class GenericPacket extends RtcpPacket
-{
+export class GenericPacket extends RtcpPacket {
 	// Buffer view holding the packet body.
 	#bodyView: DataView;
 
@@ -49,17 +47,14 @@ export class GenericPacket extends RtcpPacket
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP generic packet.
 	 */
-	constructor(view?: DataView, packetType?: RtcpPacketType | number)
-	{
+	constructor(view?: DataView, packetType?: RtcpPacketType | number) {
 		super(view ? getRtcpPacketType(view) : packetType!, view);
 
-		if (!view && !packetType)
-		{
+		if (!view && !packetType) {
 			throw new TypeError('view or packetType must be given');
 		}
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
 
 			// Write version and packet type.
@@ -69,7 +64,7 @@ export class GenericPacket extends RtcpPacket
 			this.#bodyView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + COMMON_HEADER_LENGTH,
-				0
+				0,
 			);
 
 			return;
@@ -87,16 +82,15 @@ export class GenericPacket extends RtcpPacket
 		this.#bodyView = new DataView(
 			this.view.buffer,
 			this.view.byteOffset + pos,
-			bodyLength
+			bodyLength,
 		);
 
-		pos += (bodyLength + this.padding);
+		pos += bodyLength + this.padding;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -104,28 +98,23 @@ export class GenericPacket extends RtcpPacket
 	/**
 	 * Dump RTCP generic packet info.
 	 */
-	dump(): GenericPacketDump
-	{
+	dump(): GenericPacketDump {
 		return {
 			...super.dump(),
-			bodyLength : this.getBody().byteLength
+			bodyLength: this.getBody().byteLength,
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
 		const packetLength =
-			COMMON_HEADER_LENGTH +
-			this.#bodyView.byteLength +
-			this.padding;
+			COMMON_HEADER_LENGTH + this.#bodyView.byteLength + this.padding;
 
 		return packetLength;
 	}
@@ -133,13 +122,12 @@ export class GenericPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -153,16 +141,16 @@ export class GenericPacket extends RtcpPacket
 			new Uint8Array(
 				this.#bodyView.buffer,
 				this.#bodyView.byteOffset,
-				this.#bodyView.byteLength
+				this.#bodyView.byteLength,
 			),
-			pos
+			pos,
 		);
 
 		// Create new body DataView.
 		const bodyView = new DataView(
 			view.buffer,
 			view.byteOffset + pos,
-			this.#bodyView.byteLength
+			this.#bodyView.byteLength,
 		);
 
 		pos += bodyView.byteLength;
@@ -170,10 +158,9 @@ export class GenericPacket extends RtcpPacket
 		pos += this.padding;
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -193,14 +180,13 @@ export class GenericPacket extends RtcpPacket
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): GenericPacket
-	{
+		serializationByteOffset?: number,
+	): GenericPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new GenericPacket(view);
@@ -219,16 +205,14 @@ export class GenericPacket extends RtcpPacket
 	 *   whatever body to this packet, and hence the user may want to also
 	 *   manipulate this field.
 	 */
-	setCount(count: number): void
-	{
+	setCount(count: number): void {
 		super.setCount(count);
 	}
 
 	/**
 	 * Get the packet body.
 	 */
-	getBody(): DataView
-	{
+	getBody(): DataView {
 		return this.#bodyView;
 	}
 
@@ -238,8 +222,7 @@ export class GenericPacket extends RtcpPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setBody(view: DataView): void
-	{
+	setBody(view: DataView): void {
 		this.#bodyView = view;
 
 		// We must set the flag first because padTo4Bytes() will call getByteLength()
