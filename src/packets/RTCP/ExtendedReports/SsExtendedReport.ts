@@ -2,13 +2,13 @@ import {
 	ExtendedReport,
 	ExtendedReportType,
 	ExtendedReportDump,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './ExtendedReport';
 import {
 	readBitInDataView,
 	writeBitInDataView,
 	readBitsInDataView,
-	writeBitsInDataView
+	writeBitsInDataView,
 } from '../../../utils/bitOps';
 
 const SS_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 36;
@@ -18,8 +18,7 @@ const SS_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 36;
  *
  * @category RTCP Extended Reports
  */
-export type SsExtendedReportDump = ExtendedReportDump &
-{
+export type SsExtendedReportDump = ExtendedReportDump & {
 	ssrc: number;
 	beginSeq: number;
 	endSeq: number;
@@ -70,18 +69,15 @@ export type SsExtendedReportDump = ExtendedReportDump &
  * @see
  * - [RFC 3611 section 4.6](https://datatracker.ietf.org/doc/html/rfc3611#section-4.6)
  */
-export class SsExtendedReport extends ExtendedReport
-{
+export class SsExtendedReport extends ExtendedReport {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty Statistics
 	 *   Summary Extended Report will be created.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(ExtendedReportType.SS, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(SS_EXTENDED_REPORT_LENGTH));
 
 			// Write report type.
@@ -90,10 +86,9 @@ export class SsExtendedReport extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength !== SS_EXTENDED_REPORT_LENGTH)
-		{
+		if (this.view.byteLength !== SS_EXTENDED_REPORT_LENGTH) {
 			throw new TypeError(
-				'wrong byte length for a Statistics Summary Extended Report'
+				'wrong byte length for a Statistics Summary Extended Report',
 			);
 		}
 	}
@@ -101,45 +96,42 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Dump Statistics Summary Extended Report info.
 	 */
-	dump(): SsExtendedReportDump
-	{
+	dump(): SsExtendedReportDump {
 		return {
 			...super.dump(),
-			ssrc             : this.getSsrc(),
-			beginSeq         : this.getBeginSeq(),
-			endSeq           : this.getEndSeq(),
-			lostPackets      : this.getLostPackets(),
-			duplicatePackets : this.getDuplicatePackets(),
-			minJitter        : this.getMinJitter(),
-			maxJitter        : this.getMaxJitter(),
-			meanJitter       : this.getMeanJitter(),
-			devJitter        : this.getDevJitter(),
-			minTtlOrHl       : this.getMinTtlOrHopLimit(),
-			maxTtlOrHl       : this.getMaxTtlOrHopLimit(),
-			meanTtlOrHl      : this.getMeanTtlOrHopLimit(),
-			devTtlOrHl       : this.getDevTtlOrHopLimit(),
-			ttlOrHlMode      : this.getTtlOrHopLimitMode()
+			ssrc: this.getSsrc(),
+			beginSeq: this.getBeginSeq(),
+			endSeq: this.getEndSeq(),
+			lostPackets: this.getLostPackets(),
+			duplicatePackets: this.getDuplicatePackets(),
+			minJitter: this.getMinJitter(),
+			maxJitter: this.getMaxJitter(),
+			meanJitter: this.getMeanJitter(),
+			devJitter: this.getDevJitter(),
+			minTtlOrHl: this.getMinTtlOrHopLimit(),
+			maxTtlOrHl: this.getMaxTtlOrHopLimit(),
+			meanTtlOrHl: this.getMeanTtlOrHopLimit(),
+			devTtlOrHl: this.getDevTtlOrHopLimit(),
+			ttlOrHlMode: this.getTtlOrHopLimitMode(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
+	getByteLength(): number {
 		return SS_EXTENDED_REPORT_LENGTH;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -153,18 +145,17 @@ export class SsExtendedReport extends ExtendedReport
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				SS_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH
+				SS_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH,
 			),
-			pos
+			pos,
 		);
 
 		// Move to the end.
 		pos += SS_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH;
 
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -181,14 +172,13 @@ export class SsExtendedReport extends ExtendedReport
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): SsExtendedReport
-	{
+		serializationByteOffset?: number,
+	): SsExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new SsExtendedReport(view);
@@ -197,16 +187,14 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Get SSRC of source.
 	 */
-	getSsrc(): number
-	{
+	getSsrc(): number {
 		return this.view.getUint32(4);
 	}
 
 	/**
 	 * Set SSRC of source.
 	 */
-	setSsrc(ssrc: number): void
-	{
+	setSsrc(ssrc: number): void {
 		this.view.setUint32(4, ssrc);
 
 		this.setSerializationNeeded(true);
@@ -215,16 +203,14 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Get begin sequence number.
 	 */
-	getBeginSeq(): number
-	{
+	getBeginSeq(): number {
 		return this.view.getUint16(8);
 	}
 
 	/**
 	 * Set begin sequence number.
 	 */
-	setBeginSeq(seq: number): void
-	{
+	setBeginSeq(seq: number): void {
 		this.view.setUint16(8, seq);
 
 		this.setSerializationNeeded(true);
@@ -233,16 +219,14 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Get end sequence number.
 	 */
-	getEndSeq(): number
-	{
+	getEndSeq(): number {
 		return this.view.getUint16(10);
 	}
 
 	/**
 	 * Set end sequence number.
 	 */
-	setEndSeq(seq: number): void
-	{
+	setEndSeq(seq: number): void {
 		this.view.setUint16(10, seq);
 
 		this.setSerializationNeeded(true);
@@ -254,10 +238,8 @@ export class SsExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - It could be `undefined` if the field is unset in the report.
 	 */
-	getLostPackets(): number | undefined
-	{
-		if (!this.hasLostPacketsBit())
-		{
+	getLostPackets(): number | undefined {
+		if (!this.hasLostPacketsBit()) {
 			return undefined;
 		}
 
@@ -267,16 +249,12 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Set number of lost packets.
 	 */
-	setLostPackets(lostPackets: number | undefined): void
-	{
-		if (lostPackets !== undefined)
-		{
+	setLostPackets(lostPackets: number | undefined): void {
+		if (lostPackets !== undefined) {
 			this.setLostPacketsBit(true);
 
 			this.view.setUint32(12, lostPackets);
-		}
-		else
-		{
+		} else {
 			this.setLostPacketsBit(false);
 		}
 
@@ -289,10 +267,8 @@ export class SsExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - It could be `undefined` if the field is unset in the report.
 	 */
-	getDuplicatePackets(): number | undefined
-	{
-		if (!this.hasDuplicatePacketsBit())
-		{
+	getDuplicatePackets(): number | undefined {
+		if (!this.hasDuplicatePacketsBit()) {
 			return undefined;
 		}
 
@@ -302,16 +278,12 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Set number of duplicate packets.
 	 */
-	setDuplicatePackets(duplicatePackets: number | undefined): void
-	{
-		if (duplicatePackets !== undefined)
-		{
+	setDuplicatePackets(duplicatePackets: number | undefined): void {
+		if (duplicatePackets !== undefined) {
 			this.setDuplicatePacketsBit(true);
 
 			this.view.setUint32(16, duplicatePackets);
-		}
-		else
-		{
+		} else {
 			this.setDuplicatePacketsBit(false);
 		}
 
@@ -324,10 +296,8 @@ export class SsExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - It could be `undefined` if the field is unset in the report.
 	 */
-	getMinJitter(): number | undefined
-	{
-		if (!this.hasJitterBit())
-		{
+	getMinJitter(): number | undefined {
+		if (!this.hasJitterBit()) {
 			return undefined;
 		}
 
@@ -337,16 +307,12 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Set minimum jitter.
 	 */
-	setMinJitter(minJitter: number | undefined): void
-	{
-		if (minJitter !== undefined)
-		{
+	setMinJitter(minJitter: number | undefined): void {
+		if (minJitter !== undefined) {
 			this.setJitterBit(true);
 
 			this.view.setUint32(20, minJitter);
-		}
-		else
-		{
+		} else {
 			this.setJitterBit(false);
 		}
 
@@ -359,10 +325,8 @@ export class SsExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - It could be `undefined` if the field is unset in the report.
 	 */
-	getMaxJitter(): number | undefined
-	{
-		if (!this.hasJitterBit())
-		{
+	getMaxJitter(): number | undefined {
+		if (!this.hasJitterBit()) {
 			return undefined;
 		}
 
@@ -372,16 +336,12 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Set maximum jitter.
 	 */
-	setMaxJitter(maxJitter: number | undefined): void
-	{
-		if (maxJitter !== undefined)
-		{
+	setMaxJitter(maxJitter: number | undefined): void {
+		if (maxJitter !== undefined) {
 			this.setJitterBit(true);
 
 			this.view.setUint32(24, maxJitter);
-		}
-		else
-		{
+		} else {
 			this.setJitterBit(false);
 		}
 
@@ -394,10 +354,8 @@ export class SsExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - It could be `undefined` if the field is unset in the report.
 	 */
-	getMeanJitter(): number | undefined
-	{
-		if (!this.hasJitterBit())
-		{
+	getMeanJitter(): number | undefined {
+		if (!this.hasJitterBit()) {
 			return undefined;
 		}
 
@@ -407,16 +365,12 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Set mean jitter.
 	 */
-	setMeanJitter(meanJitter: number | undefined): void
-	{
-		if (meanJitter !== undefined)
-		{
+	setMeanJitter(meanJitter: number | undefined): void {
+		if (meanJitter !== undefined) {
 			this.setJitterBit(true);
 
 			this.view.setUint32(28, meanJitter);
-		}
-		else
-		{
+		} else {
 			this.setJitterBit(false);
 		}
 
@@ -429,10 +383,8 @@ export class SsExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - It could be `undefined` if the field is unset in the report.
 	 */
-	getDevJitter(): number | undefined
-	{
-		if (!this.hasJitterBit())
-		{
+	getDevJitter(): number | undefined {
+		if (!this.hasJitterBit()) {
 			return undefined;
 		}
 
@@ -442,16 +394,12 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Set dev jitter.
 	 */
-	setDevJitter(devJitter: number | undefined): void
-	{
-		if (devJitter !== undefined)
-		{
+	setDevJitter(devJitter: number | undefined): void {
+		if (devJitter !== undefined) {
 			this.setJitterBit(true);
 
 			this.view.setUint32(32, devJitter);
-		}
-		else
-		{
+		} else {
 			this.setJitterBit(false);
 		}
 
@@ -464,10 +412,8 @@ export class SsExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - It could be `undefined` if the field is unset in the report.
 	 */
-	getMinTtlOrHopLimit(): number | undefined
-	{
-		if (!this.getTtlOrHopLimitMode())
-		{
+	getMinTtlOrHopLimit(): number | undefined {
+		if (!this.getTtlOrHopLimitMode()) {
 			return undefined;
 		}
 
@@ -477,19 +423,14 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Set minimum TTL or Hop Limit value.
 	 */
-	setMinTtlOrHl(minTtlOrHl: number | undefined): void
-	{
-		if (minTtlOrHl !== undefined)
-		{
-			if (!this.getTtlOrHopLimitMode())
-			{
+	setMinTtlOrHl(minTtlOrHl: number | undefined): void {
+		if (minTtlOrHl !== undefined) {
+			if (!this.getTtlOrHopLimitMode()) {
 				this.setTtlOrHlMode('ipv4-ttl');
 			}
 
 			this.view.setUint8(36, minTtlOrHl);
-		}
-		else
-		{
+		} else {
 			this.setTtlOrHlMode(undefined);
 		}
 
@@ -502,10 +443,8 @@ export class SsExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - It could be `undefined` if the field is unset in the report.
 	 */
-	getMaxTtlOrHopLimit(): number | undefined
-	{
-		if (!this.getTtlOrHopLimitMode())
-		{
+	getMaxTtlOrHopLimit(): number | undefined {
+		if (!this.getTtlOrHopLimitMode()) {
 			return undefined;
 		}
 
@@ -515,19 +454,14 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Set maximum TTL or Hop Limit value.
 	 */
-	setMaxTtlOrHl(maxTtlOrHl: number | undefined): void
-	{
-		if (maxTtlOrHl !== undefined)
-		{
-			if (!this.getTtlOrHopLimitMode())
-			{
+	setMaxTtlOrHl(maxTtlOrHl: number | undefined): void {
+		if (maxTtlOrHl !== undefined) {
+			if (!this.getTtlOrHopLimitMode()) {
 				this.setTtlOrHlMode('ipv4-ttl');
 			}
 
 			this.view.setUint8(37, maxTtlOrHl);
-		}
-		else
-		{
+		} else {
 			this.setTtlOrHlMode(undefined);
 		}
 
@@ -540,10 +474,8 @@ export class SsExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - It could be `undefined` if the field is unset in the report.
 	 */
-	getMeanTtlOrHopLimit(): number | undefined
-	{
-		if (!this.getTtlOrHopLimitMode())
-		{
+	getMeanTtlOrHopLimit(): number | undefined {
+		if (!this.getTtlOrHopLimitMode()) {
 			return undefined;
 		}
 
@@ -553,19 +485,14 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Set mean TTL or Hop Limit value.
 	 */
-	setMeanTtlOrHl(meanTtlOrHl: number | undefined): void
-	{
-		if (meanTtlOrHl !== undefined)
-		{
-			if (!this.getTtlOrHopLimitMode())
-			{
+	setMeanTtlOrHl(meanTtlOrHl: number | undefined): void {
+		if (meanTtlOrHl !== undefined) {
+			if (!this.getTtlOrHopLimitMode()) {
 				this.setTtlOrHlMode('ipv4-ttl');
 			}
 
 			this.view.setUint8(38, meanTtlOrHl);
-		}
-		else
-		{
+		} else {
 			this.setTtlOrHlMode(undefined);
 		}
 
@@ -578,10 +505,8 @@ export class SsExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - It could be `undefined` if the field is unset in the report.
 	 */
-	getDevTtlOrHopLimit(): number | undefined
-	{
-		if (!this.getTtlOrHopLimitMode())
-		{
+	getDevTtlOrHopLimit(): number | undefined {
+		if (!this.getTtlOrHopLimitMode()) {
 			return undefined;
 		}
 
@@ -591,64 +516,58 @@ export class SsExtendedReport extends ExtendedReport
 	/**
 	 * Set dev TTL or Hop Limit value.
 	 */
-	setDevTtlOrHl(devTtlOrHl: number | undefined): void
-	{
-		if (devTtlOrHl !== undefined)
-		{
-			if (!this.getTtlOrHopLimitMode())
-			{
+	setDevTtlOrHl(devTtlOrHl: number | undefined): void {
+		if (devTtlOrHl !== undefined) {
+			if (!this.getTtlOrHopLimitMode()) {
 				this.setTtlOrHlMode('ipv4-ttl');
 			}
 
 			this.view.setUint8(39, devTtlOrHl);
-		}
-		else
-		{
+		} else {
 			this.setTtlOrHlMode(undefined);
 		}
 
 		this.setSerializationNeeded(true);
 	}
 
-	getTtlOrHopLimitMode(): 'ipv4-ttl' | 'ipv6-hop-limit' | undefined
-	{
-		const value = readBitsInDataView(
-			{ view: this.view, pos: 1, mask: 0b00011000 }
-		);
+	getTtlOrHopLimitMode(): 'ipv4-ttl' | 'ipv6-hop-limit' | undefined {
+		const value = readBitsInDataView({
+			view: this.view,
+			pos: 1,
+			mask: 0b00011000,
+		});
 
-		if (value === 1)
-		{
+		if (value === 1) {
 			return 'ipv4-ttl';
-		}
-		else if (value === 2)
-		{
+		} else if (value === 2) {
 			return 'ipv6-hop-limit';
-		}
-		else
-		{
+		} else {
 			return undefined;
 		}
 	}
 
-	setTtlOrHlMode(mode: 'ipv4-ttl' | 'ipv6-hop-limit' | undefined): void
-	{
-		if (mode === 'ipv4-ttl')
-		{
-			writeBitsInDataView(
-				{ view: this.view, pos: 1, mask: 0b00011000, value: 1 }
-			);
-		}
-		else if (mode === 'ipv6-hop-limit')
-		{
-			writeBitsInDataView(
-				{ view: this.view, pos: 1, mask: 0b00011000, value: 2 }
-			);
-		}
-		else
-		{
-			writeBitsInDataView(
-				{ view: this.view, pos: 1, mask: 0b00011000, value: 0 }
-			);
+	setTtlOrHlMode(mode: 'ipv4-ttl' | 'ipv6-hop-limit' | undefined): void {
+		if (mode === 'ipv4-ttl') {
+			writeBitsInDataView({
+				view: this.view,
+				pos: 1,
+				mask: 0b00011000,
+				value: 1,
+			});
+		} else if (mode === 'ipv6-hop-limit') {
+			writeBitsInDataView({
+				view: this.view,
+				pos: 1,
+				mask: 0b00011000,
+				value: 2,
+			});
+		} else {
+			writeBitsInDataView({
+				view: this.view,
+				pos: 1,
+				mask: 0b00011000,
+				value: 0,
+			});
 
 			this.view.setUint8(36, 0);
 			this.view.setUint8(37, 0);
@@ -659,47 +578,38 @@ export class SsExtendedReport extends ExtendedReport
 		this.setSerializationNeeded(true);
 	}
 
-	private hasLostPacketsBit()
-	{
+	private hasLostPacketsBit() {
 		return readBitInDataView({ view: this.view, pos: 1, bit: 7 });
 	}
 
-	private setLostPacketsBit(flag: boolean): void
-	{
+	private setLostPacketsBit(flag: boolean): void {
 		writeBitInDataView({ view: this.view, pos: 1, bit: 1, flag });
 
-		if (!flag)
-		{
+		if (!flag) {
 			this.view.setUint32(12, 0);
 		}
 	}
 
-	private hasDuplicatePacketsBit()
-	{
+	private hasDuplicatePacketsBit() {
 		return readBitInDataView({ view: this.view, pos: 1, bit: 6 });
 	}
 
-	private setDuplicatePacketsBit(flag: boolean): void
-	{
+	private setDuplicatePacketsBit(flag: boolean): void {
 		writeBitInDataView({ view: this.view, pos: 1, bit: 6, flag });
 
-		if (!flag)
-		{
+		if (!flag) {
 			this.view.setUint32(16, 0);
 		}
 	}
 
-	private hasJitterBit()
-	{
+	private hasJitterBit() {
 		return readBitInDataView({ view: this.view, pos: 1, bit: 5 });
 	}
 
-	private setJitterBit(flag: boolean): void
-	{
+	private setJitterBit(flag: boolean): void {
 		writeBitInDataView({ view: this.view, pos: 1, bit: 5, flag });
 
-		if (!flag)
-		{
+		if (!flag) {
 			this.view.setUint32(20, 0);
 			this.view.setUint32(24, 0);
 			this.view.setUint32(28, 0);

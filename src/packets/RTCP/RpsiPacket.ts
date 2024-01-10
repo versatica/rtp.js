@@ -3,7 +3,7 @@ import {
 	FeedbackPacket,
 	PsFeedbackMessageType,
 	FeedbackPacketDump,
-	FIXED_HEADER_LENGTH
+	FIXED_HEADER_LENGTH,
 } from './FeedbackPacket';
 import { padTo4Bytes } from '../../utils/helpers';
 import { readBitsInDataView, writeBitsInDataView } from '../../utils/bitOps';
@@ -15,8 +15,7 @@ const MAX_BIT_STRING_LENGTH = 6;
  *
  * @category RTCP
  */
-export type RpsiPacketDump = FeedbackPacketDump &
-{
+export type RpsiPacketDump = FeedbackPacketDump & {
 	payloadType: number;
 	bitStringLength: number;
 	paddingBits: number;
@@ -46,8 +45,7 @@ export type RpsiPacketDump = FeedbackPacketDump &
  * @see
  * - [RFC 4585 section 6.3.3](https://datatracker.ietf.org/doc/html/rfc4585#section-6.3.3)
  */
-export class RpsiPacket extends FeedbackPacket
-{
+export class RpsiPacket extends FeedbackPacket {
 	// Buffer view holding the bit string.
 	#bitStringView: DataView;
 
@@ -58,12 +56,10 @@ export class RpsiPacket extends FeedbackPacket
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP RPSI packet.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(RtcpPacketType.PSFB, PsFeedbackMessageType.RPSI, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH + 4));
 
 			// Write version, packet type and feedback message type.
@@ -73,7 +69,7 @@ export class RpsiPacket extends FeedbackPacket
 			this.#bitStringView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + FIXED_HEADER_LENGTH + 2,
-				2
+				2,
 			);
 
 			return;
@@ -87,17 +83,15 @@ export class RpsiPacket extends FeedbackPacket
 
 		const fciPaddingBits = this.view.getUint8(pos);
 
-		if (fciPaddingBits % 8 !== 0)
-		{
+		if (fciPaddingBits % 8 !== 0) {
 			throw new TypeError(
-				'invalid RPSI packet with fractional number of padding bytes'
+				'invalid RPSI packet with fractional number of padding bytes',
 			);
 		}
 
 		const fciPaddingBytes = fciPaddingBits / 8;
 
-		if (fciPaddingBytes > MAX_BIT_STRING_LENGTH)
-		{
+		if (fciPaddingBytes > MAX_BIT_STRING_LENGTH) {
 			throw new TypeError('too many padding bytes');
 		}
 
@@ -111,16 +105,15 @@ export class RpsiPacket extends FeedbackPacket
 		this.#bitStringView = new DataView(
 			this.view.buffer,
 			this.view.byteOffset + pos,
-			bitStringLength
+			bitStringLength,
 		);
 
-		pos += (bitStringLength + fciPaddingBytes + this.padding);
+		pos += bitStringLength + fciPaddingBytes + this.padding;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -128,23 +121,20 @@ export class RpsiPacket extends FeedbackPacket
 	/**
 	 * Dump RTCP RPSI packet info.
 	 */
-	dump(): RpsiPacketDump
-	{
+	dump(): RpsiPacketDump {
 		return {
 			...super.dump(),
-			payloadType     : this.getPayloadType(),
-			bitStringLength : this.getBitString().byteLength,
-			paddingBits     : this.getFciPaddingBits()
+			payloadType: this.getPayloadType(),
+			bitStringLength: this.getBitString().byteLength,
+			paddingBits: this.getFciPaddingBits(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
@@ -152,7 +142,7 @@ export class RpsiPacket extends FeedbackPacket
 			FIXED_HEADER_LENGTH +
 			2 +
 			this.#bitStringView.byteLength +
-			(this.getFciPaddingBits() / 8) +
+			this.getFciPaddingBits() / 8 +
 			this.padding;
 
 		return packetLength;
@@ -161,13 +151,12 @@ export class RpsiPacket extends FeedbackPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -179,12 +168,8 @@ export class RpsiPacket extends FeedbackPacket
 		// Copy the rest of the fixed fields (padding bits and payload type) into
 		// the new buffer.
 		uint8Array.set(
-			new Uint8Array(
-				this.view.buffer,
-				this.view.byteOffset + pos,
-				2
-			),
-			pos
+			new Uint8Array(this.view.buffer, this.view.byteOffset + pos, 2),
+			pos,
 		);
 
 		// Move to padding bit string.
@@ -195,16 +180,16 @@ export class RpsiPacket extends FeedbackPacket
 			new Uint8Array(
 				this.#bitStringView.buffer,
 				this.#bitStringView.byteOffset,
-				this.#bitStringView.byteLength
+				this.#bitStringView.byteLength,
 			),
-			pos
+			pos,
 		);
 
 		// Create new bit string DataView.
 		const bitStringView = new DataView(
 			view.buffer,
 			view.byteOffset + pos,
-			this.#bitStringView.byteLength
+			this.#bitStringView.byteLength,
 		);
 
 		// Move to FCI padding.
@@ -213,8 +198,7 @@ export class RpsiPacket extends FeedbackPacket
 		const fciPaddingBytes = this.getFciPaddingBits() / 8;
 
 		// Fill padding bytes with zeros.
-		for (let i = 0; i < fciPaddingBytes; ++i)
-		{
+		for (let i = 0; i < fciPaddingBytes; ++i) {
 			view.setUint8(pos + i, 0);
 		}
 
@@ -224,10 +208,9 @@ export class RpsiPacket extends FeedbackPacket
 		pos += this.padding;
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -244,14 +227,13 @@ export class RpsiPacket extends FeedbackPacket
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): RpsiPacket
-	{
+		serializationByteOffset?: number,
+	): RpsiPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new RpsiPacket(view);
@@ -260,26 +242,26 @@ export class RpsiPacket extends FeedbackPacket
 	/**
 	 * Get payload type.
 	 */
-	getPayloadType(): number
-	{
+	getPayloadType(): number {
 		return readBitsInDataView({ view: this.view, pos: 13, mask: 0b01111111 });
 	}
 
 	/**
 	 * Set the payload type.
 	 */
-	setPayloadType(payloadType: number): void
-	{
-		writeBitsInDataView(
-			{ view: this.view, pos: 13, mask: 0b01111111, value: payloadType }
-		);
+	setPayloadType(payloadType: number): void {
+		writeBitsInDataView({
+			view: this.view,
+			pos: 13,
+			mask: 0b01111111,
+			value: payloadType,
+		});
 	}
 
 	/**
 	 * Get the bit string.
 	 */
-	getBitString(): DataView
-	{
+	getBitString(): DataView {
 		return this.#bitStringView;
 	}
 
@@ -289,8 +271,7 @@ export class RpsiPacket extends FeedbackPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setBitString(view: DataView): void
-	{
+	setBitString(view: DataView): void {
 		this.#bitStringView = view;
 
 		const fciLength = 2 + this.#bitStringView.byteLength;
@@ -302,13 +283,11 @@ export class RpsiPacket extends FeedbackPacket
 		this.setSerializationNeeded(true);
 	}
 
-	private getFciPaddingBits(): number
-	{
+	private getFciPaddingBits(): number {
 		return this.view.getUint8(12);
 	}
 
-	private setFciPaddingBits(paddingBits: number): void
-	{
+	private setFciPaddingBits(paddingBits: number): void {
 		return this.view.setUint8(12, paddingBits);
 	}
 }

@@ -6,8 +6,7 @@
 // ESLint absurdly complains about "'RtpExtensionType' is already declared in the
 // upper scope".
 // eslint-disable-next-line no-shadow
-export enum RtpExtensionType
-{
+export enum RtpExtensionType {
 	/**
 	 * Media identification.
 	 *
@@ -79,7 +78,7 @@ export enum RtpExtensionType
 	 * @see
 	 * - [RFC 5450](https://datatracker.ietf.org/doc/html/rfc5450)
 	 */
-	TOFFSET
+	TOFFSET,
 }
 
 /**
@@ -102,47 +101,39 @@ export type RtpExtensionMapping = Partial<Record<RtpExtensionType, number>>;
  *
  * @category RTP
  */
-export function rtpExtensionUriToType(uri: string): RtpExtensionType | undefined
-{
-	switch (uri)
-	{
-		case 'urn:ietf:params:rtp-hdrext:sdes:mid':
-		{
+export function rtpExtensionUriToType(
+	uri: string,
+): RtpExtensionType | undefined {
+	switch (uri) {
+		case 'urn:ietf:params:rtp-hdrext:sdes:mid': {
 			return RtpExtensionType.MID;
 		}
 
-		case 'urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id':
-		{
+		case 'urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id': {
 			return RtpExtensionType.RTP_STREAM_ID;
 		}
 
-		case 'urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id':
-		{
+		case 'urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id': {
 			return RtpExtensionType.RTP_REPAIRED_STREAM_ID;
 		}
 
-		case 'http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time':
-		{
+		case 'http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time': {
 			return RtpExtensionType.ABS_SEND_TIME;
 		}
 
-		case 'http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01':
-		{
+		case 'http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01': {
 			return RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER;
 		}
 
-		case 'urn:ietf:params:rtp-hdrext:ssrc-audio-level':
-		{
+		case 'urn:ietf:params:rtp-hdrext:ssrc-audio-level': {
 			return RtpExtensionType.SSRC_AUDIO_LEVEL;
 		}
 
-		case 'urn:3gpp:video-orientation':
-		{
+		case 'urn:3gpp:video-orientation': {
 			return RtpExtensionType.VIDEO_ORIENTATION;
 		}
 
-		case 'urn:ietf:params:rtp-hdrext:toffset':
-		{
+		case 'urn:ietf:params:rtp-hdrext:toffset': {
 			return RtpExtensionType.TOFFSET;
 		}
 	}
@@ -156,8 +147,7 @@ export function rtpExtensionUriToType(uri: string): RtpExtensionType | undefined
  * @see
  * - [RFC 6464](https://datatracker.ietf.org/doc/html/rfc6464)
  */
-export type SsrcAudioLevelExtension =
-{
+export type SsrcAudioLevelExtension = {
 	/**
 	 * Audio level expressed in -dBov, with values from 0 to 127 representing 0
 	 * to -127 dBov.
@@ -177,8 +167,7 @@ export type SsrcAudioLevelExtension =
  * @see
  * - [3GPP TS 26.114 V12.7.0](https://www.etsi.org/deliver/etsi_ts/126100_126199/126114/13.02.00_60/ts_126114v130200p.pdf)
  */
-export type VideoOrientationExtension =
-{
+export type VideoOrientationExtension = {
 	camera: boolean;
 	flip: boolean;
 	/**
@@ -198,7 +187,6 @@ export type VideoOrientationExtension =
  * @see
  * - [Google Source](https://webrtc.googlesource.com/src/+/refs/heads/main/docs/native-code/rtp-hdrext/abs-send-time)
  */
-export function timeMsToAbsSendTime(timeMs: number): number
-{
-	return (((timeMs << 18) + 500) / 1000) & 0x00FFFFFF;
+export function timeMsToAbsSendTime(timeMs: number): number {
+	return (((timeMs << 18) + 500) / 1000) & 0x00ffffff;
 }

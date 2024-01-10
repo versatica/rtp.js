@@ -2,12 +2,12 @@ import {
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './RtcpPacket';
 import {
 	dataViewToString,
 	stringToUint8Array,
-	getStringByteLength
+	getStringByteLength,
 } from '../../utils/helpers';
 
 /**
@@ -15,8 +15,7 @@ import {
  *
  * @category RTCP
  */
-export type ByePacketDump = RtcpPacketDump &
-{
+export type ByePacketDump = RtcpPacketDump & {
 	ssrcs: number[];
 	reason?: string;
 };
@@ -43,8 +42,7 @@ export type ByePacketDump = RtcpPacketDump &
  * @see
  * - [RFC 3550 section 6.6](https://datatracker.ietf.org/doc/html/rfc3550#section-6.6)
  */
-export class ByePacket extends RtcpPacket
-{
+export class ByePacket extends RtcpPacket {
 	// SSRC/CSRC array.
 	#ssrcs: number[] = [];
 	// Termination season.
@@ -57,12 +55,10 @@ export class ByePacket extends RtcpPacket
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP BYE packet.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(RtcpPacketType.BYE, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
 
 			// Write version and packet type.
@@ -79,8 +75,7 @@ export class ByePacket extends RtcpPacket
 
 		let count = this.getCount();
 
-		while (count-- > 0)
-		{
+		while (count-- > 0) {
 			const ssrc = this.view.getUint32(pos);
 
 			this.#ssrcs.push(ssrc);
@@ -89,8 +84,7 @@ export class ByePacket extends RtcpPacket
 		}
 
 		// Check if there is reason.
-		if (pos + this.padding < this.view.byteLength)
-		{
+		if (pos + this.padding < this.view.byteLength) {
 			const reasonLength = this.view.getUint8(pos);
 			const reasonPadding = -(reasonLength + 1) & 3;
 
@@ -100,7 +94,7 @@ export class ByePacket extends RtcpPacket
 			const reasonView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				reasonLength
+				reasonLength,
 			);
 
 			this.#reason = dataViewToString(reasonView);
@@ -111,10 +105,9 @@ export class ByePacket extends RtcpPacket
 		pos += this.padding;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -122,29 +115,25 @@ export class ByePacket extends RtcpPacket
 	/**
 	 * Dump RTCP BYE packet info.
 	 */
-	dump(): ByePacketDump
-	{
+	dump(): ByePacketDump {
 		return {
 			...super.dump(),
-			ssrcs  : this.getSsrcs(),
-			reason : this.getReason()
+			ssrcs: this.getSsrcs(),
+			reason: this.getReason(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
-		let packetLength = COMMON_HEADER_LENGTH + (this.#ssrcs.length * 4);
+		let packetLength = COMMON_HEADER_LENGTH + this.#ssrcs.length * 4;
 
-		if (this.#reason)
-		{
+		if (this.#reason) {
 			const reasonLength = getStringByteLength(this.#reason);
 			const reasonPadding = -(reasonLength + 1) & 3;
 
@@ -159,8 +148,7 @@ export class ByePacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 
 		// Position relative to the DataView byte offset.
@@ -170,22 +158,20 @@ export class ByePacket extends RtcpPacket
 		pos += COMMON_HEADER_LENGTH;
 
 		// Write SSRCs/CSRCs.
-		for (const ssrc of this.#ssrcs)
-		{
+		for (const ssrc of this.#ssrcs) {
 			view.setUint32(pos, ssrc);
 
 			pos += 4;
 		}
 
-		if (this.#reason)
-		{
+		if (this.#reason) {
 			const reasonUint8Array = stringToUint8Array(this.#reason);
 			const reasonLength = reasonUint8Array.byteLength;
 			const reasonPadding = -(reasonLength + 1) & 3;
 			const uint8Array = new Uint8Array(
 				view.buffer,
 				view.byteOffset,
-				view.byteLength
+				view.byteLength,
 			);
 
 			// Write reason length.
@@ -204,10 +190,9 @@ export class ByePacket extends RtcpPacket
 		pos += this.padding;
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -224,14 +209,13 @@ export class ByePacket extends RtcpPacket
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): ByePacket
-	{
+		serializationByteOffset?: number,
+	): ByePacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new ByePacket(view);
@@ -240,8 +224,7 @@ export class ByePacket extends RtcpPacket
 	/**
 	 * Get SSRC values.
 	 */
-	getSsrcs(): number[]
-	{
+	getSsrcs(): number[] {
 		return Array.from(this.#ssrcs);
 	}
 
@@ -251,8 +234,7 @@ export class ByePacket extends RtcpPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setSsrcs(ssrcs: number[]): void
-	{
+	setSsrcs(ssrcs: number[]): void {
 		this.#ssrcs = Array.from(ssrcs);
 
 		// Update RTCP count.
@@ -267,8 +249,7 @@ export class ByePacket extends RtcpPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	addSsrc(ssrc: number): void
-	{
+	addSsrc(ssrc: number): void {
 		this.#ssrcs.push(ssrc);
 
 		// Update RTCP count.
@@ -280,16 +261,14 @@ export class ByePacket extends RtcpPacket
 	/**
 	 * Get reason.
 	 */
-	getReason(): string | undefined
-	{
+	getReason(): string | undefined {
 		return this.#reason;
 	}
 
 	/**
 	 * Set reason.
 	 */
-	setReason(reason?: string): void
-	{
+	setReason(reason?: string): void {
 		this.#reason = reason;
 
 		this.setSerializationNeeded(true);

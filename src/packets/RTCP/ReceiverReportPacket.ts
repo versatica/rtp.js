@@ -2,7 +2,7 @@ import {
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './RtcpPacket';
 import { Serializable, SerializableDump } from '../Serializable';
 
@@ -16,8 +16,7 @@ export const RECEPTION_REPORT_LENGTH = 24;
  *
  * @category RTCP
  */
-export type ReceiverReportPacketDump = RtcpPacketDump &
-{
+export type ReceiverReportPacketDump = RtcpPacketDump & {
 	ssrc: number;
 	reports: ReceptionReportDump[];
 };
@@ -27,8 +26,7 @@ export type ReceiverReportPacketDump = RtcpPacketDump &
  *
  * @category RTCP
  */
-export type ReceptionReportDump = SerializableDump &
-{
+export type ReceptionReportDump = SerializableDump & {
 	ssrc: number;
 	fractionLost: number;
 	totalLost: number;
@@ -74,8 +72,7 @@ export type ReceptionReportDump = SerializableDump &
  * @see
  * - [RFC 3550 section 6.4.2](https://datatracker.ietf.org/doc/html/rfc3550#section-6.4.2)
  */
-export class ReceiverReportPacket extends RtcpPacket
-{
+export class ReceiverReportPacket extends RtcpPacket {
 	// Reception Reports.
 	#reports: ReceptionReport[] = [];
 
@@ -86,12 +83,10 @@ export class ReceiverReportPacket extends RtcpPacket
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP Receiver Report packet.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(RtcpPacketType.RR, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
 			// Write version and packet type.
@@ -108,14 +103,13 @@ export class ReceiverReportPacket extends RtcpPacket
 
 		let count = this.getCount();
 
-		while (count-- > 0)
-		{
+		while (count-- > 0) {
 			const reportView = new DataView(
 				this.view.buffer,
-				this.view.byteOffset
-					+ FIXED_HEADER_LENGTH
-					+ (this.#reports.length * RECEPTION_REPORT_LENGTH),
-				RECEPTION_REPORT_LENGTH
+				this.view.byteOffset +
+					FIXED_HEADER_LENGTH +
+					this.#reports.length * RECEPTION_REPORT_LENGTH,
+				RECEPTION_REPORT_LENGTH,
 			);
 
 			pos += RECEPTION_REPORT_LENGTH;
@@ -128,10 +122,9 @@ export class ReceiverReportPacket extends RtcpPacket
 		pos += this.padding;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -139,28 +132,25 @@ export class ReceiverReportPacket extends RtcpPacket
 	/**
 	 * Dump Receiver Report packet info.
 	 */
-	dump(): ReceiverReportPacketDump
-	{
+	dump(): ReceiverReportPacketDump {
 		return {
 			...super.dump(),
-			ssrc    : this.getSsrc(),
-			reports : this.#reports.map((report) => report.dump())
+			ssrc: this.getSsrc(),
+			reports: this.#reports.map(report => report.dump()),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
 		const packetLength =
 			FIXED_HEADER_LENGTH +
-			(this.#reports.length * RECEPTION_REPORT_LENGTH) +
+			this.#reports.length * RECEPTION_REPORT_LENGTH +
 			this.padding;
 
 		return packetLength;
@@ -169,24 +159,22 @@ export class ReceiverReportPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	needsSerialization(): boolean
-	{
+	needsSerialization(): boolean {
 		return (
 			super.needsSerialization() ||
-			this.#reports.some((report) => report.needsSerialization())
+			this.#reports.some(report => report.needsSerialization())
 		);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -200,17 +188,16 @@ export class ReceiverReportPacket extends RtcpPacket
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH
+				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH,
 			),
-			pos
+			pos,
 		);
 
 		// Move to Reception Reports.
 		pos += FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH;
 
 		// Write Reception Reports.
-		for (const report of this.#reports)
-		{
+		for (const report of this.#reports) {
 			report.serialize(view.buffer, view.byteOffset + pos);
 
 			pos += report.getByteLength();
@@ -219,10 +206,9 @@ export class ReceiverReportPacket extends RtcpPacket
 		pos += this.padding;
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -239,14 +225,13 @@ export class ReceiverReportPacket extends RtcpPacket
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): ReceiverReportPacket
-	{
+		serializationByteOffset?: number,
+	): ReceiverReportPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new ReceiverReportPacket(view);
@@ -255,24 +240,21 @@ export class ReceiverReportPacket extends RtcpPacket
 	/**
 	 * Get sender SSRC.
 	 */
-	getSsrc(): number
-	{
+	getSsrc(): number {
 		return this.view.getUint32(4);
 	}
 
 	/**
 	 * Set sender SSRC.
 	 */
-	setSsrc(ssrc: number)
-	{
+	setSsrc(ssrc: number) {
 		this.view.setUint32(4, ssrc);
 	}
 
 	/**
 	 * Get Reception Reports.
 	 */
-	getReports(): ReceptionReport[]
-	{
+	getReports(): ReceptionReport[] {
 		return Array.from(this.#reports);
 	}
 
@@ -282,8 +264,7 @@ export class ReceiverReportPacket extends RtcpPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setReports(reports: ReceptionReport[]): void
-	{
+	setReports(reports: ReceptionReport[]): void {
 		this.#reports = Array.from(reports);
 
 		// Update RTCP count.
@@ -298,8 +279,7 @@ export class ReceiverReportPacket extends RtcpPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	addReport(report: ReceptionReport): void
-	{
+	addReport(report: ReceptionReport): void {
 		this.#reports.push(report);
 
 		// Update RTCP count.
@@ -314,25 +294,21 @@ export class ReceiverReportPacket extends RtcpPacket
  *
  * @category RTCP
  */
-export class ReceptionReport extends Serializable
-{
+export class ReceptionReport extends Serializable {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP Receiver
 	 *   Report will be created.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(RECEPTION_REPORT_LENGTH));
 
 			return;
 		}
 
-		if (this.view.byteLength !== RECEPTION_REPORT_LENGTH)
-		{
+		if (this.view.byteLength !== RECEPTION_REPORT_LENGTH) {
 			throw new TypeError('wrong byte length for a RTCP Reception Report');
 		}
 	}
@@ -340,45 +316,42 @@ export class ReceptionReport extends Serializable
 	/**
 	 * Dump Reception Report info.
 	 */
-	dump(): ReceptionReportDump
-	{
+	dump(): ReceptionReportDump {
 		return {
 			...super.dump(),
-			ssrc         : this.getSsrc(),
-			fractionLost : this.getFractionLost(),
-			totalLost    : this.getTotalLost(),
-			highestSeq   : this.getHighestSeqNumber(),
-			jitter       : this.getJitter(),
-			lsr          : this.getLastSRTimestamp(),
-			dlsr         : this.getDelaySinceLastSR()
+			ssrc: this.getSsrc(),
+			fractionLost: this.getFractionLost(),
+			totalLost: this.getTotalLost(),
+			highestSeq: this.getHighestSeqNumber(),
+			jitter: this.getJitter(),
+			lsr: this.getLastSRTimestamp(),
+			dlsr: this.getDelaySinceLastSR(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
+	getByteLength(): number {
 		return RECEPTION_REPORT_LENGTH;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
 		const view = new DataView(
 			bufferData.buffer,
 			bufferData.byteOffset,
-			bufferData.byteLength
+			bufferData.byteLength,
 		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Copy the entire report into the new buffer.
@@ -386,9 +359,9 @@ export class ReceptionReport extends Serializable
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset,
-				RECEPTION_REPORT_LENGTH
+				RECEPTION_REPORT_LENGTH,
 			),
-			0
+			0,
 		);
 
 		this.setSerializationNeeded(false);
@@ -401,14 +374,13 @@ export class ReceptionReport extends Serializable
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): ReceptionReport
-	{
+		serializationByteOffset?: number,
+	): ReceptionReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new ReceptionReport(view);
@@ -417,16 +389,14 @@ export class ReceptionReport extends Serializable
 	/**
 	 * Get receiver SSRC.
 	 */
-	getSsrc(): number
-	{
+	getSsrc(): number {
 		return this.view.getUint32(0);
 	}
 
 	/**
 	 * Set receiver SSRC.
 	 */
-	setSsrc(ssrc: number): void
-	{
+	setSsrc(ssrc: number): void {
 		this.view.setUint32(0, ssrc);
 
 		this.setSerializationNeeded(true);
@@ -435,16 +405,14 @@ export class ReceptionReport extends Serializable
 	/**
 	 * Get fraction lost.
 	 */
-	getFractionLost(): number
-	{
+	getFractionLost(): number {
 		return this.view.getUint8(4);
 	}
 
 	/**
 	 * Set fraction lost.
 	 */
-	setFractionLost(fractionLost: number): void
-	{
+	setFractionLost(fractionLost: number): void {
 		this.view.setUint8(4, fractionLost);
 
 		this.setSerializationNeeded(true);
@@ -453,19 +421,16 @@ export class ReceptionReport extends Serializable
 	/**
 	 * Get total lost.
 	 */
-	getTotalLost(): number
-	{
-		let value = this.view.getUint32(4) & 0x0FFF;
+	getTotalLost(): number {
+		let value = this.view.getUint32(4) & 0x0fff;
 
 		// Possitive value.
-		if (((value >> 23) & 1) == 0)
-		{
+		if (((value >> 23) & 1) == 0) {
 			return value;
 		}
 
 		// Negative value.
-		if (value != 0x0800000)
-		{
+		if (value != 0x0800000) {
 			value &= ~(1 << 23);
 		}
 
@@ -475,18 +440,18 @@ export class ReceptionReport extends Serializable
 	/**
 	 * Set total lost.
 	 */
-	setTotalLost(totalLost: number): void
-	{
+	setTotalLost(totalLost: number): void {
 		// Get the limit value for possitive and negative total lost.
-		const clamp = (totalLost >= 0)
-			? totalLost > 0x07FFFFF
-				? 0x07FFFFF
-				: totalLost
-			: -totalLost > 0x0800000
-				? 0x0800000
-				: -totalLost;
+		const clamp =
+			totalLost >= 0
+				? totalLost > 0x07fffff
+					? 0x07fffff
+					: totalLost
+				: -totalLost > 0x0800000
+					? 0x0800000
+					: -totalLost;
 
-		const value = (totalLost >= 0) ? (clamp & 0x07FFFFF) : (clamp | 0x0800000);
+		const value = totalLost >= 0 ? clamp & 0x07fffff : clamp | 0x0800000;
 		const fractionLost = this.view.getUint8(4);
 
 		this.view.setUint32(4, value);
@@ -498,16 +463,14 @@ export class ReceptionReport extends Serializable
 	/**
 	 * Get highest RTP sequence number.
 	 */
-	getHighestSeqNumber(): number
-	{
+	getHighestSeqNumber(): number {
 		return this.view.getUint32(8);
 	}
 
 	/**
 	 * Set highest RTP sequence number.
 	 */
-	setHighestSeqNumber(seq: number): void
-	{
+	setHighestSeqNumber(seq: number): void {
 		this.view.setUint32(8, seq);
 
 		this.setSerializationNeeded(true);
@@ -516,16 +479,14 @@ export class ReceptionReport extends Serializable
 	/**
 	 * Get interarrival jitter.
 	 */
-	getJitter(): number
-	{
+	getJitter(): number {
 		return this.view.getUint32(12);
 	}
 
 	/**
 	 * Set interarrival jitter.
 	 */
-	setJitter(jitter: number)
-	{
+	setJitter(jitter: number) {
 		this.view.setUint32(12, jitter);
 
 		this.setSerializationNeeded(true);
@@ -534,16 +495,14 @@ export class ReceptionReport extends Serializable
 	/**
 	 * Set last Sender Report timestamp.
 	 */
-	getLastSRTimestamp(): number
-	{
+	getLastSRTimestamp(): number {
 		return this.view.getUint32(16);
 	}
 
 	/**
 	 * Set last Sender Report timestamp.
 	 */
-	setLastSRTimestamp(lsr: number): void
-	{
+	setLastSRTimestamp(lsr: number): void {
 		this.view.setUint32(16, lsr);
 
 		this.setSerializationNeeded(true);
@@ -552,16 +511,14 @@ export class ReceptionReport extends Serializable
 	/**
 	 * Get delay since last Sender Report.
 	 */
-	getDelaySinceLastSR(): number
-	{
+	getDelaySinceLastSR(): number {
 		return this.view.getUint32(20);
 	}
 
 	/**
 	 * Set delay since last Sender Report.
 	 */
-	setDelaySinceLastSR(dlsr: number): void
-	{
+	setDelaySinceLastSR(dlsr: number): void {
 		this.view.setUint32(20, dlsr);
 
 		this.setSerializationNeeded(true);

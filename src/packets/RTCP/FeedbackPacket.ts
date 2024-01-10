@@ -3,7 +3,7 @@ import {
 	RtcpPacketType,
 	RtcpPacketDump,
 	packetTypeToString,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './RtcpPacket';
 import { assertUnreachable } from '../../utils/helpers';
 import { readBitsInDataView, writeBitsInDataView } from '../../utils/bitOps';
@@ -20,8 +20,7 @@ export const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 8;
 // ESLint absurdly complains about "'RtpFeedbackMessageType' is already declared
 // in the upper scope".
 // eslint-disable-next-line no-shadow
-export enum RtpFeedbackMessageType
-{
+export enum RtpFeedbackMessageType {
 	/**
 	 * Generic NACK.
 	 */
@@ -33,7 +32,7 @@ export enum RtpFeedbackMessageType
 	/**
 	 * Explicit Congestion Notification (ECN).
 	 */
-	ECN = 8
+	ECN = 8,
 }
 
 /**
@@ -44,8 +43,7 @@ export enum RtpFeedbackMessageType
 // ESLint absurdly complains about "'PsFeedbackMessageType' is already declared
 // in the upper scope".
 // eslint-disable-next-line no-shadow
-export enum PsFeedbackMessageType
-{
+export enum PsFeedbackMessageType {
 	/**
 	 * Picture Loss Indication.
 	 */
@@ -61,7 +59,7 @@ export enum PsFeedbackMessageType
 	/**
 	 * Application layer FB message.
 	 */
-	AFB = 15
+	AFB = 15,
 }
 
 /**
@@ -69,8 +67,7 @@ export enum PsFeedbackMessageType
  *
  * @category RTCP
  */
-export type FeedbackPacketDump = RtcpPacketDump &
-{
+export type FeedbackPacketDump = RtcpPacketDump & {
 	messageType: RtpFeedbackMessageType | PsFeedbackMessageType;
 	senderSsrc: number;
 	mediaSsrc: number;
@@ -82,55 +79,44 @@ export type FeedbackPacketDump = RtcpPacketDump &
  * @hidden
  */
 export function getRtcpFeedbackMessageType(
-	view: DataView
-): RtpFeedbackMessageType | PsFeedbackMessageType
-{
+	view: DataView,
+): RtpFeedbackMessageType | PsFeedbackMessageType {
 	return readBitsInDataView({ view, pos: 0, mask: 0b00011111 });
 }
 
 function messageTypeToString(
-	messageType: RtpFeedbackMessageType | PsFeedbackMessageType
-): string
-{
-	switch (messageType)
-	{
-		case RtpFeedbackMessageType.NACK:
-		{
+	messageType: RtpFeedbackMessageType | PsFeedbackMessageType,
+): string {
+	switch (messageType) {
+		case RtpFeedbackMessageType.NACK: {
 			return 'Generic NACK';
 		}
 
-		case RtpFeedbackMessageType.SR_REQ:
-		{
+		case RtpFeedbackMessageType.SR_REQ: {
 			return 'Rapid Resynchronisation Request';
 		}
 
-		case RtpFeedbackMessageType.ECN:
-		{
+		case RtpFeedbackMessageType.ECN: {
 			return 'Explicit Congestion Notification (ECN)';
 		}
 
-		case PsFeedbackMessageType.PLI:
-		{
+		case PsFeedbackMessageType.PLI: {
 			return 'Picture Loss Indication';
 		}
 
-		case PsFeedbackMessageType.SLI:
-		{
+		case PsFeedbackMessageType.SLI: {
 			return 'Slice Loss Indication';
 		}
 
-		case PsFeedbackMessageType.RPSI:
-		{
+		case PsFeedbackMessageType.RPSI: {
 			return 'Reference Picture Selection Indication';
 		}
 
-		case PsFeedbackMessageType.AFB:
-		{
+		case PsFeedbackMessageType.AFB: {
 			return 'Application layer FB message';
 		}
 
-		default:
-		{
+		default: {
 			assertUnreachable(messageType);
 		}
 	}
@@ -158,27 +144,27 @@ function messageTypeToString(
  * @see
  * - [RFC 4585 section 6.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.1)
  */
-export abstract class FeedbackPacket extends RtcpPacket
-{
+export abstract class FeedbackPacket extends RtcpPacket {
 	// RTCP Feedback message type.
 	readonly #messageType: RtpFeedbackMessageType | PsFeedbackMessageType;
 
 	protected constructor(
 		packetType: RtcpPacketType.RTPFB | RtcpPacketType.PSFB,
 		messageType: RtpFeedbackMessageType | PsFeedbackMessageType,
-		view?: DataView
-	)
-	{
+		view?: DataView,
+	) {
 		super(packetType, view);
 
 		this.#messageType = messageType;
 
-		if (this.view)
-		{
-			if (this.getMessageType() !== this.#messageType)
-			{
+		if (this.view) {
+			if (this.getMessageType() !== this.#messageType) {
 				throw new TypeError(
-					`given buffer view is not a RTCP ${packetTypeToString(this.getPacketType())} packet with ${messageTypeToString(this.#messageType)} message type`
+					`given buffer view is not a RTCP ${packetTypeToString(
+						this.getPacketType(),
+					)} packet with ${messageTypeToString(
+						this.#messageType,
+					)} message type`,
 				);
 			}
 		}
@@ -190,58 +176,51 @@ export abstract class FeedbackPacket extends RtcpPacket
 	 * @remarks
 	 * - Read the info dump type of each RTCP Feedback packet instead.
 	 */
-	dump(): FeedbackPacketDump
-	{
+	dump(): FeedbackPacketDump {
 		return {
 			...super.dump(),
-			messageType : this.getMessageType(),
-			senderSsrc  : this.getSenderSsrc(),
-			mediaSsrc   : this.getMediaSsrc()
+			messageType: this.getMessageType(),
+			senderSsrc: this.getSenderSsrc(),
+			mediaSsrc: this.getMediaSsrc(),
 		};
 	}
 
 	/**
 	 * Get the RTCP Feedback message type.
 	 */
-	getMessageType(): RtpFeedbackMessageType | PsFeedbackMessageType
-	{
+	getMessageType(): RtpFeedbackMessageType | PsFeedbackMessageType {
 		return readBitsInDataView({ view: this.view, pos: 0, mask: 0b00011111 });
 	}
 
 	/**
 	 * Get sender SSRC.
 	 */
-	getSenderSsrc(): number
-	{
+	getSenderSsrc(): number {
 		return this.view.getUint32(4);
 	}
 
 	/**
 	 * Set sender SSRC.
 	 */
-	setSenderSsrc(ssrc: number)
-	{
+	setSenderSsrc(ssrc: number) {
 		this.view.setUint32(4, ssrc);
 	}
 
 	/**
 	 * Get media SSRC.
 	 */
-	getMediaSsrc(): number
-	{
+	getMediaSsrc(): number {
 		return this.view.getUint32(8);
 	}
 
 	/**
 	 * Set media SSRC.
 	 */
-	setMediaSsrc(ssrc: number)
-	{
+	setMediaSsrc(ssrc: number) {
 		this.view.setUint32(8, ssrc);
 	}
 
-	protected writeFixedHeader(): void
-	{
+	protected writeFixedHeader(): void {
 		super.writeCommonHeader();
 
 		this.setMessageType();
@@ -250,13 +229,12 @@ export abstract class FeedbackPacket extends RtcpPacket
 	/**
 	 * Serialize base RTCP Feedback packet into a new buffer.
 	 */
-	protected serializeBase(buffer?: ArrayBuffer, byteOffset?: number): DataView
-	{
+	protected serializeBase(buffer?: ArrayBuffer, byteOffset?: number): DataView {
 		const view = super.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -270,9 +248,9 @@ export abstract class FeedbackPacket extends RtcpPacket
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH
+				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH,
 			),
-			pos
+			pos,
 		);
 
 		return view;
@@ -285,10 +263,12 @@ export abstract class FeedbackPacket extends RtcpPacket
 	 * - This method is not public since users should not manipulate this field
 	 *   directly.
 	 */
-	private setMessageType(): void
-	{
-		writeBitsInDataView(
-			{ view: this.view, pos: 0, mask: 0b00011111, value: this.#messageType }
-		);
+	private setMessageType(): void {
+		writeBitsInDataView({
+			view: this.view,
+			pos: 0,
+			mask: 0b00011111,
+			value: this.#messageType,
+		});
 	}
 }

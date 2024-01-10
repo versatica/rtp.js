@@ -11,5 +11,5 @@ export {
 	dataViewToString,
 	arrayBufferToString,
 	stringToDataView,
-	getStringByteLength
+	getStringByteLength,
 } from './helpers';

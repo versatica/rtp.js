@@ -5,7 +5,7 @@ import {
 	PsFeedbackMessageType,
 	FeedbackPacketDump,
 	getRtcpFeedbackMessageType,
-	FIXED_HEADER_LENGTH
+	FIXED_HEADER_LENGTH,
 } from './FeedbackPacket';
 
 /**
@@ -13,8 +13,7 @@ import {
  *
  * @category RTCP
  */
-export type GenericFeedbackPacketDump = FeedbackPacketDump &
-{
+export type GenericFeedbackPacketDump = FeedbackPacketDump & {
 	bodyLength: number;
 };
 
@@ -40,8 +39,7 @@ export type GenericFeedbackPacketDump = FeedbackPacketDump &
  * @see
  * - [RFC 4585 section 6.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.1)
  */
-export class GenericFeedbackPacket extends FeedbackPacket
-{
+export class GenericFeedbackPacket extends FeedbackPacket {
 	// Buffer view holding the packet body.
 	#bodyView: DataView;
 
@@ -57,23 +55,21 @@ export class GenericFeedbackPacket extends FeedbackPacket
 	constructor(
 		view?: DataView,
 		packetType?: RtcpPacketType.RTPFB | RtcpPacketType.PSFB,
-		messageType?: RtpFeedbackMessageType | PsFeedbackMessageType
-	)
-	{
+		messageType?: RtpFeedbackMessageType | PsFeedbackMessageType,
+	) {
 		super(
 			(view ? getRtcpPacketType(view) : packetType!) as
-				RtcpPacketType.RTPFB | RtcpPacketType.PSFB,
+				| RtcpPacketType.RTPFB
+				| RtcpPacketType.PSFB,
 			view ? getRtcpFeedbackMessageType(view) : messageType!,
-			view
+			view,
 		);
 
-		if (!view && (!packetType || !messageType))
-		{
+		if (!view && (!packetType || !messageType)) {
 			throw new TypeError('view or (packetType and messageType) must be given');
 		}
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
 			// Write version, packet type and feedback message type.
@@ -83,7 +79,7 @@ export class GenericFeedbackPacket extends FeedbackPacket
 			this.#bodyView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + FIXED_HEADER_LENGTH,
-				0
+				0,
 			);
 
 			return;
@@ -101,16 +97,15 @@ export class GenericFeedbackPacket extends FeedbackPacket
 		this.#bodyView = new DataView(
 			this.view.buffer,
 			this.view.byteOffset + pos,
-			bodyLength
+			bodyLength,
 		);
 
-		pos += (bodyLength + this.padding);
+		pos += bodyLength + this.padding;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -118,28 +113,23 @@ export class GenericFeedbackPacket extends FeedbackPacket
 	/**
 	 * Dump RTCP generic Feedback packet info.
 	 */
-	dump(): GenericFeedbackPacketDump
-	{
+	dump(): GenericFeedbackPacketDump {
 		return {
 			...super.dump(),
-			bodyLength : this.getBody().byteLength
+			bodyLength: this.getBody().byteLength,
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
 		const packetLength =
-			FIXED_HEADER_LENGTH +
-			this.#bodyView.byteLength +
-			this.padding;
+			FIXED_HEADER_LENGTH + this.#bodyView.byteLength + this.padding;
 
 		return packetLength;
 	}
@@ -147,13 +137,12 @@ export class GenericFeedbackPacket extends FeedbackPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -167,16 +156,16 @@ export class GenericFeedbackPacket extends FeedbackPacket
 			new Uint8Array(
 				this.#bodyView.buffer,
 				this.#bodyView.byteOffset,
-				this.#bodyView.byteLength
+				this.#bodyView.byteLength,
 			),
-			pos
+			pos,
 		);
 
 		// Create new body DataView.
 		const bodyView = new DataView(
 			view.buffer,
 			view.byteOffset + pos,
-			this.#bodyView.byteLength
+			this.#bodyView.byteLength,
 		);
 
 		pos += bodyView.byteLength;
@@ -184,10 +173,9 @@ export class GenericFeedbackPacket extends FeedbackPacket
 		pos += this.padding;
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -207,14 +195,13 @@ export class GenericFeedbackPacket extends FeedbackPacket
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): GenericFeedbackPacket
-	{
+		serializationByteOffset?: number,
+	): GenericFeedbackPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new GenericFeedbackPacket(view);
@@ -223,8 +210,7 @@ export class GenericFeedbackPacket extends FeedbackPacket
 	/**
 	 * Get the packet body.
 	 */
-	getBody(): DataView
-	{
+	getBody(): DataView {
 		return this.#bodyView;
 	}
 
@@ -234,8 +220,7 @@ export class GenericFeedbackPacket extends FeedbackPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setBody(view: DataView): void
-	{
+	setBody(view: DataView): void {
 		this.#bodyView = view;
 
 		// We must set the flag first because padTo4Bytes() will call getByteLength()

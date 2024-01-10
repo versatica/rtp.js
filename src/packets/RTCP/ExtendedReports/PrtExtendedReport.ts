@@ -2,12 +2,9 @@ import {
 	ExtendedReport,
 	ExtendedReportType,
 	ExtendedReportDump,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './ExtendedReport';
-import {
-	readBitsInDataView,
-	writeBitsInDataView
-} from '../../../utils/bitOps';
+import { readBitsInDataView, writeBitsInDataView } from '../../../utils/bitOps';
 
 // Common header + SSRC of source + begin seq + end seq.
 const PRT_EXTENDED_REPORT_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
@@ -17,8 +14,7 @@ const PRT_EXTENDED_REPORT_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
  *
  * @category RTCP Extended Reports
  */
-export type PrtExtendedReportDump = ExtendedReportDump &
-{
+export type PrtExtendedReportDump = ExtendedReportDump & {
 	thinning: number;
 	ssrc: number;
 	beginSeq: number;
@@ -54,8 +50,7 @@ export type PrtExtendedReportDump = ExtendedReportDump &
  * @see
  * - [RFC 3611 section 4.3](https://datatracker.ietf.org/doc/html/rfc3611#section-4.3)
  */
-export class PrtExtendedReport extends ExtendedReport
-{
+export class PrtExtendedReport extends ExtendedReport {
 	// Receipt times (4 bytes numbers, unparsed).
 	#receiptTimes: number[] = [];
 
@@ -63,15 +58,11 @@ export class PrtExtendedReport extends ExtendedReport
 	 * @param view - If given it will be parsed. Otherwise an empty Packet Receipt
 	 *   Times Extended Report will be created.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(ExtendedReportType.PRT, view);
 
-		if (!this.view)
-		{
-			this.view = new DataView(
-				new ArrayBuffer(PRT_EXTENDED_REPORT_MIN_LENGTH)
-			);
+		if (!this.view) {
+			this.view = new DataView(new ArrayBuffer(PRT_EXTENDED_REPORT_MIN_LENGTH));
 
 			// Write report type.
 			this.writeCommonHeader();
@@ -79,10 +70,9 @@ export class PrtExtendedReport extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength < PRT_EXTENDED_REPORT_MIN_LENGTH)
-		{
+		if (this.view.byteLength < PRT_EXTENDED_REPORT_MIN_LENGTH) {
 			throw new TypeError(
-				'wrong byte length for a Packet Receipt Times Extended Report'
+				'wrong byte length for a Packet Receipt Times Extended Report',
 			);
 		}
 
@@ -92,8 +82,7 @@ export class PrtExtendedReport extends ExtendedReport
 		// Move to receipt times.
 		pos += PRT_EXTENDED_REPORT_MIN_LENGTH;
 
-		while (pos < this.view.byteLength)
-		{
+		while (pos < this.view.byteLength) {
 			const receiptTime = this.view.getUint32(pos);
 
 			this.#receiptTimes.push(receiptTime);
@@ -105,25 +94,22 @@ export class PrtExtendedReport extends ExtendedReport
 	/**
 	 * Dump Packet Receipt Times Extended Report info.
 	 */
-	dump(): PrtExtendedReportDump
-	{
+	dump(): PrtExtendedReportDump {
 		return {
 			...super.dump(),
-			thinning     : this.getThinning(),
-			ssrc         : this.getSsrc(),
-			beginSeq     : this.getBeginSeq(),
-			endSeq       : this.getEndSeq(),
-			receiptTimes : this.getReceiptTimes()
+			thinning: this.getThinning(),
+			ssrc: this.getSsrc(),
+			beginSeq: this.getBeginSeq(),
+			endSeq: this.getEndSeq(),
+			receiptTimes: this.getReceiptTimes(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
@@ -139,13 +125,12 @@ export class PrtExtendedReport extends ExtendedReport
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -159,26 +144,24 @@ export class PrtExtendedReport extends ExtendedReport
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				PRT_EXTENDED_REPORT_MIN_LENGTH - COMMON_HEADER_LENGTH
+				PRT_EXTENDED_REPORT_MIN_LENGTH - COMMON_HEADER_LENGTH,
 			),
-			pos
+			pos,
 		);
 
 		// Move to receipt times.
 		pos += PRT_EXTENDED_REPORT_MIN_LENGTH - COMMON_HEADER_LENGTH;
 
 		// Copy receipt times.
-		for (const receiptTime of this.#receiptTimes)
-		{
+		for (const receiptTime of this.#receiptTimes) {
 			view.setUint32(pos, receiptTime);
 
 			pos += 4;
 		}
 
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -195,14 +178,13 @@ export class PrtExtendedReport extends ExtendedReport
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): PrtExtendedReport
-	{
+		serializationByteOffset?: number,
+	): PrtExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new PrtExtendedReport(view);
@@ -211,19 +193,20 @@ export class PrtExtendedReport extends ExtendedReport
 	/**
 	 * Get thinning.
 	 */
-	getThinning(): number
-	{
-		return readBitsInDataView({ view: this.view, pos: 1, mask: 0x0F });
+	getThinning(): number {
+		return readBitsInDataView({ view: this.view, pos: 1, mask: 0x0f });
 	}
 
 	/**
 	 * Set thinning.
 	 */
-	setThinning(thinning: number): void
-	{
-		writeBitsInDataView(
-			{ view: this.view, pos: 1, mask: 0x0F, value: thinning }
-		);
+	setThinning(thinning: number): void {
+		writeBitsInDataView({
+			view: this.view,
+			pos: 1,
+			mask: 0x0f,
+			value: thinning,
+		});
 
 		this.setSerializationNeeded(true);
 	}
@@ -231,16 +214,14 @@ export class PrtExtendedReport extends ExtendedReport
 	/**
 	 * Get SSRC of source.
 	 */
-	getSsrc(): number
-	{
+	getSsrc(): number {
 		return this.view.getUint32(4);
 	}
 
 	/**
 	 * Set SSRC of source.
 	 */
-	setSsrc(ssrc: number): void
-	{
+	setSsrc(ssrc: number): void {
 		this.view.setUint32(4, ssrc);
 
 		this.setSerializationNeeded(true);
@@ -249,16 +230,14 @@ export class PrtExtendedReport extends ExtendedReport
 	/**
 	 * Get begin sequence number.
 	 */
-	getBeginSeq(): number
-	{
+	getBeginSeq(): number {
 		return this.view.getUint16(8);
 	}
 
 	/**
 	 * Set begin sequence number.
 	 */
-	setBeginSeq(seq: number): void
-	{
+	setBeginSeq(seq: number): void {
 		this.view.setUint16(8, seq);
 
 		this.setSerializationNeeded(true);
@@ -267,16 +246,14 @@ export class PrtExtendedReport extends ExtendedReport
 	/**
 	 * Get end sequence number.
 	 */
-	getEndSeq(): number
-	{
+	getEndSeq(): number {
 		return this.view.getUint16(10);
 	}
 
 	/**
 	 * Set end sequence number.
 	 */
-	setEndSeq(seq: number): void
-	{
+	setEndSeq(seq: number): void {
 		this.view.setUint16(10, seq);
 
 		this.setSerializationNeeded(true);
@@ -288,8 +265,7 @@ export class PrtExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - Receipt times are given as a list of 4 byte integers.
 	 */
-	getReceiptTimes(): number[]
-	{
+	getReceiptTimes(): number[] {
 		return Array.from(this.#receiptTimes);
 	}
 
@@ -299,8 +275,7 @@ export class PrtExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - Receipt times must be given as a list of 4 byte integers.
 	 */
-	setReceiptTimes(receiptTimes: number[]): void
-	{
+	setReceiptTimes(receiptTimes: number[]): void {
 		this.#receiptTimes = Array.from(receiptTimes);
 
 		this.setSerializationNeeded(true);
@@ -312,8 +287,7 @@ export class PrtExtendedReport extends ExtendedReport
 	 * @remarks
 	 * - Receipt time must be given as 4 byte integer.
 	 */
-	addReceiptTime(receiptTime: number): void
-	{
+	addReceiptTime(receiptTime: number): void {
 		this.#receiptTimes.push(receiptTime);
 
 		this.setSerializationNeeded(true);

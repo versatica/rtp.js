@@ -1,0 +1,7 @@
+# NOTE: This file and .prettierignore must contain same paths.
+
+/.cache
+/coverage
+/doc
+/doc-assets
+/lib

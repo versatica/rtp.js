@@ -20,8 +20,7 @@ export const COMMON_HEADER_LENGTH = 4;
 // ESLint absurdly complains about "'RtcpPacketType' is already declared in the
 // upper scope".
 // eslint-disable-next-line no-shadow
-export enum RtcpPacketType
-{
+export enum RtcpPacketType {
 	/**
 	 * Extended Jitter Reports packet.
 	 */
@@ -57,7 +56,7 @@ export enum RtcpPacketType
 	/**
 	 * RTCP Extended Report packet.
 	 */
-	XR = 207
+	XR = 207,
 }
 
 /**
@@ -65,8 +64,7 @@ export enum RtcpPacketType
  *
  * @category RTCP
  */
-export type RtcpPacketDump = PacketDump &
-{
+export type RtcpPacketDump = PacketDump & {
 	packetType: RtcpPacketType;
 	count: number;
 };
@@ -76,21 +74,22 @@ export type RtcpPacketDump = PacketDump &
  *
  * @category RTCP
  */
-export function isRtcp(view: DataView): boolean
-{
+export function isRtcp(view: DataView): boolean {
 	const firstByte = view.getUint8(0);
 	const secondByte = view.getUint8(1);
 
 	return (
 		view.byteLength >= COMMON_HEADER_LENGTH &&
 		// DOC: https://tools.ietf.org/html/draft-ietf-avtcore-rfc5764-mux-fixes
-		(firstByte > 127 && firstByte < 192) &&
+		firstByte > 127 &&
+		firstByte < 192 &&
 		// RTCP Version must be 2.
-		(firstByte >> 6) === RTP_VERSION &&
+		firstByte >> 6 === RTP_VERSION &&
 		// RTCP packet types defined by IANA:
 		// http://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml#rtp-parameters-4
 		// RFC 5761 (RTCP-mux) states this range for secure RTCP/RTP detection.
-		(secondByte >= 192 && secondByte <= 223)
+		secondByte >= 192 &&
+		secondByte <= 223
 	);
 }
 
@@ -99,8 +98,7 @@ export function isRtcp(view: DataView): boolean
  *
  * @hidden
  */
-export function getRtcpPacketType(view: DataView): RtcpPacketType
-{
+export function getRtcpPacketType(view: DataView): RtcpPacketType {
 	return view.getUint8(1);
 }
 
@@ -110,8 +108,7 @@ export function getRtcpPacketType(view: DataView): RtcpPacketType
  *
  * @hidden
  */
-export function getRtcpLength(view: DataView): number
-{
+export function getRtcpLength(view: DataView): number {
 	// As per RFC 3550, this is the length of this RTCP packet in 32-bit words
 	// minus one, including the header and any padding.
 	const length = view.getUint16(2);
@@ -125,17 +122,15 @@ export function getRtcpLength(view: DataView): number
  *
  * @hidden
  */
-function setRtcpLength(view: DataView, byteLength: number): void
-{
+function setRtcpLength(view: DataView, byteLength: number): void {
 	// RTCP packet byte length must be multiple of 4.
-	if (byteLength % 4 !== 0)
-	{
+	if (byteLength % 4 !== 0) {
 		throw new RangeError(
-			`RTCP packet byte length must be multiple of 4 but given byte length is ${byteLength} bytes`
+			`RTCP packet byte length must be multiple of 4 but given byte length is ${byteLength} bytes`,
 		);
 	}
 
-	const length = (byteLength / 4) - 1;
+	const length = byteLength / 4 - 1;
 
 	view.setUint16(2, length);
 }
@@ -143,57 +138,45 @@ function setRtcpLength(view: DataView, byteLength: number): void
 /**
  * @hidden
  */
-export function packetTypeToString(packetType: RtcpPacketType): string
-{
-	switch (packetType)
-	{
-		case RtcpPacketType.SR:
-		{
+export function packetTypeToString(packetType: RtcpPacketType): string {
+	switch (packetType) {
+		case RtcpPacketType.SR: {
 			return 'Sender Report';
 		}
 
-		case RtcpPacketType.RR:
-		{
+		case RtcpPacketType.RR: {
 			return 'Receiver Report';
 		}
 
-		case RtcpPacketType.SDES:
-		{
+		case RtcpPacketType.SDES: {
 			return 'SDES';
 		}
 
-		case RtcpPacketType.BYE:
-		{
+		case RtcpPacketType.BYE: {
 			return 'BYE';
 		}
 
-		case RtcpPacketType.APP:
-		{
+		case RtcpPacketType.APP: {
 			return 'APP';
 		}
 
-		case RtcpPacketType.RTPFB:
-		{
+		case RtcpPacketType.RTPFB: {
 			return 'RTP Feedback';
 		}
 
-		case RtcpPacketType.PSFB:
-		{
+		case RtcpPacketType.PSFB: {
 			return 'PS Feedback';
 		}
 
-		case RtcpPacketType.XR:
-		{
+		case RtcpPacketType.XR: {
 			return 'Extended Report';
 		}
 
-		case RtcpPacketType.IJ:
-		{
+		case RtcpPacketType.IJ: {
 			return 'Extended Jitter Reports';
 		}
 
-		default:
-		{
+		default: {
 			assertUnreachable(packetType);
 		}
 	}
@@ -215,46 +198,42 @@ export function packetTypeToString(packetType: RtcpPacketType): string
  * @see
  * - [RFC 3550 section 6.1](https://datatracker.ietf.org/doc/html/rfc3550#section-6.1)
  */
-export abstract class RtcpPacket extends Packet
-{
+export abstract class RtcpPacket extends Packet {
 	// RTCP packet type.
 	readonly #packetType: RtcpPacketType;
 
-	protected constructor(packetType: RtcpPacketType, view?: DataView)
-	{
+	protected constructor(packetType: RtcpPacketType, view?: DataView) {
 		super(view);
 
 		this.#packetType = packetType;
 
-		if (this.view)
-		{
-			if (!isRtcp(this.view))
-			{
+		if (this.view) {
+			if (!isRtcp(this.view)) {
 				throw new TypeError('not a RTCP packet');
-			}
-			else if (this.getPacketType() !== this.#packetType)
-			{
+			} else if (this.getPacketType() !== this.#packetType) {
 				throw new TypeError(
-					`given buffer view is not a RTCP ${packetTypeToString(this.#packetType)} packet`
+					`given buffer view is not a RTCP ${packetTypeToString(
+						this.#packetType,
+					)} packet`,
 				);
 			}
 			// RTCP packet byte length must be multiple of 4.
-			else if (this.view.byteLength % 4 !== 0)
-			{
+			else if (this.view.byteLength % 4 !== 0) {
 				throw new RangeError(
-					`RTCP packet byte length must be multiple of 4 but given buffer view is ${this.view.byteLength} bytes`
+					`RTCP packet byte length must be multiple of 4 but given buffer view is ${this.view.byteLength} bytes`,
 				);
-			}
-			else if (getRtcpLength(this.view) !== this.view.byteLength)
-			{
+			} else if (getRtcpLength(this.view) !== this.view.byteLength) {
 				throw new RangeError(
-					`length in the RTCP header (${getRtcpLength(this.view)} bytes) does not match buffer view length (${this.view.byteLength} bytes)`
+					`length in the RTCP header (${getRtcpLength(
+						this.view,
+					)} bytes) does not match buffer view length (${
+						this.view.byteLength
+					} bytes)`,
 				);
 			}
 
 			// Get padding.
-			if (this.hasPaddingBit())
-			{
+			if (this.hasPaddingBit()) {
 				this.padding = this.view.getUint8(this.view.byteLength - 1);
 			}
 		}
@@ -266,20 +245,18 @@ export abstract class RtcpPacket extends Packet
 	 * @remarks
 	 * - Read the info dump type of each RTCP packet instead.
 	 */
-	dump(): RtcpPacketDump
-	{
+	dump(): RtcpPacketDump {
 		return {
 			...super.dump(),
-			packetType : this.getPacketType(),
-			count      : this.getCount()
+			packetType: this.getPacketType(),
+			count: this.getCount(),
 		};
 	}
 
 	/**
 	 * Get the RTCP packet type.
 	 */
-	getPacketType(): RtcpPacketType
-	{
+	getPacketType(): RtcpPacketType {
 		return this.view.getUint8(1);
 	}
 
@@ -290,13 +267,11 @@ export abstract class RtcpPacket extends Packet
 	 * - Some RTCP packets do not use this byte (the second one in the common
 	 *   RTCP header) for counting chunks or items.
 	 */
-	getCount(): number
-	{
+	getCount(): number {
 		return readBitsInDataView({ view: this.view, pos: 0, mask: 0b00011111 });
 	}
 
-	protected writeCommonHeader(): void
-	{
+	protected writeCommonHeader(): void {
 		this.setVersion();
 		this.setPacketType();
 
@@ -313,30 +288,31 @@ export abstract class RtcpPacket extends Packet
 	 * - Also, there is no `count` field in all RTCP packets. For instance, XR
 	 *   and APP packets do not have it.
 	 */
-	protected setCount(count: number): void
-	{
-		writeBitsInDataView(
-			{ view: this.view, pos: 0, mask: 0b00011111, value: count }
-		);
+	protected setCount(count: number): void {
+		writeBitsInDataView({
+			view: this.view,
+			pos: 0,
+			mask: 0b00011111,
+			value: count,
+		});
 	}
 
 	/**
 	 * Serialize base RTCP packet into a new buffer.
 	 */
-	protected serializeBase(buffer?: ArrayBuffer, byteOffset?: number): DataView
-	{
+	protected serializeBase(buffer?: ArrayBuffer, byteOffset?: number): DataView {
 		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
 		const view = new DataView(
 			bufferData.buffer,
 			bufferData.byteOffset,
-			bufferData.byteLength
+			bufferData.byteLength,
 		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Copy the common header into the new buffer.
@@ -344,21 +320,19 @@ export abstract class RtcpPacket extends Packet
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset,
-				COMMON_HEADER_LENGTH
+				COMMON_HEADER_LENGTH,
 			),
-			0
+			0,
 		);
 
 		// Update the length field in the RTCP header.
 		setRtcpLength(view, view.byteLength);
 
 		// Write padding.
-		if (this.padding > 0)
-		{
-			if (this.padding > 255)
-			{
+		if (this.padding > 0) {
+			if (this.padding > 255) {
 				throw new TypeError(
-					`padding (${this.padding} bytes) cannot be higher than 255`
+					`padding (${this.padding} bytes) cannot be higher than 255`,
 				);
 			}
 
@@ -375,8 +349,7 @@ export abstract class RtcpPacket extends Packet
 	 * - This method is not public since users should not manipulate this field
 	 *   directly.
 	 */
-	private setPacketType(): void
-	{
+	private setPacketType(): void {
 		this.view.setUint8(1, this.#packetType);
 	}
 }

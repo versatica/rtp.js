@@ -2,7 +2,7 @@ import {
 	ExtendedReport,
 	ExtendedReportType,
 	ExtendedReportDump,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './ExtendedReport';
 
 // Common header + NTP timestamp.
@@ -13,8 +13,7 @@ const RRT_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 8;
  *
  * @category RTCP Extended Reports
  */
-export type RrtExtendedReportDump = ExtendedReportDump &
-{
+export type RrtExtendedReportDump = ExtendedReportDump & {
 	ntpSeq: number;
 	ntpFraction: number;
 };
@@ -39,18 +38,15 @@ export type RrtExtendedReportDump = ExtendedReportDump &
  * @see
  * - [RFC 3611 section 4.4](https://datatracker.ietf.org/doc/html/rfc3611#section-4.4)
  */
-export class RrtExtendedReport extends ExtendedReport
-{
+export class RrtExtendedReport extends ExtendedReport {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty Receiver
 	 *   Reference Time Extended Report will be created.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(ExtendedReportType.RRT, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(RRT_EXTENDED_REPORT_LENGTH));
 
 			// Write report type.
@@ -59,10 +55,9 @@ export class RrtExtendedReport extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength !== RRT_EXTENDED_REPORT_LENGTH)
-		{
+		if (this.view.byteLength !== RRT_EXTENDED_REPORT_LENGTH) {
 			throw new TypeError(
-				'wrong byte length for a Receiver Reference Time Extended Report'
+				'wrong byte length for a Receiver Reference Time Extended Report',
 			);
 		}
 	}
@@ -70,33 +65,30 @@ export class RrtExtendedReport extends ExtendedReport
 	/**
 	 * Dump Receiver Reference Time Extended Report info.
 	 */
-	dump(): RrtExtendedReportDump
-	{
+	dump(): RrtExtendedReportDump {
 		return {
 			...super.dump(),
-			ntpSeq      : this.getNtpSeconds(),
-			ntpFraction : this.getNtpFraction()
+			ntpSeq: this.getNtpSeconds(),
+			ntpFraction: this.getNtpFraction(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
+	getByteLength(): number {
 		return RRT_EXTENDED_REPORT_LENGTH;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -110,18 +102,17 @@ export class RrtExtendedReport extends ExtendedReport
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				RRT_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH
+				RRT_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH,
 			),
-			pos
+			pos,
 		);
 
 		// Move to the end.
 		pos += RRT_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH;
 
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -138,14 +129,13 @@ export class RrtExtendedReport extends ExtendedReport
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): RrtExtendedReport
-	{
+		serializationByteOffset?: number,
+	): RrtExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new RrtExtendedReport(view);
@@ -154,16 +144,14 @@ export class RrtExtendedReport extends ExtendedReport
 	/**
 	 * Get NTP seconds.
 	 */
-	getNtpSeconds(): number
-	{
+	getNtpSeconds(): number {
 		return this.view.getUint32(4);
 	}
 
 	/**
 	 * Set NTP seconds.
 	 */
-	setNtpSeconds(seconds: number): void
-	{
+	setNtpSeconds(seconds: number): void {
 		this.view.setUint32(4, seconds);
 
 		this.setSerializationNeeded(true);
@@ -172,16 +160,14 @@ export class RrtExtendedReport extends ExtendedReport
 	/**
 	 * Get NTP fraction.
 	 */
-	getNtpFraction(): number
-	{
+	getNtpFraction(): number {
 		return this.view.getUint32(8);
 	}
 
 	/**
 	 * Set NTP fraction.
 	 */
-	setNtpFraction(fraction: number): void
-	{
+	setNtpFraction(fraction: number): void {
 		this.view.setUint32(8, fraction);
 
 		this.setSerializationNeeded(true);

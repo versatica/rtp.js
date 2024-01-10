@@ -3,7 +3,7 @@ import {
 	FeedbackPacket,
 	PsFeedbackMessageType,
 	FeedbackPacketDump,
-	FIXED_HEADER_LENGTH
+	FIXED_HEADER_LENGTH,
 } from './FeedbackPacket';
 
 /**
@@ -11,8 +11,7 @@ import {
  *
  * @category RTCP
  */
-export type SliPacketDump = FeedbackPacketDump &
-{
+export type SliPacketDump = FeedbackPacketDump & {
 	items: { first: number; number: number; pictureId: number }[];
 };
 
@@ -40,8 +39,7 @@ export type SliPacketDump = FeedbackPacketDump &
  * @see
  * - [RFC 4585 section 6.3.2](https://datatracker.ietf.org/doc/html/rfc4585#section-6.3.2)
  */
-export class SliPacket extends FeedbackPacket
-{
+export class SliPacket extends FeedbackPacket {
 	#items: { first: number; number: number; pictureId: number }[] = [];
 
 	/**
@@ -51,12 +49,10 @@ export class SliPacket extends FeedbackPacket
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP SLI packet.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(RtcpPacketType.PSFB, PsFeedbackMessageType.SLI, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
 			// Write version, packet type and feedback message type.
@@ -71,8 +67,7 @@ export class SliPacket extends FeedbackPacket
 		// Move to items.
 		pos += FIXED_HEADER_LENGTH;
 
-		while (pos < this.view.byteLength - this.padding)
-		{
+		while (pos < this.view.byteLength - this.padding) {
 			const first = this.view.getUint16(pos) >> 3;
 
 			const number =
@@ -88,10 +83,9 @@ export class SliPacket extends FeedbackPacket
 		pos += this.padding;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -99,28 +93,23 @@ export class SliPacket extends FeedbackPacket
 	/**
 	 * Dump RTCP SLI packet info.
 	 */
-	dump(): SliPacketDump
-	{
+	dump(): SliPacketDump {
 		return {
 			...super.dump(),
-			items : this.getItems()
+			items: this.getItems(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
 		const packetLength =
-			FIXED_HEADER_LENGTH +
-			(this.#items.length * 4) +
-			this.padding;
+			FIXED_HEADER_LENGTH + this.#items.length * 4 + this.padding;
 
 		return packetLength;
 	}
@@ -128,8 +117,7 @@ export class SliPacket extends FeedbackPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 
 		// Position relative to the DataView byte offset.
@@ -139,12 +127,8 @@ export class SliPacket extends FeedbackPacket
 		pos += FIXED_HEADER_LENGTH;
 
 		// Write items.
-		for (const { first, number, pictureId } of this.#items)
-		{
-			view.setUint32(
-				pos,
-				(first << 19) + (number << 6) + pictureId
-			);
+		for (const { first, number, pictureId } of this.#items) {
+			view.setUint32(pos, (first << 19) + (number << 6) + pictureId);
 
 			pos += 4;
 		}
@@ -152,10 +136,9 @@ export class SliPacket extends FeedbackPacket
 		pos += this.padding;
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -172,14 +155,13 @@ export class SliPacket extends FeedbackPacket
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): SliPacket
-	{
+		serializationByteOffset?: number,
+	): SliPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new SliPacket(view);
@@ -188,8 +170,7 @@ export class SliPacket extends FeedbackPacket
 	/**
 	 * Get SLI items.
 	 */
-	getItems(): { first: number; number: number; pictureId: number }[]
-	{
+	getItems(): { first: number; number: number; pictureId: number }[] {
 		return Array.from(this.#items);
 	}
 
@@ -199,8 +180,9 @@ export class SliPacket extends FeedbackPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setItems(items: { first: number; number: number; pictureId: number }[]): void
-	{
+	setItems(
+		items: { first: number; number: number; pictureId: number }[],
+	): void {
 		this.#items = Array.from(items);
 
 		this.setSerializationNeeded(true);
@@ -212,8 +194,7 @@ export class SliPacket extends FeedbackPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	addItem(first: number, number: number, pictureId: number): void
-	{
+	addItem(first: number, number: number, pictureId: number): void {
 		this.#items.push({ first, number, pictureId });
 
 		this.setSerializationNeeded(true);

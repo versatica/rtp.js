@@ -5,7 +5,7 @@ import {
 	RtcpPacket,
 	RtcpPacketDump,
 	getRtcpPacketType,
-	getRtcpLength
+	getRtcpLength,
 } from './RtcpPacket';
 import { ReceiverReportPacket } from './ReceiverReportPacket';
 import { SenderReportPacket } from './SenderReportPacket';
@@ -14,7 +14,7 @@ import { SdesPacket } from './SdesPacket';
 import {
 	RtpFeedbackMessageType,
 	PsFeedbackMessageType,
-	getRtcpFeedbackMessageType
+	getRtcpFeedbackMessageType,
 } from './FeedbackPacket';
 import { NackPacket } from './NackPacket';
 import { SrReqPacket } from './SrReqPacket';
@@ -32,8 +32,7 @@ import { GenericPacket } from './GenericPacket';
  *
  * @category RTCP
  */
-export type CompoundPacketDump = PacketDump &
-{
+export type CompoundPacketDump = PacketDump & {
 	packets: RtcpPacketDump[];
 };
 
@@ -45,8 +44,7 @@ export type CompoundPacketDump = PacketDump &
  * @see
  * - [RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)
  */
-export class CompoundPacket extends Packet
-{
+export class CompoundPacket extends Packet {
 	// RTCP packets.
 	#packets: RtcpPacket[] = [];
 
@@ -57,17 +55,14 @@ export class CompoundPacket extends Packet
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP Compound packet.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(view);
 
-		if (this.view && !isRtcp(this.view))
-		{
+		if (this.view && !isRtcp(this.view)) {
 			throw new TypeError('not a RTCP compound packet');
 		}
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(0));
 
 			return;
@@ -77,12 +72,11 @@ export class CompoundPacket extends Packet
 		let pos = 0;
 
 		// Parse all RTCP packets.
-		while (pos < this.view.byteLength)
-		{
+		while (pos < this.view.byteLength) {
 			const remainingView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				this.view.byteLength - pos
+				this.view.byteLength - pos,
 			);
 
 			const packetLength = getRtcpLength(remainingView);
@@ -90,68 +84,57 @@ export class CompoundPacket extends Packet
 			const packetView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				packetLength
+				packetLength,
 			);
 
 			let packet: RtcpPacket;
 
-			switch (getRtcpPacketType(remainingView))
-			{
-				case RtcpPacketType.RR:
-				{
+			switch (getRtcpPacketType(remainingView)) {
+				case RtcpPacketType.RR: {
 					packet = new ReceiverReportPacket(packetView);
 
 					break;
 				}
 
-				case RtcpPacketType.SR:
-				{
+				case RtcpPacketType.SR: {
 					packet = new SenderReportPacket(packetView);
 
 					break;
 				}
 
-				case RtcpPacketType.BYE:
-				{
+				case RtcpPacketType.BYE: {
 					packet = new ByePacket(packetView);
 
 					break;
 				}
 
-				case RtcpPacketType.SDES:
-				{
+				case RtcpPacketType.SDES: {
 					packet = new SdesPacket(packetView);
 
 					break;
 				}
 
-				case RtcpPacketType.RTPFB:
-				{
-					switch (getRtcpFeedbackMessageType(packetView))
-					{
-						case RtpFeedbackMessageType.NACK:
-						{
+				case RtcpPacketType.RTPFB: {
+					switch (getRtcpFeedbackMessageType(packetView)) {
+						case RtpFeedbackMessageType.NACK: {
 							packet = new NackPacket(packetView);
 
 							break;
 						}
 
-						case RtpFeedbackMessageType.SR_REQ:
-						{
+						case RtpFeedbackMessageType.SR_REQ: {
 							packet = new SrReqPacket(packetView);
 
 							break;
 						}
 
-						case RtpFeedbackMessageType.ECN:
-						{
+						case RtpFeedbackMessageType.ECN: {
 							packet = new EcnPacket(packetView);
 
 							break;
 						}
 
-						default:
-						{
+						default: {
 							packet = new GenericFeedbackPacket(packetView);
 						}
 					}
@@ -159,33 +142,27 @@ export class CompoundPacket extends Packet
 					break;
 				}
 
-				case RtcpPacketType.PSFB:
-				{
-					switch (getRtcpFeedbackMessageType(packetView))
-					{
-						case PsFeedbackMessageType.PLI:
-						{
+				case RtcpPacketType.PSFB: {
+					switch (getRtcpFeedbackMessageType(packetView)) {
+						case PsFeedbackMessageType.PLI: {
 							packet = new PliPacket(packetView);
 
 							break;
 						}
 
-						case PsFeedbackMessageType.SLI:
-						{
+						case PsFeedbackMessageType.SLI: {
 							packet = new SliPacket(packetView);
 
 							break;
 						}
 
-						case PsFeedbackMessageType.RPSI:
-						{
+						case PsFeedbackMessageType.RPSI: {
 							packet = new RpsiPacket(packetView);
 
 							break;
 						}
 
-						default:
-						{
+						default: {
 							packet = new GenericFeedbackPacket(packetView);
 						}
 					}
@@ -193,22 +170,19 @@ export class CompoundPacket extends Packet
 					break;
 				}
 
-				case RtcpPacketType.XR:
-				{
+				case RtcpPacketType.XR: {
 					packet = new XrPacket(packetView);
 
 					break;
 				}
 
-				case RtcpPacketType.IJ:
-				{
+				case RtcpPacketType.IJ: {
 					packet = new ExtendedJitterReportsPacket(packetView);
 
 					break;
 				}
 
-				default:
-				{
+				default: {
 					packet = new GenericPacket(packetView);
 				}
 			}
@@ -219,10 +193,9 @@ export class CompoundPacket extends Packet
 		}
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -230,27 +203,24 @@ export class CompoundPacket extends Packet
 	/**
 	 * Dump RTCP Compound packet info.
 	 */
-	dump(): CompoundPacketDump
-	{
+	dump(): CompoundPacketDump {
 		return {
 			...super.dump(),
-			packets : this.#packets.map((packet) => packet.dump())
+			packets: this.#packets.map(packet => packet.dump()),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
 		const packetLength = this.#packets.reduce(
 			(sum, packet) => sum + packet.getByteLength(),
-			0
+			0,
 		);
 
 		return packetLength;
@@ -261,8 +231,7 @@ export class CompoundPacket extends Packet
 	 *
 	 * @hidden
 	 */
-	getPadding(): number
-	{
+	getPadding(): number {
 		return 0;
 	}
 
@@ -271,51 +240,46 @@ export class CompoundPacket extends Packet
 	 *
 	 * @hidden
 	 */
-	padTo4Bytes(): void
-	{
+	padTo4Bytes(): void {
 		throw new Error('method not implemented in RTCP CompoundPacket');
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	needsSerialization(): boolean
-	{
+	needsSerialization(): boolean {
 		return (
 			super.needsSerialization() ||
-			this.#packets.some((packet) => packet.needsSerialization())
+			this.#packets.some(packet => packet.needsSerialization())
 		);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
 		const view = new DataView(
 			bufferData.buffer,
 			bufferData.byteOffset,
-			bufferData.byteLength
+			bufferData.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
 		let pos = 0;
 
-		for (const packet of this.#packets)
-		{
+		for (const packet of this.#packets) {
 			packet.serialize(view.buffer, view.byteOffset + pos);
 
 			pos += packet.getByteLength();
 		}
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -332,14 +296,13 @@ export class CompoundPacket extends Packet
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): CompoundPacket
-	{
+		serializationByteOffset?: number,
+	): CompoundPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new CompoundPacket(view);
@@ -379,8 +342,7 @@ export class CompoundPacket extends Packet
 	 * }
 	 * ```
 	 */
-	getPackets(): RtcpPacket[]
-	{
+	getPackets(): RtcpPacket[] {
 		return Array.from(this.#packets);
 	}
 
@@ -390,8 +352,7 @@ export class CompoundPacket extends Packet
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setPackets(packets: RtcpPacket[]): void
-	{
+	setPackets(packets: RtcpPacket[]): void {
 		this.#packets = Array.from(packets);
 
 		this.setSerializationNeeded(true);
@@ -403,8 +364,7 @@ export class CompoundPacket extends Packet
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	addPacket(packet: RtcpPacket): void
-	{
+	addPacket(packet: RtcpPacket): void {
 		this.#packets.push(packet);
 
 		this.setSerializationNeeded(true);

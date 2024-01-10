@@ -2,13 +2,10 @@ import {
 	ExtendedReport,
 	ExtendedReportType,
 	ExtendedReportDump,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './ExtendedReport';
 import { padTo4Bytes } from '../../../utils/helpers';
-import {
-	readBitsInDataView,
-	writeBitsInDataView
-} from '../../../utils/bitOps';
+import { readBitsInDataView, writeBitsInDataView } from '../../../utils/bitOps';
 
 // Common header + SSRC of source + begin seq + end seq.
 const LRLE_EXTENDED_REPORT_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
@@ -18,8 +15,7 @@ const LRLE_EXTENDED_REPORT_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;
  *
  * @category RTCP Extended Reports
  */
-export type LrleExtendedReportDump = ExtendedReportDump &
-{
+export type LrleExtendedReportDump = ExtendedReportDump & {
 	thinning: number;
 	ssrc: number;
 	beginSeq: number;
@@ -53,8 +49,7 @@ export type LrleExtendedReportDump = ExtendedReportDump &
  * @see
  * - [RFC 3611 section 4.1](https://datatracker.ietf.org/doc/html/rfc3611#section-4.1)
  */
-export class LrleExtendedReport extends ExtendedReport
-{
+export class LrleExtendedReport extends ExtendedReport {
 	// Chunks (2 bytes numbers, unparsed).
 	#chunks: number[] = [];
 
@@ -62,14 +57,12 @@ export class LrleExtendedReport extends ExtendedReport
 	 * @param view - If given it will be parsed. Otherwise an empty Loss RLE
 	 *   Extended Report will be created.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(ExtendedReportType.LRLE, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(
-				new ArrayBuffer(LRLE_EXTENDED_REPORT_MIN_LENGTH)
+				new ArrayBuffer(LRLE_EXTENDED_REPORT_MIN_LENGTH),
 			);
 
 			// Write report type.
@@ -78,8 +71,7 @@ export class LrleExtendedReport extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength < LRLE_EXTENDED_REPORT_MIN_LENGTH)
-		{
+		if (this.view.byteLength < LRLE_EXTENDED_REPORT_MIN_LENGTH) {
 			throw new TypeError('wrong byte length for a Loss RLE Extended Report');
 		}
 
@@ -89,12 +81,10 @@ export class LrleExtendedReport extends ExtendedReport
 		// Move to chunks.
 		pos += LRLE_EXTENDED_REPORT_MIN_LENGTH;
 
-		while (pos < this.view.byteLength)
-		{
+		while (pos < this.view.byteLength) {
 			const chunk = this.view.getUint16(pos);
 
-			if (chunk === 0)
-			{
+			if (chunk === 0) {
 				break;
 			}
 
@@ -107,25 +97,22 @@ export class LrleExtendedReport extends ExtendedReport
 	/**
 	 * Dump Loss RLE Extended Report info.
 	 */
-	dump(): LrleExtendedReportDump
-	{
+	dump(): LrleExtendedReportDump {
 		return {
 			...super.dump(),
-			thinning : this.getThinning(),
-			ssrc     : this.getSsrc(),
-			beginSeq : this.getBeginSeq(),
-			endSeq   : this.getEndSeq(),
-			chunks   : this.getChunks()
+			thinning: this.getThinning(),
+			ssrc: this.getSsrc(),
+			beginSeq: this.getBeginSeq(),
+			endSeq: this.getEndSeq(),
+			chunks: this.getChunks(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
@@ -145,13 +132,12 @@ export class LrleExtendedReport extends ExtendedReport
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -165,17 +151,16 @@ export class LrleExtendedReport extends ExtendedReport
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				LRLE_EXTENDED_REPORT_MIN_LENGTH - COMMON_HEADER_LENGTH
+				LRLE_EXTENDED_REPORT_MIN_LENGTH - COMMON_HEADER_LENGTH,
 			),
-			pos
+			pos,
 		);
 
 		// Move to chunks.
 		pos += LRLE_EXTENDED_REPORT_MIN_LENGTH - COMMON_HEADER_LENGTH;
 
 		// Copy chunks.
-		for (const chunk of this.#chunks)
-		{
+		for (const chunk of this.#chunks) {
 			view.setUint16(pos, chunk);
 
 			pos += 2;
@@ -184,10 +169,9 @@ export class LrleExtendedReport extends ExtendedReport
 		// NOTE: Must pad the content to 4 bytes.
 		pos = padTo4Bytes(pos);
 
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -204,14 +188,13 @@ export class LrleExtendedReport extends ExtendedReport
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): LrleExtendedReport
-	{
+		serializationByteOffset?: number,
+	): LrleExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new LrleExtendedReport(view);
@@ -220,19 +203,20 @@ export class LrleExtendedReport extends ExtendedReport
 	/**
 	 * Get thinning.
 	 */
-	getThinning(): number
-	{
-		return readBitsInDataView({ view: this.view, pos: 1, mask: 0x0F });
+	getThinning(): number {
+		return readBitsInDataView({ view: this.view, pos: 1, mask: 0x0f });
 	}
 
 	/**
 	 * Set thinning.
 	 */
-	setThinning(thinning: number): void
-	{
-		writeBitsInDataView(
-			{ view: this.view, pos: 1, mask: 0x0F, value: thinning }
-		);
+	setThinning(thinning: number): void {
+		writeBitsInDataView({
+			view: this.view,
+			pos: 1,
+			mask: 0x0f,
+			value: thinning,
+		});
 
 		this.setSerializationNeeded(true);
 	}
@@ -240,16 +224,14 @@ export class LrleExtendedReport extends ExtendedReport
 	/**
 	 * Get SSRC of source.
 	 */
-	getSsrc(): number
-	{
+	getSsrc(): number {
 		return this.view.getUint32(4);
 	}
 
 	/**
 	 * Set SSRC of source.
 	 */
-	setSsrc(ssrc: number): void
-	{
+	setSsrc(ssrc: number): void {
 		this.view.setUint32(4, ssrc);
 
 		this.setSerializationNeeded(true);
@@ -258,16 +240,14 @@ export class LrleExtendedReport extends ExtendedReport
 	/**
 	 * Get begin sequence number.
 	 */
-	getBeginSeq(): number
-	{
+	getBeginSeq(): number {
 		return this.view.getUint16(8);
 	}
 
 	/**
 	 * Set begin sequence number.
 	 */
-	setBeginSeq(seq: number): void
-	{
+	setBeginSeq(seq: number): void {
 		this.view.setUint16(8, seq);
 
 		this.setSerializationNeeded(true);
@@ -276,16 +256,14 @@ export class LrleExtendedReport extends ExtendedReport
 	/**
 	 * Get end sequence number.
 	 */
-	getEndSeq(): number
-	{
+	getEndSeq(): number {
 		return this.view.getUint16(10);
 	}
 
 	/**
 	 * Set end sequence number.
 	 */
-	setEndSeq(seq: number): void
-	{
+	setEndSeq(seq: number): void {
 		this.view.setUint16(10, seq);
 
 		this.setSerializationNeeded(true);
@@ -298,8 +276,7 @@ export class LrleExtendedReport extends ExtendedReport
 	 * - Chunks are given as a list of 2 byte integers.
 	 * - Use {@link parseExtendedReportChunk} to parse them.
 	 */
-	getChunks(): number[]
-	{
+	getChunks(): number[] {
 		return Array.from(this.#chunks);
 	}
 
@@ -311,8 +288,7 @@ export class LrleExtendedReport extends ExtendedReport
 	 * - Use {@link createExtendedReportRunLengthChunk} or
 	 *   {@link createExtendedReportBitVectorChunk} to create them.
 	 */
-	setChunks(chunks: number[]): void
-	{
+	setChunks(chunks: number[]): void {
 		this.#chunks = Array.from(chunks);
 
 		this.setSerializationNeeded(true);
@@ -327,10 +303,8 @@ export class LrleExtendedReport extends ExtendedReport
 	 *   {@link createExtendedReportBitVectorChunk} to create it.
 	 * - Given chunk cannot be a terminating null chunk (0 number).
 	 */
-	addChunk(chunk: number): void
-	{
-		if (chunk === 0)
-		{
+	addChunk(chunk: number): void {
+		if (chunk === 0) {
 			throw new TypeError('cannot add terminating null chunks');
 		}
 

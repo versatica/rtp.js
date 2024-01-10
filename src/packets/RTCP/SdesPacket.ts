@@ -2,14 +2,14 @@ import {
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './RtcpPacket';
 import { Serializable, SerializableDump } from '../Serializable';
 import {
 	padTo4Bytes,
 	dataViewToString,
 	stringToUint8Array,
-	getStringByteLength
+	getStringByteLength,
 } from '../../utils/helpers';
 
 // SSRC (4 bytes) + null type (1 byte) + padding (3 bytes).
@@ -23,8 +23,7 @@ const SDES_CHUNK_MIN_LENGTH = 8;
 // ESLint absurdly complains about "'SdesItemType' is already declared in the
 // upper scope".
 // eslint-disable-next-line no-shadow
-export enum SdesItemType
-{
+export enum SdesItemType {
 	/**
 	 * Canonical End-Point Identifier SDES Item.
 	 */
@@ -56,7 +55,7 @@ export enum SdesItemType
 	/**
 	 * Private Extensions SDES Item.
 	 */
-	PRIV = 8
+	PRIV = 8,
 }
 
 /**
@@ -64,8 +63,7 @@ export enum SdesItemType
  *
  * @category RTCP
  */
-export type SdesPacketDump = RtcpPacketDump &
-{
+export type SdesPacketDump = RtcpPacketDump & {
 	chunks: SdesChunkDump[];
 };
 
@@ -74,8 +72,7 @@ export type SdesPacketDump = RtcpPacketDump &
  *
  * @category RTCP
  */
-export type SdesChunkDump = SerializableDump &
-{
+export type SdesChunkDump = SerializableDump & {
 	ssrc: number;
 	items: { type: SdesItemType; text: string }[];
 };
@@ -106,8 +103,7 @@ export type SdesChunkDump = SerializableDump &
  * @see
  * - [RFC 3550 section 6.5](https://datatracker.ietf.org/doc/html/rfc3550#section-6.5)
  */
-export class SdesPacket extends RtcpPacket
-{
+export class SdesPacket extends RtcpPacket {
 	// SDES Chunks.
 	#chunks: SdesChunk[] = [];
 
@@ -118,12 +114,10 @@ export class SdesPacket extends RtcpPacket
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP SDES packet.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(RtcpPacketType.SDES, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
 
 			// Write version and packet type.
@@ -140,8 +134,7 @@ export class SdesPacket extends RtcpPacket
 
 		let count = this.getCount();
 
-		while (count-- > 0)
-		{
+		while (count-- > 0) {
 			const chunkPos = pos;
 			let chunkLength = 0;
 
@@ -151,8 +144,7 @@ export class SdesPacket extends RtcpPacket
 
 			// Read the length of all items in this chunk until we find an item with
 			// type 0.
-			while (pos < this.view.byteLength - this.padding)
-			{
+			while (pos < this.view.byteLength - this.padding) {
 				const itemType = this.view.getUint8(pos);
 
 				++pos;
@@ -160,8 +152,7 @@ export class SdesPacket extends RtcpPacket
 
 				// Item type 0 means padding (to both indicate end of items and also
 				// beginning of padding).
-				if (itemType === 0)
-				{
+				if (itemType === 0) {
 					// Read up to 3 more additional null octests.
 					let additionalNumNullOctets = 0;
 
@@ -169,8 +160,7 @@ export class SdesPacket extends RtcpPacket
 						pos < this.view.byteLength - this.padding &&
 						additionalNumNullOctets < 3 &&
 						this.view.getUint8(pos) === 0
-					)
-					{
+					) {
 						++pos;
 						++chunkLength;
 						++additionalNumNullOctets;
@@ -191,7 +181,7 @@ export class SdesPacket extends RtcpPacket
 			const chunkView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + chunkPos,
-				chunkLength
+				chunkLength,
 			);
 
 			const chunk = new SdesChunk(chunkView);
@@ -199,20 +189,20 @@ export class SdesPacket extends RtcpPacket
 			this.#chunks.push(chunk);
 		}
 
-		if (this.#chunks.length !== this.getCount())
-		{
+		if (this.#chunks.length !== this.getCount()) {
 			throw new RangeError(
-				`num of parsed SDES Chunks (${this.#chunks.length}) doesn't match RTCP count field ({${this.getCount()}})`
+				`num of parsed SDES Chunks (${
+					this.#chunks.length
+				}) doesn't match RTCP count field ({${this.getCount()}})`,
 			);
 		}
 
 		pos += this.padding;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -220,30 +210,24 @@ export class SdesPacket extends RtcpPacket
 	/**
 	 * Dump Receiver Report packet info.
 	 */
-	dump(): SdesPacketDump
-	{
+	dump(): SdesPacketDump {
 		return {
 			...super.dump(),
-			chunks : this.#chunks.map((chunk) => chunk.dump())
+			chunks: this.#chunks.map(chunk => chunk.dump()),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
 		const packetLength =
 			COMMON_HEADER_LENGTH +
-			this.#chunks.reduce(
-				(sum, chunk) => sum + chunk.getByteLength(),
-				0
-			) +
+			this.#chunks.reduce((sum, chunk) => sum + chunk.getByteLength(), 0) +
 			this.padding;
 
 		return packetLength;
@@ -252,19 +236,17 @@ export class SdesPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	needsSerialization(): boolean
-	{
+	needsSerialization(): boolean {
 		return (
 			super.needsSerialization() ||
-			this.#chunks.some((chunk) => chunk.needsSerialization())
+			this.#chunks.some(chunk => chunk.needsSerialization())
 		);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 
 		// Position relative to the DataView byte offset.
@@ -274,8 +256,7 @@ export class SdesPacket extends RtcpPacket
 		pos += COMMON_HEADER_LENGTH;
 
 		// Write chunks.
-		for (const chunk of this.#chunks)
-		{
+		for (const chunk of this.#chunks) {
 			chunk.serialize(view.buffer, view.byteOffset + pos);
 
 			pos += chunk.getByteLength();
@@ -284,10 +265,9 @@ export class SdesPacket extends RtcpPacket
 		pos += this.padding;
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -304,14 +284,13 @@ export class SdesPacket extends RtcpPacket
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): SdesPacket
-	{
+		serializationByteOffset?: number,
+	): SdesPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new SdesPacket(view);
@@ -320,8 +299,7 @@ export class SdesPacket extends RtcpPacket
 	/**
 	 * Get SDES Chunks.
 	 */
-	getChunks(): SdesChunk[]
-	{
+	getChunks(): SdesChunk[] {
 		return Array.from(this.#chunks);
 	}
 
@@ -331,8 +309,7 @@ export class SdesPacket extends RtcpPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setChunks(chunks: SdesChunk[]): void
-	{
+	setChunks(chunks: SdesChunk[]): void {
 		this.#chunks = Array.from(chunks);
 
 		// Update RTCP count.
@@ -347,8 +324,7 @@ export class SdesPacket extends RtcpPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	addChunk(chunk: SdesChunk): void
-	{
+	addChunk(chunk: SdesChunk): void {
 		this.#chunks.push(chunk);
 
 		// Update RTCP count.
@@ -363,8 +339,7 @@ export class SdesPacket extends RtcpPacket
  *
  * @category RTCP
  */
-export class SdesChunk extends Serializable
-{
+export class SdesChunk extends Serializable {
 	// SDES Items indexed by type with text as value.
 	#items: { type: SdesItemType; text: string }[] = [];
 
@@ -372,24 +347,21 @@ export class SdesChunk extends Serializable
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP SDES
 	 *   Chunk will be created.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(SDES_CHUNK_MIN_LENGTH));
 
 			return;
 		}
 
-		if (this.view.byteLength < SDES_CHUNK_MIN_LENGTH)
-		{
+		if (this.view.byteLength < SDES_CHUNK_MIN_LENGTH) {
 			throw new TypeError('wrong byte length for a SDES Chunk');
-		}
-		else if (this.view.byteLength % 4 !== 0)
-		{
-			throw new RangeError(`SDES Chunk length must be multiple of 4 bytes but it is ${this.view.byteLength} bytes`);
+		} else if (this.view.byteLength % 4 !== 0) {
+			throw new RangeError(
+				`SDES Chunk length must be multiple of 4 bytes but it is ${this.view.byteLength} bytes`,
+			);
 		}
 
 		// Position relative to the DataView byte offset.
@@ -398,15 +370,13 @@ export class SdesChunk extends Serializable
 		// Move to items.
 		pos += 4;
 
-		while (pos < this.view.byteLength)
-		{
+		while (pos < this.view.byteLength) {
 			const itemType = this.view.getUint8(pos);
 
 			// NOTE: Don't increase pos here since we don't want it increased if 0.
 
 			// Item type 0 means padding.
-			if (itemType === 0)
-			{
+			if (itemType === 0) {
 				break;
 			}
 
@@ -420,7 +390,7 @@ export class SdesChunk extends Serializable
 			const itemView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				itemLength
+				itemLength,
 			);
 
 			pos += itemLength;
@@ -432,46 +402,39 @@ export class SdesChunk extends Serializable
 		// octets to pad the chunk to 4 bytes.
 		const numNullOctets = this.view.byteLength - pos;
 
-		if (numNullOctets < 1 || numNullOctets > 4)
-		{
-			throw new RangeError(`SDES Chunk has wrong number of null octests at the end (${numNullOctets} null octets)`);
+		if (numNullOctets < 1 || numNullOctets > 4) {
+			throw new RangeError(
+				`SDES Chunk has wrong number of null octests at the end (${numNullOctets} null octets)`,
+			);
 		}
 	}
 
 	/**
 	 * Dump SDES Chunk info.
 	 */
-	dump(): SdesChunkDump
-	{
+	dump(): SdesChunkDump {
 		return {
 			...super.dump(),
-			ssrc  : this.getSsrc(),
-			items : this.getItems()
+			ssrc: this.getSsrc(),
+			items: this.getItems(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
 		// SSRC (4 bytes).
 		let chunkLength = 4;
 
-		chunkLength += this.#items
-			.reduce(
-				(sum, { text }) =>
-				{
-					// Item type field + item length field + text length.
-					return sum + 2 + getStringByteLength(text);
-				},
-				0
-			);
+		chunkLength += this.#items.reduce((sum, { text }) => {
+			// Item type field + item length field + text length.
+			return sum + 2 + getStringByteLength(text);
+		}, 0);
 
 		// The list of items in each chunk MUST be terminated by one or more null
 		// octets, so add a byte to hold a null byte.
@@ -486,20 +449,19 @@ export class SdesChunk extends Serializable
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
 		const view = new DataView(
 			bufferData.buffer,
 			bufferData.byteOffset,
-			bufferData.byteLength
+			bufferData.byteLength,
 		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		let pos = 0;
@@ -510,8 +472,7 @@ export class SdesChunk extends Serializable
 		// Move to items.
 		pos += 4;
 
-		for (const { type, text } of this.#items)
-		{
+		for (const { type, text } of this.#items) {
 			const itemUint8Array = stringToUint8Array(text);
 
 			view.setUint8(pos, type);
@@ -540,14 +501,13 @@ export class SdesChunk extends Serializable
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): SdesChunk
-	{
+		serializationByteOffset?: number,
+	): SdesChunk {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new SdesChunk(view);
@@ -556,16 +516,14 @@ export class SdesChunk extends Serializable
 	/**
 	 * Get SDES Chunk SSRC.
 	 */
-	getSsrc(): number
-	{
+	getSsrc(): number {
 		return this.view.getUint32(0);
 	}
 
 	/**
 	 * Set SDES Chunk SSRC.
 	 */
-	setSsrc(ssrc: number): void
-	{
+	setSsrc(ssrc: number): void {
 		this.view.setUint32(0, ssrc);
 
 		this.setSerializationNeeded(true);
@@ -574,16 +532,14 @@ export class SdesChunk extends Serializable
 	/**
 	 * Get SDES Items.
 	 */
-	getItems(): { type: SdesItemType; text: string }[]
-	{
+	getItems(): { type: SdesItemType; text: string }[] {
 		return Array.from(this.#items);
 	}
 
 	/**
 	 * Set SDES Items.
 	 */
-	setItems(items: { type: SdesItemType; text: string }[]): void
-	{
+	setItems(items: { type: SdesItemType; text: string }[]): void {
 		this.#items = Array.from(items);
 
 		this.setSerializationNeeded(true);
@@ -592,8 +548,7 @@ export class SdesChunk extends Serializable
 	/**
 	 * Add SDES Item.
 	 */
-	addItem(type: SdesItemType, text: string): void
-	{
+	addItem(type: SdesItemType, text: string): void {
 		this.#items.push({ type, text });
 
 		this.setSerializationNeeded(true);

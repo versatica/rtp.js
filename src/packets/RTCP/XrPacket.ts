@@ -3,7 +3,7 @@ import {
 	ExtendedReportType,
 	ExtendedReportDump,
 	getExtendedReportType,
-	getExtendedReportLength
+	getExtendedReportLength,
 } from './ExtendedReports/ExtendedReport';
 import { LrleExtendedReport } from './ExtendedReports/LrleExtendedReport';
 import { DrleExtendedReport } from './ExtendedReports/DrleExtendedReport';
@@ -18,7 +18,7 @@ import {
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './RtcpPacket';
 
 // Common RTCP header length + 4 (SSRC of packet sender).
@@ -29,8 +29,7 @@ const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 4;
  *
  * @category RTCP
  */
-export type XrPacketDump = RtcpPacketDump &
-{
+export type XrPacketDump = RtcpPacketDump & {
 	ssrc: number;
 	reports: ExtendedReportDump[];
 };
@@ -55,8 +54,7 @@ export type XrPacketDump = RtcpPacketDump &
  * @see
  * - [RFC 3611 section 2](https://datatracker.ietf.org/doc/html/rfc3611#section-2)
  */
-export class XrPacket extends RtcpPacket
-{
+export class XrPacket extends RtcpPacket {
 	// Extended Reports.
 	#reports: ExtendedReport[] = [];
 
@@ -67,12 +65,10 @@ export class XrPacket extends RtcpPacket
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP XR packet.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(RtcpPacketType.XR, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
 			// Write version and packet type.
@@ -87,12 +83,11 @@ export class XrPacket extends RtcpPacket
 		// Move to Extended Reports.
 		pos += FIXED_HEADER_LENGTH;
 
-		while (pos < this.view.byteLength - this.padding)
-		{
+		while (pos < this.view.byteLength - this.padding) {
 			const remainingView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				this.view.byteLength - this.padding - pos
+				this.view.byteLength - this.padding - pos,
 			);
 
 			const reportType = getExtendedReportType(remainingView);
@@ -101,71 +96,61 @@ export class XrPacket extends RtcpPacket
 			const reportView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				reportLength
+				reportLength,
 			);
 
 			let report: ExtendedReport;
 
-			switch (reportType)
-			{
-				case ExtendedReportType.LRLE:
-				{
+			switch (reportType) {
+				case ExtendedReportType.LRLE: {
 					report = new LrleExtendedReport(reportView);
 
 					break;
 				}
 
-				case ExtendedReportType.DRLE:
-				{
+				case ExtendedReportType.DRLE: {
 					report = new DrleExtendedReport(reportView);
 
 					break;
 				}
 
-				case ExtendedReportType.PRT:
-				{
+				case ExtendedReportType.PRT: {
 					report = new PrtExtendedReport(reportView);
 
 					break;
 				}
 
-				case ExtendedReportType.RRT:
-				{
+				case ExtendedReportType.RRT: {
 					report = new RrtExtendedReport(reportView);
 
 					break;
 				}
 
-				case ExtendedReportType.DLRR:
-				{
+				case ExtendedReportType.DLRR: {
 					report = new DlrrExtendedReport(reportView);
 
 					break;
 				}
 
-				case ExtendedReportType.SS:
-				{
+				case ExtendedReportType.SS: {
 					report = new SsExtendedReport(reportView);
 
 					break;
 				}
 
-				case ExtendedReportType.VM:
-				{
+				case ExtendedReportType.VM: {
 					report = new VmExtendedReport(reportView);
 
 					break;
 				}
 
-				case ExtendedReportType.ECN:
-				{
+				case ExtendedReportType.ECN: {
 					report = new EcnExtendedReport(reportView);
 
 					break;
 				}
 
-				default:
-				{
+				default: {
 					report = new GenericExtendedReport(reportView);
 				}
 			}
@@ -178,10 +163,9 @@ export class XrPacket extends RtcpPacket
 		pos += this.padding;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -189,31 +173,25 @@ export class XrPacket extends RtcpPacket
 	/**
 	 * Dump XR packet info.
 	 */
-	dump(): XrPacketDump
-	{
+	dump(): XrPacketDump {
 		return {
 			...super.dump(),
-			ssrc    : this.getSsrc(),
-			reports : this.#reports.map((report) => report.dump())
+			ssrc: this.getSsrc(),
+			reports: this.#reports.map(report => report.dump()),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
 		const packetLength =
 			FIXED_HEADER_LENGTH +
-			this.#reports.reduce(
-				(sum, report) => sum + report.getByteLength(),
-				0
-			) +
+			this.#reports.reduce((sum, report) => sum + report.getByteLength(), 0) +
 			this.padding;
 
 		return packetLength;
@@ -222,24 +200,22 @@ export class XrPacket extends RtcpPacket
 	/**
 	 * @inheritDoc
 	 */
-	needsSerialization(): boolean
-	{
+	needsSerialization(): boolean {
 		return (
 			super.needsSerialization() ||
-			this.#reports.some((report) => report.needsSerialization())
+			this.#reports.some(report => report.needsSerialization())
 		);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -253,17 +229,16 @@ export class XrPacket extends RtcpPacket
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH
+				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH,
 			),
-			pos
+			pos,
 		);
 
 		// Move to Reception Reports.
 		pos += FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH;
 
 		// Write Reception Reports.
-		for (const report of this.#reports)
-		{
+		for (const report of this.#reports) {
 			// Serialize the report into the current position.
 			report.serialize(view.buffer, view.byteOffset + pos);
 
@@ -273,10 +248,9 @@ export class XrPacket extends RtcpPacket
 		pos += this.padding;
 
 		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -293,14 +267,13 @@ export class XrPacket extends RtcpPacket
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): XrPacket
-	{
+		serializationByteOffset?: number,
+	): XrPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new XrPacket(view);
@@ -309,16 +282,14 @@ export class XrPacket extends RtcpPacket
 	/**
 	 * Get sender SSRC.
 	 */
-	getSsrc(): number
-	{
+	getSsrc(): number {
 		return this.view.getUint32(4);
 	}
 
 	/**
 	 * Set sender SSRC.
 	 */
-	setSsrc(ssrc: number)
-	{
+	setSsrc(ssrc: number) {
 		this.view.setUint32(4, ssrc);
 	}
 
@@ -356,8 +327,7 @@ export class XrPacket extends RtcpPacket
 	 * }
 	 * ```
 	 */
-	getReports(): ExtendedReport[]
-	{
+	getReports(): ExtendedReport[] {
 		return Array.from(this.#reports);
 	}
 
@@ -367,8 +337,7 @@ export class XrPacket extends RtcpPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	setReports(reports: ExtendedReport[]): void
-	{
+	setReports(reports: ExtendedReport[]): void {
 		this.#reports = Array.from(reports);
 
 		// NOTE: Do not update RTCP count since XR packets do not have that field.
@@ -382,8 +351,7 @@ export class XrPacket extends RtcpPacket
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	addReport(report: ExtendedReport): void
-	{
+	addReport(report: ExtendedReport): void {
 		this.#reports.push(report);
 
 		// Update RTCP count.

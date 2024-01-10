@@ -3,7 +3,7 @@ import {
 	FeedbackPacket,
 	PsFeedbackMessageType,
 	FeedbackPacketDump,
-	FIXED_HEADER_LENGTH
+	FIXED_HEADER_LENGTH,
 } from './FeedbackPacket';
 
 /**
@@ -33,8 +33,7 @@ export type PliPacketDump = FeedbackPacketDump;
  * @see
  * - [RFC 4585 section 6.3.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.3.1)
  */
-export class PliPacket extends FeedbackPacket
-{
+export class PliPacket extends FeedbackPacket {
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty RTCP PLI
 	 *   packet will be created.
@@ -42,12 +41,10 @@ export class PliPacket extends FeedbackPacket
 	 * @throws
 	 * - If given `view` does not contain a valid RTCP PLI packet.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(RtcpPacketType.PSFB, PsFeedbackMessageType.PLI, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
 
 			// Write version, packet type and feedback message type.
@@ -65,10 +62,9 @@ export class PliPacket extends FeedbackPacket
 		pos += this.padding;
 
 		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength)
-		{
+		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
 			);
 		}
 	}
@@ -76,18 +72,15 @@ export class PliPacket extends FeedbackPacket
 	/**
 	 * Dump RTCP PLI packet info.
 	 */
-	dump(): PliPacketDump
-	{
+	dump(): PliPacketDump {
 		return super.dump();
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
-		if (!this.needsSerialization())
-		{
+	getByteLength(): number {
+		if (!this.needsSerialization()) {
 			return this.view.byteLength;
 		}
 
@@ -99,8 +92,7 @@ export class PliPacket extends FeedbackPacket
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 
 		// Nothing else to do.
@@ -118,14 +110,13 @@ export class PliPacket extends FeedbackPacket
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): PliPacket
-	{
+		serializationByteOffset?: number,
+	): PliPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new PliPacket(view);

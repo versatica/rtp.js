@@ -2,7 +2,7 @@ import {
 	ExtendedReport,
 	ExtendedReportType,
 	ExtendedReportDump,
-	COMMON_HEADER_LENGTH
+	COMMON_HEADER_LENGTH,
 } from './ExtendedReport';
 
 const ECN_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 20;
@@ -12,8 +12,7 @@ const ECN_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 20;
  *
  * @category RTCP Extended Reports
  */
-export type EcnExtendedReportDump = ExtendedReportDump &
-{
+export type EcnExtendedReportDump = ExtendedReportDump & {
 	ssrc: number;
 	ect0Counter: number;
 	ect1Counter: number;
@@ -49,8 +48,7 @@ export type EcnExtendedReportDump = ExtendedReportDump &
  * @see
  * - [RFC 6679 section 5.2](https://datatracker.ietf.org/doc/html/rfc6679#section-5.2)
  */
-export class EcnExtendedReport extends ExtendedReport
-{
+export class EcnExtendedReport extends ExtendedReport {
 	// Chunks (2 bytes numbers, unparsed).
 	#chunks: number[] = [];
 
@@ -58,12 +56,10 @@ export class EcnExtendedReport extends ExtendedReport
 	 * @param view - If given it will be parsed. Otherwise an empty ECN Summary
 	 *   Extended Report will be created.
 	 */
-	constructor(view?: DataView)
-	{
+	constructor(view?: DataView) {
 		super(ExtendedReportType.ECN, view);
 
-		if (!this.view)
-		{
+		if (!this.view) {
 			this.view = new DataView(new ArrayBuffer(ECN_EXTENDED_REPORT_LENGTH));
 
 			// Write report type.
@@ -72,10 +68,9 @@ export class EcnExtendedReport extends ExtendedReport
 			return;
 		}
 
-		if (this.view.byteLength !== ECN_EXTENDED_REPORT_LENGTH)
-		{
+		if (this.view.byteLength !== ECN_EXTENDED_REPORT_LENGTH) {
 			throw new TypeError(
-				'wrong byte length for a ECN Summary Extended Report'
+				'wrong byte length for a ECN Summary Extended Report',
 			);
 		}
 	}
@@ -83,38 +78,35 @@ export class EcnExtendedReport extends ExtendedReport
 	/**
 	 * Dump ECN Summary Extended Report info.
 	 */
-	dump(): EcnExtendedReportDump
-	{
+	dump(): EcnExtendedReportDump {
 		return {
 			...super.dump(),
-			ssrc               : this.getSsrc(),
-			ect0Counter        : this.getEct0Counter(),
-			ect1Counter        : this.getEct1Counter(),
-			ecnCeCounter       : this.getEcnCeCounter(),
-			nonEctCounter      : this.getNonEctCounter(),
-			lostPacketsCounter : this.getLostPacketsCounter(),
-			duplicationCounter : this.getDuplicationCounter()
+			ssrc: this.getSsrc(),
+			ect0Counter: this.getEct0Counter(),
+			ect1Counter: this.getEct1Counter(),
+			ecnCeCounter: this.getEcnCeCounter(),
+			nonEctCounter: this.getNonEctCounter(),
+			lostPacketsCounter: this.getLostPacketsCounter(),
+			duplicationCounter: this.getDuplicationCounter(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number
-	{
+	getByteLength(): number {
 		return ECN_EXTENDED_REPORT_LENGTH;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void
-	{
+	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength
+			view.byteLength,
 		);
 
 		// Position relative to the DataView byte offset.
@@ -128,18 +120,17 @@ export class EcnExtendedReport extends ExtendedReport
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				ECN_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH
+				ECN_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH,
 			),
-			pos
+			pos,
 		);
 
 		// Move to the end.
 		pos += ECN_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH;
 
-		if (pos !== view.byteLength)
-		{
+		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
 			);
 		}
 
@@ -156,14 +147,13 @@ export class EcnExtendedReport extends ExtendedReport
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number
-	): EcnExtendedReport
-	{
+		serializationByteOffset?: number,
+	): EcnExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset
+			serializationByteOffset,
 		);
 
 		return new EcnExtendedReport(view);
@@ -172,16 +162,14 @@ export class EcnExtendedReport extends ExtendedReport
 	/**
 	 * Get SSRC of media sender.
 	 */
-	getSsrc(): number
-	{
+	getSsrc(): number {
 		return this.view.getUint32(4);
 	}
 
 	/**
 	 * Set SSRC of media sender.
 	 */
-	setSsrc(ssrc: number): void
-	{
+	setSsrc(ssrc: number): void {
 		this.view.setUint32(4, ssrc);
 
 		this.setSerializationNeeded(true);
@@ -190,16 +178,14 @@ export class EcnExtendedReport extends ExtendedReport
 	/**
 	 * Get ECT (0) Counter.
 	 */
-	getEct0Counter(): number
-	{
+	getEct0Counter(): number {
 		return this.view.getUint32(8);
 	}
 
 	/**
 	 * Set ECT (0) Counter.
 	 */
-	setEct0Counter(counter: number): void
-	{
+	setEct0Counter(counter: number): void {
 		this.view.setUint32(8, counter);
 
 		this.setSerializationNeeded(true);
@@ -208,16 +194,14 @@ export class EcnExtendedReport extends ExtendedReport
 	/**
 	 * Get ECT (1) Counter.
 	 */
-	getEct1Counter(): number
-	{
+	getEct1Counter(): number {
 		return this.view.getUint32(12);
 	}
 
 	/**
 	 * Set ECT (1) Counter.
 	 */
-	setEct1Counter(counter: number): void
-	{
+	setEct1Counter(counter: number): void {
 		this.view.setUint32(12, counter);
 
 		this.setSerializationNeeded(true);
@@ -226,16 +210,14 @@ export class EcnExtendedReport extends ExtendedReport
 	/**
 	 * Get ECN-CE Counter.
 	 */
-	getEcnCeCounter(): number
-	{
+	getEcnCeCounter(): number {
 		return this.view.getUint16(16);
 	}
 
 	/**
 	 * Set ECN-CE Counter.
 	 */
-	setEcnCeCounter(counter: number): void
-	{
+	setEcnCeCounter(counter: number): void {
 		this.view.setUint16(16, counter);
 
 		this.setSerializationNeeded(true);
@@ -244,16 +226,14 @@ export class EcnExtendedReport extends ExtendedReport
 	/**
 	 * Get not-ECT Counter.
 	 */
-	getNonEctCounter(): number
-	{
+	getNonEctCounter(): number {
 		return this.view.getUint16(18);
 	}
 
 	/**
 	 * Set not-ECT Counter.
 	 */
-	setNonEctCounter(counter: number): void
-	{
+	setNonEctCounter(counter: number): void {
 		this.view.setUint16(18, counter);
 
 		this.setSerializationNeeded(true);
@@ -262,16 +242,14 @@ export class EcnExtendedReport extends ExtendedReport
 	/**
 	 * Get Lost Packets Counter.
 	 */
-	getLostPacketsCounter(): number
-	{
+	getLostPacketsCounter(): number {
 		return this.view.getUint16(20);
 	}
 
 	/**
 	 * Set Lost Packets Counter.
 	 */
-	setLostPacketsCounter(counter: number): void
-	{
+	setLostPacketsCounter(counter: number): void {
 		this.view.setUint16(20, counter);
 
 		this.setSerializationNeeded(true);
@@ -280,16 +258,14 @@ export class EcnExtendedReport extends ExtendedReport
 	/**
 	 * Get Duplication Counter.
 	 */
-	getDuplicationCounter(): number
-	{
+	getDuplicationCounter(): number {
 		return this.view.getUint16(22);
 	}
 
 	/**
 	 * Set Duplication Counter.
 	 */
-	setDuplicationCounter(counter: number): void
-	{
+	setDuplicationCounter(counter: number): void {
 		this.view.setUint16(22, counter);
 
 		this.setSerializationNeeded(true);

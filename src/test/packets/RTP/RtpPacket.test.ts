@@ -3,31 +3,28 @@ import * as path from 'path';
 import {
 	isRtp,
 	RtpPacket,
-	RtpPacketDump
+	RtpPacketDump,
 } from '../../../packets/RTP/RtpPacket';
 import {
 	clone,
 	areDataViewsEqual,
 	nodeBufferToDataView,
 	numericArrayToDataView,
-	stringToDataView
+	stringToDataView,
 } from '../../../utils/helpers';
 
-describe('parse RTP packet 1', () =>
-{
+describe('parse RTP packet 1', () => {
 	const view = nodeBufferToDataView(
-		fs.readFileSync(path.join(__dirname, '..', '..', 'data', 'rtppacket1.raw'))
+		fs.readFileSync(path.join(__dirname, '..', '..', 'data', 'rtppacket1.raw')),
 	);
 
 	let packet: RtpPacket;
 
-	test('isRtp() succeeds', () =>
-	{
+	test('isRtp() succeeds', () => {
 		expect(isRtp(view)).toBe(true);
 	});
 
-	test('packet processing succeeds', () =>
-	{
+	test('packet processing succeeds', () => {
 		packet = new RtpPacket(view);
 
 		expect(packet.getByteLength()).toBe(54);
@@ -42,31 +39,30 @@ describe('parse RTP packet 1', () =>
 		expect(packet.hasOneByteExtensions()).toBe(true);
 		expect(packet.hasTwoBytesExtensions()).toBe(false);
 		expect(packet.getExtensions().size).toBe(1);
-		expect(packet.getExtension(1)).toEqual(numericArrayToDataView([ 255 ]));
+		expect(packet.getExtension(1)).toEqual(numericArrayToDataView([255]));
 		expect(packet.needsSerialization()).toBe(false);
 
 		packet.setExtension(1, stringToDataView('foo œæ€å∫∂ ®†¥∂ƒ∑©√'));
 		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.needsSerialization()).toBe(true);
-		expect(packet.getExtension(1)).toEqual(stringToDataView('foo œæ€å∫∂ ®†¥∂ƒ∑©√'));
+		expect(packet.getExtension(1)).toEqual(
+			stringToDataView('foo œæ€å∫∂ ®†¥∂ƒ∑©√'),
+		);
 	});
 });
 
-describe('parse RTP packet 2', () =>
-{
+describe('parse RTP packet 2', () => {
 	const view = nodeBufferToDataView(
-		fs.readFileSync(path.join(__dirname, '..', '..', 'data', 'rtppacket2.raw'))
+		fs.readFileSync(path.join(__dirname, '..', '..', 'data', 'rtppacket2.raw')),
 	);
 
 	let packet: RtpPacket;
 
-	test('isRtp() succeeds', () =>
-	{
+	test('isRtp() succeeds', () => {
 		expect(isRtp(view)).toBe(true);
 	});
 
-	test('packet processing succeeds', () =>
-	{
+	test('packet processing succeeds', () => {
 		packet = new RtpPacket(view);
 
 		expect(packet.getByteLength()).toBe(102);
@@ -79,42 +75,55 @@ describe('parse RTP packet 2', () =>
 		expect(packet.getPadding()).toBe(0);
 		expect(packet.hasOneByteExtensions()).toBe(true);
 		expect(packet.hasTwoBytesExtensions()).toBe(false);
-		expect(packet.getExtension(3))
-			.toEqual(numericArrayToDataView([ 0x65, 0x34, 0x1E ]));
+		expect(packet.getExtension(3)).toEqual(
+			numericArrayToDataView([0x65, 0x34, 0x1e]),
+		);
 		expect(packet.getPayload().byteLength).toBe(78);
 		expect(packet.needsSerialization()).toBe(false);
 	});
 });
 
-describe('parse RTP packet 3', () =>
-{
-	const array = new Uint8Array(
-		[
-			0b10010000, 0b00000001, 0x00, 0x08,
-			0x00, 0x00, 0x00, 0x04,
-			0x00, 0x00, 0x00, 0x05,
-			0xBE, 0xDE, 0x00, 0x03, // Header extension.
-			0b00010000, 0xFF, 0b00100001, 0xFF,
-			0xFF, 0x00, 0x00, 0b00110011,
-			0xFF, 0xFF, 0xFF, 0xFF
-		]
-	);
+describe('parse RTP packet 3', () => {
+	const array = new Uint8Array([
+		0b10010000,
+		0b00000001,
+		0x00,
+		0x08,
+		0x00,
+		0x00,
+		0x00,
+		0x04,
+		0x00,
+		0x00,
+		0x00,
+		0x05,
+		0xbe,
+		0xde,
+		0x00,
+		0x03, // Header extension.
+		0b00010000,
+		0xff,
+		0b00100001,
+		0xff,
+		0xff,
+		0x00,
+		0x00,
+		0b00110011,
+		0xff,
+		0xff,
+		0xff,
+		0xff,
+	]);
 
-	const view = new DataView(
-		array.buffer,
-		array.byteOffset,
-		array.byteLength
-	);
+	const view = new DataView(array.buffer, array.byteOffset, array.byteLength);
 
 	let packet: RtpPacket;
 
-	test('isRtp() succeeds', () =>
-	{
+	test('isRtp() succeeds', () => {
 		expect(isRtp(view)).toBe(true);
 	});
 
-	test('packet processing succeeds', () =>
-	{
+	test('packet processing succeeds', () => {
 		packet = new RtpPacket(view);
 
 		expect(packet.getByteLength()).toBe(array.byteLength);
@@ -132,43 +141,60 @@ describe('parse RTP packet 3', () =>
 	});
 });
 
-describe('parse RTP packet 4', () =>
-{
+describe('parse RTP packet 4', () => {
 	const uselessExtensionAlignment = 4;
 
 	// This RTP packet contains 4 extensions with id=0 meaning alignment so
 	// those are discarded if the packet is serialized.
-	const array = new Uint8Array(
-		[
-			0b10010000, 0b00000001, 0x00, 0x08,
-			0x00, 0x00, 0x00, 0x04,
-			0x00, 0x00, 0x00, 0x05,
-			0b00010000, 0x00, 0x00, 0x04, // Header extension.
-			0x00, 0x00, 0x01, 0x00,
-			0x02, 0x01, 0x42, 0x00,
-			0x03, 0x02, 0x11, 0x22,
-			0x00, 0x00, 0x04, 0x00
-		]
-	);
+	const array = new Uint8Array([
+		0b10010000,
+		0b00000001,
+		0x00,
+		0x08,
+		0x00,
+		0x00,
+		0x00,
+		0x04,
+		0x00,
+		0x00,
+		0x00,
+		0x05,
+		0b00010000,
+		0x00,
+		0x00,
+		0x04, // Header extension.
+		0x00,
+		0x00,
+		0x01,
+		0x00,
+		0x02,
+		0x01,
+		0x42,
+		0x00,
+		0x03,
+		0x02,
+		0x11,
+		0x22,
+		0x00,
+		0x00,
+		0x04,
+		0x00,
+	]);
 
-	const view = new DataView(
-		array.buffer,
-		array.byteOffset,
-		array.byteLength
-	);
+	const view = new DataView(array.buffer, array.byteOffset, array.byteLength);
 
 	let packet: RtpPacket;
 
-	test('isRtp() succeeds', () =>
-	{
+	test('isRtp() succeeds', () => {
 		expect(isRtp(view)).toBe(true);
 	});
 
-	test('packet processing succeeds', () =>
-	{
+	test('packet processing succeeds', () => {
 		packet = new RtpPacket(view);
 
-		expect(packet.getByteLength()).toBe(array.byteLength - uselessExtensionAlignment);
+		expect(packet.getByteLength()).toBe(
+			array.byteLength - uselessExtensionAlignment,
+		);
 		expect(packet.getPayloadType()).toBe(1);
 		expect(packet.getSequenceNumber()).toBe(8);
 		expect(packet.getTimestamp()).toBe(4);
@@ -180,8 +206,10 @@ describe('parse RTP packet 4', () =>
 		expect(packet.hasTwoBytesExtensions()).toBe(true);
 		expect(packet.getExtensions().size).toBe(4);
 		expect(packet.getExtension(1)).toEqual(new DataView(new ArrayBuffer(0)));
-		expect(packet.getExtension(2)).toEqual(numericArrayToDataView([ 0x42 ]));
-		expect(packet.getExtension(3)).toEqual(numericArrayToDataView([ 0x11, 0x22 ]));
+		expect(packet.getExtension(2)).toEqual(numericArrayToDataView([0x42]));
+		expect(packet.getExtension(3)).toEqual(
+			numericArrayToDataView([0x11, 0x22]),
+		);
 		expect(packet.getExtension(4)).toEqual(new DataView(new ArrayBuffer(0)));
 		expect(packet.getExtension(5)).toBeUndefined();
 		expect(packet.getPayload().byteLength).toBe(0);
@@ -194,34 +222,43 @@ describe('parse RTP packet 4', () =>
 	});
 });
 
-describe('parse RTP packet 5 with uncommon header extension value', () =>
-{
-	const array = new Uint8Array(
-		[
-			0b10010000, 0b00000001, 0x00, 0x08,
-			0x00, 0x00, 0x00, 0x04,
-			0x00, 0x00, 0x00, 0x05,
-			0xA1, 0xB1, 0x00, 0x01, // Uncommon header extension id: 0xA1B1.
-			0xA2, 0xB2, 0xC2, 0xD2, // Uncommon header extension value: 0xA2B2C2D2)
-			0x11, 0x22, 0x33, 0x44 // Payload.
-		]
-	);
+describe('parse RTP packet 5 with uncommon header extension value', () => {
+	const array = new Uint8Array([
+		0b10010000,
+		0b00000001,
+		0x00,
+		0x08,
+		0x00,
+		0x00,
+		0x00,
+		0x04,
+		0x00,
+		0x00,
+		0x00,
+		0x05,
+		0xa1,
+		0xb1,
+		0x00,
+		0x01, // Uncommon header extension id: 0xA1B1.
+		0xa2,
+		0xb2,
+		0xc2,
+		0xd2, // Uncommon header extension value: 0xA2B2C2D2)
+		0x11,
+		0x22,
+		0x33,
+		0x44, // Payload.
+	]);
 
-	const view = new DataView(
-		array.buffer,
-		array.byteOffset,
-		array.byteLength
-	);
+	const view = new DataView(array.buffer, array.byteOffset, array.byteLength);
 
 	let packet: RtpPacket;
 
-	test('isRtp() succeeds', () =>
-	{
+	test('isRtp() succeeds', () => {
 		expect(isRtp(view)).toBe(true);
 	});
 
-	test('packet processing succeeds', () =>
-	{
+	test('packet processing succeeds', () => {
 		packet = new RtpPacket(view);
 
 		const packetView = clone<DataView>(packet.getView());
@@ -253,12 +290,10 @@ describe('parse RTP packet 5 with uncommon header extension value', () =>
 	});
 });
 
-describe('create RTP packet 6 from scratch', () =>
-{
+describe('create RTP packet 6 from scratch', () => {
 	let packet: RtpPacket;
 
-	test('packet processing succeeds', () =>
-	{
+	test('packet processing succeeds', () => {
 		packet = new RtpPacket();
 
 		expect(isRtp(packet.getView())).toBe(true);
@@ -299,9 +334,9 @@ describe('create RTP packet 6 from scratch', () =>
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getMarker()).toBe(true);
 
-		packet.setCsrcs([ 1111, 2222 ]);
+		packet.setCsrcs([1111, 2222]);
 		expect(packet.needsSerialization()).toBe(true);
-		expect(packet.getCsrcs()).toEqual([ 1111, 2222 ]);
+		expect(packet.getCsrcs()).toEqual([1111, 2222]);
 
 		packet.enableOneByteExtensions();
 		expect(packet.needsSerialization()).toBe(true);
@@ -320,10 +355,12 @@ describe('create RTP packet 6 from scratch', () =>
 		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.getExtension(1)).toEqual(stringToDataView('foo'));
 
-		packet.setExtension(2, numericArrayToDataView([ 1, 2, 3, 4 ]));
+		packet.setExtension(2, numericArrayToDataView([1, 2, 3, 4]));
 		expect(packet.getExtensions().size).toBe(2);
 		expect(packet.needsSerialization()).toBe(true);
-		expect(packet.getExtension(2)).toEqual(numericArrayToDataView([ 1, 2, 3, 4 ]));
+		expect(packet.getExtension(2)).toEqual(
+			numericArrayToDataView([1, 2, 3, 4]),
+		);
 
 		packet.deleteExtension(1);
 		expect(packet.getExtensions().size).toBe(1);
@@ -335,18 +372,19 @@ describe('create RTP packet 6 from scratch', () =>
 		expect(packet.getExtensions().size).toBe(0);
 		expect(packet.getExtension(2)).toBeUndefined();
 
-		packet.setExtension(2, numericArrayToDataView([ 1, 2, 3, 4 ]));
+		packet.setExtension(2, numericArrayToDataView([1, 2, 3, 4]));
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getExtensions().size).toBe(1);
-		expect(packet.getExtension(2)).toEqual(numericArrayToDataView([ 1, 2, 3, 4 ]));
+		expect(packet.getExtension(2)).toEqual(
+			numericArrayToDataView([1, 2, 3, 4]),
+		);
 
 		packet.setPayload(stringToDataView('codec'));
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getPayload()).toEqual(stringToDataView('codec'));
 	});
 
-	test('packet.clone() succeeds', () =>
-	{
+	test('packet.clone() succeeds', () => {
 		// Serialize to reset serialization packet.
 		packet.serialize();
 		expect(packet.needsSerialization()).toBe(false);
@@ -360,29 +398,32 @@ describe('create RTP packet 6 from scratch', () =>
 		expect(clonedPacket.getTimestamp()).toBe(1234567890);
 		expect(clonedPacket.getSsrc()).toBe(3294967295);
 		expect(clonedPacket.getMarker()).toBe(true);
-		expect(clonedPacket.getCsrcs()).toEqual([ 1111, 2222 ]);
+		expect(clonedPacket.getCsrcs()).toEqual([1111, 2222]);
 		expect(clonedPacket.hasOneByteExtensions()).toBe(false);
 		expect(clonedPacket.hasTwoBytesExtensions()).toBe(true);
-		expect(clonedPacket.getExtension(2))
-			.toEqual(numericArrayToDataView([ 1, 2, 3, 4 ]));
+		expect(clonedPacket.getExtension(2)).toEqual(
+			numericArrayToDataView([1, 2, 3, 4]),
+		);
 		expect(clonedPacket.getPayload()).toEqual(stringToDataView('codec'));
 		expect(clonedPacket.getPadding()).toBe(0);
 		expect(clonedPacket.dump()).toEqual(packet.dump());
 		expect(clonedPacket.needsSerialization()).toBe(false);
 		// Packet views and payload views must be the same.
-		expect(areDataViewsEqual(
-			clonedPacket.getView(), packet.getView())
-		).toBe(true);
-		expect(areDataViewsEqual(
-			clonedPacket.getPayload(), packet.getPayload())
+		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
+			true,
+		);
+		expect(
+			areDataViewsEqual(clonedPacket.getPayload(), packet.getPayload()),
 		).toBe(true);
 		// DataViews instances must be different since it's a cloned packet.
 		expect(clonedPacket.getView() === packet.getView()).toBe(false);
 		expect(clonedPacket.getPayload() === packet.getPayload()).toBe(false);
 		// Internal ArrayBuffer instances must be different.
-		expect(clonedPacket.getView().buffer === packet.getView().buffer).toBe(false);
+		expect(clonedPacket.getView().buffer === packet.getView().buffer).toBe(
+			false,
+		);
 		expect(
-			clonedPacket.getPayload().buffer === packet.getPayload().buffer
+			clonedPacket.getPayload().buffer === packet.getPayload().buffer,
 		).toBe(false);
 
 		// Clone again, now in a given buffer.
@@ -394,14 +435,15 @@ describe('create RTP packet 6 from scratch', () =>
 		expect(clonedPacket2.getView() === packet.getView()).toBe(false);
 		expect(clonedPacket2.getPayload() === packet.getPayload()).toBe(false);
 		// Internal ArrayBuffer instances must be different.
-		expect(clonedPacket2.getView().buffer === packet.getView().buffer).toBe(false);
+		expect(clonedPacket2.getView().buffer === packet.getView().buffer).toBe(
+			false,
+		);
 		expect(
-			clonedPacket2.getPayload().buffer === packet.getPayload().buffer
+			clonedPacket2.getPayload().buffer === packet.getPayload().buffer,
 		).toBe(false);
 	});
 
-	test('packet.rtxEncode() and packet.rtxDecode() succeed', () =>
-	{
+	test('packet.rtxEncode() and packet.rtxDecode() succeed', () => {
 		// Serialize to reset serialization needed.
 		packet.serialize();
 		expect(packet.needsSerialization()).toBe(false);
@@ -431,10 +473,12 @@ describe('create RTP packet 6 from scratch', () =>
 		const payloadWithoutSeqNumberView = new DataView(
 			packet.getPayload().buffer,
 			packet.getPayload().byteOffset + 2,
-			packet.getPayload().byteLength - 2
+			packet.getPayload().byteLength - 2,
 		);
 
-		expect(areDataViewsEqual(payloadWithoutSeqNumberView, payloadView)).toBe(true);
+		expect(areDataViewsEqual(payloadWithoutSeqNumberView, payloadView)).toBe(
+			true,
+		);
 
 		packet.rtxDecode(payloadType, ssrc);
 
@@ -451,20 +495,20 @@ describe('create RTP packet 6 from scratch', () =>
 	});
 });
 
-describe('create RTP packet 7 from scratch', () =>
-{
+describe('create RTP packet 7 from scratch', () => {
 	let packet: RtpPacket;
 
-	test('packet processing succeeds', () =>
-	{
+	test('packet processing succeeds', () => {
 		packet = new RtpPacket();
 
 		// Adding an extension without having One-Byte or Two-Bytes extensions
 		// enabled should force One-Byte.
-		packet.setExtension(1, numericArrayToDataView([ 1, 2, 3, 4 ]));
+		packet.setExtension(1, numericArrayToDataView([1, 2, 3, 4]));
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getExtensions().size).toBe(1);
-		expect(packet.getExtension(1)).toEqual(numericArrayToDataView([ 1, 2, 3, 4 ]));
+		expect(packet.getExtension(1)).toEqual(
+			numericArrayToDataView([1, 2, 3, 4]),
+		);
 		expect(packet.hasOneByteExtensions()).toBe(true);
 		expect(packet.hasTwoBytesExtensions()).toBe(false);
 		// Packet total length must match RTP fixed header length (12) + header
@@ -486,19 +530,17 @@ describe('create RTP packet 7 from scratch', () =>
 	});
 });
 
-describe('create RTP packet 8 from scratch', () =>
-{
+describe('create RTP packet 8 from scratch', () => {
 	let packet: RtpPacket;
 
-	test('packet processing succeeds', () =>
-	{
+	test('packet processing succeeds', () => {
 		packet = new RtpPacket();
 
 		packet.enableOneByteExtensions();
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getExtensions().size).toBe(0);
 		packet.setExtension(0, stringToDataView('ignore me'));
-		packet.setExtension(1, numericArrayToDataView([ 1, 2, 3, 4 ]));
+		packet.setExtension(1, numericArrayToDataView([1, 2, 3, 4]));
 		packet.setExtension(15, stringToDataView('also ignore me'));
 		packet.setExtension(16, stringToDataView('also ignore me'));
 		// We don't validate extensions (`id` and value length) until the packet
@@ -509,7 +551,9 @@ describe('create RTP packet 8 from scratch', () =>
 		packet.serialize();
 		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.getExtension(0)).toBeUndefined();
-		expect(packet.getExtension(1)).toEqual(numericArrayToDataView([ 1, 2, 3, 4 ]));
+		expect(packet.getExtension(1)).toEqual(
+			numericArrayToDataView([1, 2, 3, 4]),
+		);
 		// Extension with id 16 (so 0 in 4 bits) must be ignored.
 		expect(packet.getExtension(16)).toBeUndefined();
 		expect(packet.hasOneByteExtensions()).toBe(true);
@@ -528,19 +572,17 @@ describe('create RTP packet 8 from scratch', () =>
 	});
 });
 
-describe('create RTP packet 9 from scratch', () =>
-{
+describe('create RTP packet 9 from scratch', () => {
 	let packet: RtpPacket;
 
-	test('packet processing succeeds', () =>
-	{
+	test('packet processing succeeds', () => {
 		packet = new RtpPacket();
 
 		packet.enableTwoBytesExtensions();
 		expect(packet.needsSerialization()).toBe(true);
 		expect(packet.getExtensions().size).toBe(0);
 		packet.setExtension(0, stringToDataView('ignore me'));
-		packet.setExtension(1, numericArrayToDataView([ 1, 2, 3, 4 ]));
+		packet.setExtension(1, numericArrayToDataView([1, 2, 3, 4]));
 		packet.setExtension(256, stringToDataView('also ignore me'));
 		packet.setExtension(257, stringToDataView('also ignore me'));
 		// We don't validate extensions (`id` and value length) until the packet
@@ -551,7 +593,9 @@ describe('create RTP packet 9 from scratch', () =>
 		packet.serialize();
 		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.getExtension(0)).toBeUndefined();
-		expect(packet.getExtension(1)).toEqual(numericArrayToDataView([ 1, 2, 3, 4 ]));
+		expect(packet.getExtension(1)).toEqual(
+			numericArrayToDataView([1, 2, 3, 4]),
+		);
 		// Extension with id 256 (so 0 in 8 bits) must be ignored.
 		expect(packet.getExtension(256)).toBeUndefined();
 		expect(packet.getExtension(257)).toBeUndefined();
@@ -571,15 +615,13 @@ describe('create RTP packet 9 from scratch', () =>
 	});
 });
 
-describe('create RTP packet 10 from scratch', () =>
-{
+describe('create RTP packet 10 from scratch', () => {
 	let packet: RtpPacket;
 
-	test('packet processing succeeds', () =>
-	{
+	test('packet processing succeeds', () => {
 		packet = new RtpPacket();
 
-		packet.setPayload(numericArrayToDataView([ 1, 2, 3, 4 ]));
+		packet.setPayload(numericArrayToDataView([1, 2, 3, 4]));
 		expect(packet.needsSerialization()).toBe(true);
 		// Packet total length must match RTP fixed header length (12) + payload
 		// (4), so 16.
@@ -600,7 +642,7 @@ describe('create RTP packet 10 from scratch', () =>
 		expect(packet.getByteLength()).toBe(16);
 		expect(packet.getPadding()).toBe(0);
 
-		packet.setPayload(numericArrayToDataView([ 1, 2, 3, 4, 5 ]));
+		packet.setPayload(numericArrayToDataView([1, 2, 3, 4, 5]));
 		expect(packet.getByteLength()).toBe(17);
 
 		// Padding a packet of 17 bytes (0 bytes of padding) must become 20 bytes.
@@ -612,19 +654,17 @@ describe('create RTP packet 10 from scratch', () =>
 	});
 });
 
-describe('serialize packet into a given buffer', () =>
-{
+describe('serialize packet into a given buffer', () => {
 	const packet = new RtpPacket();
 
-	packet.setPayload(numericArrayToDataView([ 1, 2, 3, 4 ]));
+	packet.setPayload(numericArrayToDataView([1, 2, 3, 4]));
 	packet.serialize();
 
 	const packetView = clone<DataView>(packet.getView());
 	const payloadView = clone<DataView>(packet.getPayload());
 	const packetDump = clone<RtpPacketDump>(packet.dump());
 
-	test('serialization succeeds', () =>
-	{
+	test('serialization succeeds', () => {
 		const buffer = new ArrayBuffer(2000);
 		const byteOffset = 135;
 
@@ -638,31 +678,26 @@ describe('serialize packet into a given buffer', () =>
 		expect(packet.dump()).toEqual(packetDump);
 	});
 
-	test('serialization fails if given buffer do not have enough space', () =>
-	{
+	test('serialization fails if given buffer do not have enough space', () => {
 		// Packet length is 16 byrtes so let's pass only 15 bytes to make it throw.
 		const buffer = new ArrayBuffer(16);
 		const byteOffset = 1;
 
-		expect(
-			() => packet.serialize(buffer, byteOffset)
-		).toThrow(RangeError);
+		expect(() => packet.serialize(buffer, byteOffset)).toThrow(RangeError);
 	});
 });
 
-describe('clone packet into a given buffer', () =>
-{
+describe('clone packet into a given buffer', () => {
 	const packet = new RtpPacket();
 
-	packet.setPayload(numericArrayToDataView([ 1, 2, 3, 4 ]));
+	packet.setPayload(numericArrayToDataView([1, 2, 3, 4]));
 	packet.serialize();
 
 	const packetView = clone<DataView>(packet.getView());
 	const payloadView = clone<DataView>(packet.getPayload());
 	const packetDump = clone<RtpPacketDump>(packet.dump());
 
-	test('cloning succeeds', () =>
-	{
+	test('cloning succeeds', () => {
 		const buffer = new ArrayBuffer(2000);
 		const byteOffset = 135;
 
@@ -670,20 +705,19 @@ describe('clone packet into a given buffer', () =>
 
 		// Packet and payload views must be the same.
 		expect(areDataViewsEqual(clonedPacket.getView(), packetView)).toBe(true);
-		expect(areDataViewsEqual(clonedPacket.getPayload(), payloadView)).toBe(true);
+		expect(areDataViewsEqual(clonedPacket.getPayload(), payloadView)).toBe(
+			true,
+		);
 		expect(clonedPacket.getView().buffer === buffer).toBe(true);
 		expect(clonedPacket.getView().byteOffset).toBe(byteOffset);
 		expect(clonedPacket.dump()).toEqual(packetDump);
 	});
 
-	test('cloning fails if given buffer do not have enough space', () =>
-	{
+	test('cloning fails if given buffer do not have enough space', () => {
 		// Packet length is 16 byrtes so let's pass only 15 bytes to make it throw.
 		const buffer = new ArrayBuffer(16);
 		const byteOffset = 1;
 
-		expect(
-			() => packet.clone(buffer, byteOffset)
-		).toThrow(RangeError);
+		expect(() => packet.clone(buffer, byteOffset)).toThrow(RangeError);
 	});
 });
