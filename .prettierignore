@@ -2,6 +2,6 @@
 
 /.cache
 /coverage
-/doc
-/doc-assets
+/docs
+/docs-assets
 /lib

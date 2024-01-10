@@ -13,7 +13,7 @@
 	"include": ["src"],
 	"typedocOptions": {
 		"entryPoints": ["src/packets/public.ts", "src/utils/public.ts"],
-		"out": "doc",
+		"out": "docs",
 		"excludePrivate": true,
 		"excludeProtected": true,
 		"excludeNotDocumented": true,
@@ -33,6 +33,6 @@
 		"navigationLinks": {
 			"GitHub": "https://github.com/versatica/rtp.js"
 		},
-		"customCss": "./doc-assets/custom-styles.css"
+		"customCss": "./docs-assets/custom-styles.css"
 	}
 }

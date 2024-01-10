@@ -80,8 +80,8 @@ async function run() {
 
 		case 'release': {
 			checkRelease();
-			generateDoc();
-			executeCmd('git add doc');
+			generateDocs();
+			executeCmd('git add docs');
 			executeCmd(`git commit -am '${PKG.version}'`);
 			executeCmd(`git tag -a ${PKG.version} -m '${PKG.version}'`);
 			executeCmd(`git push origin ${RELEASE_BRANCH}`);
@@ -91,9 +91,9 @@ async function run() {
 			break;
 		}
 
-		case 'doc': {
-			generateDoc();
-			executeCmd('open-cli doc/index.html');
+		case 'docs': {
+			generateDocs();
+			executeCmd('open-cli docs/index.html');
 
 			break;
 		}
@@ -171,13 +171,13 @@ function checkRelease() {
 	test();
 }
 
-function generateDoc() {
-	logInfo('generateDoc()');
+function generateDocs() {
+	logInfo('generateDocs()');
 
 	// NOTE: typedoc options are given in tsconfig.json.
 	// NOTE: .nojekyll is required, otherwise GitHub pages will ignore
 	// generated HTML files with underscore.
-	executeCmd('typedoc && touch doc/.nojekyll');
+	executeCmd('typedoc && touch docs/.nojekyll');
 }
 
 function executeCmd(command, exitOnError = true) {

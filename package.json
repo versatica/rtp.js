@@ -37,7 +37,7 @@
 		"coverage": "node npm-scripts.mjs coverage",
 		"release:check": "node npm-scripts.mjs release:check",
 		"release": "node npm-scripts.mjs release",
-		"doc": "node npm-scripts.mjs doc"
+		"docs": "node npm-scripts.mjs docs"
 	},
 	"jest": {
 		"verbose": true,
