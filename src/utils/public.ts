@@ -5,7 +5,9 @@
 export {
 	padTo4Bytes,
 	nodeBufferToDataView,
+	dataViewToNodeBuffer,
 	nodeBufferToArrayBuffer,
+	arrayBufferToNodeBuffer,
 	numericArrayToDataView,
 	numberToDataView,
 	dataViewToString,
