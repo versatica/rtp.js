@@ -134,9 +134,23 @@ export function areDataViewsEqual(view1: DataView, view2: DataView)
  * @remarks
  * - Just for Node.js.
  */
-export function nodeBufferToDataView(buffer: Buffer): DataView
+export function nodeBufferToDataView(nodeBuffer: Buffer): DataView
 {
-	return new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+	return new DataView(
+		nodeBuffer.buffer, nodeBuffer.byteOffset, nodeBuffer.byteLength
+	);
+}
+
+/**
+ * Convert DataView to Node.js Buffer using the same underlying ArrayBuffer.
+ *
+ * @category Utils
+ * @remarks
+ * - Just for Node.js.
+ */
+export function dataViewToNodeBuffer(view: DataView): Buffer
+{
+	return Buffer.from(view.buffer, view.byteOffset, view.byteLength);
 }
 
 /**
@@ -146,9 +160,23 @@ export function nodeBufferToDataView(buffer: Buffer): DataView
  * @remarks
  * - Just for Node.js.
  */
-export function nodeBufferToArrayBuffer(buffer: Buffer): ArrayBuffer
+export function nodeBufferToArrayBuffer(nodeBuffer: Buffer): ArrayBuffer
 {
-	return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+	return nodeBuffer.buffer.slice(
+		nodeBuffer.byteOffset, nodeBuffer.byteOffset + nodeBuffer.byteLength
+	);
+}
+
+/**
+ * Convert ArrayBuffer to Node.js Buffer.
+ *
+ * @category Utils
+ * @remarks
+ * - Just for Node.js.
+ */
+export function arrayBufferToNodeBuffer(arrayBuffer: ArrayBuffer): Buffer
+{
+	return Buffer.from(arrayBuffer, 0, arrayBuffer.byteLength);
 }
 
 /**
@@ -205,11 +233,11 @@ export function dataViewToString(view: DataView): string
  *
  * @category Utils
  */
-export function arrayBufferToString(buffer: ArrayBuffer): string
+export function arrayBufferToString(arrayBuffer: ArrayBuffer): string
 {
 	const decoder = new TextDecoder();
 
-	return decoder.decode(buffer);
+	return decoder.decode(arrayBuffer);
 }
 
 /**
