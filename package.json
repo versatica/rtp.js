@@ -10,7 +10,7 @@
 	"license": "ISC",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/versatica/rtp.js.git"
+		"url": "git+https://github.com/versatica/rtp.js.git"
 	},
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
