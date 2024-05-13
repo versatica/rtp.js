@@ -1,10 +1,26 @@
 import * as process from 'node:process';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
 import { execSync } from 'node:child_process';
 
 const PKG = JSON.parse(fs.readFileSync('./package.json').toString());
 const RELEASE_BRANCH = 'master';
+
+// Paths for ESLint to check. Converted to string for convenience.
+const ESLINT_PATHS = ['src', 'npm-scripts.mjs'].join(' ');
+// Paths for ESLint to ignore. Converted to string argument for convenience.
+const ESLINT_IGNORE_PATTERN_ARGS = []
+	.map(entry => `--ignore-pattern ${entry}`)
+	.join(' ');
+// Paths for Prettier to check/write. Converted to string for convenience.
+// NOTE: Prettier ignores paths in .gitignore so we don't need to care about
+// node/src/fbs.
+const PRETTIER_PATHS = [
+	'README.md',
+	'src',
+	'npm-scripts.mjs',
+	'package.json',
+	'tsconfig.json',
+].join(' ');
 
 const task = process.argv[2];
 const args = process.argv.slice(3).join(' ');
@@ -130,21 +146,21 @@ function buildTypescript({ force = false } = { force: false }) {
 function lint() {
 	logInfo('lint()');
 
-	executeCmd('prettier . --check');
-
 	// Ensure there are no rules that are unnecessary or conflict with Prettier
 	// rules.
 	executeCmd('eslint-config-prettier .eslintrc.js');
 
 	executeCmd(
-		'eslint -c .eslintrc.js --ignore-path .eslintignore --max-warnings 0 .',
+		`eslint -c .eslintrc.js --ext=ts,js,mjs --max-warnings 0 ${ESLINT_IGNORE_PATTERN_ARGS} ${ESLINT_PATHS}`,
 	);
+
+	executeCmd(`prettier --check ${PRETTIER_PATHS}`);
 }
 
 function format() {
 	logInfo('format()');
 
-	executeCmd('prettier . --write');
+	executeCmd(`prettier --write ${PRETTIER_PATHS}`);
 }
 
 function test() {
