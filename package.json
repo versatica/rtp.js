@@ -63,12 +63,12 @@
 		"cacheDirectory": ".cache/jest"
 	},
 	"dependencies": {
-		"debug": "^4.3.7",
+		"debug": "^4.4.0",
 		"supports-color": "^9.4.0"
 	},
 	"devDependencies": {
 		"@types/debug": "^4.1.12",
-		"@types/jest": "^29.5.13",
+		"@types/jest": "^29.5.14",
 		"@typescript-eslint/eslint-plugin": "^7.8.0",
 		"@typescript-eslint/parser": "^7.8.0",
 		"eslint": "^8.57.0",
