@@ -8,9 +8,6 @@ export const COMMON_HEADER_LENGTH = 4;
  *
  * @category RTCP Extended Reports
  */
-// ESLint absurdly complains about "'ExtendedReportType' is already declared in
-// the upper scope".
-// eslint-disable-next-line no-shadow
 export enum ExtendedReportType {
 	/**
 	 * Loss RLE Report.
@@ -87,12 +84,12 @@ export function getExtendedReportLength(view: DataView): number {
  */
 export function setExtendedReportLength(
 	view: DataView,
-	byteLength: number,
+	byteLength: number
 ): void {
 	// Report byte length must be multiple of 4.
 	if (byteLength % 4 !== 0) {
 		throw new RangeError(
-			`Extended Report byte length must be multiple of 4 but given byte length is ${byteLength} bytes`,
+			`Extended Report byte length must be multiple of 4 but given byte length is ${byteLength} bytes`
 		);
 	}
 
@@ -177,17 +174,17 @@ export abstract class ExtendedReport extends Serializable {
 			// Extended Report byte length must be multiple of 4.
 			else if (this.view.byteLength % 4 !== 0) {
 				throw new RangeError(
-					`Extended Report byte length must be multiple of 4 but given buffer view is ${this.view.byteLength} bytes`,
+					`Extended Report byte length must be multiple of 4 but given buffer view is ${this.view.byteLength} bytes`
 				);
 			} else if (getExtendedReportType(this.view) !== reportType) {
 				throw new TypeError(
-					`not a ${reportTypeToString(reportType)} Extended Report`,
+					`not a ${reportTypeToString(reportType)} Extended Report`
 				);
 			} else if (getExtendedReportLength(this.view) !== this.view.byteLength) {
 				throw new RangeError(
 					`length in the RTCP header (${getExtendedReportLength(
-						this.view,
-					)} bytes) does not match view length (${this.view.byteLength} bytes)`,
+						this.view
+					)} bytes) does not match view length (${this.view.byteLength} bytes)`
 				);
 			}
 		}
@@ -230,12 +227,12 @@ export abstract class ExtendedReport extends Serializable {
 		const view = new DataView(
 			bufferData.buffer,
 			bufferData.byteOffset,
-			bufferData.byteLength,
+			bufferData.byteLength
 		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Copy the common header into the new buffer.
@@ -243,9 +240,9 @@ export abstract class ExtendedReport extends Serializable {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset,
-				COMMON_HEADER_LENGTH,
+				COMMON_HEADER_LENGTH
 			),
-			0,
+			0
 		);
 
 		// Update the report length field in the report header.

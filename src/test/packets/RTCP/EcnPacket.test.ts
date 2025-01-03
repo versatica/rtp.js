@@ -95,7 +95,7 @@ describe('create RTCP ECN packet', () => {
 		packet.setSenderSsrc(ecnPacketDump.senderSsrc);
 		packet.setMediaSsrc(ecnPacketDump.mediaSsrc);
 		packet.setExtendedHighestSequenceNumber(
-			ecnPacketDump.extendedHighestSequenceNumber,
+			ecnPacketDump.extendedHighestSequenceNumber
 		);
 		packet.setEct0Counter(ecnPacketDump.ect0Counter);
 		packet.setEct1Counter(ecnPacketDump.ect1Counter);

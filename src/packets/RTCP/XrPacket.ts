@@ -87,7 +87,7 @@ export class XrPacket extends RtcpPacket {
 			const remainingView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				this.view.byteLength - this.padding - pos,
+				this.view.byteLength - this.padding - pos
 			);
 
 			const reportType = getExtendedReportType(remainingView);
@@ -96,7 +96,7 @@ export class XrPacket extends RtcpPacket {
 			const reportView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				reportLength,
+				reportLength
 			);
 
 			let report: ExtendedReport;
@@ -165,7 +165,7 @@ export class XrPacket extends RtcpPacket {
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -215,7 +215,7 @@ export class XrPacket extends RtcpPacket {
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -229,9 +229,9 @@ export class XrPacket extends RtcpPacket {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH,
+				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH
 			),
-			pos,
+			pos
 		);
 
 		// Move to Reception Reports.
@@ -250,7 +250,7 @@ export class XrPacket extends RtcpPacket {
 		// Assert that current position is equal than new buffer length.
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -267,13 +267,13 @@ export class XrPacket extends RtcpPacket {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): XrPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new XrPacket(view);

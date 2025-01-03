@@ -50,6 +50,7 @@ export type EcnExtendedReportDump = ExtendedReportDump & {
  */
 export class EcnExtendedReport extends ExtendedReport {
 	// Chunks (2 bytes numbers, unparsed).
+	// eslint-disable-next-line no-unused-private-class-members
 	#chunks: number[] = [];
 
 	/**
@@ -70,7 +71,7 @@ export class EcnExtendedReport extends ExtendedReport {
 
 		if (this.view.byteLength !== ECN_EXTENDED_REPORT_LENGTH) {
 			throw new TypeError(
-				'wrong byte length for a ECN Summary Extended Report',
+				'wrong byte length for a ECN Summary Extended Report'
 			);
 		}
 	}
@@ -106,7 +107,7 @@ export class EcnExtendedReport extends ExtendedReport {
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -120,9 +121,9 @@ export class EcnExtendedReport extends ExtendedReport {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				ECN_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH,
+				ECN_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH
 			),
-			pos,
+			pos
 		);
 
 		// Move to the end.
@@ -130,7 +131,7 @@ export class EcnExtendedReport extends ExtendedReport {
 
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -147,13 +148,13 @@ export class EcnExtendedReport extends ExtendedReport {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): EcnExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new EcnExtendedReport(view);

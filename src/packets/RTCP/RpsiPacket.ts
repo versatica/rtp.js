@@ -69,7 +69,7 @@ export class RpsiPacket extends FeedbackPacket {
 			this.#bitStringView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + FIXED_HEADER_LENGTH + 2,
-				2,
+				2
 			);
 
 			return;
@@ -85,7 +85,7 @@ export class RpsiPacket extends FeedbackPacket {
 
 		if (fciPaddingBits % 8 !== 0) {
 			throw new TypeError(
-				'invalid RPSI packet with fractional number of padding bytes',
+				'invalid RPSI packet with fractional number of padding bytes'
 			);
 		}
 
@@ -105,7 +105,7 @@ export class RpsiPacket extends FeedbackPacket {
 		this.#bitStringView = new DataView(
 			this.view.buffer,
 			this.view.byteOffset + pos,
-			bitStringLength,
+			bitStringLength
 		);
 
 		pos += bitStringLength + fciPaddingBytes + this.padding;
@@ -113,7 +113,7 @@ export class RpsiPacket extends FeedbackPacket {
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -156,7 +156,7 @@ export class RpsiPacket extends FeedbackPacket {
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -169,7 +169,7 @@ export class RpsiPacket extends FeedbackPacket {
 		// the new buffer.
 		uint8Array.set(
 			new Uint8Array(this.view.buffer, this.view.byteOffset + pos, 2),
-			pos,
+			pos
 		);
 
 		// Move to padding bit string.
@@ -180,16 +180,16 @@ export class RpsiPacket extends FeedbackPacket {
 			new Uint8Array(
 				this.#bitStringView.buffer,
 				this.#bitStringView.byteOffset,
-				this.#bitStringView.byteLength,
+				this.#bitStringView.byteLength
 			),
-			pos,
+			pos
 		);
 
 		// Create new bit string DataView.
 		const bitStringView = new DataView(
 			view.buffer,
 			view.byteOffset + pos,
-			this.#bitStringView.byteLength,
+			this.#bitStringView.byteLength
 		);
 
 		// Move to FCI padding.
@@ -210,7 +210,7 @@ export class RpsiPacket extends FeedbackPacket {
 		// Assert that current position is equal than new buffer length.
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -227,13 +227,13 @@ export class RpsiPacket extends FeedbackPacket {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): RpsiPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new RpsiPacket(view);

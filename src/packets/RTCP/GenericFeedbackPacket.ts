@@ -55,14 +55,14 @@ export class GenericFeedbackPacket extends FeedbackPacket {
 	constructor(
 		view?: DataView,
 		packetType?: RtcpPacketType.RTPFB | RtcpPacketType.PSFB,
-		messageType?: RtpFeedbackMessageType | PsFeedbackMessageType,
+		messageType?: RtpFeedbackMessageType | PsFeedbackMessageType
 	) {
 		super(
 			(view ? getRtcpPacketType(view) : packetType!) as
 				| RtcpPacketType.RTPFB
 				| RtcpPacketType.PSFB,
 			view ? getRtcpFeedbackMessageType(view) : messageType!,
-			view,
+			view
 		);
 
 		if (!view && (!packetType || !messageType)) {
@@ -79,7 +79,7 @@ export class GenericFeedbackPacket extends FeedbackPacket {
 			this.#bodyView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + FIXED_HEADER_LENGTH,
-				0,
+				0
 			);
 
 			return;
@@ -97,7 +97,7 @@ export class GenericFeedbackPacket extends FeedbackPacket {
 		this.#bodyView = new DataView(
 			this.view.buffer,
 			this.view.byteOffset + pos,
-			bodyLength,
+			bodyLength
 		);
 
 		pos += bodyLength + this.padding;
@@ -105,7 +105,7 @@ export class GenericFeedbackPacket extends FeedbackPacket {
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -142,7 +142,7 @@ export class GenericFeedbackPacket extends FeedbackPacket {
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -156,16 +156,16 @@ export class GenericFeedbackPacket extends FeedbackPacket {
 			new Uint8Array(
 				this.#bodyView.buffer,
 				this.#bodyView.byteOffset,
-				this.#bodyView.byteLength,
+				this.#bodyView.byteLength
 			),
-			pos,
+			pos
 		);
 
 		// Create new body DataView.
 		const bodyView = new DataView(
 			view.buffer,
 			view.byteOffset + pos,
-			this.#bodyView.byteLength,
+			this.#bodyView.byteLength
 		);
 
 		pos += bodyView.byteLength;
@@ -175,7 +175,7 @@ export class GenericFeedbackPacket extends FeedbackPacket {
 		// Assert that current position is equal than new buffer length.
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -195,13 +195,13 @@ export class GenericFeedbackPacket extends FeedbackPacket {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): GenericFeedbackPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new GenericFeedbackPacket(view);

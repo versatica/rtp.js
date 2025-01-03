@@ -243,7 +243,7 @@ describe('parse RTCP SDES packet with padding', () => {
 	const view2 = new DataView(
 		array2.buffer,
 		array2.byteOffset,
-		array2.byteLength,
+		array2.byteLength
 	);
 
 	const packet = new SdesPacket(view2);
@@ -309,7 +309,7 @@ describe('parse RTCP SDES packet with padded item', () => {
 	const view3 = new DataView(
 		array3.buffer,
 		array3.byteOffset,
-		array3.byteLength,
+		array3.byteLength
 	);
 
 	const packet = new SdesPacket(view3);
@@ -420,7 +420,7 @@ describe('parse another RTCP SDES packet', () => {
 	const view4 = new DataView(
 		array4.buffer,
 		array4.byteOffset,
-		array4.byteLength,
+		array4.byteLength
 	);
 
 	const packet = new SdesPacket(view4);
@@ -453,7 +453,7 @@ describe('parse invalid RTCP SDES packet', () => {
 		// Parse just the first 26 bytes of the buffer.
 		const view5 = new DataView(array.buffer, array.byteOffset, 26);
 
-		expect(() => new SdesPacket(view5)).toThrowError(RangeError);
+		expect(() => new SdesPacket(view5)).toThrow(RangeError);
 	});
 
 	test('parsing a packet with missing null octets in the chunk throws', () => {
@@ -476,10 +476,10 @@ describe('parse invalid RTCP SDES packet', () => {
 		const view6 = new DataView(
 			array6.buffer,
 			array6.byteOffset,
-			array6.byteLength,
+			array6.byteLength
 		);
 
-		expect(() => new SdesPacket(view6)).toThrowError(RangeError);
+		expect(() => new SdesPacket(view6)).toThrow(RangeError);
 	});
 });
 
@@ -536,7 +536,7 @@ describe('create another RTCP SDES packet', () => {
 		expect(isRtcp(clonedPacket.getView())).toBe(true);
 		expect(clonedPacket.dump()).toEqual(packet.dump());
 		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
-			true,
+			true
 		);
 
 		const clonedChunk1 = clonedPacket.getChunks()[0];
@@ -621,7 +621,7 @@ describe('create SDES Chunk', () => {
 			cloningBuffer,
 			cloningByteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		expect(chunk.needsSerialization()).toBe(false);

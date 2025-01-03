@@ -76,7 +76,7 @@ export class CompoundPacket extends Packet {
 			const remainingView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				this.view.byteLength - pos,
+				this.view.byteLength - pos
 			);
 
 			const packetLength = getRtcpLength(remainingView);
@@ -84,7 +84,7 @@ export class CompoundPacket extends Packet {
 			const packetView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				packetLength,
+				packetLength
 			);
 
 			let packet: RtcpPacket;
@@ -195,7 +195,7 @@ export class CompoundPacket extends Packet {
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -220,7 +220,7 @@ export class CompoundPacket extends Packet {
 
 		const packetLength = this.#packets.reduce(
 			(sum, packet) => sum + packet.getByteLength(),
-			0,
+			0
 		);
 
 		return packetLength;
@@ -264,7 +264,7 @@ export class CompoundPacket extends Packet {
 		const view = new DataView(
 			bufferData.buffer,
 			bufferData.byteOffset,
-			bufferData.byteLength,
+			bufferData.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -279,7 +279,7 @@ export class CompoundPacket extends Packet {
 		// Assert that current position is equal than new buffer length.
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -296,13 +296,13 @@ export class CompoundPacket extends Packet {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): CompoundPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new CompoundPacket(view);

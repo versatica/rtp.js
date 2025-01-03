@@ -13,7 +13,8 @@ export type SerializableDump = {
  */
 export abstract class Serializable {
 	// Buffer view holding the packet or item content.
-	// @ts-ignore ('view' has not initializer and is not assigned in constructor).
+	// @ts-expect-error --- 'view' has not initializer and is not assigned in
+	// constructor.
 	protected view: DataView;
 	// Whether serialization is needed due to recent modifications.
 	#serializationNeeded: boolean = false;
@@ -52,7 +53,7 @@ export abstract class Serializable {
 	 */
 	getView(
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): DataView {
 		if (this.needsSerialization()) {
 			this.serialize(serializationBuffer, serializationByteOffset);
@@ -130,7 +131,7 @@ export abstract class Serializable {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): Serializable;
 
 	protected setSerializationNeeded(flag: boolean): void {
@@ -144,14 +145,13 @@ export abstract class Serializable {
 	 */
 	protected getSerializationBuffer(
 		buffer?: ArrayBuffer,
-		byteOffset?: number,
+		byteOffset?: number
 	): {
 		buffer: ArrayBuffer;
 		byteOffset: number;
 		byteLength: number;
 		// NOTE: ESlint absurdly complaining about "Expected indentation of 2 tabs but
 		// found 1".
-		// eslint-disable-next-line indent
 	} {
 		byteOffset ??= 0;
 
@@ -162,7 +162,7 @@ export abstract class Serializable {
 				throw new RangeError(
 					`given buffer available space (${
 						buffer.byteLength - byteOffset
-					} bytes) is less than length required for serialization (${byteLength} bytes)`,
+					} bytes) is less than length required for serialization (${byteLength} bytes)`
 				);
 			}
 
@@ -182,7 +182,7 @@ export abstract class Serializable {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): DataView {
 		if (this.needsSerialization()) {
 			this.serialize(serializationBuffer, serializationByteOffset);
@@ -201,7 +201,7 @@ export abstract class Serializable {
 						buffer.byteLength - byteOffset
 					} bytes) is less than length required for clonation (${
 						this.view.byteLength
-					} bytes)`,
+					} bytes)`
 				);
 			}
 
@@ -209,22 +209,22 @@ export abstract class Serializable {
 			const uint8Array = new Uint8Array(
 				buffer,
 				byteOffset,
-				this.view.byteLength,
+				this.view.byteLength
 			);
 
 			uint8Array.set(
 				new Uint8Array(
 					this.view.buffer,
 					this.view.byteOffset,
-					this.view.byteLength,
+					this.view.byteLength
 				),
-				0,
+				0
 			);
 
 			view = new DataView(
 				uint8Array.buffer,
 				uint8Array.byteOffset,
-				uint8Array.byteLength,
+				uint8Array.byteLength
 			);
 		} else {
 			view = clone<DataView>(this.view);

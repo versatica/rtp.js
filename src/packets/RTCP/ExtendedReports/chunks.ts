@@ -102,7 +102,7 @@ export function parseExtendedReportChunk(chunk: number): ExtendedReportChunk {
  */
 export function createExtendedReportRunLengthChunk(
 	runType: 'zeros' | 'ones',
-	runLength: number,
+	runLength: number
 ): number {
 	if (runLength < 0 || runLength > 16383) {
 		throw new TypeError('invalid run length value');

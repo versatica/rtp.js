@@ -1,7 +1,7 @@
 import { Serializable } from '../../packets/Serializable';
 import { clone, areDataViewsEqual } from '../../utils/helpers';
 
-export class Foo extends Serializable {
+class Foo extends Serializable {
 	constructor(view: DataView) {
 		super(view);
 	}
@@ -17,12 +17,12 @@ export class Foo extends Serializable {
 		const view = new DataView(
 			bufferData.buffer,
 			bufferData.byteOffset,
-			bufferData.byteLength,
+			bufferData.byteLength
 		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Copy the entire view into the new buffer.
@@ -30,9 +30,9 @@ export class Foo extends Serializable {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset,
-				this.view.byteLength,
+				this.view.byteLength
 			),
-			0,
+			0
 		);
 
 		// Update DataView.
@@ -45,13 +45,13 @@ export class Foo extends Serializable {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): Foo {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new Foo(view);
@@ -128,8 +128,8 @@ describe('parse Foo 1', () => {
 	});
 
 	test('clone() fails if current buffer is given for serialization and it collides', () => {
-		// Force seriqlization when cloning.
-		// @ts-ignore
+		// Force serialization when cloning.
+		// @ts-expect-error --- Protected class method.
 		foo.setSerializationNeeded(true);
 
 		const buffer = new ArrayBuffer(10);
@@ -138,7 +138,7 @@ describe('parse Foo 1', () => {
 			buffer,
 			byteOffset,
 			/* serializationBuffer */ view.buffer,
-			/* byteOffset */ 9,
+			/* byteOffset */ 9
 		);
 
 		expect(clonedFoo.getByteLength()).toBe(10);

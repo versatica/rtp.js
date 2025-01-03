@@ -45,7 +45,7 @@ test('set RTP extension mapping and get/set specific RTP extensions', () => {
 	packet.setRepairedRidExtension(rtpPacketDump.repairedRidExt);
 	packet.setAbsSendTimeExtension(rtpPacketDump.absSendTimeExt);
 	packet.setTransportWideSeqNumberExtension(
-		rtpPacketDump.transportWideSeqNumberExt,
+		rtpPacketDump.transportWideSeqNumberExt
 	);
 	packet.setSsrcAudioLevelExtension(rtpPacketDump.ssrcAudioLevelExt);
 	packet.setVideoOrientationExtension(rtpPacketDump.videoOrientationExt);
@@ -70,41 +70,41 @@ test('setting specific RTP extension without mapping does nothing', () => {
 
 test('rtpExtensionUriToType()', () => {
 	expect(rtpExtensionUriToType('urn:ietf:params:rtp-hdrext:sdes:mid')).toBe(
-		RtpExtensionType.MID,
+		RtpExtensionType.MID
 	);
 
 	expect(
-		rtpExtensionUriToType('urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id'),
+		rtpExtensionUriToType('urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id')
 	).toBe(RtpExtensionType.RTP_STREAM_ID);
 
 	expect(
 		rtpExtensionUriToType(
-			'urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id',
-		),
+			'urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id'
+		)
 	).toBe(RtpExtensionType.RTP_REPAIRED_STREAM_ID);
 
 	expect(
 		rtpExtensionUriToType(
-			'http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time',
-		),
+			'http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time'
+		)
 	).toBe(RtpExtensionType.ABS_SEND_TIME);
 
 	expect(
 		rtpExtensionUriToType(
-			'http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01',
-		),
+			'http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01'
+		)
 	).toBe(RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER);
 
 	expect(
-		rtpExtensionUriToType('urn:ietf:params:rtp-hdrext:ssrc-audio-level'),
+		rtpExtensionUriToType('urn:ietf:params:rtp-hdrext:ssrc-audio-level')
 	).toBe(RtpExtensionType.SSRC_AUDIO_LEVEL);
 
 	expect(rtpExtensionUriToType('urn:3gpp:video-orientation')).toBe(
-		RtpExtensionType.VIDEO_ORIENTATION,
+		RtpExtensionType.VIDEO_ORIENTATION
 	);
 
 	expect(rtpExtensionUriToType('urn:ietf:params:rtp-hdrext:toffset')).toBe(
-		RtpExtensionType.TOFFSET,
+		RtpExtensionType.TOFFSET
 	);
 
 	expect(rtpExtensionUriToType('foo')).toBe(undefined);

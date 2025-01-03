@@ -72,7 +72,7 @@ export class PrtExtendedReport extends ExtendedReport {
 
 		if (this.view.byteLength < PRT_EXTENDED_REPORT_MIN_LENGTH) {
 			throw new TypeError(
-				'wrong byte length for a Packet Receipt Times Extended Report',
+				'wrong byte length for a Packet Receipt Times Extended Report'
 			);
 		}
 
@@ -130,7 +130,7 @@ export class PrtExtendedReport extends ExtendedReport {
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -144,9 +144,9 @@ export class PrtExtendedReport extends ExtendedReport {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				PRT_EXTENDED_REPORT_MIN_LENGTH - COMMON_HEADER_LENGTH,
+				PRT_EXTENDED_REPORT_MIN_LENGTH - COMMON_HEADER_LENGTH
 			),
-			pos,
+			pos
 		);
 
 		// Move to receipt times.
@@ -161,7 +161,7 @@ export class PrtExtendedReport extends ExtendedReport {
 
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -178,13 +178,13 @@ export class PrtExtendedReport extends ExtendedReport {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): PrtExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new PrtExtendedReport(view);

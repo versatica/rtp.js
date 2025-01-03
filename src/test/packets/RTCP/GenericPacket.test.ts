@@ -36,7 +36,7 @@ describe('parse RTCP generic packet', () => {
 		expect(packet.getCount()).toBe(2);
 		expect(packet.getPadding()).toBe(0);
 		expect(packet.getBody()).toEqual(
-			numericArrayToDataView([0x62, 0x42, 0x76, 0xe0, 0x26, 0x24, 0x67, 0x0e]),
+			numericArrayToDataView([0x62, 0x42, 0x76, 0xe0, 0x26, 0x24, 0x67, 0x0e])
 		);
 		expect(packet.needsSerialization()).toBe(false);
 	});
@@ -64,7 +64,7 @@ describe('parse RTCP generic packet', () => {
 		const view2 = new DataView(
 			array2.buffer,
 			array2.byteOffset,
-			array2.byteLength,
+			array2.byteLength
 		);
 
 		const packet = new GenericPacket(view2);
@@ -78,7 +78,7 @@ describe('parse RTCP generic packet', () => {
 		expect(packet.getBody()).toEqual(
 			numericArrayToDataView([
 				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
-			]),
+			])
 		);
 		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
 
@@ -94,7 +94,7 @@ describe('parse RTCP generic packet', () => {
 		expect(packet.getBody()).toEqual(
 			numericArrayToDataView([
 				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
-			]),
+			])
 		);
 		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
 	});
@@ -103,13 +103,13 @@ describe('parse RTCP generic packet', () => {
 		// Parse the first 8 bytes of the buffer so RTCP length is wrong.
 		const view3 = new DataView(array.buffer, array.byteOffset, 8);
 
-		expect(() => new GenericPacket(view3)).toThrowError(RangeError);
+		expect(() => new GenericPacket(view3)).toThrow(RangeError);
 	});
 });
 
 describe('create RTCP generic packet', () => {
 	test('creating a generic packet without view and packet type throws', () => {
-		expect(() => new GenericPacket()).toThrowError(TypeError);
+		expect(() => new GenericPacket()).toThrow(TypeError);
 	});
 
 	test('creating a generic packet with padding succeeds', () => {
@@ -192,7 +192,7 @@ describe('create RTCP generic packet', () => {
 		expect(clonedPacket.getBody()).toEqual(packet.getBody());
 		expect(clonedPacket.dump()).toEqual(packet.dump());
 		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
-			true,
+			true
 		);
 	});
 });

@@ -57,7 +57,7 @@ export class RrtExtendedReport extends ExtendedReport {
 
 		if (this.view.byteLength !== RRT_EXTENDED_REPORT_LENGTH) {
 			throw new TypeError(
-				'wrong byte length for a Receiver Reference Time Extended Report',
+				'wrong byte length for a Receiver Reference Time Extended Report'
 			);
 		}
 	}
@@ -88,7 +88,7 @@ export class RrtExtendedReport extends ExtendedReport {
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -102,9 +102,9 @@ export class RrtExtendedReport extends ExtendedReport {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				RRT_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH,
+				RRT_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH
 			),
-			pos,
+			pos
 		);
 
 		// Move to the end.
@@ -112,7 +112,7 @@ export class RrtExtendedReport extends ExtendedReport {
 
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -129,13 +129,13 @@ export class RrtExtendedReport extends ExtendedReport {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): RrtExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new RrtExtendedReport(view);

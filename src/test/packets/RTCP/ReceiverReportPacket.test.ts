@@ -162,7 +162,7 @@ describe('parse RTCP Receiver Report packet', () => {
 		const view2 = new DataView(
 			array2.buffer,
 			array2.byteOffset,
-			array2.byteLength,
+			array2.byteLength
 		);
 
 		const packet = new ReceiverReportPacket(view2);
@@ -214,7 +214,7 @@ describe('parse RTCP Receiver Report packet', () => {
 		// holding no report at all.
 		const view3 = new DataView(array.buffer, array.byteOffset, 8);
 
-		expect(() => new ReceiverReportPacket(view3)).toThrowError(RangeError);
+		expect(() => new ReceiverReportPacket(view3)).toThrow(RangeError);
 	});
 });
 
@@ -275,7 +275,7 @@ describe('create RTCP Receiver Report packet', () => {
 		expect(isRtcp(clonedPacket.getView())).toBe(true);
 		expect(clonedPacket.dump()).toEqual(packet.dump());
 		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
-			true,
+			true
 		);
 	});
 
@@ -312,7 +312,7 @@ describe('create RTCP Receiver Report packet', () => {
 		expect(clonedPacket.getSsrc()).toBe(0x5d931534);
 		expect(clonedPacket.dump()).toEqual(packet.dump());
 		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
-			true,
+			true
 		);
 	});
 });
@@ -357,9 +357,9 @@ describe('parse RTCP Reception Report', () => {
 
 	test('parsing a buffer which length does not fit the report size throws', () => {
 		// Parse a 23 bytes buffer.
-		expect(
-			() => new ReceptionReport(numericArrayToDataView([23])),
-		).toThrowError(TypeError);
+		expect(() => new ReceptionReport(numericArrayToDataView([23]))).toThrow(
+			TypeError
+		);
 	});
 });
 

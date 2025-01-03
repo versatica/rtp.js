@@ -56,3 +56,9 @@ jobs:
 
       - name: npm run test
         run: npm run test
+
+      - name: npm run test
+        run: npm run test
+
+      - name: npm run docs:check
+        run: npm run docs:check

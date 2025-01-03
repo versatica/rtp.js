@@ -109,7 +109,7 @@ export class ReceiverReportPacket extends RtcpPacket {
 				this.view.byteOffset +
 					FIXED_HEADER_LENGTH +
 					this.#reports.length * RECEPTION_REPORT_LENGTH,
-				RECEPTION_REPORT_LENGTH,
+				RECEPTION_REPORT_LENGTH
 			);
 
 			pos += RECEPTION_REPORT_LENGTH;
@@ -124,7 +124,7 @@ export class ReceiverReportPacket extends RtcpPacket {
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -174,7 +174,7 @@ export class ReceiverReportPacket extends RtcpPacket {
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -188,9 +188,9 @@ export class ReceiverReportPacket extends RtcpPacket {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH,
+				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH
 			),
-			pos,
+			pos
 		);
 
 		// Move to Reception Reports.
@@ -208,7 +208,7 @@ export class ReceiverReportPacket extends RtcpPacket {
 		// Assert that current position is equal than new buffer length.
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -225,13 +225,13 @@ export class ReceiverReportPacket extends RtcpPacket {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): ReceiverReportPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new ReceiverReportPacket(view);
@@ -346,12 +346,12 @@ export class ReceptionReport extends Serializable {
 		const view = new DataView(
 			bufferData.buffer,
 			bufferData.byteOffset,
-			bufferData.byteLength,
+			bufferData.byteLength
 		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Copy the entire report into the new buffer.
@@ -359,9 +359,9 @@ export class ReceptionReport extends Serializable {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset,
-				RECEPTION_REPORT_LENGTH,
+				RECEPTION_REPORT_LENGTH
 			),
-			0,
+			0
 		);
 
 		this.setSerializationNeeded(false);
@@ -374,13 +374,13 @@ export class ReceptionReport extends Serializable {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): ReceptionReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new ReceptionReport(view);

@@ -6,16 +6,21 @@ const PKG = JSON.parse(fs.readFileSync('./package.json').toString());
 const RELEASE_BRANCH = 'master';
 
 // Paths for ESLint to check. Converted to string for convenience.
-const ESLINT_PATHS = ['src', 'npm-scripts.mjs'].join(' ');
+const ESLINT_PATHS = [
+	'eslint.config.mjs',
+	'typedoc.config.mjs',
+	'src',
+	'npm-scripts.mjs',
+].join(' ');
 // Paths for ESLint to ignore. Converted to string argument for convenience.
 const ESLINT_IGNORE_PATTERN_ARGS = []
 	.map(entry => `--ignore-pattern ${entry}`)
 	.join(' ');
 // Paths for Prettier to check/write. Converted to string for convenience.
-// NOTE: Prettier ignores paths in .gitignore so we don't need to care about
-// node/src/fbs.
 const PRETTIER_PATHS = [
 	'README.md',
+	'eslint.config.mjs',
+	'typedoc.config.mjs',
 	'src',
 	'npm-scripts.mjs',
 	'package.json',
@@ -114,6 +119,20 @@ async function run() {
 			break;
 		}
 
+		case 'docs:watch': {
+			generateDocs();
+			executeCmd('open-cli docs/index.html');
+			executeCmd('typedoc --watch');
+
+			break;
+		}
+
+		case 'docs:check': {
+			checkDocs();
+
+			break;
+		}
+
 		default: {
 			logError('unknown task');
 
@@ -148,10 +167,10 @@ function lint() {
 
 	// Ensure there are no rules that are unnecessary or conflict with Prettier
 	// rules.
-	executeCmd('eslint-config-prettier .eslintrc.js');
+	executeCmd('eslint-config-prettier eslint.config.mjs');
 
 	executeCmd(
-		`eslint -c .eslintrc.js --ext=ts,js,mjs --max-warnings 0 ${ESLINT_IGNORE_PATTERN_ARGS} ${ESLINT_PATHS}`,
+		`eslint -c eslint.config.mjs --max-warnings 0 ${ESLINT_IGNORE_PATTERN_ARGS} ${ESLINT_PATHS}`
 	);
 
 	executeCmd(`prettier --check ${PRETTIER_PATHS}`);
@@ -185,6 +204,7 @@ function checkRelease() {
 	buildTypescript({ force: true });
 	lint();
 	test();
+	checkDocs();
 }
 
 function generateDocs() {
@@ -194,6 +214,12 @@ function generateDocs() {
 	// NOTE: .nojekyll is required, otherwise GitHub pages will ignore
 	// generated HTML files with underscore.
 	executeCmd('typedoc && touch docs/.nojekyll');
+}
+
+function checkDocs() {
+	logInfo('checkDocs()');
+
+	executeCmd('typedoc --emit none');
 }
 
 function executeCmd(command, exitOnError = true) {

@@ -85,7 +85,7 @@ export class SliPacket extends FeedbackPacket {
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -138,7 +138,7 @@ export class SliPacket extends FeedbackPacket {
 		// Assert that current position is equal than new buffer length.
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -155,13 +155,13 @@ export class SliPacket extends FeedbackPacket {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): SliPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new SliPacket(view);
@@ -181,7 +181,7 @@ export class SliPacket extends FeedbackPacket {
 	 * - Serialization is needed after calling this method.
 	 */
 	setItems(
-		items: { first: number; number: number; pictureId: number }[],
+		items: { first: number; number: number; pictureId: number }[]
 	): void {
 		this.#items = Array.from(items);
 
