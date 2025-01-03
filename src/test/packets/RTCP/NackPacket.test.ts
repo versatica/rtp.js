@@ -129,13 +129,13 @@ describe('NACK items', () => {
 
 	test('createNackItem()', () => {
 		expect(
-			createNackItem([100, 102, 104, 106, 108, 110, 112, 114, 116]),
+			createNackItem([100, 102, 104, 106, 108, 110, 112, 114, 116])
 		).toEqual(nackItem1);
 
 		expect(
 			createNackItem([
 				10000, 10001, 10002, 10003, 10004, 10009, 10010, 10011, 10012,
-			]),
+			])
 		).toEqual(nackItem2);
 	});
 });

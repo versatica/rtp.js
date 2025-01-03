@@ -1,8 +1,8 @@
 {
 	"compileOnSave": true,
 	"compilerOptions": {
-		"lib": ["es2020"],
-		"target": "es2020",
+		"lib": ["es2022"],
+		"target": "es2022",
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"strict": true,
@@ -10,29 +10,5 @@
 		"declaration": true,
 		"declarationMap": true
 	},
-	"include": ["src"],
-	"typedocOptions": {
-		"entryPoints": ["src/packets/public.ts", "src/utils/public.ts"],
-		"out": "docs",
-		"excludePrivate": true,
-		"excludeProtected": true,
-		"excludeNotDocumented": true,
-		"excludeInternal": true,
-		"includeVersion": true,
-		"gitRemote": "origin",
-		"hideGenerator": false,
-		"titleLink": "https://versatica.github.io/rtp.js",
-		"treatWarningsAsErrors": true,
-		"cacheBust": true,
-		"categorizeByGroup": false,
-		"categoryOrder": ["RTP", "RTCP", "RTCP Extended Reports", "Utils", "*"],
-		"navigationLinks": {
-			"GitHub": "https://github.com/versatica/rtp.js",
-			"NPM": "https://www.npmjs.com/package/rtp.js"
-		},
-		"navigationLinks": {
-			"GitHub": "https://github.com/versatica/rtp.js"
-		},
-		"customCss": "./docs-assets/custom-styles.css"
-	}
+	"include": ["src"]
 }

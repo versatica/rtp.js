@@ -182,7 +182,7 @@ describe('parse RTCP Sender Report packet', () => {
 		const view2 = new DataView(
 			array2.buffer,
 			array2.byteOffset,
-			array2.byteLength,
+			array2.byteLength
 		);
 
 		const packet = new SenderReportPacket(view2);
@@ -207,7 +207,7 @@ describe('parse RTCP Sender Report packet', () => {
 		// holding no report at all.
 		const view3 = new DataView(array.buffer, array.byteOffset, 8);
 
-		expect(() => new SenderReportPacket(view3)).toThrowError(RangeError);
+		expect(() => new SenderReportPacket(view3)).toThrow(RangeError);
 	});
 });
 
@@ -294,7 +294,7 @@ describe('create RTCP Sender Report packet', () => {
 		expect(isRtcp(clonedPacket.getView())).toBe(true);
 		expect(clonedPacket.dump()).toEqual(packet.dump());
 		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
-			true,
+			true
 		);
 	});
 
@@ -356,7 +356,7 @@ describe('create RTCP Sender Report packet', () => {
 		expect(packet.getOctetCount()).toBe(577280);
 		expect(clonedPacket.dump()).toEqual(packet.dump());
 		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
-			true,
+			true
 		);
 	});
 });

@@ -64,7 +64,7 @@ export class PliPacket extends FeedbackPacket {
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -110,13 +110,13 @@ export class PliPacket extends FeedbackPacket {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): PliPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new PliPacket(view);

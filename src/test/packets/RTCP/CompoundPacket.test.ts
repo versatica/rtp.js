@@ -308,7 +308,7 @@ describe('parse RTCP Compound packet', () => {
 		expect(packet4.getBody()).toEqual(
 			numericArrayToDataView([
 				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
-			]),
+			])
 		);
 
 		const packet5 = compoundPacket.getPackets()[4] as SdesPacket;
@@ -407,7 +407,7 @@ describe('parse RTCP Compound packet', () => {
 		expect(packet4B.getBody()).toEqual(
 			numericArrayToDataView([
 				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
-			]),
+			])
 		);
 
 		const packet5B = compoundPacket.getPackets()[4] as SdesPacket;
@@ -482,17 +482,17 @@ describe('parse RTCP Compound packet', () => {
 
 		expect(clonedCompoundPacket.needsSerialization()).toBe(false);
 		expect(clonedCompoundPacket.getByteLength()).toBe(
-			compoundPacket.getByteLength(),
+			compoundPacket.getByteLength()
 		);
 		expect(clonedCompoundPacket.getPackets().length).toBe(
-			compoundPacket.getPackets().length,
+			compoundPacket.getPackets().length
 		);
 		expect(clonedCompoundPacket.dump()).toEqual(compoundPacket.dump());
 		expect(
 			areDataViewsEqual(
 				clonedCompoundPacket.getView(),
-				compoundPacket.getView(),
-			),
+				compoundPacket.getView()
+			)
 		).toBe(true);
 	});
 
@@ -500,7 +500,7 @@ describe('parse RTCP Compound packet', () => {
 		// Read only 136 bytes of the buffer view.
 		const view2 = new DataView(array.buffer, array.byteOffset, 136);
 
-		expect(() => new CompoundPacket(view2)).toThrowError(RangeError);
+		expect(() => new CompoundPacket(view2)).toThrow(RangeError);
 	});
 });
 

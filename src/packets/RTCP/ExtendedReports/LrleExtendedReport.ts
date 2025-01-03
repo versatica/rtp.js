@@ -62,7 +62,7 @@ export class LrleExtendedReport extends ExtendedReport {
 
 		if (!this.view) {
 			this.view = new DataView(
-				new ArrayBuffer(LRLE_EXTENDED_REPORT_MIN_LENGTH),
+				new ArrayBuffer(LRLE_EXTENDED_REPORT_MIN_LENGTH)
 			);
 
 			// Write report type.
@@ -137,7 +137,7 @@ export class LrleExtendedReport extends ExtendedReport {
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -151,9 +151,9 @@ export class LrleExtendedReport extends ExtendedReport {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				LRLE_EXTENDED_REPORT_MIN_LENGTH - COMMON_HEADER_LENGTH,
+				LRLE_EXTENDED_REPORT_MIN_LENGTH - COMMON_HEADER_LENGTH
 			),
-			pos,
+			pos
 		);
 
 		// Move to chunks.
@@ -171,7 +171,7 @@ export class LrleExtendedReport extends ExtendedReport {
 
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -188,13 +188,13 @@ export class LrleExtendedReport extends ExtendedReport {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): LrleExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new LrleExtendedReport(view);

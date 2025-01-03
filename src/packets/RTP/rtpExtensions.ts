@@ -3,9 +3,6 @@
  *
  * @category RTP
  */
-// ESLint absurdly complains about "'RtpExtensionType' is already declared in the
-// upper scope".
-// eslint-disable-next-line no-shadow
 export enum RtpExtensionType {
 	/**
 	 * Media identification.
@@ -102,7 +99,7 @@ export type RtpExtensionMapping = Partial<Record<RtpExtensionType, number>>;
  * @category RTP
  */
 export function rtpExtensionUriToType(
-	uri: string,
+	uri: string
 ): RtpExtensionType | undefined {
 	switch (uri) {
 		case 'urn:ietf:params:rtp-hdrext:sdes:mid': {

@@ -88,7 +88,7 @@ export class SsExtendedReport extends ExtendedReport {
 
 		if (this.view.byteLength !== SS_EXTENDED_REPORT_LENGTH) {
 			throw new TypeError(
-				'wrong byte length for a Statistics Summary Extended Report',
+				'wrong byte length for a Statistics Summary Extended Report'
 			);
 		}
 	}
@@ -131,7 +131,7 @@ export class SsExtendedReport extends ExtendedReport {
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -145,9 +145,9 @@ export class SsExtendedReport extends ExtendedReport {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				SS_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH,
+				SS_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH
 			),
-			pos,
+			pos
 		);
 
 		// Move to the end.
@@ -155,7 +155,7 @@ export class SsExtendedReport extends ExtendedReport {
 
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -172,13 +172,13 @@ export class SsExtendedReport extends ExtendedReport {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): SsExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new SsExtendedReport(view);

@@ -13,7 +13,7 @@ export function clone<T>(data: T): T {
 		return data.slice(0) as unknown as T;
 	} else if (data instanceof DataView) {
 		return new DataView(
-			data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength),
+			data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)
 		) as unknown as T;
 	} else if (data === undefined) {
 		return undefined as unknown as T;
@@ -34,7 +34,6 @@ export function clone<T>(data: T): T {
  * @category Utils
  * @hidden
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function assertUnreachable(_x: never): never {
 	throw new Error(`we should not get here: ${_x}`);
 }
@@ -62,7 +61,7 @@ export function padTo4Bytes(size: number): number {
 export function areDataViewsEqual(view1: DataView, view2: DataView) {
 	if (view1 === view2) {
 		logger.debug(
-			'areDataViewsEqual() | view1 and view2 are the same DataView instance',
+			'areDataViewsEqual() | view1 and view2 are the same DataView instance'
 		);
 
 		return true;
@@ -71,7 +70,7 @@ export function areDataViewsEqual(view1: DataView, view2: DataView) {
 	if (view1.byteLength !== view2.byteLength) {
 		if (logger.debug.enabled) {
 			logger.debug(
-				`areDataViewsEqual() | different byte length [view1.byteLength:${view1.byteLength}, view2.byteLength:${view2.byteLength}]`,
+				`areDataViewsEqual() | different byte length [view1.byteLength:${view1.byteLength}, view2.byteLength:${view2.byteLength}]`
 			);
 			logger.debug('areDataViewsEqual() | view1:', view1);
 			logger.debug('areDataViewsEqual() | view2:', view2);
@@ -88,7 +87,7 @@ export function areDataViewsEqual(view1: DataView, view2: DataView) {
 				logger.debug(
 					`areDataViewsEqual() | different byte [idx:${i}, view1:${view1
 						.getUint8(i)
-						.toString(16)}, view2:${view2.getUint8(i).toString(16)}]`,
+						.toString(16)}, view2:${view2.getUint8(i).toString(16)}]`
 				);
 				logger.debug('areDataViewsEqual() | view1:', view1);
 				logger.debug('areDataViewsEqual() | view2:', view2);
@@ -114,7 +113,7 @@ export function nodeBufferToDataView(nodeBuffer: Buffer): DataView {
 	return new DataView(
 		nodeBuffer.buffer,
 		nodeBuffer.byteOffset,
-		nodeBuffer.byteLength,
+		nodeBuffer.byteLength
 	);
 }
 
@@ -139,7 +138,7 @@ export function dataViewToNodeBuffer(view: DataView): Buffer {
 export function nodeBufferToArrayBuffer(nodeBuffer: Buffer): ArrayBuffer {
 	return nodeBuffer.buffer.slice(
 		nodeBuffer.byteOffset,
-		nodeBuffer.byteOffset + nodeBuffer.byteLength,
+		nodeBuffer.byteOffset + nodeBuffer.byteLength
 	);
 }
 
@@ -184,7 +183,7 @@ export function numberToDataView(number: number): DataView {
 	return new DataView(
 		uint8Array.buffer,
 		uint8Array.byteOffset,
-		uint8Array.byteLength,
+		uint8Array.byteLength
 	);
 }
 
@@ -222,7 +221,7 @@ export function stringToDataView(string: string): DataView {
 	return new DataView(
 		uint8Array.buffer,
 		uint8Array.byteOffset,
-		uint8Array.byteLength,
+		uint8Array.byteLength
 	);
 }
 
@@ -251,7 +250,7 @@ export function stringToUint8Array(string: string): Uint8Array {
 	return new Uint8Array(
 		uint8Array.buffer,
 		uint8Array.byteOffset,
-		uint8Array.byteLength,
+		uint8Array.byteLength
 	);
 }
 

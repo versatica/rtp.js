@@ -80,7 +80,7 @@ describe('create RTCP generic Feedback packet', () => {
 	const packet = new GenericFeedbackPacket(
 		undefined,
 		RtcpPacketType.PSFB,
-		PsFeedbackMessageType.AFB,
+		PsFeedbackMessageType.AFB
 	);
 
 	test('packet view is RTCP', () => {
@@ -93,7 +93,7 @@ describe('create RTCP generic Feedback packet', () => {
 		// Let's set body with 7 bytes length so it should be internally padded
 		// to 8.
 		packet.setBody(
-			numericArrayToDataView([0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66]),
+			numericArrayToDataView([0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66])
 		);
 
 		expect(packet.needsSerialization()).toBe(true);

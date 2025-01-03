@@ -94,7 +94,7 @@ export class ByePacket extends RtcpPacket {
 			const reasonView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				reasonLength,
+				reasonLength
 			);
 
 			this.#reason = dataViewToString(reasonView);
@@ -107,7 +107,7 @@ export class ByePacket extends RtcpPacket {
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -171,7 +171,7 @@ export class ByePacket extends RtcpPacket {
 			const uint8Array = new Uint8Array(
 				view.buffer,
 				view.byteOffset,
-				view.byteLength,
+				view.byteLength
 			);
 
 			// Write reason length.
@@ -192,7 +192,7 @@ export class ByePacket extends RtcpPacket {
 		// Assert that current position is equal than new buffer length.
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -209,13 +209,13 @@ export class ByePacket extends RtcpPacket {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): ByePacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new ByePacket(view);

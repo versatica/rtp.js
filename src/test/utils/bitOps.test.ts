@@ -46,39 +46,39 @@ test('writeBitInDataView()', () => {
 
 test('readBitsInDataView()', () => {
 	// Must throw if mask has no enabled bit.
-	expect(() =>
-		readBitsInDataView({ view, pos: 0, mask: 0b00000000 }),
-	).toThrowError(TypeError);
+	expect(() => readBitsInDataView({ view, pos: 0, mask: 0b00000000 })).toThrow(
+		TypeError
+	);
 
 	// Must throw if mask has is bigger than 0b11111111.
-	expect(() =>
-		readBitsInDataView({ view, pos: 0, mask: 0b100000000 }),
-	).toThrowError(TypeError);
+	expect(() => readBitsInDataView({ view, pos: 0, mask: 0b100000000 })).toThrow(
+		TypeError
+	);
 
 	expect(readBitsInDataView({ view, pos: 0, mask: 0b00000011 })).toBe(
-		0b00000000,
+		0b00000000
 	);
 	expect(readBitsInDataView({ view, pos: 0, mask: 0b00000110 })).toBe(
-		0b00000000,
+		0b00000000
 	);
 	expect(readBitsInDataView({ view, pos: 0, mask: 0b10000000 })).toBe(
-		0b00000000,
+		0b00000000
 	);
 	expect(readBitsInDataView({ view, pos: 0, mask: 0b10000001 })).toBe(
-		0b00000000,
+		0b00000000
 	);
 });
 
 test('writeBitsInDataView()', () => {
 	// Must throw if mask has no enabled bit.
 	expect(() =>
-		writeBitsInDataView({ view, pos: 0, mask: 0b00000000, value: 123 }),
-	).toThrowError(TypeError);
+		writeBitsInDataView({ view, pos: 0, mask: 0b00000000, value: 123 })
+	).toThrow(TypeError);
 
 	// Must throw if mask has is bigger than 0b11111111.
 	expect(() =>
-		writeBitsInDataView({ view, pos: 0, mask: 0b100000000, value: 123 }),
-	).toThrowError(TypeError);
+		writeBitsInDataView({ view, pos: 0, mask: 0b100000000, value: 123 })
+	).toThrow(TypeError);
 
 	writeBitsInDataView({ view, pos: 0, mask: 0b00000001, value: 1 });
 	expect(view.getUint8(0)).toBe(1);

@@ -17,9 +17,6 @@ export const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 8;
  *
  * @category RTCP
  */
-// ESLint absurdly complains about "'RtpFeedbackMessageType' is already declared
-// in the upper scope".
-// eslint-disable-next-line no-shadow
 export enum RtpFeedbackMessageType {
 	/**
 	 * Generic NACK.
@@ -40,9 +37,6 @@ export enum RtpFeedbackMessageType {
  *
  * @category RTCP
  */
-// ESLint absurdly complains about "'PsFeedbackMessageType' is already declared
-// in the upper scope".
-// eslint-disable-next-line no-shadow
 export enum PsFeedbackMessageType {
 	/**
 	 * Picture Loss Indication.
@@ -79,13 +73,13 @@ export type FeedbackPacketDump = RtcpPacketDump & {
  * @hidden
  */
 export function getRtcpFeedbackMessageType(
-	view: DataView,
+	view: DataView
 ): RtpFeedbackMessageType | PsFeedbackMessageType {
 	return readBitsInDataView({ view, pos: 0, mask: 0b00011111 });
 }
 
 function messageTypeToString(
-	messageType: RtpFeedbackMessageType | PsFeedbackMessageType,
+	messageType: RtpFeedbackMessageType | PsFeedbackMessageType
 ): string {
 	switch (messageType) {
 		case RtpFeedbackMessageType.NACK: {
@@ -151,7 +145,7 @@ export abstract class FeedbackPacket extends RtcpPacket {
 	protected constructor(
 		packetType: RtcpPacketType.RTPFB | RtcpPacketType.PSFB,
 		messageType: RtpFeedbackMessageType | PsFeedbackMessageType,
-		view?: DataView,
+		view?: DataView
 	) {
 		super(packetType, view);
 
@@ -161,10 +155,8 @@ export abstract class FeedbackPacket extends RtcpPacket {
 			if (this.getMessageType() !== this.#messageType) {
 				throw new TypeError(
 					`given buffer view is not a RTCP ${packetTypeToString(
-						this.getPacketType(),
-					)} packet with ${messageTypeToString(
-						this.#messageType,
-					)} message type`,
+						this.getPacketType()
+					)} packet with ${messageTypeToString(this.#messageType)} message type`
 				);
 			}
 		}
@@ -234,7 +226,7 @@ export abstract class FeedbackPacket extends RtcpPacket {
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -248,9 +240,9 @@ export abstract class FeedbackPacket extends RtcpPacket {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH,
+				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH
 			),
-			pos,
+			pos
 		);
 
 		return view;

@@ -17,9 +17,6 @@ export const COMMON_HEADER_LENGTH = 4;
  *
  * @category RTCP
  */
-// ESLint absurdly complains about "'RtcpPacketType' is already declared in the
-// upper scope".
-// eslint-disable-next-line no-shadow
 export enum RtcpPacketType {
 	/**
 	 * Extended Jitter Reports packet.
@@ -126,7 +123,7 @@ function setRtcpLength(view: DataView, byteLength: number): void {
 	// RTCP packet byte length must be multiple of 4.
 	if (byteLength % 4 !== 0) {
 		throw new RangeError(
-			`RTCP packet byte length must be multiple of 4 but given byte length is ${byteLength} bytes`,
+			`RTCP packet byte length must be multiple of 4 but given byte length is ${byteLength} bytes`
 		);
 	}
 
@@ -213,22 +210,22 @@ export abstract class RtcpPacket extends Packet {
 			} else if (this.getPacketType() !== this.#packetType) {
 				throw new TypeError(
 					`given buffer view is not a RTCP ${packetTypeToString(
-						this.#packetType,
-					)} packet`,
+						this.#packetType
+					)} packet`
 				);
 			}
 			// RTCP packet byte length must be multiple of 4.
 			else if (this.view.byteLength % 4 !== 0) {
 				throw new RangeError(
-					`RTCP packet byte length must be multiple of 4 but given buffer view is ${this.view.byteLength} bytes`,
+					`RTCP packet byte length must be multiple of 4 but given buffer view is ${this.view.byteLength} bytes`
 				);
 			} else if (getRtcpLength(this.view) !== this.view.byteLength) {
 				throw new RangeError(
 					`length in the RTCP header (${getRtcpLength(
-						this.view,
+						this.view
 					)} bytes) does not match buffer view length (${
 						this.view.byteLength
-					} bytes)`,
+					} bytes)`
 				);
 			}
 
@@ -307,12 +304,12 @@ export abstract class RtcpPacket extends Packet {
 		const view = new DataView(
 			bufferData.buffer,
 			bufferData.byteOffset,
-			bufferData.byteLength,
+			bufferData.byteLength
 		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Copy the common header into the new buffer.
@@ -320,9 +317,9 @@ export abstract class RtcpPacket extends Packet {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset,
-				COMMON_HEADER_LENGTH,
+				COMMON_HEADER_LENGTH
 			),
-			0,
+			0
 		);
 
 		// Update the length field in the RTCP header.
@@ -332,7 +329,7 @@ export abstract class RtcpPacket extends Packet {
 		if (this.padding > 0) {
 			if (this.padding > 255) {
 				throw new TypeError(
-					`padding (${this.padding} bytes) cannot be higher than 255`,
+					`padding (${this.padding} bytes) cannot be higher than 255`
 				);
 			}
 

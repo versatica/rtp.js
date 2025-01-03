@@ -245,7 +245,7 @@ describe('create RTCP XR packet', () => {
 			padding: 0,
 		});
 		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
-			true,
+			true
 		);
 	});
 });
@@ -276,17 +276,17 @@ describe('chunks parsing and creation', () => {
 
 	test('createExtendedReportRunLengthChunk()', () => {
 		expect(createExtendedReportRunLengthChunk('zeros', 0b10101010101010)).toBe(
-			runLengthZerosChunk,
+			runLengthZerosChunk
 		);
 
 		expect(createExtendedReportRunLengthChunk('ones', 0b10101010101010)).toBe(
-			runLengthOnesChunk,
+			runLengthOnesChunk
 		);
 	});
 
 	test('createExtendedReportBitVectorChunk()', () => {
 		expect(createExtendedReportBitVectorChunk(0b110101010101010)).toBe(
-			bitVectorChunk,
+			bitVectorChunk
 		);
 	});
 });

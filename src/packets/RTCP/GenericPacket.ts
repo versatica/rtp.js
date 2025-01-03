@@ -64,7 +64,7 @@ export class GenericPacket extends RtcpPacket {
 			this.#bodyView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + COMMON_HEADER_LENGTH,
-				0,
+				0
 			);
 
 			return;
@@ -82,7 +82,7 @@ export class GenericPacket extends RtcpPacket {
 		this.#bodyView = new DataView(
 			this.view.buffer,
 			this.view.byteOffset + pos,
-			bodyLength,
+			bodyLength
 		);
 
 		pos += bodyLength + this.padding;
@@ -90,7 +90,7 @@ export class GenericPacket extends RtcpPacket {
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -127,7 +127,7 @@ export class GenericPacket extends RtcpPacket {
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -141,16 +141,16 @@ export class GenericPacket extends RtcpPacket {
 			new Uint8Array(
 				this.#bodyView.buffer,
 				this.#bodyView.byteOffset,
-				this.#bodyView.byteLength,
+				this.#bodyView.byteLength
 			),
-			pos,
+			pos
 		);
 
 		// Create new body DataView.
 		const bodyView = new DataView(
 			view.buffer,
 			view.byteOffset + pos,
-			this.#bodyView.byteLength,
+			this.#bodyView.byteLength
 		);
 
 		pos += bodyView.byteLength;
@@ -160,7 +160,7 @@ export class GenericPacket extends RtcpPacket {
 		// Assert that current position is equal than new buffer length.
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -180,13 +180,13 @@ export class GenericPacket extends RtcpPacket {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): GenericPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new GenericPacket(view);

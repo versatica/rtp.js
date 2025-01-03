@@ -20,9 +20,6 @@ const SDES_CHUNK_MIN_LENGTH = 8;
  *
  * @category RTCP
  */
-// ESLint absurdly complains about "'SdesItemType' is already declared in the
-// upper scope".
-// eslint-disable-next-line no-shadow
 export enum SdesItemType {
 	/**
 	 * Canonical End-Point Identifier SDES Item.
@@ -181,7 +178,7 @@ export class SdesPacket extends RtcpPacket {
 			const chunkView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + chunkPos,
-				chunkLength,
+				chunkLength
 			);
 
 			const chunk = new SdesChunk(chunkView);
@@ -193,7 +190,7 @@ export class SdesPacket extends RtcpPacket {
 			throw new RangeError(
 				`num of parsed SDES Chunks (${
 					this.#chunks.length
-				}) doesn't match RTCP count field ({${this.getCount()}})`,
+				}) doesn't match RTCP count field ({${this.getCount()}})`
 			);
 		}
 
@@ -202,7 +199,7 @@ export class SdesPacket extends RtcpPacket {
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -267,7 +264,7 @@ export class SdesPacket extends RtcpPacket {
 		// Assert that current position is equal than new buffer length.
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -284,13 +281,13 @@ export class SdesPacket extends RtcpPacket {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): SdesPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new SdesPacket(view);
@@ -360,7 +357,7 @@ export class SdesChunk extends Serializable {
 			throw new TypeError('wrong byte length for a SDES Chunk');
 		} else if (this.view.byteLength % 4 !== 0) {
 			throw new RangeError(
-				`SDES Chunk length must be multiple of 4 bytes but it is ${this.view.byteLength} bytes`,
+				`SDES Chunk length must be multiple of 4 bytes but it is ${this.view.byteLength} bytes`
 			);
 		}
 
@@ -390,7 +387,7 @@ export class SdesChunk extends Serializable {
 			const itemView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				itemLength,
+				itemLength
 			);
 
 			pos += itemLength;
@@ -404,7 +401,7 @@ export class SdesChunk extends Serializable {
 
 		if (numNullOctets < 1 || numNullOctets > 4) {
 			throw new RangeError(
-				`SDES Chunk has wrong number of null octests at the end (${numNullOctets} null octets)`,
+				`SDES Chunk has wrong number of null octests at the end (${numNullOctets} null octets)`
 			);
 		}
 	}
@@ -456,12 +453,12 @@ export class SdesChunk extends Serializable {
 		const view = new DataView(
 			bufferData.buffer,
 			bufferData.byteOffset,
-			bufferData.byteLength,
+			bufferData.byteLength
 		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		let pos = 0;
@@ -501,13 +498,13 @@ export class SdesChunk extends Serializable {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): SdesChunk {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new SdesChunk(view);

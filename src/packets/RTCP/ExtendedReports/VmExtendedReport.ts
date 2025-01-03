@@ -90,7 +90,7 @@ export class VmExtendedReport extends ExtendedReport {
 
 		if (this.view.byteLength !== VM_EXTENDED_REPORT_LENGTH) {
 			throw new TypeError(
-				'wrong byte length for a VoIP Metrics Extended Report',
+				'wrong byte length for a VoIP Metrics Extended Report'
 			);
 		}
 	}
@@ -142,7 +142,7 @@ export class VmExtendedReport extends ExtendedReport {
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -156,9 +156,9 @@ export class VmExtendedReport extends ExtendedReport {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				VM_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH,
+				VM_EXTENDED_REPORT_LENGTH - COMMON_HEADER_LENGTH
 			),
-			pos,
+			pos
 		);
 
 		// Move to the end.
@@ -166,7 +166,7 @@ export class VmExtendedReport extends ExtendedReport {
 
 		if (pos !== view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -183,13 +183,13 @@ export class VmExtendedReport extends ExtendedReport {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): VmExtendedReport {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		return new VmExtendedReport(view);

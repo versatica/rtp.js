@@ -132,7 +132,7 @@ export class RtpPacket extends Packet {
 			this.#payloadView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + FIXED_HEADER_LENGTH,
-				0,
+				0
 			);
 
 			return;
@@ -176,7 +176,7 @@ export class RtpPacket extends Packet {
 			headerExtensionView = new DataView(
 				this.view.buffer,
 				this.view.byteOffset + pos,
-				headerExtensionLength,
+				headerExtensionLength
 			);
 
 			pos += headerExtensionLength;
@@ -210,7 +210,7 @@ export class RtpPacket extends Packet {
 				if (extId !== 0) {
 					if (extPos + 1 + extLength > headerExtensionView.byteLength) {
 						throw new RangeError(
-							'not enough space for the announced One-Byte extension value',
+							'not enough space for the announced One-Byte extension value'
 						);
 					}
 
@@ -220,8 +220,8 @@ export class RtpPacket extends Packet {
 						new DataView(
 							headerExtensionView.buffer,
 							headerExtensionView.byteOffset + extPos + 1,
-							extLength,
-						),
+							extLength
+						)
 					);
 
 					extPos += 1 + extLength;
@@ -251,7 +251,7 @@ export class RtpPacket extends Packet {
 				if (extId !== 0) {
 					if (extPos + 2 + extLength > headerExtensionView.byteLength) {
 						throw new RangeError(
-							'not enough space for the announced Two-Bytes extension value',
+							'not enough space for the announced Two-Bytes extension value'
 						);
 					}
 
@@ -261,8 +261,8 @@ export class RtpPacket extends Packet {
 						new DataView(
 							headerExtensionView.buffer,
 							headerExtensionView.byteOffset + extPos + 2,
-							extLength,
-						),
+							extLength
+						)
 					);
 
 					extPos += 2 + extLength;
@@ -303,14 +303,14 @@ export class RtpPacket extends Packet {
 					this.padding
 				} bytes) is bigger than available space for payload (${
 					this.view.byteLength - pos
-				} bytes)`,
+				} bytes)`
 			);
 		}
 
 		this.#payloadView = new DataView(
 			this.view.buffer,
 			this.view.byteOffset + pos,
-			payloadLength,
+			payloadLength
 		);
 
 		pos += payloadLength + this.padding;
@@ -318,7 +318,7 @@ export class RtpPacket extends Packet {
 		// Ensure that view length and parsed length match.
 		if (pos !== this.view.byteLength) {
 			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`,
+				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
 			);
 		}
 	}
@@ -426,12 +426,12 @@ export class RtpPacket extends Packet {
 		const view = new DataView(
 			bufferData.buffer,
 			bufferData.byteOffset,
-			bufferData.byteLength,
+			bufferData.byteLength
 		);
 		const uint8Array = new Uint8Array(
 			view.buffer,
 			view.byteOffset,
-			view.byteLength,
+			view.byteLength
 		);
 
 		// Position relative to the DataView byte offset.
@@ -442,9 +442,9 @@ export class RtpPacket extends Packet {
 			new Uint8Array(
 				this.view.buffer,
 				this.view.byteOffset,
-				FIXED_HEADER_LENGTH,
+				FIXED_HEADER_LENGTH
 			),
-			pos,
+			pos
 		);
 
 		// Move to CSRCs.
@@ -487,11 +487,11 @@ export class RtpPacket extends Packet {
 
 					if (extView.byteLength === 0) {
 						throw new TypeError(
-							'cannot serialize extensions with length 0 in One-Byte mode',
+							'cannot serialize extensions with length 0 in One-Byte mode'
 						);
 					} else if (extView.byteLength > 16) {
 						throw new RangeError(
-							'cannot serialize extensions with length > 16 in One-Byte mode',
+							'cannot serialize extensions with length > 16 in One-Byte mode'
 						);
 					}
 
@@ -515,9 +515,9 @@ export class RtpPacket extends Packet {
 						new Uint8Array(
 							extView.buffer,
 							extView.byteOffset,
-							extView.byteLength,
+							extView.byteLength
 						),
-						pos,
+						pos
 					);
 
 					pos += extView.byteLength;
@@ -540,7 +540,7 @@ export class RtpPacket extends Packet {
 
 					if (extView.byteLength > 255) {
 						throw new RangeError(
-							'cannot serialize extensions with length > 255 in Two-Bytes mode',
+							'cannot serialize extensions with length > 255 in Two-Bytes mode'
 						);
 					}
 
@@ -558,9 +558,9 @@ export class RtpPacket extends Packet {
 						new Uint8Array(
 							extView.buffer,
 							extView.byteOffset,
-							extView.byteLength,
+							extView.byteLength
 						),
-						pos,
+						pos
 					);
 
 					pos += extView.byteLength;
@@ -584,9 +584,9 @@ export class RtpPacket extends Packet {
 					new Uint8Array(
 						this.#headerExtensionView.buffer,
 						this.#headerExtensionView.byteOffset,
-						this.#headerExtensionView.byteLength,
+						this.#headerExtensionView.byteLength
 					),
-					pos,
+					pos
 				);
 
 				pos += this.#headerExtensionView.byteLength;
@@ -601,16 +601,16 @@ export class RtpPacket extends Packet {
 			new Uint8Array(
 				this.#payloadView.buffer,
 				this.#payloadView.byteOffset,
-				this.#payloadView.byteLength,
+				this.#payloadView.byteLength
 			),
-			pos,
+			pos
 		);
 
 		// Create new payload DataView.
 		const payloadView = new DataView(
 			view.buffer,
 			view.byteOffset + pos,
-			this.#payloadView.byteLength,
+			this.#payloadView.byteLength
 		);
 
 		pos += payloadView.byteLength;
@@ -619,7 +619,7 @@ export class RtpPacket extends Packet {
 		if (this.padding > 0) {
 			if (this.padding > 255) {
 				throw new TypeError(
-					`padding (${this.padding} bytes) cannot be higher than 255`,
+					`padding (${this.padding} bytes) cannot be higher than 255`
 				);
 			}
 
@@ -634,7 +634,7 @@ export class RtpPacket extends Packet {
 		// during the process.
 		if (pos > view.byteLength) {
 			throw new RangeError(
-				`filled length (${pos} bytes) is bigger than the available buffer size (${view.byteLength} bytes)`,
+				`filled length (${pos} bytes) is bigger than the available buffer size (${view.byteLength} bytes)`
 			);
 		}
 
@@ -654,13 +654,13 @@ export class RtpPacket extends Packet {
 		buffer?: ArrayBuffer,
 		byteOffset?: number,
 		serializationBuffer?: ArrayBuffer,
-		serializationByteOffset?: number,
+		serializationByteOffset?: number
 	): RtpPacket {
 		const view = this.cloneInternal(
 			buffer,
 			byteOffset,
 			serializationBuffer,
-			serializationByteOffset,
+			serializationByteOffset
 		);
 
 		const clonedPacket = new RtpPacket(view);
@@ -917,7 +917,7 @@ export class RtpPacket extends Packet {
 	 */
 	getMidExtension(): string | undefined {
 		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.MID]!,
+			this.#extensionMapping[RtpExtensionType.MID]!
 		);
 
 		if (!view) {
@@ -950,7 +950,7 @@ export class RtpPacket extends Packet {
 	 */
 	getRidExtension(): string | undefined {
 		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.RTP_STREAM_ID]!,
+			this.#extensionMapping[RtpExtensionType.RTP_STREAM_ID]!
 		);
 
 		if (!view) {
@@ -984,7 +984,7 @@ export class RtpPacket extends Packet {
 	 */
 	getRepairedRidExtension(): string | undefined {
 		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.RTP_REPAIRED_STREAM_ID]!,
+			this.#extensionMapping[RtpExtensionType.RTP_REPAIRED_STREAM_ID]!
 		);
 
 		if (!view) {
@@ -1023,7 +1023,7 @@ export class RtpPacket extends Packet {
 	 */
 	getAbsSendTimeExtension(): number | undefined {
 		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.ABS_SEND_TIME]!,
+			this.#extensionMapping[RtpExtensionType.ABS_SEND_TIME]!
 		);
 
 		if (!view) {
@@ -1065,7 +1065,7 @@ export class RtpPacket extends Packet {
 	 */
 	getTransportWideSeqNumberExtension(): number | undefined {
 		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER]!,
+			this.#extensionMapping[RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER]!
 		);
 
 		if (!view) {
@@ -1100,7 +1100,7 @@ export class RtpPacket extends Packet {
 	 */
 	getSsrcAudioLevelExtension(): SsrcAudioLevelExtension | undefined {
 		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.SSRC_AUDIO_LEVEL]!,
+			this.#extensionMapping[RtpExtensionType.SSRC_AUDIO_LEVEL]!
 		);
 
 		if (!view) {
@@ -1147,7 +1147,7 @@ export class RtpPacket extends Packet {
 	 */
 	getVideoOrientationExtension(): VideoOrientationExtension | undefined {
 		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.VIDEO_ORIENTATION]!,
+			this.#extensionMapping[RtpExtensionType.VIDEO_ORIENTATION]!
 		);
 
 		if (!view) {
@@ -1166,7 +1166,7 @@ export class RtpPacket extends Packet {
 	 * extension.
 	 */
 	setVideoOrientationExtension(
-		videoOrientation?: VideoOrientationExtension,
+		videoOrientation?: VideoOrientationExtension
 	): void {
 		const extId = this.#extensionMapping[RtpExtensionType.VIDEO_ORIENTATION];
 
@@ -1202,7 +1202,7 @@ export class RtpPacket extends Packet {
 	 */
 	getTransmissionOffsetExtension(): number | undefined {
 		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.TOFFSET]!,
+			this.#extensionMapping[RtpExtensionType.TOFFSET]!
 		);
 
 		if (!view) {
@@ -1270,12 +1270,12 @@ export class RtpPacket extends Packet {
 		this.setSsrc(ssrc);
 
 		const payloadView = new DataView(
-			new ArrayBuffer(2 + this.#payloadView.byteLength),
+			new ArrayBuffer(2 + this.#payloadView.byteLength)
 		);
 		const payloadUint8Array = new Uint8Array(
 			payloadView.buffer,
 			payloadView.byteOffset,
-			payloadView.byteLength,
+			payloadView.byteLength
 		);
 
 		// Write the original sequence number at the begining of the new payload.
@@ -1286,9 +1286,9 @@ export class RtpPacket extends Packet {
 			new Uint8Array(
 				this.#payloadView.buffer,
 				this.#payloadView.byteOffset,
-				this.#payloadView.byteLength,
+				this.#payloadView.byteLength
 			),
-			2,
+			2
 		);
 
 		this.#payloadView = payloadView;
@@ -1317,7 +1317,7 @@ export class RtpPacket extends Packet {
 	rtxDecode(payloadType: number, ssrc: number) {
 		if (this.#payloadView.byteLength < 2) {
 			throw new RangeError(
-				'payload length must be greater or equal than 2 bytes',
+				'payload length must be greater or equal than 2 bytes'
 			);
 		}
 
@@ -1334,7 +1334,7 @@ export class RtpPacket extends Packet {
 
 		// Reduce the payload.
 		this.setPayload(
-			new DataView(this.#payloadView.buffer, this.#payloadView.byteOffset + 2),
+			new DataView(this.#payloadView.buffer, this.#payloadView.byteOffset + 2)
 		);
 
 		// Remove padding.

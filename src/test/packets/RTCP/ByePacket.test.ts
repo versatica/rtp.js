@@ -165,7 +165,7 @@ describe('parse RTCP BYE packet with padding', () => {
 	const view2 = new DataView(
 		array2.buffer,
 		array2.byteOffset,
-		array2.byteLength,
+		array2.byteLength
 	);
 
 	const packet = new ByePacket(view2);
@@ -225,7 +225,7 @@ describe('parse RTCP BYE packet without reason', () => {
 	const view3 = new DataView(
 		array3.buffer,
 		array3.byteOffset,
-		array3.byteLength,
+		array3.byteLength
 	);
 
 	const packet = new ByePacket(view3);
@@ -259,6 +259,6 @@ describe('parse invalid RTCP BYE packet', () => {
 		// SSRC at all.
 		const view4 = new DataView(array.buffer, array.byteOffset, 8);
 
-		expect(() => new ByePacket(view4)).toThrowError(RangeError);
+		expect(() => new ByePacket(view4)).toThrow(RangeError);
 	});
 });

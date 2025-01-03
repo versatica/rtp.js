@@ -76,7 +76,7 @@ describe('parse RTCP RPSI packet', () => {
 		expect(clonedPacket.dump()).toEqual(rpsiPacketDump);
 		expect(areDataViewsEqual(clonedPacket.getView(), view)).toBe(true);
 		expect(areDataViewsEqual(clonedPacket.getBitString(), bitStringView)).toBe(
-			true,
+			true
 		);
 	});
 });
@@ -105,7 +105,7 @@ describe('create RTCP RPSI packet', () => {
 		// Fill optional fields so serialization should be needed.
 		packet.setPayloadType(rpsiPacketDump.payloadType);
 		packet.setBitString(
-			numericArrayToDataView([0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88]),
+			numericArrayToDataView([0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88])
 		);
 
 		expect(packet.needsSerialization()).toBe(true);
@@ -126,7 +126,7 @@ describe('create RTCP RPSI packet', () => {
 		expect(clonedPacket.dump()).toEqual(rpsiPacketDump);
 		expect(areDataViewsEqual(clonedPacket.getView(), view)).toBe(true);
 		expect(areDataViewsEqual(clonedPacket.getBitString(), bitStringView)).toBe(
-			true,
+			true
 		);
 	});
 });
