@@ -98,15 +98,26 @@ describe('parse Foo 1', () => {
 		expect(areDataViewsEqual(foo.getView(), clonedView)).toBe(true);
 	});
 
-	test('serialize() fails if current buffer is given and it collides', () => {
-		foo.serialize(view.buffer, /* byteOffset */ 9);
+	test('serialize() succeeds if current buffer is given with a byteOffset that avoids collision', () => {
+		expect(() => foo.serialize(view.buffer, /* byteOffset */ 10)).not.toThrow();
 
 		expect(foo.getByteLength()).toBe(10);
 		expect(foo.needsSerialization()).toBe(false);
 		// This is true because obviously both are the same DataView instance,
 		// however it's been overwritten.
 		expect(areDataViewsEqual(foo.getView(), view)).toBe(true);
-		expect(areDataViewsEqual(foo.getView(), clonedView)).toBe(false);
+		expect(areDataViewsEqual(foo.getView(), clonedView)).toBe(true);
+	});
+
+	test('serialize() fails if current buffer is given with same byteOffset', () => {
+		expect(() => foo.serialize(view.buffer, /* byteOffset */ 0)).toThrow(Error);
+
+		expect(foo.getByteLength()).toBe(10);
+		expect(foo.needsSerialization()).toBe(false);
+		// This is true because obviously both are the same DataView instance,
+		// however it's been overwritten.
+		expect(areDataViewsEqual(foo.getView(), view)).toBe(true);
+		expect(areDataViewsEqual(foo.getView(), clonedView)).toBe(true);
 	});
 
 	test('clone() succeeds', () => {

@@ -685,6 +685,23 @@ describe('serialize packet into a given buffer', () => {
 
 		expect(() => packet.serialize(buffer, byteOffset)).toThrow(RangeError);
 	});
+
+	test('serialization corrupts the packet if current buffer is given with a byteOffset that makes the serialization overlap the packet content', () => {
+		packet.setSequenceNumber(55555);
+		expect(packet.needsSerialization()).toBe(false);
+		expect(packet.getSequenceNumber()).toBe(55555);
+
+		const buffer = new ArrayBuffer(1500);
+
+		packet.serialize(buffer, 0);
+		expect(packet.getSequenceNumber()).toBe(55555);
+
+		// Here we are serializing the packet in its own buffer with an offset of 2,
+		// so we are effectively overriding its current content, including the bytes
+		// where the sequence number value is stored.
+		packet.serialize(buffer, 2);
+		expect(packet.getSequenceNumber()).not.toBe(55555);
+	});
 });
 
 describe('clone packet into a given buffer', () => {
