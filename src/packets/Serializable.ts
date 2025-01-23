@@ -99,6 +99,11 @@ export abstract class Serializable {
 	 * @throws
 	 * - If serialization fails due to invalid content previously added.
 	 * - If given `buffer` doesn't have space enough to serialize the content.
+	 * - If the `buffer` member of the given `ArrayBuffer` and the given
+	 *   `byteOffset` match the `buffer` member and the `byteOffset` of the current
+	 *   view. The same buffer can be given but, if so, care must be taken with
+	 *   the valud of `byteOffset` to avoid data corruption if the serializetion
+	 *   happens in the same bytes where the packet data is currently placed.
 	 */
 	abstract serialize(buffer?: ArrayBuffer, byteOffset?: number): void;
 
@@ -150,9 +155,13 @@ export abstract class Serializable {
 		buffer: ArrayBuffer;
 		byteOffset: number;
 		byteLength: number;
-		// NOTE: ESlint absurdly complaining about "Expected indentation of 2 tabs but
-		// found 1".
 	} {
+		if (buffer === this.view.buffer && byteOffset === this.view.byteOffset) {
+			throw new Error(
+				'given buffer cannot be the the same as the internal buffer of the packet'
+			);
+		}
+
 		byteOffset ??= 0;
 
 		const byteLength = this.getByteLength();
