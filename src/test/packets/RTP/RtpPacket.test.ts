@@ -686,7 +686,7 @@ describe('serialize packet into a given buffer', () => {
 		expect(() => packet.serialize(buffer, byteOffset)).toThrow(RangeError);
 	});
 
-	test('serialization corrupts the packet if current buffer is given with a byteOffset that makes the serialization overlap the packet content', () => {
+	test('serialization fails if given buffer is the same as the internal one in the packet and given byteOffset would make serialization overlap the current packet content', () => {
 		packet.setSequenceNumber(55555);
 		expect(packet.needsSerialization()).toBe(false);
 		expect(packet.getSequenceNumber()).toBe(55555);
@@ -697,10 +697,8 @@ describe('serialize packet into a given buffer', () => {
 		expect(packet.getSequenceNumber()).toBe(55555);
 
 		// Here we are serializing the packet in its own buffer with an offset of 2,
-		// so we are effectively overriding its current content, including the bytes
-		// where the sequence number value is stored.
-		packet.serialize(buffer, 2);
-		expect(packet.getSequenceNumber()).not.toBe(55555);
+		// so we are effectively overriding its current content.
+		expect(() => packet.serialize(buffer, 2)).toThrow(RangeError);
 	});
 });
 

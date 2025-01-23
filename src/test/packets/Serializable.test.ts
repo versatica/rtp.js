@@ -145,18 +145,14 @@ describe('parse Foo 1', () => {
 
 		const buffer = new ArrayBuffer(10);
 		const byteOffset = 0;
-		const clonedFoo = foo.clone(
-			buffer,
-			byteOffset,
-			/* serializationBuffer */ view.buffer,
-			/* byteOffset */ 9
-		);
 
-		expect(clonedFoo.getByteLength()).toBe(10);
-		expect(clonedFoo.needsSerialization()).toBe(false);
-		// This is true because obviously both are the same DataView instance,
-		// however it's been overwritten.
-		expect(areDataViewsEqual(clonedFoo.getView(), view)).toBe(true);
-		expect(areDataViewsEqual(clonedFoo.getView(), clonedView)).toBe(false);
+		expect(() =>
+			foo.clone(
+				buffer,
+				byteOffset,
+				/* serializationBuffer */ view.buffer,
+				/* byteOffset */ 9
+			)
+		).toThrow(RangeError);
 	});
 });
