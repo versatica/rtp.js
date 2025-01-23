@@ -99,11 +99,10 @@ export abstract class Serializable {
 	 * @throws
 	 * - If serialization fails due to invalid content previously added.
 	 * - If given `buffer` doesn't have space enough to serialize the content.
-	 * - If the `buffer` member of the given `ArrayBuffer` and the given
-	 *   `byteOffset` match the `buffer` member and the `byteOffset` of the current
-	 *   view. The same buffer can be given but, if so, care must be taken with
-	 *   the valud of `byteOffset` to avoid data corruption if the serializetion
-	 *   happens in the same bytes where the packet data is currently placed.
+	 * - If the `buffer` member of the given `ArrayBuffer` is the same than the
+	 *   internal buffer in this packet and the given `byteOffset` would make
+	 *   the serialization happen in bytes currently used by the packet (this would
+	 *   corrupt the packet).
 	 */
 	abstract serialize(buffer?: ArrayBuffer, byteOffset?: number): void;
 
@@ -156,12 +155,6 @@ export abstract class Serializable {
 		byteOffset: number;
 		byteLength: number;
 	} {
-		if (buffer === this.view.buffer && byteOffset === this.view.byteOffset) {
-			throw new Error(
-				'given buffer cannot be the the same as the internal buffer of the packet'
-			);
-		}
-
 		const byteLength = this.getByteLength();
 
 		if (buffer) {
@@ -170,6 +163,25 @@ export abstract class Serializable {
 					`given buffer available space (${
 						buffer.byteLength - byteOffset
 					} bytes) is less than length required for serialization (${byteLength} bytes)`
+				);
+			}
+
+			// If the given buffer is the same as the one internally used by the view
+			// of this packet, we must assert that the new serialization would not
+			// happen in bytes where the packet currently exists.
+			// Here we must take into account the given byte offset and the byte
+			// offset of the view, the current packet length and the expected packet
+			// length after the serialization.
+			if (
+				buffer === this.view.buffer &&
+				((byteOffset >= this.view.byteOffset &&
+					byteOffset <= this.view.byteOffset + this.view.byteLength - 1) ||
+					(byteOffset + byteLength - 1 >= this.view.byteOffset &&
+						byteOffset + byteLength <=
+							this.view.byteOffset + this.view.byteLength - 1))
+			) {
+				throw new RangeError(
+					'given buffer is the same as the internal buffer of the packet and given byteLength would make serialization override existing packet data'
 				);
 			}
 
