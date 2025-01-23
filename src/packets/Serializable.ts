@@ -149,8 +149,8 @@ export abstract class Serializable {
 	 * whether the serialized content can fit into it and will throw otherwise.
 	 */
 	protected getSerializationBuffer(
-		buffer?: ArrayBuffer,
-		byteOffset?: number
+		buffer: ArrayBuffer | undefined,
+		byteOffset: number = 0
 	): {
 		buffer: ArrayBuffer;
 		byteOffset: number;
@@ -161,8 +161,6 @@ export abstract class Serializable {
 				'given buffer cannot be the the same as the internal buffer of the packet'
 			);
 		}
-
-		byteOffset ??= 0;
 
 		const byteLength = this.getByteLength();
 
@@ -188,8 +186,8 @@ export abstract class Serializable {
 	}
 
 	protected cloneInternal(
-		buffer?: ArrayBuffer,
-		byteOffset?: number,
+		buffer: ArrayBuffer | undefined,
+		byteOffset: number = 0,
 		serializationBuffer?: ArrayBuffer,
 		serializationByteOffset?: number
 	): DataView {
@@ -202,8 +200,6 @@ export abstract class Serializable {
 		// If buffer is given, let's check whether it holds enough space for the
 		// content.
 		if (buffer) {
-			byteOffset ??= 0;
-
 			if (buffer.byteLength - byteOffset < this.view.byteLength) {
 				throw new RangeError(
 					`given buffer available space (${
