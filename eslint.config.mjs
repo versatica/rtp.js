@@ -107,19 +107,19 @@ const config = tsEslint.config(
 			yoda: 2,
 		},
 	},
-	// NOTE: We need to apply this only to .ts files (and not to .mjs files).
+	// NOTE: We need to apply this only to .mts files (and not to .mjs files).
 	...tsEslint.configs.recommendedTypeChecked.map(item => ({
 		...item,
-		files: ['src/**/*.ts'],
+		files: ['src/**/*.mts'],
 	})),
-	// NOTE: We need to apply this only to .ts files (and not to .mjs files).
+	// NOTE: We need to apply this only to .mts files (and not to .mjs files).
 	...tsEslint.configs.stylisticTypeChecked.map(item => ({
 		...item,
-		files: ['src/**/*.ts'],
+		files: ['src/**/*.mts'],
 	})),
 	{
-		name: 'mediasoup-client .ts files',
-		files: ['src/**/*.ts'],
+		name: 'mediasoup-client .mts files',
+		files: ['src/**/*.mts'],
 		languageOptions: {
 			parserOptions: {
 				projectService: true,
@@ -163,9 +163,9 @@ const config = tsEslint.config(
 		},
 	},
 	{
-		name: 'mediasoup-client .ts test files',
+		name: 'mediasoup-client .mts test files',
 		...jestEslint.configs['flat/recommended'],
-		files: ['src/test/**/*.ts'],
+		files: ['src/test/**/*.mts'],
 		rules: {
 			...jestEslint.configs['flat/recommended'].rules,
 			'jest/no-disabled-tests': 2,

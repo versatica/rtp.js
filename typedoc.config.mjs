@@ -1,6 +1,6 @@
 /** @type {Partial<import('typedoc').TypeDocOptions>} */
 const config = {
-	entryPoints: ['src/packets/public.ts', 'src/utils/public.ts'],
+	entryPoints: ['src/packets/public.mts', 'src/utils/public.mts'],
 	out: 'docs',
 	skipErrorChecking: false,
 	excludePrivate: true,
