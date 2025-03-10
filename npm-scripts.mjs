@@ -8,6 +8,7 @@ const RELEASE_BRANCH = 'master';
 // Paths for ESLint to check. Converted to string for convenience.
 const ESLINT_PATHS = [
 	'eslint.config.mjs',
+	'rollup.config.mjs',
 	'typedoc.config.mjs',
 	'src',
 	'npm-scripts.mjs',
@@ -21,6 +22,7 @@ const PRETTIER_PATHS = [
 	'README.md',
 	'babel.config.cjs',
 	'eslint.config.mjs',
+	'rollup.config.mjs',
 	'typedoc.config.mjs',
 	'src',
 	'npm-scripts.mjs',
@@ -62,7 +64,7 @@ async function run() {
 
 		case 'typescript:watch': {
 			deleteLib();
-			executeCmd(`tsc --watch ${args}`);
+			executeCmd('rollup --config --watch');
 
 			break;
 		}
@@ -160,7 +162,8 @@ function buildTypescript({ force = false } = { force: false }) {
 	logInfo('buildTypescript()');
 
 	deleteLib();
-	executeCmd('tsc');
+	executeCmd('tsc --noEmit');
+	executeCmd('rollup --config');
 }
 
 function lint() {
