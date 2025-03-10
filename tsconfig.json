@@ -2,7 +2,7 @@
 	"compileOnSave": true,
 	"compilerOptions": {
 		"lib": ["es2022"],
-		"target": "ESNext",
+		"target": "es2024",
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
 		"allowImportingTsExtensions": true,

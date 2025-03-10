@@ -118,7 +118,7 @@ const config = tsEslint.config(
 		files: ['src/**/*.mts'],
 	})),
 	{
-		name: 'mediasoup-client .mts files',
+		name: '.mts files',
 		files: ['src/**/*.mts'],
 		languageOptions: {
 			parserOptions: {
@@ -163,7 +163,7 @@ const config = tsEslint.config(
 		},
 	},
 	{
-		name: 'mediasoup-client .mts test files',
+		name: '.mts test files',
 		...jestEslint.configs['flat/recommended'],
 		files: ['src/test/**/*.mts'],
 		rules: {

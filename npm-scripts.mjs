@@ -19,6 +19,7 @@ const ESLINT_IGNORE_PATTERN_ARGS = []
 // Paths for Prettier to check/write. Converted to string for convenience.
 const PRETTIER_PATHS = [
 	'README.md',
+	'babel.config.cjs',
 	'eslint.config.mjs',
 	'typedoc.config.mjs',
 	'src',
