@@ -1,13 +1,10 @@
-import {
-	RpsiPacket,
-	RpsiPacketDump,
-} from '../../../packets/RTCP/RpsiPacket.ts';
-import { PsFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket.ts';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.ts';
+import { RpsiPacket, RpsiPacketDump } from '../../../packets/RTCP/RpsiPacket';
+import { PsFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket';
+import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
 import {
 	areDataViewsEqual,
 	numericArrayToDataView,
-} from '../../../utils/helpers.ts';
+} from '../../../utils/helpers';
 
 const rpsiPacketDump: RpsiPacketDump = {
 	byteLength: 24,

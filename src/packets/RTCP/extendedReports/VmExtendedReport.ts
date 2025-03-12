@@ -3,11 +3,8 @@ import {
 	ExtendedReportType,
 	ExtendedReportDump,
 	COMMON_HEADER_LENGTH,
-} from './ExtendedReport.ts';
-import {
-	readBitsInDataView,
-	writeBitsInDataView,
-} from '../../../utils/bitOps.ts';
+} from './ExtendedReport';
+import { readBitsInDataView, writeBitsInDataView } from '../../../utils/bitOps';
 
 const VM_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 32;
 

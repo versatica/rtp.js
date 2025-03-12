@@ -4,7 +4,7 @@ import {
 	dataViewToNodeBuffer,
 	nodeBufferToArrayBuffer,
 	arrayBufferToNodeBuffer,
-} from '../../utils/helpers.ts';
+} from '../../utils/helpers';
 
 test('nodeBufferToDataView() and dataViewToNodeBuffer()', () => {
 	const array = new Uint8Array([

@@ -4,22 +4,22 @@ import {
 	ExtendedReportDump,
 	getExtendedReportType,
 	getExtendedReportLength,
-} from './extendedReports/ExtendedReport.ts';
-import { LrleExtendedReport } from './extendedReports/LrleExtendedReport.ts';
-import { DrleExtendedReport } from './extendedReports/DrleExtendedReport.ts';
-import { PrtExtendedReport } from './extendedReports/PrtExtendedReport.ts';
-import { RrtExtendedReport } from './extendedReports/RrtExtendedReport.ts';
-import { DlrrExtendedReport } from './extendedReports/DlrrExtendedReport.ts';
-import { SsExtendedReport } from './extendedReports/SsExtendedReport.ts';
-import { VmExtendedReport } from './extendedReports/VmExtendedReport.ts';
-import { EcnExtendedReport } from './extendedReports/EcnExtendedReport.ts';
-import { GenericExtendedReport } from './extendedReports/GenericExtendedReport.ts';
+} from './extendedReports/ExtendedReport';
+import { LrleExtendedReport } from './extendedReports/LrleExtendedReport';
+import { DrleExtendedReport } from './extendedReports/DrleExtendedReport';
+import { PrtExtendedReport } from './extendedReports/PrtExtendedReport';
+import { RrtExtendedReport } from './extendedReports/RrtExtendedReport';
+import { DlrrExtendedReport } from './extendedReports/DlrrExtendedReport';
+import { SsExtendedReport } from './extendedReports/SsExtendedReport';
+import { VmExtendedReport } from './extendedReports/VmExtendedReport';
+import { EcnExtendedReport } from './extendedReports/EcnExtendedReport';
+import { GenericExtendedReport } from './extendedReports/GenericExtendedReport';
 import {
 	RtcpPacket,
 	RtcpPacketType,
 	RtcpPacketDump,
 	COMMON_HEADER_LENGTH,
-} from './RtcpPacket.ts';
+} from './RtcpPacket';
 
 // Common RTCP header length + 4 (SSRC of packet sender).
 const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 4;

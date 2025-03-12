@@ -4,7 +4,7 @@ import {
 	ExtendedReportDump,
 	getExtendedReportType,
 	COMMON_HEADER_LENGTH,
-} from './ExtendedReport.ts';
+} from './ExtendedReport';
 
 /**
  * Generic Extended Report dump.

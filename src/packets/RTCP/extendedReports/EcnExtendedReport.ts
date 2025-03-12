@@ -3,7 +3,7 @@ import {
 	ExtendedReportType,
 	ExtendedReportDump,
 	COMMON_HEADER_LENGTH,
-} from './ExtendedReport.ts';
+} from './ExtendedReport';
 
 const ECN_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 20;
 

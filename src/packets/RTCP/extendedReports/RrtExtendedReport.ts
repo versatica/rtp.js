@@ -3,7 +3,7 @@ import {
 	ExtendedReportType,
 	ExtendedReportDump,
 	COMMON_HEADER_LENGTH,
-} from './ExtendedReport.ts';
+} from './ExtendedReport';
 
 // Common header + NTP timestamp.
 const RRT_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 8;

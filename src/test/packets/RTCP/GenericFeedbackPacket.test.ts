@@ -1,13 +1,13 @@
 import {
 	GenericFeedbackPacket,
 	GenericFeedbackPacketDump,
-} from '../../../packets/RTCP/GenericFeedbackPacket.ts';
-import { PsFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket.ts';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.ts';
+} from '../../../packets/RTCP/GenericFeedbackPacket';
+import { PsFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket';
+import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
 import {
 	areDataViewsEqual,
 	numericArrayToDataView,
-} from '../../../utils/helpers.ts';
+} from '../../../utils/helpers';
 
 const genericFeedbackPacket: GenericFeedbackPacketDump = {
 	byteLength: 20,

@@ -1,27 +1,27 @@
-import { RTP_VERSION, Packet, PacketDump } from '../Packet.ts';
+import { RTP_VERSION, Packet, PacketDump } from '../Packet';
 import {
 	RtpExtensionType,
 	RtpExtensionMapping,
 	SsrcAudioLevelExtension,
 	VideoOrientationExtension,
-} from './rtpExtensions.ts';
+} from './rtpExtensions';
 import {
 	clone,
 	padTo4Bytes,
 	numberToDataView,
 	dataViewToString,
 	stringToDataView,
-} from '../../utils/helpers.ts';
+} from '../../utils/helpers';
 import {
 	readBitInDataView,
 	writeBitInDataView,
 	readBitsInDataView,
 	writeBitsInDataView,
-} from '../../utils/bitOps.ts';
+} from '../../utils/bitOps';
 import {
 	read3BytesInDataView,
 	write3BytesInDataView,
-} from '../../utils/byteOps.ts';
+} from '../../utils/byteOps';
 
 const FIXED_HEADER_LENGTH = 12;
 

@@ -1,4 +1,4 @@
-import { RtcpPacketType, getRtcpPacketType } from './RtcpPacket.ts';
+import { RtcpPacketType, getRtcpPacketType } from './RtcpPacket';
 import {
 	FeedbackPacket,
 	RtpFeedbackMessageType,
@@ -6,7 +6,7 @@ import {
 	FeedbackPacketDump,
 	getRtcpFeedbackMessageType,
 	FIXED_HEADER_LENGTH,
-} from './FeedbackPacket.ts';
+} from './FeedbackPacket';
 
 /**
  * RTCP generic Feedback packet info.

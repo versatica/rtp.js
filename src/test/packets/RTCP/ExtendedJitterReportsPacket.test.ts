@@ -1,9 +1,9 @@
 import {
 	ExtendedJitterReportsPacket,
 	ExtendedJitterReportsPacketDump,
-} from '../../../packets/RTCP/ExtendedJitterReportsPacket.ts';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.ts';
-import { areDataViewsEqual } from '../../../utils/helpers.ts';
+} from '../../../packets/RTCP/ExtendedJitterReportsPacket';
+import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
+import { areDataViewsEqual } from '../../../utils/helpers';
 
 const extendedJitterReportsPacketDump: ExtendedJitterReportsPacketDump = {
 	byteLength: 12,

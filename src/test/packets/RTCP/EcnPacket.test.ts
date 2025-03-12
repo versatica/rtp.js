@@ -1,7 +1,7 @@
-import { EcnPacket, EcnPacketDump } from '../../../packets/RTCP/EcnPacket.ts';
-import { RtpFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket.ts';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.ts';
-import { areDataViewsEqual } from '../../../utils/helpers.ts';
+import { EcnPacket, EcnPacketDump } from '../../../packets/RTCP/EcnPacket';
+import { RtpFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket';
+import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
+import { areDataViewsEqual } from '../../../utils/helpers';
 
 const ecnPacketDump: EcnPacketDump = {
 	byteLength: 32,

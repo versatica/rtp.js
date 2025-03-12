@@ -4,14 +4,14 @@ import {
 	isRtp,
 	RtpPacket,
 	RtpPacketDump,
-} from '../../../packets/RTP/RtpPacket.ts';
+} from '../../../packets/RTP/RtpPacket';
 import {
 	clone,
 	areDataViewsEqual,
 	nodeBufferToDataView,
 	numericArrayToDataView,
 	stringToDataView,
-} from '../../../utils/helpers.ts';
+} from '../../../utils/helpers';
 
 describe('parse RTP packet 1', () => {
 	const view = nodeBufferToDataView(

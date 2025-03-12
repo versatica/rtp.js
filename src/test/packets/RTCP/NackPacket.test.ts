@@ -3,10 +3,10 @@ import {
 	NackPacketDump,
 	parseNackItem,
 	createNackItem,
-} from '../../../packets/RTCP/NackPacket.ts';
-import { RtpFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket.ts';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.ts';
-import { areDataViewsEqual } from '../../../utils/helpers.ts';
+} from '../../../packets/RTCP/NackPacket';
+import { RtpFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket';
+import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
+import { areDataViewsEqual } from '../../../utils/helpers';
 
 const nackPacketDump: NackPacketDump = {
 	byteLength: 20,

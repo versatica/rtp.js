@@ -3,11 +3,8 @@ import {
 	ExtendedReportType,
 	ExtendedReportDump,
 	COMMON_HEADER_LENGTH,
-} from './ExtendedReport.ts';
-import {
-	readBitsInDataView,
-	writeBitsInDataView,
-} from '../../../utils/bitOps.ts';
+} from './ExtendedReport';
+import { readBitsInDataView, writeBitsInDataView } from '../../../utils/bitOps';
 
 // Common header + SSRC of source + begin seq + end seq.
 const PRT_EXTENDED_REPORT_MIN_LENGTH = COMMON_HEADER_LENGTH + 8;

@@ -3,7 +3,7 @@ import {
 	write3BytesInDataView,
 	readSigned3BytesInDataView,
 	writeSigned3BytesInDataView,
-} from '../../utils/byteOps.ts';
+} from '../../utils/byteOps';
 
 let view: DataView;
 

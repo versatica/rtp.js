@@ -1,7 +1,7 @@
-import { SliPacket, SliPacketDump } from '../../../packets/RTCP/SliPacket.ts';
-import { PsFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket.ts';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.ts';
-import { areDataViewsEqual } from '../../../utils/helpers.ts';
+import { SliPacket, SliPacketDump } from '../../../packets/RTCP/SliPacket';
+import { PsFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket';
+import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
+import { areDataViewsEqual } from '../../../utils/helpers';
 
 const sliPacketDump: SliPacketDump = {
 	byteLength: 20,

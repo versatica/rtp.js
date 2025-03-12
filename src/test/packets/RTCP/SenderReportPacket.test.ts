@@ -1,10 +1,10 @@
-import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket.ts';
+import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket';
 import {
 	ReceptionReport,
 	ReceptionReportDump,
-} from '../../../packets/RTCP/ReceiverReportPacket.ts';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.ts';
-import { areDataViewsEqual } from '../../../utils/helpers.ts';
+} from '../../../packets/RTCP/ReceiverReportPacket';
+import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
+import { areDataViewsEqual } from '../../../utils/helpers';
 
 const receptionReportDump1: ReceptionReportDump = {
 	byteLength: 24,

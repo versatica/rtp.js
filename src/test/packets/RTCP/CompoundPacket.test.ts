@@ -1,18 +1,18 @@
-import { CompoundPacket } from '../../../packets/RTCP/CompoundPacket.ts';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.ts';
-import { RtpFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket.ts';
-import { ReceiverReportPacket } from '../../../packets/RTCP/ReceiverReportPacket.ts';
-import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket.ts';
-import { ByePacket } from '../../../packets/RTCP/ByePacket.ts';
-import { SdesPacket } from '../../../packets/RTCP/SdesPacket.ts';
-import { NackPacket } from '../../../packets/RTCP/NackPacket.ts';
-import { PliPacket } from '../../../packets/RTCP/PliPacket.ts';
-import { XrPacket } from '../../../packets/RTCP/XrPacket.ts';
-import { GenericPacket } from '../../../packets/RTCP/GenericPacket.ts';
+import { CompoundPacket } from '../../../packets/RTCP/CompoundPacket';
+import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
+import { RtpFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket';
+import { ReceiverReportPacket } from '../../../packets/RTCP/ReceiverReportPacket';
+import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket';
+import { ByePacket } from '../../../packets/RTCP/ByePacket';
+import { SdesPacket } from '../../../packets/RTCP/SdesPacket';
+import { NackPacket } from '../../../packets/RTCP/NackPacket';
+import { PliPacket } from '../../../packets/RTCP/PliPacket';
+import { XrPacket } from '../../../packets/RTCP/XrPacket';
+import { GenericPacket } from '../../../packets/RTCP/GenericPacket';
 import {
 	areDataViewsEqual,
 	numericArrayToDataView,
-} from '../../../utils/helpers.ts';
+} from '../../../utils/helpers';
 
 describe('parse RTCP Compound packet', () => {
 	const array = new Uint8Array([

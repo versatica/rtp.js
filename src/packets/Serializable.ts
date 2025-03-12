@@ -1,4 +1,4 @@
-import { clone } from '../utils/helpers.ts';
+import { clone } from '../utils/helpers';
 
 /**
  * Serializable info dump.

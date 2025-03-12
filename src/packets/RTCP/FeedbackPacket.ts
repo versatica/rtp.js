@@ -4,9 +4,9 @@ import {
 	RtcpPacketDump,
 	packetTypeToString,
 	COMMON_HEADER_LENGTH,
-} from './RtcpPacket.ts';
-import { assertUnreachable } from '../../utils/helpers.ts';
-import { readBitsInDataView, writeBitsInDataView } from '../../utils/bitOps.ts';
+} from './RtcpPacket';
+import { assertUnreachable } from '../../utils/helpers';
+import { readBitsInDataView, writeBitsInDataView } from '../../utils/bitOps';
 
 // Common RTCP header length + 4 (SSRC of packet sender) + 4 (SSRC of media
 // source).

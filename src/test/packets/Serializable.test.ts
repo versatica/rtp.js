@@ -1,5 +1,5 @@
-import { Serializable } from '../../packets/Serializable.ts';
-import { clone, areDataViewsEqual } from '../../utils/helpers.ts';
+import { Serializable } from '../../packets/Serializable';
+import { clone, areDataViewsEqual } from '../../utils/helpers';
 
 class Foo extends Serializable {
 	constructor(view: DataView) {

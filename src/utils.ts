@@ -14,4 +14,4 @@ export {
 	arrayBufferToString,
 	stringToDataView,
 	getStringByteLength,
-} from './utils/helpers.ts';
+} from './utils/helpers';

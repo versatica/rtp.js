@@ -1,5 +1,5 @@
-import { Serializable, SerializableDump } from '../../Serializable.ts';
-import { assertUnreachable } from '../../../utils/helpers.ts';
+import { Serializable, SerializableDump } from '../../Serializable';
+import { assertUnreachable } from '../../../utils/helpers';
 
 export const COMMON_HEADER_LENGTH = 4;
 

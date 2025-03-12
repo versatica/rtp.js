@@ -3,14 +3,14 @@ import {
 	RtcpPacketType,
 	RtcpPacketDump,
 	COMMON_HEADER_LENGTH,
-} from './RtcpPacket.ts';
-import { Serializable, SerializableDump } from '../Serializable.ts';
+} from './RtcpPacket';
+import { Serializable, SerializableDump } from '../Serializable';
 import {
 	padTo4Bytes,
 	dataViewToString,
 	stringToUint8Array,
 	getStringByteLength,
-} from '../../utils/helpers.ts';
+} from '../../utils/helpers';
 
 // SSRC (4 bytes) + null type (1 byte) + padding (3 bytes).
 const SDES_CHUNK_MIN_LENGTH = 8;

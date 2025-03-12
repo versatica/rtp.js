@@ -1,10 +1,10 @@
-import { RtcpPacketType } from './RtcpPacket.ts';
+import { RtcpPacketType } from './RtcpPacket';
 import {
 	FeedbackPacket,
 	RtpFeedbackMessageType,
 	FeedbackPacketDump,
 	FIXED_HEADER_LENGTH,
-} from './FeedbackPacket.ts';
+} from './FeedbackPacket';
 
 const ECN_PACKET_LENGTH = FIXED_HEADER_LENGTH + 20;
 

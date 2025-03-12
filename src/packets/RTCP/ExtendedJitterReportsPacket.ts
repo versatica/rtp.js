@@ -3,7 +3,7 @@ import {
 	RtcpPacketType,
 	RtcpPacketDump,
 	COMMON_HEADER_LENGTH,
-} from './RtcpPacket.ts';
+} from './RtcpPacket';
 
 /**
  * RTCP Extended Jitter Reports packet info dump.

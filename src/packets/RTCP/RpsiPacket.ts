@@ -1,12 +1,12 @@
-import { RtcpPacketType } from './RtcpPacket.ts';
+import { RtcpPacketType } from './RtcpPacket';
 import {
 	FeedbackPacket,
 	PsFeedbackMessageType,
 	FeedbackPacketDump,
 	FIXED_HEADER_LENGTH,
-} from './FeedbackPacket.ts';
-import { padTo4Bytes } from '../../utils/helpers.ts';
-import { readBitsInDataView, writeBitsInDataView } from '../../utils/bitOps.ts';
+} from './FeedbackPacket';
+import { padTo4Bytes } from '../../utils/helpers';
+import { readBitsInDataView, writeBitsInDataView } from '../../utils/bitOps';
 
 const MAX_BIT_STRING_LENGTH = 6;
 

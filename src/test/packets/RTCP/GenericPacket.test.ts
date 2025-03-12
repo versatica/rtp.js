@@ -1,9 +1,9 @@
-import { GenericPacket } from '../../../packets/RTCP/GenericPacket.ts';
-import { isRtcp } from '../../../packets/RTCP/RtcpPacket.ts';
+import { GenericPacket } from '../../../packets/RTCP/GenericPacket';
+import { isRtcp } from '../../../packets/RTCP/RtcpPacket';
 import {
 	areDataViewsEqual,
 	numericArrayToDataView,
-} from '../../../utils/helpers.ts';
+} from '../../../utils/helpers';
 
 describe('parse RTCP generic packet', () => {
 	const array = new Uint8Array([

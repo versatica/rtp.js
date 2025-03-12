@@ -3,7 +3,7 @@ import {
 	writeBitInDataView,
 	readBitsInDataView,
 	writeBitsInDataView,
-} from '../../utils/bitOps.ts';
+} from '../../utils/bitOps';
 
 let view: DataView;
 

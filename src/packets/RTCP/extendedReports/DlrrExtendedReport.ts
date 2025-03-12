@@ -3,7 +3,7 @@ import {
 	ExtendedReportType,
 	ExtendedReportDump,
 	COMMON_HEADER_LENGTH,
-} from './ExtendedReport.ts';
+} from './ExtendedReport';
 
 /**
  * DLRR Extended Report dump.

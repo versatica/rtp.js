@@ -4,9 +4,9 @@ import {
 	SdesChunk,
 	SdesChunkDump,
 	SdesItemType,
-} from '../../../packets/RTCP/SdesPacket.ts';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.ts';
-import { areDataViewsEqual } from '../../../utils/helpers.ts';
+} from '../../../packets/RTCP/SdesPacket';
+import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
+import { areDataViewsEqual } from '../../../utils/helpers';
 
 const sdesPacketDump: SdesPacketDump = {
 	byteLength: 28,

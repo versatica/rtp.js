@@ -1,11 +1,11 @@
-import { RtcpPacketType } from './RtcpPacket.ts';
+import { RtcpPacketType } from './RtcpPacket';
 import {
 	FeedbackPacket,
 	RtpFeedbackMessageType,
 	FeedbackPacketDump,
 	FIXED_HEADER_LENGTH,
-} from './FeedbackPacket.ts';
-import { readBit, writeBit } from '../../utils/bitOps.ts';
+} from './FeedbackPacket';
+import { readBit, writeBit } from '../../utils/bitOps';
 
 /**
  * RTCP NACK packet info dump.

@@ -1,10 +1,10 @@
-import { Serializable, SerializableDump } from './Serializable.ts';
-import { padTo4Bytes } from '../utils/helpers.ts';
+import { Serializable, SerializableDump } from './Serializable';
+import { padTo4Bytes } from '../utils/helpers';
 import {
 	readBitInDataView,
 	writeBitInDataView,
 	writeBitsInDataView,
-} from '../utils/bitOps.ts';
+} from '../utils/bitOps';
 
 export const RTP_VERSION = 2;
 

@@ -3,12 +3,12 @@ import {
 	RtcpPacketType,
 	RtcpPacketDump,
 	COMMON_HEADER_LENGTH,
-} from './RtcpPacket.ts';
+} from './RtcpPacket';
 import {
 	ReceptionReport,
 	ReceptionReportDump,
 	RECEPTION_REPORT_LENGTH,
-} from './ReceiverReportPacket.ts';
+} from './ReceiverReportPacket';
 
 // Common RTCP header length + 24.
 const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 24;

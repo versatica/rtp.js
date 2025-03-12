@@ -3,12 +3,12 @@ import {
 	RtcpPacketType,
 	RtcpPacketDump,
 	COMMON_HEADER_LENGTH,
-} from './RtcpPacket.ts';
+} from './RtcpPacket';
 import {
 	dataViewToString,
 	stringToUint8Array,
 	getStringByteLength,
-} from '../../utils/helpers.ts';
+} from '../../utils/helpers';
 
 /**
  * RTCP BYE packet info dump.

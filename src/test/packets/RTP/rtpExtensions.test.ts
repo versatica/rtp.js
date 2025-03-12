@@ -1,9 +1,9 @@
-import { RtpPacket, RtpPacketDump } from '../../../packets/RTP/RtpPacket.ts';
+import { RtpPacket, RtpPacketDump } from '../../../packets/RTP/RtpPacket';
 import {
 	RtpExtensionType,
 	RtpExtensionMapping,
 	rtpExtensionUriToType,
-} from '../../../packets/RTP/rtpExtensions.ts';
+} from '../../../packets/RTP/rtpExtensions';
 
 const rtpPacketDump: Partial<RtpPacketDump> = {
 	midExt: 'œæ€å∫∂',

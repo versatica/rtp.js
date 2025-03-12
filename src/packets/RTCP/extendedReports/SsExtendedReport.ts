@@ -3,13 +3,13 @@ import {
 	ExtendedReportType,
 	ExtendedReportDump,
 	COMMON_HEADER_LENGTH,
-} from './ExtendedReport.ts';
+} from './ExtendedReport';
 import {
 	readBitInDataView,
 	writeBitInDataView,
 	readBitsInDataView,
 	writeBitsInDataView,
-} from '../../../utils/bitOps.ts';
+} from '../../../utils/bitOps';
 
 const SS_EXTENDED_REPORT_LENGTH = COMMON_HEADER_LENGTH + 36;
 

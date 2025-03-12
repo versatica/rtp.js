@@ -1,6 +1,6 @@
-import { RTP_VERSION, Packet, PacketDump } from '../Packet.ts';
-import { assertUnreachable } from '../../utils/helpers.ts';
-import { readBitsInDataView, writeBitsInDataView } from '../../utils/bitOps.ts';
+import { RTP_VERSION, Packet, PacketDump } from '../Packet';
+import { assertUnreachable } from '../../utils/helpers';
+import { readBitsInDataView, writeBitsInDataView } from '../../utils/bitOps';
 
 /**
  *         0                   1                   2                   3

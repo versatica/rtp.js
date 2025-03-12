@@ -1,10 +1,10 @@
 import {
 	SrReqPacket,
 	SrReqPacketDump,
-} from '../../../packets/RTCP/SrReqPacket.ts';
-import { RtpFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket.ts';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.ts';
-import { areDataViewsEqual } from '../../../utils/helpers.ts';
+} from '../../../packets/RTCP/SrReqPacket';
+import { RtpFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket';
+import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
+import { areDataViewsEqual } from '../../../utils/helpers';
 
 const srReqPacketDump: SrReqPacketDump = {
 	byteLength: 12,

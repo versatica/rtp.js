@@ -1,10 +1,10 @@
-import { RtcpPacketType } from './RtcpPacket.ts';
+import { RtcpPacketType } from './RtcpPacket';
 import {
 	FeedbackPacket,
 	PsFeedbackMessageType,
 	FeedbackPacketDump,
 	FIXED_HEADER_LENGTH,
-} from './FeedbackPacket.ts';
+} from './FeedbackPacket';
 
 /**
  * RTCP PLI packet info dump.

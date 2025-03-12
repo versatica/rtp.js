@@ -4,7 +4,7 @@ import {
 	RtcpPacketDump,
 	getRtcpPacketType,
 	COMMON_HEADER_LENGTH,
-} from './RtcpPacket.ts';
+} from './RtcpPacket';
 
 /**
  * RTCP generic packet info dump.

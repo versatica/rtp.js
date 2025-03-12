@@ -1,4 +1,4 @@
-import { Packet, PacketDump } from '../Packet.ts';
+import { Packet, PacketDump } from '../Packet';
 import {
 	isRtcp,
 	RtcpPacketType,
@@ -6,26 +6,26 @@ import {
 	RtcpPacketDump,
 	getRtcpPacketType,
 	getRtcpLength,
-} from './RtcpPacket.ts';
-import { ReceiverReportPacket } from './ReceiverReportPacket.ts';
-import { SenderReportPacket } from './SenderReportPacket.ts';
-import { ByePacket } from './ByePacket.ts';
-import { SdesPacket } from './SdesPacket.ts';
+} from './RtcpPacket';
+import { ReceiverReportPacket } from './ReceiverReportPacket';
+import { SenderReportPacket } from './SenderReportPacket';
+import { ByePacket } from './ByePacket';
+import { SdesPacket } from './SdesPacket';
 import {
 	RtpFeedbackMessageType,
 	PsFeedbackMessageType,
 	getRtcpFeedbackMessageType,
-} from './FeedbackPacket.ts';
-import { NackPacket } from './NackPacket.ts';
-import { SrReqPacket } from './SrReqPacket.ts';
-import { EcnPacket } from './EcnPacket.ts';
-import { PliPacket } from './PliPacket.ts';
-import { SliPacket } from './SliPacket.ts';
-import { RpsiPacket } from './RpsiPacket.ts';
-import { GenericFeedbackPacket } from './GenericFeedbackPacket.ts';
-import { XrPacket } from './XrPacket.ts';
-import { ExtendedJitterReportsPacket } from './ExtendedJitterReportsPacket.ts';
-import { GenericPacket } from './GenericPacket.ts';
+} from './FeedbackPacket';
+import { NackPacket } from './NackPacket';
+import { SrReqPacket } from './SrReqPacket';
+import { EcnPacket } from './EcnPacket';
+import { PliPacket } from './PliPacket';
+import { SliPacket } from './SliPacket';
+import { RpsiPacket } from './RpsiPacket';
+import { GenericFeedbackPacket } from './GenericFeedbackPacket';
+import { XrPacket } from './XrPacket';
+import { ExtendedJitterReportsPacket } from './ExtendedJitterReportsPacket';
+import { GenericPacket } from './GenericPacket';
 
 /**
  * RTCP Compound packet info dump.

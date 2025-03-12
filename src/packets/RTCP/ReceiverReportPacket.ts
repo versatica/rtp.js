@@ -3,8 +3,8 @@ import {
 	RtcpPacketType,
 	RtcpPacketDump,
 	COMMON_HEADER_LENGTH,
-} from './RtcpPacket.ts';
-import { Serializable, SerializableDump } from '../Serializable.ts';
+} from './RtcpPacket';
+import { Serializable, SerializableDump } from '../Serializable';
 
 // Common RTCP header length + 4 (SSRC of packet sender).
 const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 4;

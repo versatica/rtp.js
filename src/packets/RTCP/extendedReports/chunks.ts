@@ -1,4 +1,4 @@
-import { readBit, writeBit } from '../../../utils/bitOps.ts';
+import { readBit, writeBit } from '../../../utils/bitOps';
 
 /**
  * Loss RLE and Duplicate RLE Extended Report chunk info.

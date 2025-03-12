@@ -1,6 +1,6 @@
-import { ByePacket, ByePacketDump } from '../../../packets/RTCP/ByePacket.ts';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.ts';
-import { areDataViewsEqual } from '../../../utils/helpers.ts';
+import { ByePacket, ByePacketDump } from '../../../packets/RTCP/ByePacket';
+import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
+import { areDataViewsEqual } from '../../../utils/helpers';
 
 const byePacketDump: ByePacketDump = {
 	byteLength: 44,
