@@ -12,12 +12,16 @@
 		"type": "git",
 		"url": "git+https://github.com/versatica/rtp.js.git"
 	},
-	"main": "lib/index.js",
-	"module": "lib/index.mjs",
-	"types": "lib/index.d.ts",
+	"main": "./lib/index.js",
+	"module": "./lib/index.mjs",
+	"types": "./lib/index.d.ts",
+	"exports": {
+		"import": "./lib/index.mjs",
+		"require": "./lib/index.js"
+	},
 	"files": [
-		"npm-scripts.mjs",
-		"lib"
+		"./npm-scripts.mjs",
+		"./lib"
 	],
 	"keywords": [
 		"rtp",
@@ -51,13 +55,13 @@
 			"ts",
 			"mts"
 		],
-		"testRegex": "src/test/.*\\.test.*\\.ts",
+		"testRegex": "./src/test/.*.test.ts",
 		"coveragePathIgnorePatterns": [
-			"src/Logger.ts",
-			"src/utils",
-			"src/test"
+			"./src/Logger.ts",
+			"./src/utils",
+			"./src/test"
 		],
-		"cacheDirectory": ".cache/jest"
+		"cacheDirectory": "./.cache/jest"
 	},
 	"dependencies": {
 		"debug": "^4.4.0",
