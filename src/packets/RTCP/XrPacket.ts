@@ -4,16 +4,16 @@ import {
 	ExtendedReportDump,
 	getExtendedReportType,
 	getExtendedReportLength,
-} from './ExtendedReports/ExtendedReport.ts';
-import { LrleExtendedReport } from './ExtendedReports/LrleExtendedReport.ts';
-import { DrleExtendedReport } from './ExtendedReports/DrleExtendedReport.ts';
-import { PrtExtendedReport } from './ExtendedReports/PrtExtendedReport.ts';
-import { RrtExtendedReport } from './ExtendedReports/RrtExtendedReport.ts';
-import { DlrrExtendedReport } from './ExtendedReports/DlrrExtendedReport.ts';
-import { SsExtendedReport } from './ExtendedReports/SsExtendedReport.ts';
-import { VmExtendedReport } from './ExtendedReports/VmExtendedReport.ts';
-import { EcnExtendedReport } from './ExtendedReports/EcnExtendedReport.ts';
-import { GenericExtendedReport } from './ExtendedReports/GenericExtendedReport.ts';
+} from './extendedReports/ExtendedReport.ts';
+import { LrleExtendedReport } from './extendedReports/LrleExtendedReport.ts';
+import { DrleExtendedReport } from './extendedReports/DrleExtendedReport.ts';
+import { PrtExtendedReport } from './extendedReports/PrtExtendedReport.ts';
+import { RrtExtendedReport } from './extendedReports/RrtExtendedReport.ts';
+import { DlrrExtendedReport } from './extendedReports/DlrrExtendedReport.ts';
+import { SsExtendedReport } from './extendedReports/SsExtendedReport.ts';
+import { VmExtendedReport } from './extendedReports/VmExtendedReport.ts';
+import { EcnExtendedReport } from './extendedReports/EcnExtendedReport.ts';
+import { GenericExtendedReport } from './extendedReports/GenericExtendedReport.ts';
 import {
 	RtcpPacket,
 	RtcpPacketType,

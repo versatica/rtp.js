@@ -64,7 +64,7 @@ async function run() {
 
 		case 'typescript:watch': {
 			deleteLib();
-			executeCmd('rollup --config --watch');
+			executeCmd('tsc --noEmit --watch');
 
 			break;
 		}

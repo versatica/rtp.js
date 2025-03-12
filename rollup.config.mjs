@@ -1,37 +1,41 @@
 import esbuild from 'rollup-plugin-esbuild';
 import dts from 'rollup-plugin-dts';
 
+// Make it explicit that we don't want to include external deps in bundle
+// files.
 const external = id => !/^[./]/.test(id);
 
-const createBundleConfig = (input, output) => [
+export default [
+	/**
+	 * Create ES and CJS bundle files and their source map files.
+	 */
 	{
-		// Create a bundle.
-		input: input,
+		input: 'src/index.ts',
 		plugins: [esbuild({ include: /\.ts$/ })],
 		output: [
 			{
-				file: `${output}.js`,
-				format: 'cjs',
+				format: 'es',
+				file: 'lib/rtp.js.bundle.mjs',
 				sourcemap: true,
 			},
 			{
-				file: `${output}.mjs`,
-				format: 'es',
+				format: 'cjs',
+				file: 'lib/rtp.js.bundle.cjs',
 				sourcemap: true,
 			},
 		],
 		external: external,
 	},
+	/**
+	 * Create a .d.ts bundle file for TypeScript types.
+	 */
 	{
-		// Create a bundle for types.
-		input: input,
+		input: 'src/index.ts',
 		plugins: [dts({ include: /\.ts$/ })],
 		output: {
-			file: `${output}.d.ts`,
 			format: 'es',
+			file: 'lib/rtp.js.bundle.d.ts',
 		},
 		external: external,
 	},
 ];
-
-export default [...createBundleConfig('src/index.ts', 'lib/rtpjs-bundle')];

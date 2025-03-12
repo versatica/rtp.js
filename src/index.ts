@@ -1,2 +1,2 @@
-export * as packets from './packets/public.ts';
-export * as utils from './utils/public.ts';
+export * as packets from './packets.ts';
+export * as utils from './utils.ts';

@@ -12,16 +12,16 @@
 		"type": "git",
 		"url": "git+https://github.com/versatica/rtp.js.git"
 	},
-	"main": "./lib/rtpjs-bundle.js",
-	"module": "./lib/rtpjs-bundle.mjs",
-	"types": "./lib/rtpjs-bundle.d.ts",
+	"main": "lib/rtp.js.bundle.cjs",
+	"module": "lib/rtp.js.bundle.mjs",
+	"types": "lib/rtp.js.bundle.d.ts",
 	"exports": {
-		"import": "./lib/rtpjs-bundle.mjs",
-		"require": "./lib/rtpjs-bundle.js"
+		"import": "./lib/rtp.js.bundle.mjs",
+		"require": "./lib/rtp.js.bundle.js"
 	},
 	"files": [
-		"./npm-scripts.mjs",
-		"./lib"
+		"npm-scripts.mjs",
+		"lib"
 	],
 	"keywords": [
 		"rtp",
@@ -55,13 +55,13 @@
 			"ts",
 			"mts"
 		],
-		"testRegex": "./src/test/.*.test.ts",
+		"testRegex": "src/test/.*.test.ts",
 		"coveragePathIgnorePatterns": [
-			"./src/Logger.ts",
-			"./src/utils",
-			"./src/test"
+			"src/Logger.ts",
+			"src/utils",
+			"src/test"
 		],
-		"cacheDirectory": "./.cache/jest"
+		"cacheDirectory": ".cache/jest"
 	},
 	"dependencies": {
 		"debug": "^4.4.0",
