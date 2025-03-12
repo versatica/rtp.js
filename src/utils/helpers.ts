@@ -168,6 +168,7 @@ export function numericArrayToDataView(array: number[]): DataView {
  * @category Utils
  */
 export function numberToDataView(number: number): DataView {
+	logger.debug('FOOOOO numberToDataView()!!!');
 	const array: number[] = [];
 
 	array.unshift(number & 255);
