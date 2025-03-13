@@ -56,7 +56,7 @@ jobs:
 
       - name: Log when version has not changed
         if: steps.check.outputs.changed == 'false'
-        run: 'echo "No version change: ${{ steps.check.outputs.version }}"'
+        run: 'echo "No version change"'
 
       # - name: npm ci
       #   run: npm ci --foreground-scripts
