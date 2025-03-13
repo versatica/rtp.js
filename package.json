@@ -14,30 +14,14 @@
 	},
 	"exports": {
 		"./packets": {
-			"import": {
-				"types": "./lib/packets.d.mts",
-				"default": "./lib/packets.mjs"
-			},
-			"require": {
-				"types": "./lib/packets.d.ts",
-				"default": "./lib/packets.cjs"
-			}
+			"import": "./lib/packets.mjs",
+			"require": "./lib/packets.cjs",
+			"types": "./lib/packets.d.ts"
 		},
 		"./utils": {
-			"import": {
-				"types": "./lib/utils.d.mts",
-				"default": "./lib/utils.mjs"
-			},
-			"require": {
-				"types": "./lib/utils.d.ts",
-				"default": "./lib/utils.cjs"
-			}
-		}
-	},
-	"typesVersions": {
-		"*": {
-	 		"./packets": "./lib/packets.d.mts",
-	 		"./utils": "./lib/utils.d.mts"
+			"import": "./lib/utils.mjs",
+			"require": "./lib/utils.cjs",
+			"types": "./lib/utils.d.ts"
 		}
 	},
 	"files": [
@@ -101,7 +85,6 @@
 		"eslint-config-prettier": "^10.1.1",
 		"eslint-plugin-jest": "^28.11.0",
 		"eslint-plugin-prettier": "^5.2.3",
-		"fast-glob": "^3.3.3",
 		"globals": "^16.0.0",
 		"jest": "^29.7.0",
 		"open-cli": "^8.0.0",
