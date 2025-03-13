@@ -56,7 +56,6 @@ async function run() {
 		}
 
 		case 'typescript:build': {
-			installDeps();
 			buildTypescript({ force: true });
 
 			break;
@@ -64,7 +63,7 @@ async function run() {
 
 		case 'typescript:watch': {
 			deleteLib();
-			executeCmd('tsc --noEmit --watch');
+			executeCmd('rollup --config --watch');
 
 			break;
 		}
