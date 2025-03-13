@@ -43,9 +43,6 @@ jobs:
       - name: Check if version has been updated
         id: versionCheck
         uses: EndBug/version-check@v2
-        with:
-          file-url: 'https://unpkg.com/${{ github.event.repository.name }}@latest/package.json'
-          static-checking: localIsNew
 
       - name: Log when version has changed
         if: steps.versionCheck.outputs.changed == 'true'
