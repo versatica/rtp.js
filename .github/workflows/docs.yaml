@@ -6,8 +6,6 @@ on:
     branches: [master]
   # Allows you to run this workflow manually from the Actions tab.
   workflow_dispatch:
-  # TODO: REMOVE.
-  pull_request:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -25,10 +23,9 @@ concurrency:
 jobs:
   # Single deploy job since we're just deploying.
   deploy:
-    # TODO: Uncomment
-    # environment:
-    #   name: github-pages
-    #   url: ${{ steps.deployment.outputs.page_url }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     runs-on: ubuntu-latest
 
