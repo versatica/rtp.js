@@ -3,6 +3,7 @@
 /lib
 
 ## Others.
+/docs
 /coverage
 /.cache
 
