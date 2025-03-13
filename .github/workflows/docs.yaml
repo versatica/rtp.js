@@ -58,17 +58,21 @@ jobs:
         if: steps.versionCheck.outputs.changed == 'false'
         run: 'echo "Version did not change"'
 
-      # - name: npm ci
-      #   run: npm ci --foreground-scripts
+      - name: npm ci
+        if: steps.versionCheck.outputs.changed == 'true'
+        run: npm ci --foreground-scripts
 
-      # - name: npm run docs
-      #   run: npm run docs
+      - name: npm run docs
+        if: steps.versionCheck.outputs.changed == 'true'
+        run: npm run docs
 
-      # - name: Upload artifact
-      #   uses: actions/upload-pages-artifact@v3
-      #   with:
-      #     path: docs/
+      - name: Upload docs
+        if: steps.versionCheck.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
 
-      # - name: Deploy to GitHub Pages
-      #   id: deployment
-      #   uses: actions/deploy-pages@v4
+      - name: Deploy docs to GitHub Pages
+        if: steps.versionCheck.outputs.changed == 'true'
+        id: deployment
+        uses: actions/deploy-pages@v4
