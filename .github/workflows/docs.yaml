@@ -55,17 +55,16 @@ jobs:
         if: steps.check.outputs.changed == 'false'
         run: 'echo "No version change"'
 
-      - name: Check package.json version
-        uses: hugorcd/version-diff-action@v1
-        id: version_check
+      - id: check-is-version-updated
+        uses: FreePhoenix888/check-if-version-is-updated@v1
 
-      - name: Handle version change
-        if: steps.version_check.outputs.has_changed == 'true'
-        run: echo "Version changed from ${{ steps.version_check.outputs.old_version }} to ${{ steps.version_check.outputs.new_version }}"
+      - name: Run if version has changed
+        run: echo "Version has changed! Do something here..."
+        if: steps.check-is-version-updated.outputs.is-version-changed == 'true'
 
-      - name: Handle version NOT change
-        if: steps.version_check.outputs.has_changed == 'false'
-        run: echo "Version NOT changed from ${{ steps.version_check.outputs.old_version }} to ${{ steps.version_check.outputs.new_version }}"
+      - name: Run if version has NOT changed
+        run: echo "Version has NOT changed! Do something else here..."
+        if: steps.check-is-version-updated.outputs.is-version-changed == 'false'
 
       # - name: npm ci
       #   run: npm ci --foreground-scripts
