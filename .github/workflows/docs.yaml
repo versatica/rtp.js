@@ -2,8 +2,8 @@
 name: Deploy static docs to Pages
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [master]
   # Allows you to run this workflow manually from the Actions tab.
   workflow_dispatch:
 
@@ -38,17 +38,29 @@ jobs:
         with:
           node-version: 22
 
-      - name: npm ci
-        run: npm ci --foreground-scripts
+      - name: Check if version has been updated
+        id: check
+        uses: EndBug/version-check@v2
 
-      - name: npm run docs
-        run: npm run docs
+      - name: Log when version has changed
+        if: steps.check.outputs.changed == 'true'
+        run: 'echo "Version change found in commit ${{ steps.check.outputs.commit }}! New version: ${{ steps.check.outputs.version }} (${{ steps.check.outputs.type }})"'
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/
+      - name: Log when version has not changed
+        if: steps.check.outputs.changed == 'false'
+        run: 'echo "No version change"'
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      # - name: npm ci
+      #   run: npm ci --foreground-scripts
+
+      # - name: npm run docs
+      #   run: npm run docs
+
+      # - name: Upload artifact
+      #   uses: actions/upload-pages-artifact@v3
+      #   with:
+      #     path: docs/
+
+      # - name: Deploy to GitHub Pages
+      #   id: deployment
+      #   uses: actions/deploy-pages@v4
