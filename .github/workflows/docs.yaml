@@ -46,6 +46,9 @@ jobs:
       - name: Check if version has been updated
         id: check
         uses: EndBug/version-check@v2
+        with:
+          file-url: https://unpkg.com/rtp.js/package.json
+          static-checking: localIsNew
 
       - name: Log when version has changed
         if: steps.check.outputs.changed == 'true'
@@ -53,18 +56,7 @@ jobs:
 
       - name: Log when version has not changed
         if: steps.check.outputs.changed == 'false'
-        run: 'echo "No version change"'
-
-      - id: check-is-version-updated
-        uses: FreePhoenix888/check-if-version-is-updated@v1
-
-      - name: Run if version has changed
-        run: echo "Version has changed! Do something here..."
-        if: steps.check-is-version-updated.outputs.is-version-changed == 'true'
-
-      - name: Run if version has NOT changed
-        run: echo "Version has NOT changed! Do something else here..."
-        if: steps.check-is-version-updated.outputs.is-version-changed == 'false'
+        run: 'echo "No version change: ${{ steps.check.outputs.version }}"'
 
       # - name: npm ci
       #   run: npm ci --foreground-scripts
