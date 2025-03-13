@@ -53,21 +53,17 @@ jobs:
         if: steps.check.outputs.changed == 'false'
         run: 'echo "No version change"'
 
-      - name: 2 package changed in last commit
-        id: changedAction
-        uses: Octopus-Moneycoach/version-has-changed@v1
-        with:
-          path: package.json # Root package.json file
-          from: HEAD^1 # Check for changes since previous commit (feel free to put a branch name instead in the form of origin/<branchName>)
-          to: HEAD^
+      - name: Check package.json version
+        uses: hugorcd/version-diff-action@v1
+        id: version_check
 
-      - name: 2 Log version has changed
-        if: steps.changedAction.outputs.changed == 'true'
-        run: echo 'package-a changed!'
+      - name: Handle version change
+        if: steps.version_check.outputs.has_changed == 'true'
+        run: echo "Version changed from ${{ steps.version_check.outputs.old_version }} to ${{ steps.version_check.outputs.new_version }}"
 
-      - name: 2 Log version has not changed
-        if: steps.changedAction.outputs.changed == 'false'
-        run: echo 'package-a NOT changed!'
+      - name: Handle version NOT change
+        if: steps.version_check.outputs.has_changed == 'false'
+        run: echo "Version NOT changed from ${{ steps.version_check.outputs.old_version }} to ${{ steps.version_check.outputs.new_version }}"
 
       # - name: npm ci
       #   run: npm ci --foreground-scripts
