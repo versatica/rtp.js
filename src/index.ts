@@ -1,2 +1,2 @@
-export * as packets from './packets/public';
-export * as utils from './utils/public';
+export * as packets from './packets';
+export * as utils from './utils';

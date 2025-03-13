@@ -79,39 +79,64 @@ export function getRtcpFeedbackMessageType(
 }
 
 function messageTypeToString(
+	packetType: RtcpPacketType.RTPFB | RtcpPacketType.PSFB,
 	messageType: RtpFeedbackMessageType | PsFeedbackMessageType
 ): string {
-	switch (messageType) {
-		case RtpFeedbackMessageType.NACK: {
-			return 'Generic NACK';
+	switch (packetType) {
+		case RtcpPacketType.RTPFB: {
+			messageType = messageType as RtpFeedbackMessageType;
+
+			switch (messageType) {
+				case RtpFeedbackMessageType.NACK: {
+					return 'Generic NACK';
+				}
+
+				case RtpFeedbackMessageType.SR_REQ: {
+					return 'Rapid Resynchronisation Request';
+				}
+
+				case RtpFeedbackMessageType.ECN: {
+					return 'Explicit Congestion Notification (ECN)';
+				}
+
+				default: {
+					assertUnreachable(messageType);
+				}
+			}
+
+			break;
 		}
 
-		case RtpFeedbackMessageType.SR_REQ: {
-			return 'Rapid Resynchronisation Request';
-		}
+		case RtcpPacketType.PSFB: {
+			messageType = messageType as PsFeedbackMessageType;
 
-		case RtpFeedbackMessageType.ECN: {
-			return 'Explicit Congestion Notification (ECN)';
-		}
+			switch (messageType) {
+				case PsFeedbackMessageType.PLI: {
+					return 'Picture Loss Indication';
+				}
 
-		case PsFeedbackMessageType.PLI: {
-			return 'Picture Loss Indication';
-		}
+				case PsFeedbackMessageType.SLI: {
+					return 'Slice Loss Indication';
+				}
 
-		case PsFeedbackMessageType.SLI: {
-			return 'Slice Loss Indication';
-		}
+				case PsFeedbackMessageType.RPSI: {
+					return 'Reference Picture Selection Indication';
+				}
 
-		case PsFeedbackMessageType.RPSI: {
-			return 'Reference Picture Selection Indication';
-		}
+				case PsFeedbackMessageType.AFB: {
+					return 'Application layer FB message';
+				}
 
-		case PsFeedbackMessageType.AFB: {
-			return 'Application layer FB message';
+				default: {
+					assertUnreachable(messageType);
+				}
+			}
+
+			break;
 		}
 
 		default: {
-			assertUnreachable(messageType);
+			assertUnreachable(packetType);
 		}
 	}
 }
@@ -156,7 +181,7 @@ export abstract class FeedbackPacket extends RtcpPacket {
 				throw new TypeError(
 					`given buffer view is not a RTCP ${packetTypeToString(
 						this.getPacketType()
-					)} packet with ${messageTypeToString(this.#messageType)} message type`
+					)} packet with ${messageTypeToString(packetType, this.#messageType)} message type`
 				);
 			}
 		}

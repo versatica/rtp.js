@@ -1,19 +1,19 @@
 import { XrPacket, XrPacketDump } from '../../../packets/RTCP/XrPacket';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { ExtendedReportType } from '../../../packets/RTCP/ExtendedReports/ExtendedReport';
+import { ExtendedReportType } from '../../../packets/RTCP/extendedReports/ExtendedReport';
 import {
 	LrleExtendedReport,
 	LrleExtendedReportDump,
-} from '../../../packets/RTCP/ExtendedReports/LrleExtendedReport';
+} from '../../../packets/RTCP/extendedReports/LrleExtendedReport';
 import {
 	DlrrExtendedReport,
 	DlrrExtendedReportDump,
-} from '../../../packets/RTCP/ExtendedReports/DlrrExtendedReport';
+} from '../../../packets/RTCP/extendedReports/DlrrExtendedReport';
 import {
 	parseExtendedReportChunk,
 	createExtendedReportRunLengthChunk,
 	createExtendedReportBitVectorChunk,
-} from '../../../packets/RTCP/ExtendedReports/chunks';
+} from '../../../packets/RTCP/extendedReports/chunks';
 import { areDataViewsEqual } from '../../../utils/helpers';
 
 const runLengthZerosChunk = 0b0010101010101010;

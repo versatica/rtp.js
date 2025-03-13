@@ -4,16 +4,16 @@ import {
 	ExtendedReportDump,
 	getExtendedReportType,
 	getExtendedReportLength,
-} from './ExtendedReports/ExtendedReport';
-import { LrleExtendedReport } from './ExtendedReports/LrleExtendedReport';
-import { DrleExtendedReport } from './ExtendedReports/DrleExtendedReport';
-import { PrtExtendedReport } from './ExtendedReports/PrtExtendedReport';
-import { RrtExtendedReport } from './ExtendedReports/RrtExtendedReport';
-import { DlrrExtendedReport } from './ExtendedReports/DlrrExtendedReport';
-import { SsExtendedReport } from './ExtendedReports/SsExtendedReport';
-import { VmExtendedReport } from './ExtendedReports/VmExtendedReport';
-import { EcnExtendedReport } from './ExtendedReports/EcnExtendedReport';
-import { GenericExtendedReport } from './ExtendedReports/GenericExtendedReport';
+} from './extendedReports/ExtendedReport';
+import { LrleExtendedReport } from './extendedReports/LrleExtendedReport';
+import { DrleExtendedReport } from './extendedReports/DrleExtendedReport';
+import { PrtExtendedReport } from './extendedReports/PrtExtendedReport';
+import { RrtExtendedReport } from './extendedReports/RrtExtendedReport';
+import { DlrrExtendedReport } from './extendedReports/DlrrExtendedReport';
+import { SsExtendedReport } from './extendedReports/SsExtendedReport';
+import { VmExtendedReport } from './extendedReports/VmExtendedReport';
+import { EcnExtendedReport } from './extendedReports/EcnExtendedReport';
+import { GenericExtendedReport } from './extendedReports/GenericExtendedReport';
 import {
 	RtcpPacket,
 	RtcpPacketType,

@@ -14,4 +14,4 @@ export {
 	arrayBufferToString,
 	stringToDataView,
 	getStringByteLength,
-} from './helpers';
+} from './utils/helpers';
