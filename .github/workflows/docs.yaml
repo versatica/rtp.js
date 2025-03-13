@@ -48,7 +48,7 @@ jobs:
         uses: EndBug/version-check@v2
         with:
           # file-url: https://unpkg.com/rtp.js/package.json
-          static-checking: localIsNew
+          # static-checking: localIsNew
 
       - name: Log when version has changed
         if: steps.check.outputs.changed == 'true'
