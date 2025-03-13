@@ -3,7 +3,7 @@ import dts from 'rollup-plugin-dts';
 
 // Make it explicit that we don't want to include external deps in bundle
 // files.
-const external = id => !/^[./]/.test(id);
+const external = ['debug'];
 
 export default [
 	/**
