@@ -43,17 +43,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Dump github context
-        run: echo "$GITHUB_CONTEXT"
-        shell: bash
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-
       - name: Check if version has been updated
         id: check
         uses: EndBug/version-check@v2
         with:
-          file-url: https://unpkg.com/rtp.js/package.json
+          file-url: 'https://unpkg.com/${{ github.event.repository.name }}@latest/package.json'
           static-checking: localIsNew
 
       - name: Log when version has changed
