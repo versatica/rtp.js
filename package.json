@@ -17,7 +17,7 @@
 	"types": "lib/rtp.js.bundle.d.ts",
 	"exports": {
 		"import": "./lib/rtp.js.bundle.mjs",
-		"require": "./lib/rtp.js.bundle.js"
+		"require": "./lib/rtp.js.bundle.cjs"
 	},
 	"files": [
 		"npm-scripts.mjs",
