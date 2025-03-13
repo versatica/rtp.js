@@ -51,6 +51,12 @@ npm install rtp.js
   const view = utils.stringToDataView('foo');
   ```
 
+- CommonJS is also supported:
+
+  ```ts
+  const { packets, utils } = require('rtp.js');
+  ```
+
 ## Authors
 
 - Iñaki Baz Castillo [[website](https://inakibaz.me)|[github](https://github.com/ibc/)]
