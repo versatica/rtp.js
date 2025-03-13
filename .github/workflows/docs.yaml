@@ -44,19 +44,19 @@ jobs:
           node-version: 22
 
       - name: Check if version has been updated
-        id: check
+        id: versionCheck
         uses: EndBug/version-check@v2
         with:
           file-url: 'https://unpkg.com/${{ github.event.repository.name }}@latest/package.json'
           static-checking: localIsNew
 
       - name: Log when version has changed
-        if: steps.check.outputs.changed == 'true'
-        run: 'echo "Version change found in commit ${{ steps.check.outputs.commit }}! New version: ${{ steps.check.outputs.version }} (${{ steps.check.outputs.type }})"'
+        if: steps.versionCheck.outputs.changed == 'true'
+        run: 'echo "Version changed, new version: ${{ steps.versionCheck.outputs.version }} (${{ steps.versionCheck.outputs.type }})"'
 
       - name: Log when version has not changed
-        if: steps.check.outputs.changed == 'false'
-        run: 'echo "No version change"'
+        if: steps.versionCheck.outputs.changed == 'false'
+        run: 'echo "Version did not change"'
 
       # - name: npm ci
       #   run: npm ci --foreground-scripts
