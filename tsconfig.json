@@ -5,12 +5,8 @@
 		"target": "es2024",
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
-		"allowImportingTsExtensions": true,
-		"rewriteRelativeImportExtensions": true,
 		"strict": true,
-		"outDir": "lib",
-		"declaration": true,
-		"declarationMap": true
+		"outDir": "lib"
 	},
 	"include": ["src"]
 }

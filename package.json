@@ -14,14 +14,16 @@
 	},
 	"exports": {
 		"./packets": {
+			"typedoc": "./src/packets/public.ts",
+			"types": "./lib/packets.d.ts",
 			"import": "./lib/packets.mjs",
-			"require": "./lib/packets.cjs",
-			"types": "./lib/packets.d.ts"
+			"require": "./lib/packets.cjs"
 		},
 		"./utils": {
+			"typedoc": "./src/utils/public.ts",
+			"types": "./lib/utils.d.ts",
 			"import": "./lib/utils.mjs",
-			"require": "./lib/utils.cjs",
-			"types": "./lib/utils.d.ts"
+			"require": "./lib/utils.cjs"
 		}
 	},
 	"files": [
@@ -54,21 +56,15 @@
 	"jest": {
 		"verbose": true,
 		"testEnvironment": "node",
-		"moduleFileExtensions": [
-			"js",
-			"mjs",
-			"ts",
-			"mts"
-		],
 		"testRegex": "src/test/.*.test.ts",
 		"coveragePathIgnorePatterns": [
 			"src/Logger.ts",
-			"src/utils",
 			"src/test"
 		],
 		"cacheDirectory": ".cache/jest"
 	},
 	"dependencies": {
+		"@types/node": "^22.13.10",
 		"debug": "^4.4.0",
 		"supports-color": "^10.0.0"
 	},

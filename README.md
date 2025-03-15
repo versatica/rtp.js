@@ -48,7 +48,7 @@ npm install rtp.js
   ```ts
   import * as utils from 'rtp.js/packets';
 
-  const view = utils.stringToDataView('foo');
+  const view = utils.stringToDataView('fooœæ€ñ#¢∞Ω©bar');
   ```
 
 - CommonJS is also supported:

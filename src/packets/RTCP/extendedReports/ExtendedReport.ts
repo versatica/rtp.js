@@ -99,49 +99,6 @@ export function setExtendedReportLength(
 }
 
 /**
- * @hidden
- */
-export function reportTypeToString(reportType: ExtendedReportType): string {
-	switch (reportType) {
-		case ExtendedReportType.LRLE: {
-			return 'Loss RLE';
-		}
-
-		case ExtendedReportType.DRLE: {
-			return 'Duplicate RLE';
-		}
-
-		case ExtendedReportType.PRT: {
-			return 'Packet Receipt Times';
-		}
-
-		case ExtendedReportType.RRT: {
-			return 'Receiver Reference Time';
-		}
-
-		case ExtendedReportType.DLRR: {
-			return 'DLRR';
-		}
-
-		case ExtendedReportType.SS: {
-			return 'Statistics Summary';
-		}
-
-		case ExtendedReportType.VM: {
-			return 'VoIP Metrics';
-		}
-
-		case ExtendedReportType.ECN: {
-			return 'ECN Summary';
-		}
-
-		default: {
-			assertUnreachable(reportType);
-		}
-	}
-}
-
-/**
  * Parent class of all {@link XrPacket} Extended Reports.
  *
  * ```text
@@ -260,5 +217,45 @@ export abstract class ExtendedReport extends Serializable {
 	 */
 	private setReportType(reportType: ExtendedReportType): void {
 		this.view.setUint8(0, reportType);
+	}
+}
+
+function reportTypeToString(reportType: ExtendedReportType): string {
+	switch (reportType) {
+		case ExtendedReportType.LRLE: {
+			return 'Loss RLE';
+		}
+
+		case ExtendedReportType.DRLE: {
+			return 'Duplicate RLE';
+		}
+
+		case ExtendedReportType.PRT: {
+			return 'Packet Receipt Times';
+		}
+
+		case ExtendedReportType.RRT: {
+			return 'Receiver Reference Time';
+		}
+
+		case ExtendedReportType.DLRR: {
+			return 'DLRR';
+		}
+
+		case ExtendedReportType.SS: {
+			return 'Statistics Summary';
+		}
+
+		case ExtendedReportType.VM: {
+			return 'VoIP Metrics';
+		}
+
+		case ExtendedReportType.ECN: {
+			return 'ECN Summary';
+		}
+
+		default: {
+			assertUnreachable(reportType);
+		}
 	}
 }

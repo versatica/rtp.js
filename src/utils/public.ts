@@ -3,7 +3,7 @@
  *
  * @example
  * ```ts
- * import * as packets from 'rtp.js/packets';
+ * import * as utils from 'rtp.js/utils';
  *
  * const {
  *   padTo4Bytes,

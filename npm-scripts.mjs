@@ -81,7 +81,6 @@ async function run() {
 		}
 
 		case 'test': {
-			buildTypescript({ force: false });
 			test();
 
 			break;
