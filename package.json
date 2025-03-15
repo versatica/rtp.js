@@ -12,12 +12,19 @@
 		"type": "git",
 		"url": "git+https://github.com/versatica/rtp.js.git"
 	},
-	"main": "lib/rtp.js.bundle.cjs",
-	"module": "lib/rtp.js.bundle.mjs",
-	"types": "lib/rtp.js.bundle.d.ts",
 	"exports": {
-		"import": "./lib/rtp.js.bundle.mjs",
-		"require": "./lib/rtp.js.bundle.cjs"
+		"./packets": {
+			"typedoc": "./src/packets/public.ts",
+			"types": "./lib/packets.d.ts",
+			"import": "./lib/packets.mjs",
+			"require": "./lib/packets.cjs"
+		},
+		"./utils": {
+			"typedoc": "./src/utils/public.ts",
+			"types": "./lib/utils.d.ts",
+			"import": "./lib/utils.mjs",
+			"require": "./lib/utils.cjs"
+		}
 	},
 	"files": [
 		"npm-scripts.mjs",
@@ -49,21 +56,15 @@
 	"jest": {
 		"verbose": true,
 		"testEnvironment": "node",
-		"moduleFileExtensions": [
-			"js",
-			"mjs",
-			"ts",
-			"mts"
-		],
 		"testRegex": "src/test/.*.test.ts",
 		"coveragePathIgnorePatterns": [
 			"src/Logger.ts",
-			"src/utils",
 			"src/test"
 		],
 		"cacheDirectory": ".cache/jest"
 	},
 	"dependencies": {
+		"@types/node": "^22.13.10",
 		"debug": "^4.4.0",
 		"supports-color": "^10.0.0"
 	},
