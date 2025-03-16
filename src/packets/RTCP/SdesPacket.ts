@@ -243,7 +243,7 @@ export class SdesPacket extends RtcpPacket {
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
+	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 
 		// Position relative to the DataView byte offset.
@@ -278,9 +278,9 @@ export class SdesPacket extends RtcpPacket {
 	 * @inheritDoc
 	 */
 	clone(
-		buffer?: ArrayBuffer,
+		buffer?: ArrayBufferLike,
 		byteOffset?: number,
-		serializationBuffer?: ArrayBuffer,
+		serializationBuffer?: ArrayBufferLike,
 		serializationByteOffset?: number
 	): SdesPacket {
 		const view = this.cloneInternal(
@@ -446,7 +446,7 @@ export class SdesChunk extends Serializable {
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
+	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
 		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
@@ -495,9 +495,9 @@ export class SdesChunk extends Serializable {
 	 * @inheritDoc
 	 */
 	clone(
-		buffer?: ArrayBuffer,
+		buffer?: ArrayBufferLike,
 		byteOffset?: number,
-		serializationBuffer?: ArrayBuffer,
+		serializationBuffer?: ArrayBufferLike,
 		serializationByteOffset?: number
 	): SdesChunk {
 		const view = this.cloneInternal(

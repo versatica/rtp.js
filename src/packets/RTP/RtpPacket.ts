@@ -419,7 +419,7 @@ export class RtpPacket extends Packet {
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
+	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
 		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
@@ -651,9 +651,9 @@ export class RtpPacket extends Packet {
 	 * @inheritDoc
 	 */
 	clone(
-		buffer?: ArrayBuffer,
+		buffer?: ArrayBufferLike,
 		byteOffset?: number,
-		serializationBuffer?: ArrayBuffer,
+		serializationBuffer?: ArrayBufferLike,
 		serializationByteOffset?: number
 	): RtpPacket {
 		const view = this.cloneInternal(

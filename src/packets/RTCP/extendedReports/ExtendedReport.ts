@@ -177,7 +177,10 @@ export abstract class ExtendedReport extends Serializable {
 	/**
 	 * Serialize base RTCP packet into a new buffer.
 	 */
-	protected serializeBase(buffer?: ArrayBuffer, byteOffset?: number): DataView {
+	protected serializeBase(
+		buffer?: ArrayBufferLike,
+		byteOffset?: number
+	): DataView {
 		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.

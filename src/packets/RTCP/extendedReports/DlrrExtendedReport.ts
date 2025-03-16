@@ -136,7 +136,7 @@ export class DlrrExtendedReport extends ExtendedReport {
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
+	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 
 		// Position relative to the DataView byte offset.
@@ -176,9 +176,9 @@ export class DlrrExtendedReport extends ExtendedReport {
 	 * @inheritDoc
 	 */
 	clone(
-		buffer?: ArrayBuffer,
+		buffer?: ArrayBufferLike,
 		byteOffset?: number,
-		serializationBuffer?: ArrayBuffer,
+		serializationBuffer?: ArrayBufferLike,
 		serializationByteOffset?: number
 	): DlrrExtendedReport {
 		const view = this.cloneInternal(

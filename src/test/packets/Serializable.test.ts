@@ -10,7 +10,7 @@ class Foo extends Serializable {
 		return this.view.byteLength;
 	}
 
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
+	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
 		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
@@ -42,9 +42,9 @@ class Foo extends Serializable {
 	}
 
 	clone(
-		buffer?: ArrayBuffer,
+		buffer?: ArrayBufferLike,
 		byteOffset?: number,
-		serializationBuffer?: ArrayBuffer,
+		serializationBuffer?: ArrayBufferLike,
 		serializationByteOffset?: number
 	): Foo {
 		const view = this.cloneInternal(

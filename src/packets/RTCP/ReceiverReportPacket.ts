@@ -169,7 +169,7 @@ export class ReceiverReportPacket extends RtcpPacket {
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
+	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
@@ -222,9 +222,9 @@ export class ReceiverReportPacket extends RtcpPacket {
 	 * @inheritDoc
 	 */
 	clone(
-		buffer?: ArrayBuffer,
+		buffer?: ArrayBufferLike,
 		byteOffset?: number,
-		serializationBuffer?: ArrayBuffer,
+		serializationBuffer?: ArrayBufferLike,
 		serializationByteOffset?: number
 	): ReceiverReportPacket {
 		const view = this.cloneInternal(
@@ -339,7 +339,7 @@ export class ReceptionReport extends Serializable {
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
+	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
 		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
 
 		// Create new DataView with new buffer.
@@ -371,9 +371,9 @@ export class ReceptionReport extends Serializable {
 	 * @inheritDoc
 	 */
 	clone(
-		buffer?: ArrayBuffer,
+		buffer?: ArrayBufferLike,
 		byteOffset?: number,
-		serializationBuffer?: ArrayBuffer,
+		serializationBuffer?: ArrayBufferLike,
 		serializationByteOffset?: number
 	): ReceptionReport {
 		const view = this.cloneInternal(

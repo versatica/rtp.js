@@ -246,7 +246,10 @@ export abstract class FeedbackPacket extends RtcpPacket {
 	/**
 	 * Serialize base RTCP Feedback packet into a new buffer.
 	 */
-	protected serializeBase(buffer?: ArrayBuffer, byteOffset?: number): DataView {
+	protected serializeBase(
+		buffer?: ArrayBufferLike,
+		byteOffset?: number
+	): DataView {
 		const view = super.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,

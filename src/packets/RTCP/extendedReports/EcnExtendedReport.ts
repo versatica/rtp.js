@@ -102,7 +102,7 @@ export class EcnExtendedReport extends ExtendedReport {
 	/**
 	 * @inheritDoc
 	 */
-	serialize(buffer?: ArrayBuffer, byteOffset?: number): void {
+	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
 		const view = this.serializeBase(buffer, byteOffset);
 		const uint8Array = new Uint8Array(
 			view.buffer,
@@ -145,9 +145,9 @@ export class EcnExtendedReport extends ExtendedReport {
 	 * @inheritDoc
 	 */
 	clone(
-		buffer?: ArrayBuffer,
+		buffer?: ArrayBufferLike,
 		byteOffset?: number,
-		serializationBuffer?: ArrayBuffer,
+		serializationBuffer?: ArrayBufferLike,
 		serializationByteOffset?: number
 	): EcnExtendedReport {
 		const view = this.cloneInternal(

@@ -9,7 +9,11 @@ const logger = new Logger('utils/helpers');
  * @hidden
  */
 export function clone<T>(data: T): T {
-	if (data instanceof ArrayBuffer) {
+	if (
+		data instanceof ArrayBuffer ||
+		(typeof SharedArrayBuffer !== 'undefined' &&
+			data instanceof SharedArrayBuffer)
+	) {
 		return data.slice(0) as unknown as T;
 	} else if (data instanceof DataView) {
 		return new DataView(
@@ -129,13 +133,13 @@ export function dataViewToNodeBuffer(view: DataView): Buffer {
 }
 
 /**
- * Convert Node.js Buffer to a new allocated ArrayBuffer.
+ * Convert Node.js Buffer to a new allocated ArrayBufferLike.
  *
  * @category Utils
  * @remarks
  * - Just for Node.js.
  */
-export function nodeBufferToArrayBuffer(nodeBuffer: Buffer): ArrayBuffer {
+export function nodeBufferToArrayBuffer(nodeBuffer: Buffer): ArrayBufferLike {
 	return nodeBuffer.buffer.slice(
 		nodeBuffer.byteOffset,
 		nodeBuffer.byteOffset + nodeBuffer.byteLength
@@ -143,13 +147,13 @@ export function nodeBufferToArrayBuffer(nodeBuffer: Buffer): ArrayBuffer {
 }
 
 /**
- * Convert ArrayBuffer to Node.js Buffer.
+ * Convert ArrayBufferLike to Node.js Buffer.
  *
  * @category Utils
  * @remarks
  * - Just for Node.js.
  */
-export function arrayBufferToNodeBuffer(arrayBuffer: ArrayBuffer): Buffer {
+export function arrayBufferToNodeBuffer(arrayBuffer: ArrayBufferLike): Buffer {
 	return Buffer.from(arrayBuffer, 0, arrayBuffer.byteLength);
 }
 
@@ -226,12 +230,12 @@ export function stringToDataView(string: string): DataView {
 }
 
 /**
- * Convert string to ArrayBuffer.
+ * Convert string to ArrayBufferLike.
  *
  * @category Utils
  * @hidden
  */
-export function stringToArrayBuffer(string: string): ArrayBuffer {
+export function stringToArrayBuffer(string: string): ArrayBufferLike {
 	const encoder = new TextEncoder();
 
 	return encoder.encode(string).buffer;

@@ -52,7 +52,7 @@ export abstract class Serializable {
 	 *   content.
 	 */
 	getView(
-		serializationBuffer?: ArrayBuffer,
+		serializationBuffer?: ArrayBufferLike,
 		serializationByteOffset?: number
 	): DataView {
 		if (this.needsSerialization()) {
@@ -99,12 +99,12 @@ export abstract class Serializable {
 	 * @throws
 	 * - If serialization fails due to invalid content previously added.
 	 * - If given `buffer` doesn't have space enough to serialize the content.
-	 * - If the `buffer` member of the given `ArrayBuffer` is the same than the
+	 * - If the `buffer` member of the given `ArrayBufferLike` is the same than the
 	 *   internal buffer in this packet and the given `byteOffset` would make
 	 *   the serialization happen in bytes currently used by the packet (this would
 	 *   corrupt the packet).
 	 */
-	abstract serialize(buffer?: ArrayBuffer, byteOffset?: number): void;
+	abstract serialize(buffer?: ArrayBufferLike, byteOffset?: number): void;
 
 	/**
 	 * Clone the packet or item. The cloned instance does not share any memory
@@ -132,9 +132,9 @@ export abstract class Serializable {
 	 *   the content.
 	 */
 	abstract clone(
-		buffer?: ArrayBuffer,
+		buffer?: ArrayBufferLike,
 		byteOffset?: number,
-		serializationBuffer?: ArrayBuffer,
+		serializationBuffer?: ArrayBufferLike,
 		serializationByteOffset?: number
 	): Serializable;
 
@@ -148,10 +148,10 @@ export abstract class Serializable {
 	 * whether the serialized content can fit into it and will throw otherwise.
 	 */
 	protected getSerializationBuffer(
-		buffer: ArrayBuffer | undefined,
+		buffer: ArrayBufferLike | undefined,
 		byteOffset: number = 0
 	): {
-		buffer: ArrayBuffer;
+		buffer: ArrayBufferLike;
 		byteOffset: number;
 		byteLength: number;
 	} {
@@ -198,9 +198,9 @@ export abstract class Serializable {
 	}
 
 	protected cloneInternal(
-		buffer: ArrayBuffer | undefined,
+		buffer: ArrayBufferLike | undefined,
 		byteOffset: number = 0,
-		serializationBuffer?: ArrayBuffer,
+		serializationBuffer?: ArrayBufferLike,
 		serializationByteOffset?: number
 	): DataView {
 		if (this.needsSerialization()) {
