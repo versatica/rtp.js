@@ -8,7 +8,7 @@ const config = {
 		'^.+\\.mts?$': [
 			'babel-jest',
 			{
-				configFile: './babel.config-jest.mjs',
+				configFile: './babel.config-jest.cjs',
 			},
 		],
 	},

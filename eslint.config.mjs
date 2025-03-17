@@ -8,7 +8,7 @@ const config = tsEslint.config(
 	{
 		languageOptions: {
 			sourceType: 'module',
-			globals: { ...globals.browser },
+			globals: { ...globals.node },
 		},
 		linterOptions: {
 			noInlineConfig: false,

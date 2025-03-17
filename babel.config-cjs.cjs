@@ -1,9 +1,9 @@
 /**
- * This Babel configuration is for TypeScript transpilation to JavaScript CJS
- * files.
+ * This is Babel configuration for transpilation of TypeScript files into
+ * JavaScript CJS files (.cjs).
  */
 
-export default {
+module.exports = {
 	presets: [
 		[
 			'@babel/preset-env',

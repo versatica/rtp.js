@@ -1,6 +1,6 @@
 /**
- * This Babel configuration is for TypeScript transpilation to JavaScript ESM
- * files.
+ * This is Babel configuration for transpilation of TypeScript files into
+ * JavaScript ESM files (.mjs).
  */
 
 export default {
