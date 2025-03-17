@@ -12,9 +12,9 @@
 		"type": "git",
 		"url": "git+https://github.com/versatica/rtp.js.git"
 	},
-	"main": "./lib/index.cjs",
-	"module": "./lib/index.mjs",
-	"types": "./lib/index.d.mts",
+	"main": "lib/index.cjs",
+	"module": "lib/index.mjs",
+	"types": "lib/index.d.mts",
 	"exports": {
 		".": {
 			"typedoc": "./src/index.mts",
