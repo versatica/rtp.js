@@ -36,6 +36,8 @@
 		}
 	},
 	"files": [
+		"LICENSE",
+		"README.md",
 		"npm-scripts.mjs",
 		"lib"
 	],
