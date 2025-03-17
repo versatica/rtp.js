@@ -58,6 +58,10 @@ npm install rtp.js
   const utils = require('rtp.js/utils');
   ```
 
+## Note about TypeScript
+
+**rtp.js** is written in TypeScript with `module: NodeNext`, meaning that TypeScript projects that have **rtp.js** as dependency must have `moduleResolution` with value "node16", 'NodeNext" or "bundler" in their `tsconfig.json` file.
+
 ## Authors
 
 - Iñaki Baz Castillo [[website](https://inakibaz.me)|[github](https://github.com/ibc/)]

@@ -6,7 +6,11 @@
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
 		"strict": true,
-		"outDir": "lib"
+		"allowImportingTsExtensions": true,
+		"declaration": true,
+		"declarationMap": true,
+		"emitDeclarationOnly": true,
+		"declarationDir": "lib"
 	},
 	"include": ["src"]
 }
