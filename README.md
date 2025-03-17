@@ -58,6 +58,16 @@ npm install rtp.js
   const utils = require('rtp.js/utils');
   ```
 
+- Single entry point ("main" or "module" entries in `package.json`) is also possible for backwards compatibility:
+
+  ```ts
+  // ESM
+  import { packets, utils } from 'rtp.js';
+
+  // CJS
+  const { packets, utils } = require('rtp.js'=;
+  ```
+
 ## Note about TypeScript
 
 **rtp.js** is written in TypeScript with `module: NodeNext`, meaning that TypeScript projects that have **rtp.js** as dependency must have `moduleResolution` with value "node16", 'NodeNext" or "bundler" in their `tsconfig.json` file.
