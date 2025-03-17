@@ -2,7 +2,6 @@
 	"compileOnSave": true,
 	"compilerOptions": {
 		"lib": ["es2024"],
-		"target": "esnext",
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
 		"strict": true,
