@@ -60,6 +60,9 @@ jobs:
       - name: npm run lint
         run: npm run lint
 
+      - name: echo node version
+        run: node -v
+
       - name: npm run test
         run: npm run test
 
