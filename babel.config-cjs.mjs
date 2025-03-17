@@ -3,7 +3,7 @@
  * JavaScript CJS files (.cjs).
  */
 
-module.exports = {
+export default {
 	presets: [
 		[
 			'@babel/preset-env',

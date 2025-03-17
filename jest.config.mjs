@@ -2,7 +2,6 @@ const config = {
 	verbose: true,
 	testEnvironment: 'node',
 	testRegex: 'src/test/.*.test.mts',
-	extensionsToTreatAsEsm: ['.mts'],
 	moduleFileExtensions: ['mts', 'mjs', 'js', 'ts'],
 	transform: {
 		'^.+\\.mts?$': [

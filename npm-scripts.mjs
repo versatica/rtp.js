@@ -7,7 +7,7 @@ const RELEASE_BRANCH = 'master';
 
 // Paths for ESLint to check. Converted to string for convenience.
 const ESLINT_PATHS = [
-	'babel.config-cjs.cjs',
+	'babel.config-cjs.mjs',
 	'babel.config-esm.mjs',
 	'babel.config-jest.cjs',
 	'eslint.config.mjs',
@@ -25,7 +25,7 @@ const ESLINT_IGNORE_PATTERN_ARGS = []
 // Paths for Prettier to check/write. Converted to string for convenience.
 const PRETTIER_PATHS = [
 	'README.md',
-	'babel.config-cjs.cjs',
+	'babel.config-cjs.mjs',
 	'babel.config-esm.mjs',
 	'babel.config-jest.cjs',
 	'eslint.config.mjs',
@@ -168,7 +168,7 @@ function buildTypescript() {
 
 	// Generate .cjs CJS files in lib/.
 	executeCmd(
-		'babel ./src --config-file "./babel.config-cjs.cjs" --out-dir "./lib" --ignore "./src/test/**" --extensions .mts --out-file-extension .cjs --source-maps true'
+		'babel ./src --config-file "./babel.config-cjs.mjs" --out-dir "./lib" --ignore "./src/test/**" --extensions .mts --out-file-extension .cjs --source-maps true'
 	);
 
 	// Generate .d.mts TypeScript declaration files in lib/.
@@ -199,7 +199,7 @@ async function watchTypescript() {
 		{
 			name: 'babel CJS',
 			command:
-				'babel ./src --config-file "./babel.config-cjs.cjs" --out-dir "./lib" --ignore "./src/test/**" --extensions .mts --out-file-extension .cjs --source-maps true --watch',
+				'babel ./src --config-file "./babel.config-cjs.mjs" --out-dir "./lib" --ignore "./src/test/**" --extensions .mts --out-file-extension .cjs --source-maps true --watch',
 			raw: true,
 		},
 		// Generate .d.mts TypeScript declaration files in lib/ and watch for changes.
