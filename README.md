@@ -62,11 +62,11 @@ npm install rtp.js
 - Single entry point ("main" or "module" entries in `package.json`) is also possible for backwards compatibility:
 
   ```ts
-  // ESM
+  // Using ESM:
   import { packets, utils } from 'rtp.js';
 
-  // CJS
-  const { packets, utils } = require('rtp.js'=;
+  // Using CJS:
+  const { packets, utils } = require('rtp.js');
   ```
 
 ## Note about TypeScript
