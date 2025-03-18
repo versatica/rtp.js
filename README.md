@@ -71,7 +71,7 @@ npm install rtp.js
 
 ## Note about TypeScript
 
-**rtp.js** is written in TypeScript with `module: NodeNext`, meaning that TypeScript projects that want to import **rtp.js** using its exposed entry points (`rtp.js/packets` and `rtp.js/utils`) must have `moduleResolution` with value "node16", 'NodeNext" or "bundler" in their `tsconfig.json` file.
+**rtp.js** is written in TypeScript with `module: NodeNext`, meaning that TypeScript projects that want to import **rtp.js** using its exposed entry points ("rtp.js/packets" and "rtp.js/utils") must have `moduleResolution` set to "node16", 'NodeNext" or "bundler" in their `tsconfig.json` file.
 
 ## Authors
 
