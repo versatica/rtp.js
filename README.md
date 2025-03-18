@@ -18,7 +18,7 @@ npm install rtp.js
 - All RTP and RTCP classes, types and packet related helpers are exported by the `packets` module.
 
   ```ts
-  import { packets } from 'rtp.js';
+  import * as packets from 'rtp.js/packets';
 
   const {
   	isRtp,
@@ -46,16 +46,31 @@ npm install rtp.js
 - The `utils` module exports some generic helpers and utilities.
 
   ```ts
-  import { utils } from 'rtp.js';
+  import * as utils from 'rtp.js/packets';
 
-  const view = utils.stringToDataView('foo');
+  const view = utils.stringToDataView('fooœæ€ñ#¢∞Ω©bar');
   ```
 
 - CommonJS is also supported:
 
   ```ts
-  const { packets, utils } = require('rtp.js');
+  const packets = require('rtp.js/packets');
+  const utils = require('rtp.js/utils');
   ```
+
+- Single entry point ("main" or "module" entries in `package.json`) is also possible for backwards compatibility:
+
+  ```ts
+  // ESM
+  import { packets, utils } from 'rtp.js';
+
+  // CJS
+  const { packets, utils } = require('rtp.js'=;
+  ```
+
+## Note about TypeScript
+
+**rtp.js** is written in TypeScript with `module: NodeNext`, meaning that TypeScript projects that have **rtp.js** as dependency must have `moduleResolution` with value "node16", 'NodeNext" or "bundler" in their `tsconfig.json` file.
 
 ## Authors
 
