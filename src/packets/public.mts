@@ -3,9 +3,7 @@
  *
  * @example
  * ```ts
- * import * as packets from 'rtp.js/packets';
- *
- * const {
+ * import {
  *   isRtp,
  *   isRtcp,
  *   RtpPacket,
@@ -25,7 +23,7 @@
  *   ExtendedJitterReportsPacket,
  *   GenericPacket,
  *   // etc.
- * } = packets;
+ * } from 'rtp.js/packets';
  * ```
  */
 

@@ -3,9 +3,7 @@
  *
  * @example
  * ```ts
- * import * as utils from 'rtp.js/utils';
- *
- * const {
+ * import {
  *   padTo4Bytes,
  *   nodeBufferToDataView,
  *   dataViewToNodeBuffer,
@@ -18,7 +16,7 @@
  *   stringToDataView,
  *   getStringByteLength,
  *   // etc.
- * } = utils;
+ * } from 'rtp.js/utils';
  * ```
  */
 
