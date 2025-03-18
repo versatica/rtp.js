@@ -1,4 +1,7 @@
-import { EcnPacket, EcnPacketDump } from '../../../packets/RTCP/EcnPacket.mts';
+import {
+	EcnPacket,
+	type EcnPacketDump,
+} from '../../../packets/RTCP/EcnPacket.mts';
 import { RtpFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket.mts';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.mts';
 import { areDataViewsEqual } from '../../../utils/helpers.mts';

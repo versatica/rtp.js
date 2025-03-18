@@ -3,7 +3,7 @@ import {
 	FeedbackPacket,
 	RtpFeedbackMessageType,
 	PsFeedbackMessageType,
-	FeedbackPacketDump,
+	type FeedbackPacketDump,
 	getRtcpFeedbackMessageType,
 	FIXED_HEADER_LENGTH,
 } from './FeedbackPacket.mts';

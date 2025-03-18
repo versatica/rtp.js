@@ -2,7 +2,7 @@ import { RtcpPacketType } from './RtcpPacket.mts';
 import {
 	FeedbackPacket,
 	RtpFeedbackMessageType,
-	FeedbackPacketDump,
+	type FeedbackPacketDump,
 	FIXED_HEADER_LENGTH,
 } from './FeedbackPacket.mts';
 import { readBit, writeBit } from '../../utils/bitOps.mts';

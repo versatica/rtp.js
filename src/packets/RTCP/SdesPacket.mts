@@ -1,10 +1,10 @@
 import {
 	RtcpPacket,
 	RtcpPacketType,
-	RtcpPacketDump,
+	type RtcpPacketDump,
 	COMMON_HEADER_LENGTH,
 } from './RtcpPacket.mts';
-import { Serializable, SerializableDump } from '../Serializable.mts';
+import { Serializable, type SerializableDump } from '../Serializable.mts';
 import {
 	padTo4Bytes,
 	dataViewToString,

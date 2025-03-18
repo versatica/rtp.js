@@ -1,9 +1,9 @@
-import { RTP_VERSION, Packet, PacketDump } from '../Packet.mts';
+import { RTP_VERSION, Packet, type PacketDump } from '../Packet.mts';
 import {
 	RtpExtensionType,
-	RtpExtensionMapping,
-	SsrcAudioLevelExtension,
-	VideoOrientationExtension,
+	type RtpExtensionMapping,
+	type SsrcAudioLevelExtension,
+	type VideoOrientationExtension,
 } from './rtpExtensions.mts';
 import {
 	clone,

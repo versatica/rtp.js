@@ -1,4 +1,7 @@
-import { ByePacket, ByePacketDump } from '../../../packets/RTCP/ByePacket.mts';
+import {
+	ByePacket,
+	type ByePacketDump,
+} from '../../../packets/RTCP/ByePacket.mts';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.mts';
 import { areDataViewsEqual } from '../../../utils/helpers.mts';
 

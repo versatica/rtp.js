@@ -28,7 +28,11 @@
 		"strictFunctionTypes": true,
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true,
-		"useUnknownInCatchVariables": true
+		"useUnknownInCatchVariables": true,
+		"noUncheckedSideEffectImports": true,
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+		"useDefineForClassFields": true
 	},
 	"include": ["src"]
 }

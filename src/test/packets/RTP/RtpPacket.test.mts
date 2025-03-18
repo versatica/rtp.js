@@ -3,7 +3,7 @@ import * as path from 'path';
 import {
 	isRtp,
 	RtpPacket,
-	RtpPacketDump,
+	type RtpPacketDump,
 } from '../../../packets/RTP/RtpPacket.mts';
 import {
 	clone,

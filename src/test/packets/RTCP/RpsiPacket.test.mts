@@ -1,6 +1,6 @@
 import {
 	RpsiPacket,
-	RpsiPacketDump,
+	type RpsiPacketDump,
 } from '../../../packets/RTCP/RpsiPacket.mts';
 import { PsFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket.mts';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.mts';

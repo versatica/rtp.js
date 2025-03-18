@@ -1,8 +1,8 @@
 import {
 	SdesPacket,
-	SdesPacketDump,
+	type SdesPacketDump,
 	SdesChunk,
-	SdesChunkDump,
+	type SdesChunkDump,
 	SdesItemType,
 } from '../../../packets/RTCP/SdesPacket.mts';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.mts';

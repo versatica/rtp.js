@@ -1,7 +1,7 @@
 import {
 	RtcpPacket,
 	RtcpPacketType,
-	RtcpPacketDump,
+	type RtcpPacketDump,
 	getRtcpPacketType,
 	COMMON_HEADER_LENGTH,
 } from './RtcpPacket.mts';

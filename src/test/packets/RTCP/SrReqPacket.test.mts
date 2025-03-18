@@ -1,6 +1,6 @@
 import {
 	SrReqPacket,
-	SrReqPacketDump,
+	type SrReqPacketDump,
 } from '../../../packets/RTCP/SrReqPacket.mts';
 import { RtpFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket.mts';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.mts';

@@ -1,6 +1,6 @@
 import {
 	NackPacket,
-	NackPacketDump,
+	type NackPacketDump,
 	parseNackItem,
 	createNackItem,
 } from '../../../packets/RTCP/NackPacket.mts';

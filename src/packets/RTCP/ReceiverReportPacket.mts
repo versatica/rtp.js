@@ -1,10 +1,10 @@
 import {
 	RtcpPacket,
 	RtcpPacketType,
-	RtcpPacketDump,
+	type RtcpPacketDump,
 	COMMON_HEADER_LENGTH,
 } from './RtcpPacket.mts';
-import { Serializable, SerializableDump } from '../Serializable.mts';
+import { Serializable, type SerializableDump } from '../Serializable.mts';
 
 // Common RTCP header length + 4 (SSRC of packet sender).
 const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 4;

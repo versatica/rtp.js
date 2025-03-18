@@ -1,4 +1,4 @@
-import { RTP_VERSION, Packet, PacketDump } from '../Packet.mts';
+import { RTP_VERSION, Packet, type PacketDump } from '../Packet.mts';
 import { assertUnreachable } from '../../utils/helpers.mts';
 import {
 	readBitsInDataView,

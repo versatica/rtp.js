@@ -1,9 +1,10 @@
-import { Packet, PacketDump } from '../Packet.mts';
+import { Packet } from '../Packet.mts';
+import type { PacketDump } from '../Packet.mts';
 import {
 	isRtcp,
 	RtcpPacketType,
 	RtcpPacket,
-	RtcpPacketDump,
+	type RtcpPacketDump,
 	getRtcpPacketType,
 	getRtcpLength,
 } from './RtcpPacket.mts';

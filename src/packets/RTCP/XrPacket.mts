@@ -1,7 +1,7 @@
 import {
 	ExtendedReport,
 	ExtendedReportType,
-	ExtendedReportDump,
+	type ExtendedReportDump,
 	getExtendedReportType,
 	getExtendedReportLength,
 } from './extendedReports/ExtendedReport.mts';
@@ -17,7 +17,7 @@ import { GenericExtendedReport } from './extendedReports/GenericExtendedReport.m
 import {
 	RtcpPacket,
 	RtcpPacketType,
-	RtcpPacketDump,
+	type RtcpPacketDump,
 	COMMON_HEADER_LENGTH,
 } from './RtcpPacket.mts';
 

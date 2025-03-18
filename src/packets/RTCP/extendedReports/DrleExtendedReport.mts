@@ -1,7 +1,7 @@
 import {
 	ExtendedReport,
 	ExtendedReportType,
-	ExtendedReportDump,
+	type ExtendedReportDump,
 	COMMON_HEADER_LENGTH,
 } from './ExtendedReport.mts';
 import { padTo4Bytes } from '../../../utils/helpers.mts';

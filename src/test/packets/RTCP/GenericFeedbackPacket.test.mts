@@ -1,6 +1,6 @@
 import {
 	GenericFeedbackPacket,
-	GenericFeedbackPacketDump,
+	type GenericFeedbackPacketDump,
 } from '../../../packets/RTCP/GenericFeedbackPacket.mts';
 import { PsFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket.mts';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.mts';

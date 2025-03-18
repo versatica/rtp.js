@@ -1,7 +1,7 @@
 import {
 	ExtendedReport,
 	ExtendedReportType,
-	ExtendedReportDump,
+	type ExtendedReportDump,
 	getExtendedReportType,
 	COMMON_HEADER_LENGTH,
 } from './ExtendedReport.mts';

@@ -1,7 +1,7 @@
 import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket.mts';
 import {
 	ReceptionReport,
-	ReceptionReportDump,
+	type ReceptionReportDump,
 } from '../../../packets/RTCP/ReceiverReportPacket.mts';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.mts';
 import { areDataViewsEqual } from '../../../utils/helpers.mts';

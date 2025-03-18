@@ -1,4 +1,4 @@
-import { Serializable, SerializableDump } from '../../Serializable.mts';
+import { Serializable, type SerializableDump } from '../../Serializable.mts';
 import { assertUnreachable } from '../../../utils/helpers.mts';
 
 export const COMMON_HEADER_LENGTH = 4;

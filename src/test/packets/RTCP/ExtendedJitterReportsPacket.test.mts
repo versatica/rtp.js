@@ -1,6 +1,6 @@
 import {
 	ExtendedJitterReportsPacket,
-	ExtendedJitterReportsPacketDump,
+	type ExtendedJitterReportsPacketDump,
 } from '../../../packets/RTCP/ExtendedJitterReportsPacket.mts';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.mts';
 import { areDataViewsEqual } from '../../../utils/helpers.mts';

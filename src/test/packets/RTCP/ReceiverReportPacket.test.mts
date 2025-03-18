@@ -1,7 +1,7 @@
 import {
 	ReceiverReportPacket,
 	ReceptionReport,
-	ReceptionReportDump,
+	type ReceptionReportDump,
 } from '../../../packets/RTCP/ReceiverReportPacket.mts';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.mts';
 import {

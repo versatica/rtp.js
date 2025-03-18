@@ -2,7 +2,7 @@ import { RtcpPacketType } from './RtcpPacket.mts';
 import {
 	FeedbackPacket,
 	PsFeedbackMessageType,
-	FeedbackPacketDump,
+	type FeedbackPacketDump,
 	FIXED_HEADER_LENGTH,
 } from './FeedbackPacket.mts';
 import { padTo4Bytes } from '../../utils/helpers.mts';

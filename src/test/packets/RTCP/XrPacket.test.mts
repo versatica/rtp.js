@@ -1,13 +1,16 @@
-import { XrPacket, XrPacketDump } from '../../../packets/RTCP/XrPacket.mts';
+import {
+	XrPacket,
+	type XrPacketDump,
+} from '../../../packets/RTCP/XrPacket.mts';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.mts';
 import { ExtendedReportType } from '../../../packets/RTCP/extendedReports/ExtendedReport.mts';
 import {
 	LrleExtendedReport,
-	LrleExtendedReportDump,
+	type LrleExtendedReportDump,
 } from '../../../packets/RTCP/extendedReports/LrleExtendedReport.mts';
 import {
 	DlrrExtendedReport,
-	DlrrExtendedReportDump,
+	type DlrrExtendedReportDump,
 } from '../../../packets/RTCP/extendedReports/DlrrExtendedReport.mts';
 import {
 	parseExtendedReportChunk,

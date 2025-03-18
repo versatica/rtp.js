@@ -1,4 +1,7 @@
-import { PliPacket, PliPacketDump } from '../../../packets/RTCP/PliPacket.mts';
+import {
+	PliPacket,
+	type PliPacketDump,
+} from '../../../packets/RTCP/PliPacket.mts';
 import { PsFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket.mts';
 import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.mts';
 import { areDataViewsEqual } from '../../../utils/helpers.mts';

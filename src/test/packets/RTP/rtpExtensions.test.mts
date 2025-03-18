@@ -1,7 +1,10 @@
-import { RtpPacket, RtpPacketDump } from '../../../packets/RTP/RtpPacket.mts';
+import {
+	RtpPacket,
+	type RtpPacketDump,
+} from '../../../packets/RTP/RtpPacket.mts';
 import {
 	RtpExtensionType,
-	RtpExtensionMapping,
+	type RtpExtensionMapping,
 	rtpExtensionUriToType,
 } from '../../../packets/RTP/rtpExtensions.mts';
 
