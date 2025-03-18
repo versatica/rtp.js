@@ -44,10 +44,35 @@ npm install rtp.js
   } = packets;
   ```
 
+  ```ts
+  import { RtpPacket } from 'rtp.js/packets';
+
+  const rtpPacket = new RtpPacket();
+  ```
+
 - The `utils` module exports some generic helpers and utilities.
 
   ```ts
-  import * as utils from 'rtp.js/packets';
+  import * as utils from 'rtp.js/utils';
+
+  const {
+  	padTo4Bytes,
+  	nodeBufferToDataView,
+  	dataViewToNodeBuffer,
+  	nodeBufferToArrayBuffer,
+  	arrayBufferToNodeBuffer,
+  	numericArrayToDataView,
+  	numberToDataView,
+  	dataViewToString,
+  	arrayBufferToString,
+  	stringToDataView,
+  	getStringByteLength,
+  	// etc.
+  } = utils;
+  ```
+
+  ```ts
+  import { stringToDataView } from 'rtp.js/utils';
 
   const view = utils.stringToDataView('fooœæ€ñ#¢∞Ω©bar');
   ```
@@ -57,6 +82,12 @@ npm install rtp.js
   ```ts
   const packets = require('rtp.js/packets');
   const utils = require('rtp.js/utils');
+  ```
+
+  ```ts
+  const { RtpPacket } = require('rtp.js/packets');
+
+  const rtpPacket = new RtpPacket();
   ```
 
 - Single entry point ("main" or "module" entries in `package.json`) is also possible for backwards compatibility:
