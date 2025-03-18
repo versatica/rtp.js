@@ -16,12 +16,10 @@ npm install rtp.js
 
 - [API documentation](https://versatica.github.io/rtp.js)
 
-- All RTP and RTCP classes, types and packet related helpers are exported by the `packets` module.
+- All RTP and RTCP classes, types and packet related helpers are exported by the `packets` module:
 
   ```ts
-  import * as packets from 'rtp.js/packets';
-
-  const {
+  import {
   	isRtp,
   	isRtcp,
   	RtpPacket,
@@ -41,21 +39,15 @@ npm install rtp.js
   	ExtendedJitterReportsPacket,
   	GenericPacket,
   	// etc.
-  } = packets;
-  ```
-
-  ```ts
-  import { RtpPacket } from 'rtp.js/packets';
+  } from 'rtp.js/packets';
 
   const rtpPacket = new RtpPacket();
   ```
 
-- The `utils` module exports some generic helpers and utilities.
+- The `utils` module exports some generic helpers and utilities:
 
   ```ts
-  import * as utils from 'rtp.js/utils';
-
-  const {
+  import {
   	padTo4Bytes,
   	nodeBufferToDataView,
   	dataViewToNodeBuffer,
@@ -68,36 +60,29 @@ npm install rtp.js
   	stringToDataView,
   	getStringByteLength,
   	// etc.
-  } = utils;
-  ```
+  } from 'rtp.js/utils';
 
-  ```ts
-  import { stringToDataView } from 'rtp.js/utils';
-
-  const view = utils.stringToDataView('fooœæ€ñ#¢∞Ω©bar');
+  const view = stringToDataView('fooœæ€ñ#¢∞Ω©bar');
   ```
 
 - CommonJS is also supported:
 
   ```ts
-  const packets = require('rtp.js/packets');
-  const utils = require('rtp.js/utils');
+  const { RtpPacket /* etc. */ } = require('rtp.js/packets');
+  const { padTo4Bytes /* etc. */ } = require('rtp.js/utils');
   ```
 
-  ```ts
-  const { RtpPacket } = require('rtp.js/packets');
-
-  const rtpPacket = new RtpPacket();
-  ```
-
-- Single entry point ("main" or "module" entries in `package.json`) is also possible for backwards compatibility:
+- Single entry point ("main" or "module" entries in `package.json`) is also supported for backwards compatibility:
 
   ```ts
   // Using ESM:
-  import { packets, utils } from 'rtp.js';
+  import { packets as rtpJsPackets, utils as rtpJsUtils } from 'rtp.js';
 
   // Using CJS:
-  const { packets, utils } = require('rtp.js');
+  const { packets: rtpJsPackets, utils: rtpJsUtils } = require('rtp.js');
+
+  const { RtpPacket /* etc. */ } = rtpJsPackets;
+  const { padTo4Bytes /* etc. */ } = rtpJsUtils;
   ```
 
 ## Note about TypeScript
