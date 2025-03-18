@@ -35,7 +35,7 @@ export abstract class Packet extends Serializable {
 	 * @remarks
 	 * - Read the info dump type of each RTCP packet instead.
 	 */
-	dump(): PacketDump {
+	override dump(): PacketDump {
 		return {
 			...super.dump(),
 			padding: this.getPadding(),

@@ -110,7 +110,7 @@ export class DlrrExtendedReport extends ExtendedReport {
 	/**
 	 * Dump DLRR Extended Report info.
 	 */
-	dump(): DlrrExtendedReportDump {
+	override dump(): DlrrExtendedReportDump {
 		return {
 			...super.dump(),
 			subReports: this.getSubReports(),

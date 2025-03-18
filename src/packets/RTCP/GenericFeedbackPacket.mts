@@ -113,7 +113,7 @@ export class GenericFeedbackPacket extends FeedbackPacket {
 	/**
 	 * Dump RTCP generic Feedback packet info.
 	 */
-	dump(): GenericFeedbackPacketDump {
+	override dump(): GenericFeedbackPacketDump {
 		return {
 			...super.dump(),
 			bodyLength: this.getBody().byteLength,

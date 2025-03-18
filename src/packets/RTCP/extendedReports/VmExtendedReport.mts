@@ -101,7 +101,7 @@ export class VmExtendedReport extends ExtendedReport {
 	/**
 	 * Dump VoIP Metrics Extended Report info.
 	 */
-	dump(): VmExtendedReportDump {
+	override dump(): VmExtendedReportDump {
 		return {
 			...super.dump(),
 			ssrc: this.getSsrc(),

@@ -100,7 +100,7 @@ describe('create RTCP SDES packet', () => {
 
 		// Fill optional fields so serialization should be needed.
 		const chunk1 = new SdesChunk();
-		const chunk1Dump = sdesPacketDump.chunks[0];
+		const chunk1Dump = sdesPacketDump.chunks[0]!;
 
 		chunk1.setSsrc(chunk1Dump.ssrc);
 		chunk1.setItems(chunk1Dump.items);
@@ -539,7 +539,7 @@ describe('create another RTCP SDES packet', () => {
 			true
 		);
 
-		const clonedChunk1 = clonedPacket.getChunks()[0];
+		const clonedChunk1 = clonedPacket.getChunks()[0]!;
 
 		expect(clonedChunk1.dump()).toEqual(chunk1.dump());
 
@@ -557,7 +557,7 @@ describe('create another RTCP SDES packet', () => {
 		expect(packet.needsSerialization()).toBe(false);
 		expect(isRtcp(packet.getView())).toBe(true);
 
-		const chunk1B = packet.getChunks()[0];
+		const chunk1B = packet.getChunks()[0]!;
 
 		expect(chunk1B.needsSerialization()).toBe(false);
 		expect(chunk1B.dump()).toEqual({
@@ -569,7 +569,7 @@ describe('create another RTCP SDES packet', () => {
 			],
 		});
 
-		const chunk2B = packet.getChunks()[1];
+		const chunk2B = packet.getChunks()[1]!;
 
 		expect(chunk2B.needsSerialization()).toBe(false);
 		expect(chunk2B.dump()).toEqual({
@@ -578,7 +578,7 @@ describe('create another RTCP SDES packet', () => {
 			items: [{ type: SdesItemType.LOC, text: 'somewhere œæ€' }],
 		});
 
-		const chunk3B = packet.getChunks()[2];
+		const chunk3B = packet.getChunks()[2]!;
 
 		expect(chunk3B.needsSerialization()).toBe(false);
 		expect(chunk3B.dump()).toEqual({

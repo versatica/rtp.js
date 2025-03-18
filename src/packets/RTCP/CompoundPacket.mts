@@ -203,7 +203,7 @@ export class CompoundPacket extends Packet {
 	/**
 	 * Dump RTCP Compound packet info.
 	 */
-	dump(): CompoundPacketDump {
+	override dump(): CompoundPacketDump {
 		return {
 			...super.dump(),
 			packets: this.#packets.map(packet => packet.dump()),
@@ -231,7 +231,7 @@ export class CompoundPacket extends Packet {
 	 *
 	 * @hidden
 	 */
-	getPadding(): number {
+	override getPadding(): number {
 		return 0;
 	}
 
@@ -240,14 +240,14 @@ export class CompoundPacket extends Packet {
 	 *
 	 * @hidden
 	 */
-	padTo4Bytes(): void {
+	override padTo4Bytes(): void {
 		throw new Error('method not implemented in RTCP CompoundPacket');
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	needsSerialization(): boolean {
+	override needsSerialization(): boolean {
 		return (
 			super.needsSerialization() ||
 			this.#packets.some(packet => packet.needsSerialization())

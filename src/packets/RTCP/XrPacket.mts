@@ -173,7 +173,7 @@ export class XrPacket extends RtcpPacket {
 	/**
 	 * Dump XR packet info.
 	 */
-	dump(): XrPacketDump {
+	override dump(): XrPacketDump {
 		return {
 			...super.dump(),
 			ssrc: this.getSsrc(),
@@ -200,7 +200,7 @@ export class XrPacket extends RtcpPacket {
 	/**
 	 * @inheritDoc
 	 */
-	needsSerialization(): boolean {
+	override needsSerialization(): boolean {
 		return (
 			super.needsSerialization() ||
 			this.#reports.some(report => report.needsSerialization())

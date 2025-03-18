@@ -96,7 +96,7 @@ export class GenericExtendedReport extends ExtendedReport {
 	/**
 	 * Dump generic Extended Report info.
 	 */
-	dump(): GenericExtendedReportDump {
+	override dump(): GenericExtendedReportDump {
 		return super.dump();
 	}
 

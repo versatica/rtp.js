@@ -326,7 +326,7 @@ export class RtpPacket extends Packet {
 	/**
 	 * Dump RTP packet info.
 	 */
-	dump(): RtpPacketDump {
+	override dump(): RtpPacketDump {
 		const extensions = Array.from(this.#extensions).map(([extId, extView]) => {
 			return {
 				id: extId,

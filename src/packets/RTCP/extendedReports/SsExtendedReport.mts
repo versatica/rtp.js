@@ -96,7 +96,7 @@ export class SsExtendedReport extends ExtendedReport {
 	/**
 	 * Dump Statistics Summary Extended Report info.
 	 */
-	dump(): SsExtendedReportDump {
+	override dump(): SsExtendedReportDump {
 		return {
 			...super.dump(),
 			ssrc: this.getSsrc(),

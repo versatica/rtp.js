@@ -65,7 +65,7 @@ export class RrtExtendedReport extends ExtendedReport {
 	/**
 	 * Dump Receiver Reference Time Extended Report info.
 	 */
-	dump(): RrtExtendedReportDump {
+	override dump(): RrtExtendedReportDump {
 		return {
 			...super.dump(),
 			ntpSeq: this.getNtpSeconds(),

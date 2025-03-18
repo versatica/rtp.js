@@ -133,6 +133,10 @@ export function rtpExtensionUriToType(
 		case 'urn:ietf:params:rtp-hdrext:toffset': {
 			return RtpExtensionType.TOFFSET;
 		}
+
+		default: {
+			return undefined;
+		}
 	}
 }
 

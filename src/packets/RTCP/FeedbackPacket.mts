@@ -107,6 +107,8 @@ function messageTypeToString(
 				}
 			}
 
+			// @ts-expect-error --- Ignore "error TS7027: Unreachable code detected"
+			// to not conflict with ESLint rules.
 			break;
 		}
 
@@ -135,6 +137,8 @@ function messageTypeToString(
 				}
 			}
 
+			// @ts-expect-error --- Ignore "error TS7027: Unreachable code detected"
+			// to not conflict with ESLint rules.
 			break;
 		}
 
@@ -196,7 +200,7 @@ export abstract class FeedbackPacket extends RtcpPacket {
 	 * @remarks
 	 * - Read the info dump type of each RTCP Feedback packet instead.
 	 */
-	dump(): FeedbackPacketDump {
+	override dump(): FeedbackPacketDump {
 		return {
 			...super.dump(),
 			messageType: this.getMessageType(),
@@ -249,7 +253,7 @@ export abstract class FeedbackPacket extends RtcpPacket {
 	/**
 	 * Serialize base RTCP Feedback packet into a new buffer.
 	 */
-	protected serializeBase(
+	protected override serializeBase(
 		buffer?: ArrayBufferLike,
 		byteOffset?: number
 	): DataView {

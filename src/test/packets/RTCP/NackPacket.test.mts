@@ -114,8 +114,8 @@ describe('create RTCP NACK packet', () => {
 });
 
 describe('NACK items', () => {
-	const nackItem1 = nackPacketDump.items[0];
-	const nackItem2 = nackPacketDump.items[1];
+	const nackItem1 = nackPacketDump.items[0]!;
+	const nackItem2 = nackPacketDump.items[1]!;
 
 	test('parseNackItem()', () => {
 		expect(parseNackItem(nackItem1.pid, nackItem1.bitmask)).toEqual([

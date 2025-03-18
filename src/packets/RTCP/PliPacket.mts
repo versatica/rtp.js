@@ -72,7 +72,7 @@ export class PliPacket extends FeedbackPacket {
 	/**
 	 * Dump RTCP PLI packet info.
 	 */
-	dump(): PliPacketDump {
+	override dump(): PliPacketDump {
 		return super.dump();
 	}
 

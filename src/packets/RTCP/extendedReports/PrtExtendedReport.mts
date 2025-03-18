@@ -97,7 +97,7 @@ export class PrtExtendedReport extends ExtendedReport {
 	/**
 	 * Dump Packet Receipt Times Extended Report info.
 	 */
-	dump(): PrtExtendedReportDump {
+	override dump(): PrtExtendedReportDump {
 		return {
 			...super.dump(),
 			thinning: this.getThinning(),

@@ -100,7 +100,7 @@ export class LrleExtendedReport extends ExtendedReport {
 	/**
 	 * Dump Loss RLE Extended Report info.
 	 */
-	dump(): LrleExtendedReportDump {
+	override dump(): LrleExtendedReportDump {
 		return {
 			...super.dump(),
 			thinning: this.getThinning(),

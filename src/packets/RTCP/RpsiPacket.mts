@@ -124,7 +124,7 @@ export class RpsiPacket extends FeedbackPacket {
 	/**
 	 * Dump RTCP RPSI packet info.
 	 */
-	dump(): RpsiPacketDump {
+	override dump(): RpsiPacketDump {
 		return {
 			...super.dump(),
 			payloadType: this.getPayloadType(),

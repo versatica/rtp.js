@@ -49,10 +49,6 @@ export type EcnExtendedReportDump = ExtendedReportDump & {
  * - [RFC 6679 section 5.2](https://datatracker.ietf.org/doc/html/rfc6679#section-5.2)
  */
 export class EcnExtendedReport extends ExtendedReport {
-	// Chunks (2 bytes numbers, unparsed).
-	// eslint-disable-next-line no-unused-private-class-members
-	#chunks: number[] = [];
-
 	/**
 	 * @param view - If given it will be parsed. Otherwise an empty ECN Summary
 	 *   Extended Report will be created.
@@ -79,7 +75,7 @@ export class EcnExtendedReport extends ExtendedReport {
 	/**
 	 * Dump ECN Summary Extended Report info.
 	 */
-	dump(): EcnExtendedReportDump {
+	override dump(): EcnExtendedReportDump {
 		return {
 			...super.dump(),
 			ssrc: this.getSsrc(),

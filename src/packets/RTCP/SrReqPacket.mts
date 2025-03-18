@@ -72,7 +72,7 @@ export class SrReqPacket extends FeedbackPacket {
 	/**
 	 * Dump RTCP SR REQ packet info.
 	 */
-	dump(): SrReqPacketDump {
+	override dump(): SrReqPacketDump {
 		return super.dump();
 	}
 

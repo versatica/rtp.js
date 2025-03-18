@@ -153,7 +153,7 @@ export abstract class ExtendedReport extends Serializable {
 	 * @remarks
 	 * - Read the info dump type of each Extended Report instead.
 	 */
-	dump(): ExtendedReportDump {
+	override dump(): ExtendedReportDump {
 		return {
 			...super.dump(),
 			reportType: this.getReportType(),

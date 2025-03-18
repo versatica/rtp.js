@@ -102,7 +102,7 @@ export class DrleExtendedReport extends ExtendedReport {
 	/**
 	 * Dump Duplicate RLE Extended Report info.
 	 */
-	dump(): DrleExtendedReportDump {
+	override dump(): DrleExtendedReportDump {
 		return {
 			...super.dump(),
 			thinning: this.getThinning(),

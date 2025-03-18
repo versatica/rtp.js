@@ -207,7 +207,7 @@ export class SdesPacket extends RtcpPacket {
 	/**
 	 * Dump Receiver Report packet info.
 	 */
-	dump(): SdesPacketDump {
+	override dump(): SdesPacketDump {
 		return {
 			...super.dump(),
 			chunks: this.#chunks.map(chunk => chunk.dump()),
@@ -233,7 +233,7 @@ export class SdesPacket extends RtcpPacket {
 	/**
 	 * @inheritDoc
 	 */
-	needsSerialization(): boolean {
+	override needsSerialization(): boolean {
 		return (
 			super.needsSerialization() ||
 			this.#chunks.some(chunk => chunk.needsSerialization())
@@ -409,7 +409,7 @@ export class SdesChunk extends Serializable {
 	/**
 	 * Dump SDES Chunk info.
 	 */
-	dump(): SdesChunkDump {
+	override dump(): SdesChunkDump {
 		return {
 			...super.dump(),
 			ssrc: this.getSsrc(),

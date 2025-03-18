@@ -87,7 +87,7 @@ export class ExtendedJitterReportsPacket extends RtcpPacket {
 	/**
 	 * Dump RTCP Extended Jitter Reports packet info.
 	 */
-	dump(): ExtendedJitterReportsPacketDump {
+	override dump(): ExtendedJitterReportsPacketDump {
 		return {
 			...super.dump(),
 			jitters: this.getJitters(),

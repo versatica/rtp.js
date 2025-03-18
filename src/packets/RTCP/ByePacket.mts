@@ -115,7 +115,7 @@ export class ByePacket extends RtcpPacket {
 	/**
 	 * Dump RTCP BYE packet info.
 	 */
-	dump(): ByePacketDump {
+	override dump(): ByePacketDump {
 		return {
 			...super.dump(),
 			ssrcs: this.getSsrcs(),

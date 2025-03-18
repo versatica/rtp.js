@@ -132,7 +132,7 @@ export class ReceiverReportPacket extends RtcpPacket {
 	/**
 	 * Dump Receiver Report packet info.
 	 */
-	dump(): ReceiverReportPacketDump {
+	override dump(): ReceiverReportPacketDump {
 		return {
 			...super.dump(),
 			ssrc: this.getSsrc(),
@@ -159,7 +159,7 @@ export class ReceiverReportPacket extends RtcpPacket {
 	/**
 	 * @inheritDoc
 	 */
-	needsSerialization(): boolean {
+	override needsSerialization(): boolean {
 		return (
 			super.needsSerialization() ||
 			this.#reports.some(report => report.needsSerialization())
@@ -316,7 +316,7 @@ export class ReceptionReport extends Serializable {
 	/**
 	 * Dump Reception Report info.
 	 */
-	dump(): ReceptionReportDump {
+	override dump(): ReceptionReportDump {
 		return {
 			...super.dump(),
 			ssrc: this.getSsrc(),

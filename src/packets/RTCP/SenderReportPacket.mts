@@ -134,7 +134,7 @@ export class SenderReportPacket extends RtcpPacket {
 	/**
 	 * Dump Sender Report packet info.
 	 */
-	dump(): SenderReportPacketDump {
+	override dump(): SenderReportPacketDump {
 		return {
 			...super.dump(),
 			ssrc: this.getSsrc(),
@@ -166,7 +166,7 @@ export class SenderReportPacket extends RtcpPacket {
 	/**
 	 * @inheritDoc
 	 */
-	needsSerialization(): boolean {
+	override needsSerialization(): boolean {
 		return (
 			super.needsSerialization() ||
 			this.#reports.some(report => report.needsSerialization())

@@ -111,8 +111,8 @@ describe('parse RTCP Receiver Report packet', () => {
 		expect(packet.getSsrc()).toBe(0x5d931534);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
 
-		const report1 = packet.getReports()[0];
-		const report2 = packet.getReports()[1];
+		const report1 = packet.getReports()[0]!;
+		const report2 = packet.getReports()[1]!;
 
 		expect(report1.dump()).toEqual(receptionReportDump1);
 		expect(report2.dump()).toEqual(receptionReportDump2);
@@ -176,7 +176,7 @@ describe('parse RTCP Receiver Report packet', () => {
 		expect(packet.getSsrc()).toBe(0x5d931534);
 		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
 
-		const report1 = packet.getReports()[0];
+		const report1 = packet.getReports()[0]!;
 
 		expect(report1.dump()).toEqual(receptionReportDump1);
 
@@ -192,7 +192,7 @@ describe('parse RTCP Receiver Report packet', () => {
 		expect(packet.getSsrc()).toBe(0x5d931534);
 		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
 
-		const report1B = packet.getReports()[0];
+		const report1B = packet.getReports()[0]!;
 
 		expect(report1B.dump()).toEqual(receptionReportDump1);
 

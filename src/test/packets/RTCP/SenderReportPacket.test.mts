@@ -105,7 +105,7 @@ describe('parse RTCP Sender Report packet', () => {
 		expect(packet.getOctetCount()).toBe(octetCount);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
 
-		const report1 = packet.getReports()[0];
+		const report1 = packet.getReports()[0]!;
 
 		expect(report1.dump()).toEqual(receptionReportDump1);
 
@@ -126,7 +126,7 @@ describe('parse RTCP Sender Report packet', () => {
 		expect(packet.getOctetCount()).toBe(octetCount);
 		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
 
-		const report1B = packet.getReports()[0];
+		const report1B = packet.getReports()[0]!;
 
 		expect(report1B.dump()).toEqual(receptionReportDump1);
 

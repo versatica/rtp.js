@@ -93,7 +93,7 @@ export class SliPacket extends FeedbackPacket {
 	/**
 	 * Dump RTCP SLI packet info.
 	 */
-	dump(): SliPacketDump {
+	override dump(): SliPacketDump {
 		return {
 			...super.dump(),
 			items: this.getItems(),

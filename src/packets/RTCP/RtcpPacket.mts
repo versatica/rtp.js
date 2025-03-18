@@ -245,7 +245,7 @@ export abstract class RtcpPacket extends Packet {
 	 * @remarks
 	 * - Read the info dump type of each RTCP packet instead.
 	 */
-	dump(): RtcpPacketDump {
+	override dump(): RtcpPacketDump {
 		return {
 			...super.dump(),
 			packetType: this.getPacketType(),

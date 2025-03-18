@@ -92,7 +92,7 @@ export class EcnPacket extends FeedbackPacket {
 	/**
 	 * Dump RTCP ECN packet info.
 	 */
-	dump(): EcnPacketDump {
+	override dump(): EcnPacketDump {
 		return {
 			...super.dump(),
 			extendedHighestSequenceNumber: this.getExtendedHighestSequenceNumber(),

@@ -98,7 +98,7 @@ export class GenericPacket extends RtcpPacket {
 	/**
 	 * Dump RTCP generic packet info.
 	 */
-	dump(): GenericPacketDump {
+	override dump(): GenericPacketDump {
 		return {
 			...super.dump(),
 			bodyLength: this.getBody().byteLength,
@@ -205,7 +205,7 @@ export class GenericPacket extends RtcpPacket {
 	 *   whatever body to this packet, and hence the user may want to also
 	 *   manipulate this field.
 	 */
-	setCount(count: number): void {
+	override setCount(count: number): void {
 		super.setCount(count);
 	}
 

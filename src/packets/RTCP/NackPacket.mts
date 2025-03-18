@@ -93,7 +93,7 @@ export class NackPacket extends FeedbackPacket {
 	/**
 	 * Dump RTCP NACK packet info.
 	 */
-	dump(): NackPacketDump {
+	override dump(): NackPacketDump {
 		return {
 			...super.dump(),
 			items: this.getItems(),
@@ -240,11 +240,11 @@ export function createNackItem(seqs: number[]): {
 	bitmask: number;
 } {
 	const orderedSeqs = [...seqs].sort();
-	const pid = orderedSeqs[0];
+	const pid = orderedSeqs[0]!;
 	let bitmask: number = 0;
 
 	for (let i = 1; i < orderedSeqs.length; ++i) {
-		const seq = orderedSeqs[i];
+		const seq = orderedSeqs[i]!;
 		const diff = (seq + 65536 - pid) % 65536;
 
 		if (diff > 16) {
