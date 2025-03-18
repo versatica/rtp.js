@@ -2,6 +2,7 @@
 
 [![][npm-shield-rtp.js]][npm-rtp.js]
 [![][github-actions-shield-rtp.js]][github-actions-rtp.js]
+[![][github-actions-shield-docs]][github-actions-docs]
 
 RTP stack for Node.js and browser written in TypeScript. **rtp.js** provides with an API to parse, generate and modify RTP and RTCP packets.
 
@@ -70,7 +71,7 @@ npm install rtp.js
 
 ## Note about TypeScript
 
-**rtp.js** is written in TypeScript with `module: NodeNext`, meaning that TypeScript projects that have **rtp.js** as dependency must have `moduleResolution` with value "node16", 'NodeNext" or "bundler" in their `tsconfig.json` file.
+**rtp.js** is written in TypeScript with `module: NodeNext`, meaning that TypeScript projects that want to import **rtp.js** using its exposed entry points (`rtp.js/packets` and `rtp.js/utils`) must have `moduleResolution` with value "node16", 'NodeNext" or "bundler" in their `tsconfig.json` file.
 
 ## Authors
 
@@ -85,3 +86,5 @@ npm install rtp.js
 [npm-rtp.js]: https://npmjs.org/package/rtp.js
 [github-actions-shield-rtp.js]: https://github.com/versatica/rtp.js/actions/workflows/rtp.js.yaml/badge.svg
 [github-actions-rtp.js]: https://github.com/versatica/rtp.js/actions/workflows/rtp.js.yaml
+[github-actions-shield-docs]: https://github.com/versatica/rtp.js/actions/workflows/docs.yaml/badge.svg
+[github-actions-docs]: https://github.com/versatica/rtp.js/actions/workflows/docs.yaml
