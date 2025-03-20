@@ -65,7 +65,7 @@ async function run() {
 		}
 
 		case 'typescript:watch': {
-			void watchTypescript();
+			watchTypescript();
 
 			break;
 		}
@@ -163,7 +163,7 @@ function buildTypescript() {
 	fs.rmSync('lib/test', { recursive: true, force: true });
 }
 
-async function watchTypescript() {
+function watchTypescript() {
 	logInfo('watchTypescript()');
 
 	deleteLib();
