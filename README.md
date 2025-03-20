@@ -78,7 +78,7 @@ npm install rtp.js
   // Using ESM:
   import { packets as rtpJsPackets, utils as rtpJsUtils } from 'rtp.js';
 
-  // Using CJS:
+  // Using CommonJS:
   const { packets: rtpJsPackets, utils: rtpJsUtils } = require('rtp.js');
 
   const { RtpPacket /* etc. */ } = rtpJsPackets;
