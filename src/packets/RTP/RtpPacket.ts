@@ -1262,7 +1262,7 @@ export class RtpPacket extends Packet {
 	 * @remarks
 	 * - Serialization is needed after calling this method.
 	 */
-	rtxEncode(payloadType: number, ssrc: number, sequenceNumber: number) {
+	rtxEncode(payloadType: number, ssrc: number, sequenceNumber: number): void {
 		// Rewrite the payload type.
 		this.setPayloadType(payloadType);
 
@@ -1314,7 +1314,7 @@ export class RtpPacket extends Packet {
 	 * @throws
 	 * - If payload length is less than 2 bytes, so RTX decode is not possible.
 	 */
-	rtxDecode(payloadType: number, ssrc: number) {
+	rtxDecode(payloadType: number, ssrc: number): void {
 		if (this.#payloadView.byteLength < 2) {
 			throw new RangeError(
 				'payload length must be greater or equal than 2 bytes'

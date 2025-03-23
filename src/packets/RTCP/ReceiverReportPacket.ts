@@ -247,7 +247,7 @@ export class ReceiverReportPacket extends RtcpPacket {
 	/**
 	 * Set sender SSRC.
 	 */
-	setSsrc(ssrc: number) {
+	setSsrc(ssrc: number): void {
 		this.view.setUint32(4, ssrc);
 	}
 
@@ -486,7 +486,7 @@ export class ReceptionReport extends Serializable {
 	/**
 	 * Set interarrival jitter.
 	 */
-	setJitter(jitter: number) {
+	setJitter(jitter: number): void {
 		this.view.setUint32(12, jitter);
 
 		this.setSerializationNeeded(true);

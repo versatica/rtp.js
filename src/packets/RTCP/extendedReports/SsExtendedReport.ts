@@ -578,7 +578,7 @@ export class SsExtendedReport extends ExtendedReport {
 		this.setSerializationNeeded(true);
 	}
 
-	private hasLostPacketsBit() {
+	private hasLostPacketsBit(): boolean {
 		return readBitInDataView({ view: this.view, pos: 1, bit: 7 });
 	}
 
@@ -590,7 +590,7 @@ export class SsExtendedReport extends ExtendedReport {
 		}
 	}
 
-	private hasDuplicatePacketsBit() {
+	private hasDuplicatePacketsBit(): boolean {
 		return readBitInDataView({ view: this.view, pos: 1, bit: 6 });
 	}
 
@@ -602,7 +602,7 @@ export class SsExtendedReport extends ExtendedReport {
 		}
 	}
 
-	private hasJitterBit() {
+	private hasJitterBit(): boolean {
 		return readBitInDataView({ view: this.view, pos: 1, bit: 5 });
 	}
 

@@ -223,7 +223,7 @@ export abstract class FeedbackPacket extends RtcpPacket {
 	/**
 	 * Set sender SSRC.
 	 */
-	setSenderSsrc(ssrc: number) {
+	setSenderSsrc(ssrc: number): void {
 		this.view.setUint32(4, ssrc);
 	}
 
@@ -237,7 +237,7 @@ export abstract class FeedbackPacket extends RtcpPacket {
 	/**
 	 * Set media SSRC.
 	 */
-	setMediaSsrc(ssrc: number) {
+	setMediaSsrc(ssrc: number): void {
 		this.view.setUint32(8, ssrc);
 	}
 

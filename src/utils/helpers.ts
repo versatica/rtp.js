@@ -27,7 +27,7 @@ export function clone<T>(data: T): T {
 		// Available in Node >= 18.
 		return structuredClone(data);
 	} else {
-		return JSON.parse(JSON.stringify(data));
+		return JSON.parse(JSON.stringify(data)) as T;
 	}
 }
 
@@ -62,7 +62,7 @@ export function padTo4Bytes(size: number): number {
  * @category Utils
  * @hidden
  */
-export function areDataViewsEqual(view1: DataView, view2: DataView) {
+export function areDataViewsEqual(view1: DataView, view2: DataView): boolean {
 	if (view1 === view2) {
 		logger.debug(
 			'areDataViewsEqual() | view1 and view2 are the same DataView instance'

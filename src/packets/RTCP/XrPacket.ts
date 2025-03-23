@@ -289,7 +289,7 @@ export class XrPacket extends RtcpPacket {
 	/**
 	 * Set sender SSRC.
 	 */
-	setSsrc(ssrc: number) {
+	setSsrc(ssrc: number): void {
 		this.view.setUint32(4, ssrc);
 	}
 

@@ -53,13 +53,13 @@ async function run() {
 		//
 		// So here we compile TypeScript to JavaScript.
 		case 'prepare': {
-			buildTypescript();
+			buildTypescript({ force: false });
 
 			break;
 		}
 
 		case 'typescript:build': {
-			buildTypescript();
+			buildTypescript({ force: true });
 
 			break;
 		}
@@ -150,17 +150,17 @@ function deleteLib() {
 	fs.rmSync('lib', { recursive: true, force: true });
 }
 
-function buildTypescript() {
+function buildTypescript({ force }) {
+	if (!force && fs.existsSync('node/lib')) {
+		return;
+	}
+
 	logInfo('buildTypescript()');
 
 	deleteLib();
 
 	// Generate .js CommonJS code and .d.ts TypeScript declaration files in lib/.
 	executeCmd('tsc');
-
-	// Delete generated lib/test because we don't to expose them in the published
-	// library.
-	fs.rmSync('lib/test', { recursive: true, force: true });
 }
 
 function watchTypescript() {
@@ -210,7 +210,7 @@ function checkRelease() {
 	logInfo('checkRelease()');
 
 	installDeps();
-	buildTypescript();
+	buildTypescript({ force: true });
 	lint();
 	test();
 	checkDocs();
