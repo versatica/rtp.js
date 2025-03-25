@@ -143,7 +143,8 @@ export abstract class Serializable {
 	}
 
 	/**
-	 * This method returns a buffer (plus byte offset) for the child to serialize.
+	 * This method returns a buffer (plus byte offset and byt elength) for the
+	 * child to serialize.
 	 * If a buffer (and optionally a byte offset) is given, this method will verify
 	 * whether the serialized content can fit into it and will throw otherwise.
 	 */
