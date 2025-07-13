@@ -44,7 +44,7 @@
 		"nodejs"
 	],
 	"engines": {
-		"node": ">=18"
+		"node": ">=20"
 	},
 	"scripts": {
 		"prepare": "node npm-scripts.mjs prepare",
