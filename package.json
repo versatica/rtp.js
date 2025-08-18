@@ -61,9 +61,9 @@
 		"docs:check": "node npm-scripts.mjs docs:check"
 	},
 	"dependencies": {
-		"@types/node": "^24.2.1",
+		"@types/node": "^24.3.0",
 		"debug": "^4.4.1",
-		"supports-color": "^10.1.0"
+		"supports-color": "^10.2.0"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.33.0",

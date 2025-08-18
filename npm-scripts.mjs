@@ -102,12 +102,7 @@ async function run() {
 		}
 
 		case 'release': {
-			checkRelease();
-			executeCmd(`git commit -am '${pkg.version}'`);
-			executeCmd(`git tag -a ${pkg.version} -m '${pkg.version}'`);
-			executeCmd(`git push origin ${RELEASE_BRANCH}`);
-			executeCmd(`git push origin '${pkg.version}'`);
-			executeInteractiveCmd('npm publish');
+			release();
 
 			break;
 		}
@@ -218,6 +213,17 @@ function checkRelease() {
 	lint();
 	test();
 	checkDocs();
+}
+
+function release() {
+	logInfo('release()');
+
+	checkRelease();
+	executeCmd(`git commit -am '${pkg.version}'`);
+	executeCmd(`git tag -a ${pkg.version} -m '${pkg.version}'`);
+	executeCmd(`git push origin ${RELEASE_BRANCH}`);
+	executeCmd(`git push origin '${pkg.version}'`);
+	executeInteractiveCmd('npm publish');
 }
 
 function generateDocs() {
