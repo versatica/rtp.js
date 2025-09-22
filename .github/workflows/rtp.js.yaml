@@ -21,8 +21,6 @@ jobs:
             node: 20
           - os: ubuntu-24.04
             node: 22
-          - os: macos-13
-            node: 20
           - os: macos-14
             node: 22
           - os: macos-15
