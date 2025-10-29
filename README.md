@@ -96,7 +96,7 @@ npm install rtp.js
 
 ## License
 
-[ISC](./LICENSE)
+[ISC](./LICENSE.md)
 
 [npm-shield-rtp.js]: https://img.shields.io/npm/v/rtp.js.svg
 [npm-rtp.js]: https://npmjs.org/package/rtp.js

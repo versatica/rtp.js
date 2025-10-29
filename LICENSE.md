@@ -1,4 +1,4 @@
-ISC License
+# ISC License
 
 Copyright © 2020, Iñaki Baz Castillo <ibc@aliax.net>
 

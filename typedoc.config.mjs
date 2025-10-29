@@ -23,7 +23,8 @@ const config = {
 	categorizeByGroup: false,
 	categoryOrder: ['RTP', 'RTCP', 'RTCP Extended Reports', 'Utils', '*'],
 	searchInComments: true,
-	projectDocuments: ['README.md', 'LICENSE'],
+	readme: 'README.md',
+	projectDocuments: ['README.md', 'LICENSE.md'],
 	navigationLinks: {
 		GitHub: 'https://github.com/versatica/rtp.js',
 		NPM: 'https://www.npmjs.com/package/rtp.js',
