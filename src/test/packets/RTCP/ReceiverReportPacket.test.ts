@@ -13,7 +13,7 @@ const receptionReportDump1: ReceptionReportDump = {
 	byteLength: 24,
 	ssrc: 26422708,
 	fractionLost: 80,
-	totalLost: 216,
+	totalLost: -1,
 	highestSeq: 342342,
 	jitter: 0,
 	lsr: 8234,
@@ -47,9 +47,9 @@ describe('parse RTCP Receiver Report packet', () => {
 		0x2d,
 		0xb4, // SSRC: 0x01932db4
 		0x50,
-		0x00,
-		0x00,
-		0xd8, // Fraction lost: 80, Total lost: 216
+		0xff,
+		0xff,
+		0xff, // Fraction lost: 80, Total lost: -1
 		0x00,
 		0x05,
 		0x39,
@@ -134,9 +134,9 @@ describe('parse RTCP Receiver Report packet', () => {
 			0x2d,
 			0xb4, // SSRC: 0x01932db4
 			0x50,
-			0x00,
-			0x00,
-			0xd8, // Fraction lost: 80, Total lost: 216
+			0xff,
+			0xff,
+			0xff, // Fraction lost: 80, Total lost: -1
 			0x00,
 			0x05,
 			0x39,
@@ -325,9 +325,9 @@ describe('parse RTCP Reception Report', () => {
 		0x2d,
 		0xb4, // SSRC: 0x01932db4
 		0x50,
-		0x00,
-		0x00,
-		0xd8, // Fraction lost: 80, Total lost: 216
+		0xff,
+		0xff,
+		0xff, // Fraction lost: 80, Total lost: -1
 		0x00,
 		0x05,
 		0x39,

@@ -5,6 +5,10 @@ import {
 	COMMON_HEADER_LENGTH,
 } from './RtcpPacket';
 import { Serializable, type SerializableDump } from '../Serializable';
+import {
+	readSigned3BytesInDataView,
+	writeSigned3BytesInDataView,
+} from '../../utils/byteOps';
 
 // Common RTCP header length + 4 (SSRC of packet sender).
 const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 4;
@@ -422,40 +426,21 @@ export class ReceptionReport extends Serializable {
 	 * Get total lost.
 	 */
 	getTotalLost(): number {
-		let value = this.view.getUint32(4) & 0x0fff;
-
-		// Possitive value.
-		if (((value >> 23) & 1) == 0) {
-			return value;
-		}
-
-		// Negative value.
-		if (value != 0x0800000) {
-			value &= ~(1 << 23);
-		}
-
-		return -value;
+		return readSigned3BytesInDataView({
+			view: this.view,
+			pos: 5,
+		});
 	}
 
 	/**
 	 * Set total lost.
 	 */
 	setTotalLost(totalLost: number): void {
-		// Get the limit value for possitive and negative total lost.
-		const clamp =
-			totalLost >= 0
-				? totalLost > 0x07fffff
-					? 0x07fffff
-					: totalLost
-				: -totalLost > 0x0800000
-					? 0x0800000
-					: -totalLost;
-
-		const value = totalLost >= 0 ? clamp & 0x07fffff : clamp | 0x0800000;
-		const fractionLost = this.view.getUint8(4);
-
-		this.view.setUint32(4, value);
-		this.view.setUint8(4, fractionLost);
+		writeSigned3BytesInDataView({
+			view: this.view,
+			pos: 5,
+			value: totalLost,
+		});
 
 		this.setSerializationNeeded(true);
 	}
