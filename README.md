@@ -20,25 +20,25 @@ npm install rtp.js
 
   ```ts
   import {
-    isRtp,
-    isRtcp,
-    RtpPacket,
-    CompoundPacket,
-    ReceiverReportPacket,
-    SenderReportPacket,
-    ReceptionReport,
-    ByePacket,
-    SdesPacket,
-    NackPacket,
-    SrReqPacket,
-    EcnPacket,
-    PliPacket,
-    SliPacket,
-    RpsiPacket,
-    XrPacket,
-    ExtendedJitterReportsPacket,
-    GenericPacket,
-    // etc.
+  	isRtp,
+  	isRtcp,
+  	RtpPacket,
+  	CompoundPacket,
+  	ReceiverReportPacket,
+  	SenderReportPacket,
+  	ReceptionReport,
+  	ByePacket,
+  	SdesPacket,
+  	NackPacket,
+  	SrReqPacket,
+  	EcnPacket,
+  	PliPacket,
+  	SliPacket,
+  	RpsiPacket,
+  	XrPacket,
+  	ExtendedJitterReportsPacket,
+  	GenericPacket,
+  	// etc.
   } from 'rtp.js/packets';
 
   const rtpPacket = new RtpPacket();
@@ -48,18 +48,18 @@ npm install rtp.js
 
   ```ts
   import {
-    padTo4Bytes,
-    nodeBufferToDataView,
-    dataViewToNodeBuffer,
-    nodeBufferToArrayBuffer,
-    arrayBufferToNodeBuffer,
-    numericArrayToDataView,
-    numberToDataView,
-    dataViewToString,
-    arrayBufferToString,
-    stringToDataView,
-    getStringByteLength,
-    // etc.
+  	padTo4Bytes,
+  	nodeBufferToDataView,
+  	dataViewToNodeBuffer,
+  	nodeBufferToArrayBuffer,
+  	arrayBufferToNodeBuffer,
+  	numericArrayToDataView,
+  	numberToDataView,
+  	dataViewToString,
+  	arrayBufferToString,
+  	stringToDataView,
+  	getStringByteLength,
+  	// etc.
   } from 'rtp.js/utils';
 
   const view = stringToDataView('fooœæ€ñ#¢∞Ω©bar');
