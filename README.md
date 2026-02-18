@@ -102,5 +102,5 @@ npm install rtp.js
 [npm-rtp.js]: https://npmjs.org/package/rtp.js
 [github-actions-shield-rtp.js]: https://github.com/versatica/rtp.js/actions/workflows/rtp.js.yaml/badge.svg?branch=master
 [github-actions-rtp.js]: https://github.com/versatica/rtp.js/actions/workflows/rtp.js.yaml?query=branch%3Amaster
-[github-actions-shield-docs]: https://github.com/versatica/rtp.js/actions/workflows/docs.yaml/badge.svg
-[github-actions-docs]: https://github.com/versatica/rtp.js/actions/workflows/docs.yaml
+[github-actions-shield-docs]: https://github.com/versatica/rtp.js/actions/workflows/docs.yaml/badge.svg?branch=master
+[github-actions-docs]: https://github.com/versatica/rtp.js/actions/workflows/docs.yaml?query=branch%3Amaster
