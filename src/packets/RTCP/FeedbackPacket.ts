@@ -84,8 +84,6 @@ function messageTypeToString(
 ): string {
 	switch (packetType) {
 		case RtcpPacketType.RTPFB: {
-			messageType = messageType as RtpFeedbackMessageType;
-
 			switch (messageType) {
 				case RtpFeedbackMessageType.NACK: {
 					return 'Generic NACK';
@@ -100,18 +98,12 @@ function messageTypeToString(
 				}
 
 				default: {
-					assertUnreachable(messageType);
+					throw new TypeError(`unknown RTPFB message type ${messageType}`);
 				}
 			}
-
-			// @ts-expect-error --- Ignore "error TS7027: Unreachable code detected"
-			// to not conflict with ESLint rules.
-			break;
 		}
 
 		case RtcpPacketType.PSFB: {
-			messageType = messageType as PsFeedbackMessageType;
-
 			switch (messageType) {
 				case PsFeedbackMessageType.PLI: {
 					return 'Picture Loss Indication';
@@ -130,13 +122,9 @@ function messageTypeToString(
 				}
 
 				default: {
-					assertUnreachable(messageType);
+					throw new TypeError(`unknown PSFB message type ${messageType}`);
 				}
 			}
-
-			// @ts-expect-error --- Ignore "error TS7027: Unreachable code detected"
-			// to not conflict with ESLint rules.
-			break;
 		}
 
 		default: {
