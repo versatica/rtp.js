@@ -59,8 +59,7 @@ export class GenericFeedbackPacket extends FeedbackPacket {
 	) {
 		super(
 			(view ? getRtcpPacketType(view) : packetType!) as
-				| RtcpPacketType.RTPFB
-				| RtcpPacketType.PSFB,
+				RtcpPacketType.RTPFB | RtcpPacketType.PSFB,
 			view ? getRtcpFeedbackMessageType(view) : messageType!,
 			view
 		);
