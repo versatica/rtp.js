@@ -1,28 +1,61 @@
-import { clone } from '../utils/helpers';
+import { isUnsignedInteger } from '../utils/helpers';
 
 /**
  * Serializable info dump.
  */
 export type SerializableDump = {
-	byteLength: number;
+	/**
+	 * Current exact length (in bytes), including padding bytes (if any).
+	 */
+	length: number;
+	/**
+	 * Maximum length (in bytes) the serializable can take.
+	 */
+	bufferLength: number;
 };
 
 /**
- * Class holding a serializable buffer view. All RTP and RTCP packets inherit
- * from this class, and also items in some RTCP packets.
+ * Class holding serializable content. RTP and RTCP packets and some items
+ * within them inherit from this class.
+ *
+ * The content lives in a `Uint8Array` given by the application, whose
+ * `byteLength` is the maximum length the serializable can take. Every change
+ * is applied in place within that buffer, so the content is always
+ * serialized.
+ *
+ * @remarks
+ * - Typically many packets and items include padding bytes to be multiple of
+ *   4 bytes. It's up to each packet or item to deal with padding. From the
+ *   point of view of the Serializable class, its length includes its padding
+ *   bytes (if any).
  */
 export abstract class Serializable {
-	// Buffer view holding the packet or item content.
-	// @ts-expect-error --- 'view' has not initializer and is not assigned in
-	// constructor.
-	protected view: DataView;
-	// Whether serialization is needed due to recent modifications.
-	#serializationNeeded: boolean = false;
+	// Buffer holding the serializable content. Its byteLength is the maximum
+	// length the serializable can take.
+	#buffer: Uint8Array;
+	// DataView over the same memory as #buffer.
+	#view: DataView;
+	// Current exact length (includes padding bytes).
+	#length: number = 0;
+	// Listener set by the parent serializable in which this one is being built
+	// in place. It's removed by consolidate() and discard() before being
+	// invoked.
+	#buildInPlaceListener?: (consolidate: boolean) => void;
+	// Whether some item is being built in place within this serializable and
+	// consolidate() or discard() wasn't invoked on it yet.
+	#needsConsolidation: boolean = false;
 
-	protected constructor(view?: DataView) {
-		if (view) {
-			this.view = view;
-		}
+	/**
+	 * @param buffer - Buffer holding the serializable. Its `byteLength` is the
+	 *   maximum length the serializable can take.
+	 */
+	protected constructor(buffer: Uint8Array) {
+		this.#buffer = buffer;
+		this.#view = new DataView(
+			buffer.buffer,
+			buffer.byteOffset,
+			buffer.byteLength
+		);
 	}
 
 	/**
@@ -30,224 +63,374 @@ export abstract class Serializable {
 	 */
 	dump(): SerializableDump {
 		return {
-			byteLength: this.getByteLength(),
+			length: this.#length,
+			bufferLength: this.#buffer.byteLength,
 		};
 	}
 
 	/**
-	 * Get a buffer view containing the serialized content of the packet or item.
-	 *
-	 * @param serializationBuffer - Buffer in which the content will be serialized
-	 *   in case serialization is needed. If not given, a new one will internally
-	 *   allocated.
-	 * @param serializationByteOffset - Byte offset of the given `serializationBuffer`
-	 *   where serialization (if needed) will start.
+	 * Get a view of the exact bytes of the serializable, ready to be sent.
 	 *
 	 * @remarks
-	 * - The internal buffer is serialized if needed (to apply pending
-	 * 	 modifications) by internally calling {@link serialize}.
+	 * - It doesn't copy any byte. The returned `Uint8Array` shares memory with
+	 *   the serializable, so later modifications in the serializable are
+	 *   visible through it.
+	 */
+	getBuffer(): Uint8Array {
+		return this.#buffer.subarray(0, this.#length);
+	}
+
+	/**
+	 * Maximum length (in bytes) the serializable can take. It's guaranteed to
+	 * be equal or greater than value returned by {@link getLength}.
+	 */
+	getBufferLength(): number {
+		return this.#buffer.byteLength;
+	}
+
+	/**
+	 * Current exact length (in bytes) of the serializable, including padding
+	 * bytes (if any).
+	 */
+	getLength(): number {
+		return this.#length;
+	}
+
+	/**
+	 * Current available length (in bytes) of the serializable.
+	 */
+	getAvailableLength(): number {
+		return this.#buffer.byteLength - this.#length;
+	}
+
+	/**
+	 * Serialize the serializable into a new buffer. This method copies the
+	 * bytes of the serializable into the given buffer, which becomes the buffer
+	 * of the serializable.
+	 *
+	 * @param buffer - The new buffer. Its `byteLength` is the new maximum
+	 *   length the serializable can take. It may share memory with the current
+	 *   buffer.
 	 *
 	 * @throws
-	 * - If buffer serialization is needed and it fails due to invalid
-	 *   content.
+	 * - `Error` if some item is being built in place within this serializable
+	 *   (see {@link needsConsolidation}).
+	 * - `TypeError` if `buffer.byteLength` is lower than the current length of
+	 *   the serializable.
 	 */
-	getView(
-		serializationBuffer?: ArrayBufferLike,
-		serializationByteOffset?: number
-	): DataView {
-		if (this.needsSerialization()) {
-			this.serialize(serializationBuffer, serializationByteOffset);
+	serialize(buffer: Uint8Array): void {
+		// An item being built in place is beyond the current length, so it would
+		// not be serialized.
+		this.assertDoesNotNeedConsolidation();
+
+		if (buffer.byteLength < this.#length) {
+			throw new TypeError(
+				`buffer length (${buffer.byteLength} bytes) is lower than current length (${this.#length} bytes)`
+			);
 		}
 
-		return this.view;
+		// NOTE: set() copies properly even if both arrays share memory.
+		buffer.set(this.#buffer.subarray(0, this.#length));
+
+		this.setBuffer(buffer);
 	}
 
 	/**
-	 * Computes total length of the content (in bytes) including padding if any.
+	 * Clone the serializable into a new buffer. This method returns a new
+	 * instance of the Serializable subclass which doesn't share any memory
+	 * with the original one.
 	 *
-	 * @remarks
-	 * - This methods computes the effective byte length of the content as if it
-	 *   was serialized at this moment, no matter modifications have been done
-	 *   before.
-	 */
-	abstract getByteLength(): number;
-
-	/**
-	 * Whether serialization is needed, meaning that the current buffer view
-	 * doesn't represent the current content of the packet or item (due to
-	 * modifications not applied yet). Calling {@link serialize} or {@link getView}
-	 * will serialize the packet or the item.
-	 */
-	needsSerialization(): boolean {
-		return this.#serializationNeeded;
-	}
-
-	/**
-	 * Apply pending changes and serialize the content of the packet or item into
-	 * a new buffer.
-	 *
-	 * @param buffer - Buffer in which the content will be serialized. If not
-	 *   given, a new one will internally allocated.
-	 * @param byteOffset - Byte offset of the given `buffer` where serialization
-	 *   will start.
-	 *
-	 * @remarks
-	 * - In most cases there is no need to use this method since many setter
-	 *   methods apply changes within the current buffer. To be sure, check
-	 *   {@link needsSerialization} before.
+	 * @param buffer - The buffer for the cloned serializable. Its `byteLength`
+	 *   is the maximum length the cloned serializable can take.
 	 *
 	 * @throws
-	 * - If serialization fails due to invalid content previously added.
-	 * - If given `buffer` doesn't have space enough to serialize the content.
-	 * - If the `buffer` member of the given `ArrayBufferLike` is the same than the
-	 *   internal buffer in this packet and the given `byteOffset` would make
-	 *   the serialization happen in bytes currently used by the packet (this would
-	 *   corrupt the packet).
+	 * - `Error` if some item is being built in place within this serializable
+	 *   (see {@link needsConsolidation}).
+	 * - `TypeError` if `buffer.byteLength` is lower than the current length of
+	 *   the serializable.
+	 * - `TypeError` if `buffer` overlaps the bytes of the serializable.
 	 */
-	abstract serialize(buffer?: ArrayBufferLike, byteOffset?: number): void;
+	abstract clone(buffer: Uint8Array): Serializable;
 
 	/**
-	 * Clone the packet or item. The cloned instance does not share any memory
-	 * with the original one. The cloned instance is a new class instance
-	 * referencing a different buffer.
-	 *
-	 * @param buffer - Buffer in which the content will be cloned. If not given, a
-	 *   new one will internally allocated.
-	 * @param byteOffset - Byte offset of the given `buffer` where clonation will
-	 *   start.
-	 * @param serializationBuffer - Buffer in which the content will be serialized
-	 *   in case serialization is needed. If not given, a new one will internally
-	 *   allocated.
-	 * @param serializationByteOffset - Byte offset of the given
-	 *   `serializationBuffer` where serialization (if needed) will start.
+	 * The application must call this method on a serializable that's been
+	 * built in place within a parent serializable, once it's completed, so the
+	 * parent adds it and updates its length.
 	 *
 	 * @remarks
-	 * - The buffer is serialized if needed (to apply pending modifications) by
-	 *   internally calling {@link serialize}.
+	 * - This method or {@link discard} can only be called once.
+	 * - Once consolidated, the serializable MUST NOT be modified, since the
+	 *   parent does not track later changes (for example, a change in its
+	 *   length would leave the parent with a wrong length).
 	 *
 	 * @throws
-	 * - If serialization is needed and it fails.
-	 * - If given `buffer` doesn't have space enough to clone the content.
-	 * - If given `serializationBuffer` doesn't have space enough to serialize
-	 *   the content.
+	 * - `Error` if this serializable is not being built in place within a
+	 *   parent, or if this method or {@link discard} was already called.
+	 * - `Error` if some item is being built in place within this serializable
+	 *   (see {@link needsConsolidation}), in which case nothing changes and
+	 *   this method can be called again.
+	 * - If the parent has no space for this serializable.
 	 */
-	abstract clone(
-		buffer?: ArrayBufferLike,
-		byteOffset?: number,
-		serializationBuffer?: ArrayBufferLike,
-		serializationByteOffset?: number
-	): Serializable;
+	consolidate(): void {
+		const listener = this.#takeBuildInPlaceListener();
 
-	protected setSerializationNeeded(flag: boolean): void {
-		this.#serializationNeeded = flag;
+		listener(/* consolidate */ true);
 	}
 
 	/**
-	 * This method returns a buffer (plus byte offset and byte length) for the
-	 * child to serialize.
-	 * If a buffer (and optionally a byte offset) is given, this method will verify
-	 * whether the serialized content can fit into it and will throw otherwise.
+	 * The application can call this method, instead of {@link consolidate}, on
+	 * a serializable that's been built in place within a parent serializable
+	 * in order to remove it from the parent. The parent is left as it was
+	 * before the serializable was built in place.
+	 *
+	 * @remarks
+	 * - The serializable MUST NOT be used after calling this method (unless it
+	 *   throws), since its bytes belong to the parent's free space.
+	 * - This method or {@link consolidate} can only be called once.
+	 *
+	 * @throws
+	 * - `Error` if this serializable is not being built in place within a
+	 *   parent, or if this method or {@link consolidate} was already called.
+	 * - `Error` if some item is being built in place within this serializable
+	 *   (see {@link needsConsolidation}), in which case nothing changes and
+	 *   this method can be called again.
 	 */
-	protected getSerializationBuffer(
-		buffer: ArrayBufferLike | undefined,
-		byteOffset: number = 0
-	): {
-		buffer: ArrayBufferLike;
-		byteOffset: number;
-		byteLength: number;
-	} {
-		const byteLength = this.getByteLength();
+	discard(): void {
+		const listener = this.#takeBuildInPlaceListener();
 
-		if (buffer) {
-			if (buffer.byteLength - byteOffset < byteLength) {
-				throw new RangeError(
-					`given buffer available space (${
-						buffer.byteLength - byteOffset
-					} bytes) is less than length required for serialization (${byteLength} bytes)`
-				);
-			}
-
-			// If the given buffer is the same as the one internally used by the view
-			// of this packet, we must assert that the new serialization would not
-			// happen in bytes where the packet currently exists.
-			// Here we must take into account the given byte offset and the byte
-			// offset of the view, the current packet length and the expected packet
-			// length after the serialization.
-			if (
-				buffer === this.view.buffer &&
-				((byteOffset >= this.view.byteOffset &&
-					byteOffset <= this.view.byteOffset + this.view.byteLength - 1) ||
-					(byteOffset + byteLength - 1 >= this.view.byteOffset &&
-						byteOffset + byteLength <=
-							this.view.byteOffset + this.view.byteLength - 1))
-			) {
-				throw new RangeError(
-					'given buffer is the same as the internal buffer of the packet and given byteLength would make serialization override existing packet data'
-				);
-			}
-
-			const uint8Array = new Uint8Array(buffer, byteOffset, byteLength);
-
-			// If a buffer is given, ensure the required length is filled with zeroes.
-			uint8Array.fill(0);
-		} else {
-			// The buffer is guaranteed to be filled with zeros.
-			buffer = new ArrayBuffer(byteLength);
-		}
-
-		return { buffer, byteOffset, byteLength };
+		listener(/* consolidate */ false);
 	}
 
-	protected cloneInternal(
-		buffer: ArrayBufferLike | undefined,
-		byteOffset: number = 0,
-		serializationBuffer?: ArrayBufferLike,
-		serializationByteOffset?: number
-	): DataView {
-		if (this.needsSerialization()) {
-			this.serialize(serializationBuffer, serializationByteOffset);
+	/**
+	 * Whether some item is being built in place within this serializable and
+	 * {@link consolidate} or {@link discard} wasn't invoked on it yet.
+	 */
+	needsConsolidation(): boolean {
+		return this.#needsConsolidation;
+	}
+
+	/**
+	 * DataView over the whole buffer of the serializable, to read and write
+	 * multi-byte fields.
+	 */
+	protected getView(): DataView {
+		return this.#view;
+	}
+
+	/**
+	 * Change the buffer of the serializable without copying any byte.
+	 *
+	 * @remarks
+	 * - Subclasses holding items within their buffer must override this method,
+	 *   call {@link setItemBuffer} for each item and then call the parent
+	 *   method.
+	 *
+	 * @throws
+	 * - `TypeError` if `buffer.byteLength` is lower than the current length of
+	 *   the serializable.
+	 */
+	protected setBuffer(buffer: Uint8Array): void {
+		if (
+			buffer.buffer === this.#buffer.buffer &&
+			buffer.byteOffset === this.#buffer.byteOffset &&
+			buffer.byteLength === this.#buffer.byteLength
+		) {
+			return;
 		}
 
-		let view: DataView;
+		if (buffer.byteLength < this.#length) {
+			throw new TypeError(
+				`buffer length (${buffer.byteLength} bytes) is lower than current length (${this.#length} bytes)`
+			);
+		}
 
-		// If buffer is given, let's check whether it holds enough space for the
-		// content.
-		if (buffer) {
-			if (buffer.byteLength - byteOffset < this.view.byteLength) {
-				throw new RangeError(
-					`given buffer available space (${
-						buffer.byteLength - byteOffset
-					} bytes) is less than length required for clonation (${
-						this.view.byteLength
-					} bytes)`
-				);
+		this.#buffer = buffer;
+		this.#view = new DataView(
+			buffer.buffer,
+			buffer.byteOffset,
+			buffer.byteLength
+		);
+	}
+
+	/**
+	 * Make given item, which lives within the buffer of this serializable, live
+	 * at the same position within the given new buffer of this serializable.
+	 *
+	 * @remarks
+	 * - It must be called before this serializable changes its buffer, since
+	 *   the position of the item is computed relative to the current one.
+	 *
+	 * @throws
+	 * - `Error` if given item doesn't live within the buffer of this
+	 *   serializable.
+	 */
+	protected setItemBuffer(item: Serializable, buffer: Uint8Array): void {
+		const offset = item.#buffer.byteOffset - this.#buffer.byteOffset;
+
+		if (
+			item.#buffer.buffer !== this.#buffer.buffer ||
+			offset < 0 ||
+			offset + item.#buffer.byteLength > this.#buffer.byteLength
+		) {
+			throw new Error('item does not live within the buffer');
+		}
+
+		item.setBuffer(buffer.subarray(offset, offset + item.#buffer.byteLength));
+	}
+
+	/**
+	 * Method to be called by the subclass to update the current exact length
+	 * of the serializable.
+	 *
+	 * @remarks
+	 * - The subclass must invoke this method after parsing completes and after
+	 *   every change in the serializable content that affects its current
+	 *   length.
+	 *
+	 * @throws
+	 * - `TypeError` if given `length` is not an unsigned integer.
+	 * - `TypeError` if given `length` is larger than the buffer length of the
+	 *   serializable.
+	 */
+	protected setLength(length: number): void {
+		if (!isUnsignedInteger(length)) {
+			throw new TypeError(`length (${length}) must be an unsigned integer`);
+		} else if (length > this.#buffer.byteLength) {
+			throw new TypeError(
+				`length (${length} bytes) is larger than buffer length (${this.#buffer.byteLength} bytes)`
+			);
+		}
+
+		this.#length = length;
+	}
+
+	/**
+	 * Copy the bytes of this serializable into the given one, which must be a
+	 * new instance of the same subclass, and set its length.
+	 *
+	 * @throws
+	 * - `Error` if some item is being built in place within this serializable
+	 *   (see {@link needsConsolidation}).
+	 * - `TypeError` if the buffer length of the given `serializable` is lower
+	 *   than the current length of this serializable.
+	 * - `TypeError` if the buffer of the given `serializable` overlaps the bytes
+	 *   of this serializable.
+	 */
+	protected cloneInto(serializable: Serializable): void {
+		// An item being built in place is beyond the current length, so it would
+		// not be cloned.
+		this.assertDoesNotNeedConsolidation();
+
+		if (serializable.#buffer.byteLength < this.#length) {
+			throw new TypeError(
+				`buffer length (${serializable.#buffer.byteLength} bytes) is lower than current length (${this.#length} bytes)`
+			);
+		}
+
+		const byteOffset = this.#buffer.byteOffset;
+		const clonedByteOffset = serializable.#buffer.byteOffset;
+
+		// The clone would overwrite the bytes of this serializable.
+		if (
+			serializable.#buffer.buffer === this.#buffer.buffer &&
+			clonedByteOffset < byteOffset + this.#length &&
+			byteOffset < clonedByteOffset + this.#length
+		) {
+			throw new TypeError(
+				'given buffer overlaps the bytes of the serializable'
+			);
+		}
+
+		serializable.#buffer.set(this.#buffer.subarray(0, this.#length));
+		serializable.#length = this.#length;
+	}
+
+	/**
+	 * Fill the last given `padding` number of bytes of the serializable with
+	 * zeros.
+	 *
+	 * @remarks
+	 * - This method does NOT add bytes to the serializable.
+	 *
+	 * @throws
+	 * - `TypeError` if given `padding` is greater than the current length.
+	 */
+	protected fillPadding(padding: number): void {
+		if (padding > this.#length) {
+			throw new TypeError(
+				`padding (${padding} bytes) cannot be greater than length (${this.#length} bytes)`
+			);
+		}
+
+		this.#buffer.fill(0, this.#length - padding, this.#length);
+	}
+
+	/**
+	 * To be called by a parent serializable once it has created, within its
+	 * free space, an item that the application is going to build in place.
+	 * When the application calls {@link consolidate} on the item, its buffer
+	 * length is fixed to its length and `onConsolidate` is invoked so the
+	 * parent adds it and updates its own length. When the application calls
+	 * {@link discard} on the item, the parent is left as it was.
+	 *
+	 * @remarks
+	 * - The parent must call {@link assertDoesNotNeedConsolidation} before
+	 *   creating the item, since another item being built in place would
+	 *   occupy the same free space.
+	 * - If `onConsolidate` throws, the item is not added and the error is
+	 *   thrown by {@link consolidate}.
+	 */
+	protected handleInPlaceItem<T extends Serializable>(
+		item: T,
+		onConsolidate: (item: T) => void
+	): void {
+		this.assertDoesNotNeedConsolidation();
+
+		this.#needsConsolidation = true;
+
+		item.#buildInPlaceListener = (consolidate: boolean): void => {
+			try {
+				if (!consolidate) {
+					return;
+				}
+
+				// Fix buffer length assigned to the item.
+				item.setBuffer(item.#buffer.subarray(0, item.#length));
+
+				onConsolidate(item);
+			} finally {
+				this.#needsConsolidation = false;
 			}
+		};
+	}
 
-			// Copy the content into the given buffer.
-			const uint8Array = new Uint8Array(
-				buffer,
-				byteOffset,
-				this.view.byteLength
+	/**
+	 * @throws
+	 * - `Error` if some item is being built in place within this serializable.
+	 *
+	 * @see {@link needsConsolidation}
+	 */
+	protected assertDoesNotNeedConsolidation(): void {
+		if (this.#needsConsolidation) {
+			throw new Error(
+				'Serializable needs consolidation of some item being built in place'
 			);
+		}
+	}
 
-			uint8Array.set(
-				new Uint8Array(
-					this.view.buffer,
-					this.view.byteOffset,
-					this.view.byteLength
-				),
-				0
-			);
+	#takeBuildInPlaceListener(): (consolidate: boolean) => void {
+		const listener = this.#buildInPlaceListener;
 
-			view = new DataView(
-				uint8Array.buffer,
-				uint8Array.byteOffset,
-				uint8Array.byteLength
-			);
-		} else {
-			view = clone<DataView>(this.view);
+		if (!listener) {
+			throw new Error('build in place listener not set');
 		}
 
-		return view;
+		// The listener of an item being built in place within this serializable
+		// refers to it.
+		this.assertDoesNotNeedConsolidation();
+
+		this.#buildInPlaceListener = undefined;
+
+		return listener;
 	}
 }
