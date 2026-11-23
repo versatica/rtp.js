@@ -1,3 +1,65 @@
+/**
+ * RTCP packets.
+ *
+ * ```ts
+ * import {
+ *   RtcpPacketType,
+ *   type RtcpPacketDump,
+ *   isRtcp,
+ *   RtcpPacket,
+ *   SdesItemType,
+ *   type SdesItem,
+ *   type SdesChunk,
+ *   type SdesPacketDump,
+ *   SdesPacket,
+ *   type ByePacketDump,
+ *   ByePacket,
+ *   type ReceptionReport,
+ *   type AnyReportPacket,
+ *   type ReceiverReportPacketDump,
+ *   ReceiverReportPacket,
+ *   type SenderReportPacketDump,
+ *   SenderReportPacket,
+ *   type XrPacketDump,
+ *   XrPacket,
+ *   type AnyFeedbackPacket,
+ *   TransportLayerFeedbackMessageType,
+ *   type AnyTransportLayerFeedbackPacket,
+ *   PayloadSpecificFeedbackMessageType,
+ *   type AnyPayloadSpecificFeedbackPacket,
+ *   type UnknownTransportLayerFeedbackPacketDump,
+ *   UnknownTransportLayerFeedbackPacket,
+ *   type UnknownPayloadSpecificFeedbackPacketDump,
+ *   UnknownPayloadSpecificFeedbackPacket,
+ *   type PliPacketDump,
+ *   PliPacket,
+ *   type NackItem,
+ *   type NackPacketDump,
+ *   NackPacket,
+ *   type FirItem,
+ *   type FirPacketDump,
+ *   FirPacket,
+ *   type RembPacketDump,
+ *   RembPacket,
+ *   type ReceivedRtpPacket,
+ *   type TransportWideCcPacketDump,
+ *   TransportWideCcPacket,
+ *   ExtendedReportBlockType,
+ *   type ExtendedReportDump,
+ *   type ExtendedReport,
+ *   type RrtExtendedReportDump,
+ *   RrtExtendedReport,
+ *   type DlrrSubBlock,
+ *   type DlrrExtendedReportDump,
+ *   DlrrExtendedReport,
+ *   type UnknownExtendedReportDump,
+ *   UnknownExtendedReport,
+ * } from 'rtp.js/packets/RTCP';
+ * ```
+ *
+ * @packageDocumentation
+ */
+
 export {
 	RtcpPacketType,
 	type RtcpPacketDump,

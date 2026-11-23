@@ -224,7 +224,7 @@ export class XrPacket extends RtcpPacket {
 		prototype: T;
 	}): T | undefined {
 		for (const extendedReport of this.#extendedReports) {
-			if (Object.getPrototypeOf(extendedReport) === type.prototype) {
+			if (extendedReport.constructor === type) {
 				return extendedReport as T;
 			}
 		}
