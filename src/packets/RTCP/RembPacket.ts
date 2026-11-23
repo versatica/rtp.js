@@ -26,6 +26,7 @@ const UNIQUE_IDENTIFIER = 0x52454d42;
  * Header included.
  *
  * @internal
+ * @knipignore
  */
 export const REMB_HEADER_LENGTH = 20;
 

@@ -16,6 +16,7 @@ import { write3BytesInDataView } from '../../utils/bytes';
  * Length (in bytes) of a FIR item.
  *
  * @internal
+ * @knipignore
  */
 export const FIR_ITEM_LENGTH = 8;
 

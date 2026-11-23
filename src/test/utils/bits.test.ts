@@ -6,6 +6,7 @@ import {
 	writeBits,
 	readBitInDataView,
 	writeBitInDataView,
+	toggleBitInDataView,
 	readBitsInDataView,
 	writeBitsInDataView,
 } from '../../utils/bits';
@@ -113,6 +114,24 @@ test('writeBitInDataView()', () => {
 	writeBitInDataView(view, 0, 7, true);
 	expect(readBitInDataView(view, 0, 0)).toBe(true);
 	expect(readBitInDataView(view, 0, 7)).toBe(true);
+});
+
+test('toggleBitInDataView()', () => {
+	toggleBitInDataView(view, 3, 0);
+	expect(view.getUint8(3)).toBe(0b00000010);
+
+	toggleBitInDataView(view, 3, 0);
+	expect(view.getUint8(3)).toBe(0b00000011);
+
+	toggleBitInDataView(view, 3, 7);
+	expect(view.getUint8(3)).toBe(0b10000011);
+
+	toggleBitInDataView(view, 4, 7);
+	expect(view.getUint8(4)).toBe(0b00000000);
+
+	// Adjacent bytes must not be modified.
+	expect(view.getUint8(2)).toBe(0b00000010);
+	expect(view.getUint8(5)).toBe(0b01000000);
 });
 
 test('readBitsInDataView()', () => {

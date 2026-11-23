@@ -26,6 +26,7 @@ export const DELTA_TICK_US = 250;
  * The reference time is expressed in multiples of this (in microseconds).
  *
  * @internal
+ * @knipignore
  */
 export const BASE_TIME_TICK_US = DELTA_TICK_US * (1 << 8);
 
@@ -33,6 +34,7 @@ export const BASE_TIME_TICK_US = DELTA_TICK_US * (1 << 8);
  * Period (in microseconds) after which the reference time wraps around.
  *
  * @internal
+ * @knipignore
  */
 export const TIME_WRAP_PERIOD_US = BASE_TIME_TICK_US * 2 ** 24;
 
@@ -40,6 +42,7 @@ export const TIME_WRAP_PERIOD_US = BASE_TIME_TICK_US * 2 ** 24;
  * Maximum number of RTP packets a feedback packet can contain status for.
  *
  * @internal
+ * @knipignore
  */
 export const MAX_REPORTED_RTP_PACKETS = 0xffff;
 
@@ -48,6 +51,7 @@ export const MAX_REPORTED_RTP_PACKETS = 0xffff;
  * Common Header included.
  *
  * @internal
+ * @knipignore
  */
 export const TRANSPORT_WIDE_CC_HEADER_LENGTH = 20;
 
@@ -110,6 +114,7 @@ export type TransportWideCcPacketDump = RtcpPacketDump & {
 	mediaSsrc: number;
 	baseSequenceNumber: number;
 	packetStatusCount: number;
+	baseTimeUs: number;
 	feedbackPacketCount: number;
 	hasDeltas: boolean;
 	receivedRtpPackets: ReceivedRtpPacket[];
@@ -147,6 +152,16 @@ class LastChunk {
 		clonedLastChunk.#hasLargeDelta = this.#hasLargeDelta;
 
 		return clonedLastChunk;
+	}
+
+	/**
+	 * Make this last chunk equal to the given one without creating a new one.
+	 */
+	copyFrom(lastChunk: LastChunk): void {
+		this.#deltaSizes.set(lastChunk.#deltaSizes);
+		this.#size = lastChunk.#size;
+		this.#allSame = lastChunk.#allSame;
+		this.#hasLargeDelta = lastChunk.#hasLargeDelta;
 	}
 
 	isEmpty(): boolean {
@@ -456,6 +471,9 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 	#lastTimestampUs = 0;
 	// Last packet chunk, also encoded in the buffer.
 	#lastChunk = new LastChunk();
+	// Copy of the last packet chunk to restore it if adding a received RTP
+	// packet fails, kept to not create one on each addition.
+	#savedLastChunk = new LastChunk();
 
 	/**
 	 * Parse a RTCP Transport-wide Congestion Control packet.
@@ -532,6 +550,7 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 			mediaSsrc: this.getMediaSsrc(),
 			baseSequenceNumber: this.getBaseSequenceNumber(),
 			packetStatusCount: this.getPacketStatusCount(),
+			baseTimeUs: this.getBaseTimeUs(),
 			feedbackPacketCount: this.getFeedbackPacketCount(),
 			hasDeltas: this.#hasDeltas,
 			receivedRtpPackets: this.getReceivedRtpPackets(),
@@ -607,7 +626,7 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 	 *
 	 * @throws
 	 * - `TypeError` if `baseSequenceNumber` is not an integer between 0 and
-	 *   65535 or if `referenceTimestampUs` is not an integer.
+	 *   65535 or if `referenceTimestampUs` is not a safe integer.
 	 * - `Error` if RTP packets have already been added.
 	 */
 	setBase(baseSequenceNumber: number, referenceTimestampUs: number): void {
@@ -615,9 +634,9 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 			throw new TypeError(
 				`baseSequenceNumber (${baseSequenceNumber}) must be an integer between 0 and 65535`
 			);
-		} else if (!Number.isInteger(referenceTimestampUs)) {
+		} else if (!Number.isSafeInteger(referenceTimestampUs)) {
 			throw new TypeError(
-				`referenceTimestampUs (${referenceTimestampUs}) must be an integer`
+				`referenceTimestampUs (${referenceTimestampUs}) must be a safe integer`
 			);
 		}
 
@@ -658,15 +677,17 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 	 *
 	 * @throws
 	 * - `TypeError` if `sequenceNumber` is not an integer between 0 and 65535
-	 *   or if `timestampUs` is not an integer.
+	 *   or if `timestampUs` is not a safe integer.
 	 */
 	addReceivedRtpPacket(sequenceNumber: number, timestampUs: number): boolean {
 		if (!isUnsignedInteger(sequenceNumber, 0xffff)) {
 			throw new TypeError(
 				`sequenceNumber (${sequenceNumber}) must be an integer between 0 and 65535`
 			);
-		} else if (!Number.isInteger(timestampUs)) {
-			throw new TypeError(`timestampUs (${timestampUs}) must be an integer`);
+		} else if (!Number.isSafeInteger(timestampUs)) {
+			throw new TypeError(
+				`timestampUs (${timestampUs}) must be a safe integer`
+			);
 		}
 
 		// Set delta to zero if receive deltas are not included, this simplifies
@@ -706,6 +727,7 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 			delta = deltaFull;
 		}
 
+		const deltaSize = delta >= 0 && delta <= 0xff ? 1 : 2;
 		const nextSequenceNumber =
 			(this.getBaseSequenceNumber() + this.getPacketStatusCount()) & 0xffff;
 
@@ -719,14 +741,12 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 			const numMissingRtpPackets =
 				(sequenceNumber - nextSequenceNumber) & 0xffff;
 
-			if (!this.#addMissingRtpPackets(numMissingRtpPackets)) {
+			if (
+				!this.#addMissingRtpPacketsAndDeltaSize(numMissingRtpPackets, deltaSize)
+			) {
 				return false;
 			}
-		}
-
-		const deltaSize = delta >= 0 && delta <= 0xff ? 1 : 2;
-
-		if (!this.#addDeltaSize(deltaSize)) {
+		} else if (!this.#addDeltaSize(deltaSize)) {
 			return false;
 		}
 
@@ -782,6 +802,8 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 	 *
 	 * @remarks
 	 * - No object is created per RTP packet status.
+	 * - The `handler` must not modify the packet, since receive deltas are read
+	 *   from the buffer while the packet is being walked.
 	 */
 	forAllRtpPackets(
 		handler: (
@@ -811,8 +833,6 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 	 * - It includes an extra wrap period so that RTP packets received earlier
 	 *   than the reference time can be represented even if the value of the
 	 *   Reference time field is 0.
-	 *
-	 * @internal
 	 */
 	getBaseTimeUs(): number {
 		// The Reference time field is a 24 bits signed integer.
@@ -826,8 +846,6 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 	 * Get the difference (in microseconds) between the reference time of this
 	 * packet and the given `previousTimestampUs`, compensating for the wrap
 	 * around of the Reference time field.
-	 *
-	 * @internal
 	 */
 	getBaseDeltaUs(previousTimestampUs: number): number {
 		let delta = this.getBaseTimeUs() - previousTimestampUs;
@@ -1159,5 +1177,66 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 		this.#setPacketStatusCount(newPacketStatusCount);
 
 		return true;
+	}
+
+	/**
+	 * Add the status of `numMissingRtpPackets` RTP packets not received and the
+	 * delta size of the received RTP packet that follows them. If any of them
+	 * cannot be added, the packet is left as it was.
+	 *
+	 * @remarks
+	 * - Missing RTP packets must not be reported without the received RTP
+	 *   packet that follows them. Otherwise, when the received RTP packet does
+	 *   not fit and goes into the next feedback packet, both feedback packets
+	 *   would report them as not received.
+	 */
+	#addMissingRtpPacketsAndDeltaSize(
+		numMissingRtpPackets: number,
+		deltaSize: number
+	): boolean {
+		const view = this.getView();
+		const packetStatusCount = this.getPacketStatusCount();
+		const chunksLength = this.#chunksLength;
+		const bodyLength = this.getBodyLength();
+		// The last packet chunk is overwritten while adding.
+		const lastChunkPos =
+			TRANSPORT_WIDE_CC_HEADER_LENGTH + chunksLength - CHUNK_LENGTH;
+		const lastChunkValue = chunksLength > 0 ? view.getUint16(lastChunkPos) : 0;
+
+		this.#savedLastChunk.copyFrom(this.#lastChunk);
+
+		if (
+			this.#addMissingRtpPackets(numMissingRtpPackets) &&
+			this.#addDeltaSize(deltaSize)
+		) {
+			return true;
+		}
+
+		// Remove the inserted packet chunks (if any).
+		if (this.#chunksLength !== chunksLength) {
+			const deltasPos = TRANSPORT_WIDE_CC_HEADER_LENGTH + chunksLength;
+			const insertedLength = this.#chunksLength - chunksLength;
+
+			// NOTE: The receive deltas are moved back before restoring the length of
+			// the packet since getBuffer() only covers the current length.
+			this.getBuffer().copyWithin(
+				deltasPos,
+				deltasPos + insertedLength,
+				deltasPos + insertedLength + this.#deltasLength
+			);
+
+			this.#chunksLength = chunksLength;
+
+			this.setBodyLength(bodyLength);
+		}
+
+		if (chunksLength > 0) {
+			view.setUint16(lastChunkPos, lastChunkValue);
+		}
+
+		this.#setPacketStatusCount(packetStatusCount);
+		this.#lastChunk.copyFrom(this.#savedLastChunk);
+
+		return false;
 	}
 }

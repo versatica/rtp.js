@@ -937,10 +937,88 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 		expect(packet.getReceivedRtpPackets().length).toBe(2);
 	});
 
+	test('TransportWideCcPacket.addReceivedRtpPacket() does not add missing RTP packets if the received one does not fit', () => {
+		const packet = TransportWideCcPacket.factory(
+			factoryBuffer.subarray(0, 24),
+			true
+		);
+
+		packet.setBase(0, 0);
+
+		// 20 bytes of fixed header, 2 bytes of packet chunk and 1 byte of receive
+		// delta, padded to 24 bytes.
+		expect(packet.addReceivedRtpPacket(0, 0)).toBe(true);
+
+		const buffer = packet.getBuffer().slice();
+
+		// The missing RTP packet fits in the last packet chunk, but the large
+		// receive delta (300 ticks) does not fit.
+		expect(packet.addReceivedRtpPacket(2, 300 * DELTA_TICK_US)).toBe(false);
+
+		expect(packet.getLength()).toBe(24);
+		expect(packet.getPacketStatusCount()).toBe(1);
+		expect(areBuffersEqual(packet.getBuffer(), buffer)).toBe(true);
+
+		// The packet keeps building from where it was.
+		expect(packet.addReceivedRtpPacket(1, DELTA_TICK_US)).toBe(true);
+		expect(packet.getPacketStatusCount()).toBe(2);
+		expect(packet.getReceivedRtpPackets()).toEqual([
+			{ sequenceNumber: 0, deltaTicks: 0 },
+			{ sequenceNumber: 1, deltaTicks: 1 },
+		]);
+	});
+
+	test('TransportWideCcPacket.addReceivedRtpPacket() does not add missing RTP packets if the received one does not fit after inserting packet chunks', () => {
+		const packet = TransportWideCcPacket.factory(
+			factoryBuffer.subarray(0, 28),
+			true
+		);
+
+		packet.setBase(0, 0);
+
+		// 20 bytes of fixed header, 2 bytes of packet chunk and 1 byte of receive
+		// delta, padded to 24 bytes.
+		expect(packet.addReceivedRtpPacket(0, 0)).toBe(true);
+
+		const buffer = packet.getBuffer().slice();
+
+		// 23 missing RTP packets: 13 fill the last packet chunk (One Bit Status
+		// Vector Chunk) and 10 go into a new Run Length Chunk, which moves the
+		// receive delta. Then the large receive delta (300 ticks) needs another
+		// packet chunk, which does not fit.
+		expect(packet.addReceivedRtpPacket(24, 300 * DELTA_TICK_US)).toBe(false);
+
+		expect(packet.getLength()).toBe(24);
+		expect(packet.getPadding()).toBe(1);
+		expect(packet.getPacketStatusCount()).toBe(1);
+		expect(areBuffersEqual(packet.getBuffer(), buffer)).toBe(true);
+
+		// The packet keeps building from where it was.
+		expect(packet.addReceivedRtpPacket(1, DELTA_TICK_US)).toBe(true);
+		expect(packet.getPacketStatusCount()).toBe(2);
+		expect(packet.getReceivedRtpPackets()).toEqual([
+			{ sequenceNumber: 0, deltaTicks: 0 },
+			{ sequenceNumber: 1, deltaTicks: 1 },
+		]);
+	});
+
 	test('TransportWideCcPacket.factory() throws if the buffer is too small', () => {
 		expect(() =>
 			TransportWideCcPacket.factory(factoryBuffer.subarray(0, 19), true)
 		).toThrow(TypeError);
+	});
+
+	test('TransportWideCcPacket.setBase() and TransportWideCcPacket.addReceivedRtpPacket() throw if timestamps are not safe integers', () => {
+		const packet = TransportWideCcPacket.factory(factoryBuffer, true);
+
+		expect(() => packet.setBase(0, 2 ** 53)).toThrow(TypeError);
+		expect(() => packet.setBase(0, -(2 ** 53))).toThrow(TypeError);
+
+		packet.setBase(0, 0);
+
+		expect(() => packet.addReceivedRtpPacket(0, 2 ** 53)).toThrow(TypeError);
+		expect(() => packet.addReceivedRtpPacket(0, -(2 ** 53))).toThrow(TypeError);
+		expect(packet.getPacketStatusCount()).toBe(0);
 	});
 
 	/* Feedback packets built from received RTP packets. */

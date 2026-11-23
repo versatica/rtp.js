@@ -202,9 +202,7 @@ function lint() {
 	const prettierFiles = PRETTIER_PATHS.join(' ');
 
 	executeCmd(`prettier --check ${prettierFiles}`);
-
-	// TODO: Uncomment when ready.
-	// executeCmd('knip --config knip.config.mjs --treat-config-hints-as-errors');
+	executeCmd('knip --config knip.config.mjs --treat-config-hints-as-errors');
 }
 
 function format() {
