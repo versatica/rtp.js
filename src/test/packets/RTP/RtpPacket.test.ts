@@ -1,6 +1,6 @@
 import { RtpPacket, isRtp } from '../../../packets/RTP/RtpPacket';
 import { ExtensionType } from '../../../packets/RTP/extensions';
-import { checkRtpPacket, type ExpectedPacket } from './rtpCommon';
+import { checkRtpPacket, type ExpectedRtpPacket } from './rtpCommon';
 import {
 	factoryBuffer,
 	serializeBuffer,
@@ -24,7 +24,7 @@ describe('RTP Packet', () => {
 			0xc2, 0x2b, 0x92, 0xdc, 0x9b, 0x23,
 		]);
 		const packet = RtpPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: buffer.byteLength,
@@ -110,7 +110,7 @@ describe('RTP Packet', () => {
 			0xec, 0x09, 0xf5, 0x76, 0x4b, 0xfc, 0x11, 0x99, 0xe6, 0x4c, 0x95,
 		]);
 		const packet = RtpPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: buffer.byteLength,
@@ -187,7 +187,7 @@ describe('RTP Packet', () => {
 			0x2a, 0xb4, 0xc6, 0x21, 0x02, 0x11,
 		]);
 		const packet = RtpPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: buffer.byteLength,
@@ -256,7 +256,7 @@ describe('RTP Packet', () => {
 			0x00, 0x00, 0x00, 0x05,
 		]);
 		const packet = RtpPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: buffer.byteLength,
@@ -338,7 +338,7 @@ describe('RTP Packet', () => {
 			0x12, 0x23,
 		]);
 		const packet = RtpPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: buffer.byteLength,
@@ -431,7 +431,7 @@ describe('RTP Packet', () => {
 			0x00, 0x00, 0x04, 0x00, // - id: 4, len: 0
 		]);
 		const packet = RtpPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: buffer.byteLength,
@@ -525,7 +525,7 @@ describe('RTP Packet', () => {
 			0x00, 0x00, 0x00, 0x08,
 		]);
 		const packet = RtpPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: buffer.byteLength,
@@ -765,7 +765,7 @@ describe('RTP Packet', () => {
 
 	test('RtpPacket.factory() succeeds', () => {
 		const packet = RtpPacket.factory(factoryBuffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtpPacket = {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 12,
@@ -823,7 +823,7 @@ describe('RTP Packet', () => {
 		packet.setPayload(dataBuffer.subarray(0, 10));
 		packet.padTo4Bytes(); // payload + padding = 12.
 
-		const expectedWithExtensions: ExpectedPacket = {
+		const expectedWithExtensions: ExpectedRtpPacket = {
 			...expected,
 			length: 12 + 16 + 10 + 2,
 			payloadType: 100,
@@ -1636,7 +1636,7 @@ describe('RTP Packet', () => {
 			0x55, 0x66, 0x77, 0x88,
 			0x99, 0xaa,
 		]);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtpPacket = {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 12 + 10 + 2,
@@ -1742,7 +1742,7 @@ describe('RTP Packet', () => {
 		packet.setExtension(2, extension2);
 		packet.setExtension(3, extension3);
 
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtpPacket = {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 12 + 16 + 10 + 2,
@@ -1895,7 +1895,7 @@ describe('RTP Packet', () => {
 		packet.setPayload(payload);
 		packet.padTo4Bytes();
 
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtpPacket = {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 12 + 10 + 2,

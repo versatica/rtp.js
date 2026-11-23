@@ -27,6 +27,8 @@ export {
 	SenderReportPacket,
 } from './SenderReportPacket';
 
+export { type XrPacketDump, XrPacket } from './XrPacket';
+
 export { type AnyFeedbackPacket } from './AnyFeedbackPacket';
 
 export {
@@ -62,3 +64,25 @@ export {
 	type TransportWideCcPacketDump,
 	TransportWideCcPacket,
 } from './TransportWideCcPacket';
+
+export {
+	ExtendedReportBlockType,
+	type ExtendedReportDump,
+	type ExtendedReport,
+} from './ExtendedReport';
+
+export {
+	type RrtExtendedReportDump,
+	RrtExtendedReport,
+} from './extendedReports/RrtExtendedReport';
+
+export {
+	type DlrrSubBlock,
+	type DlrrExtendedReportDump,
+	DlrrExtendedReport,
+} from './extendedReports/DlrrExtendedReport';
+
+export {
+	type UnknownExtendedReportDump,
+	UnknownExtendedReport,
+} from './extendedReports/UnknownExtendedReport';

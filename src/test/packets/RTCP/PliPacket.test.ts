@@ -2,7 +2,7 @@ import { PliPacket } from '../../../packets/RTCP/PliPacket';
 import { PayloadSpecificFeedbackMessageType } from '../../../packets/RTCP/AnyPayloadSpecificFeedbackPacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
 import { areBuffersEqual } from '../../../utils/buffers';
-import { checkRtcpPacket, type ExpectedPacket } from './rtcpCommon';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
 import {
 	factoryBuffer,
 	serializeBuffer,
@@ -32,7 +32,7 @@ describe('RTCP PLI Packet', () => {
 			0x23, 0x45, 0x67, 0x89,
 		]);
 		const packet = PliPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 12,

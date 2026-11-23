@@ -2,7 +2,7 @@ import { RembPacket } from '../../../packets/RTCP/RembPacket';
 import { PayloadSpecificFeedbackMessageType } from '../../../packets/RTCP/AnyPayloadSpecificFeedbackPacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
 import { areBuffersEqual } from '../../../utils/buffers';
-import { checkRtcpPacket, type ExpectedPacket } from './rtcpCommon';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
 import {
 	factoryBuffer,
 	serializeBuffer,
@@ -174,7 +174,7 @@ describe('RTCP REMB Packet', () => {
 			0x04, 0xa7, 0x67, 0x47,
 		]);
 		const packet = RembPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 28,
@@ -242,7 +242,7 @@ describe('RTCP REMB Packet', () => {
 			0x00, 0x00, 0x00, 0x04,
 		]);
 		const packet = RembPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 28,
@@ -401,7 +401,7 @@ describe('RTCP REMB Packet', () => {
 		factoryBuffer.fill(0xff);
 
 		const packet = RembPacket.factory(factoryBuffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 20,

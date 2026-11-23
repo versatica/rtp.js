@@ -1,6 +1,6 @@
 import { ByePacket } from '../../../packets/RTCP/ByePacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { checkRtcpPacket, type ExpectedPacket } from './rtcpCommon';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
 import {
 	factoryBuffer,
 	serializeBuffer,
@@ -28,7 +28,7 @@ describe('RTCP BYE Packet', () => {
 			0x62, 0x61, 0x72, 0x00,
 		]);
 		const packet = ByePacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 24,
@@ -152,7 +152,7 @@ describe('RTCP BYE Packet', () => {
 			0x00, 0x00, 0x00, 0x08,
 		]);
 		const packet = ByePacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 20,
@@ -193,7 +193,7 @@ describe('RTCP BYE Packet', () => {
 			0x00, 0x00, 0x00, 0x08,
 		]);
 		const packet = ByePacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 16,
@@ -315,7 +315,7 @@ describe('RTCP BYE Packet', () => {
 
 	test('ByePacket.factory() succeeds', () => {
 		const packet = ByePacket.factory(factoryBuffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 4,

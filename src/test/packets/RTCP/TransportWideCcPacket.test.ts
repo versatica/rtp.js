@@ -5,7 +5,7 @@ import {
 import { TransportLayerFeedbackMessageType } from '../../../packets/RTCP/AnyTransportLayerFeedbackPacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
 import { areBuffersEqual, padTo4Bytes } from '../../../utils/buffers';
-import { checkRtcpPacket, type ExpectedPacket } from './rtcpCommon';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
 import {
 	factoryBuffer,
 	serializeBuffer,
@@ -364,7 +364,7 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 			0x00, 0x1c, 0x04, 0x00,
 		]);
 		const packet = TransportWideCcPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 32,
@@ -772,7 +772,7 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 		factoryBuffer.fill(0xff);
 
 		const packet = TransportWideCcPacket.factory(factoryBuffer, true);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 20,

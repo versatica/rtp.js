@@ -3,10 +3,21 @@ import {
 	type RtcpPacketType,
 	isRtcp,
 } from '../../../packets/RTCP/RtcpPacket';
+import type {
+	ExtendedReport,
+	ExtendedReportBlockType,
+} from '../../../packets/RTCP/ExtendedReport';
 import { areBuffersEqual } from '../../../utils/buffers';
 import { throwBuffer } from '../../testHelpers';
 
-export type ExpectedPacket = {
+export type ExpectedRtcpExtendedReport = {
+	buffer: Uint8Array;
+	bufferLength: number;
+	length: number;
+	blockType: ExtendedReportBlockType;
+};
+
+export type ExpectedRtcpPacket = {
 	buffer: Uint8Array;
 	bufferLength: number;
 	length: number;
@@ -17,7 +28,7 @@ export type ExpectedPacket = {
 
 export function checkRtcpPacket(
 	packet: RtcpPacket,
-	expected: ExpectedPacket
+	expected: ExpectedRtcpPacket
 ): void {
 	const packetBuffer = packet.getBuffer();
 	const view = new DataView(
@@ -57,6 +68,44 @@ export function checkRtcpPacket(
 	).toThrow(TypeError);
 	expect(() =>
 		packet.clone(throwBuffer.subarray(0, expected.length - 1))
+	).toThrow(TypeError);
+	expect(
+		areBuffersEqual(
+			expected.buffer.subarray(0, expected.bufferLength),
+			originalBuffer
+		)
+	).toBe(true);
+}
+
+export function checkRtcpExtendedReport(
+	extendedReport: ExtendedReport,
+	expected: ExpectedRtcpExtendedReport
+): void {
+	const extendedReportBuffer = extendedReport.getBuffer();
+	const view = new DataView(
+		extendedReportBuffer.buffer,
+		extendedReportBuffer.byteOffset,
+		extendedReportBuffer.byteLength
+	);
+	const originalBuffer = expected.buffer.slice(0, expected.bufferLength);
+
+	expect(extendedReportBuffer.buffer).toBe(expected.buffer.buffer);
+	expect(extendedReportBuffer.byteOffset).toBe(expected.buffer.byteOffset);
+	expect(extendedReport.getBufferLength()).not.toBe(0);
+	expect(extendedReport.getBufferLength()).toBe(expected.bufferLength);
+	expect(extendedReport.getLength()).not.toBe(0);
+	expect(extendedReport.getLength()).toBe(expected.length);
+	expect((view.getUint16(2) + 1) * 4).toBe(expected.length);
+	expect(extendedReport.getAvailableLength()).toBe(
+		extendedReport.getBufferLength() - extendedReport.getLength()
+	);
+	expect(extendedReport.getLength() % 4).toBe(0);
+	expect(extendedReport.getBlockType()).toBe(expected.blockType);
+	expect(() =>
+		extendedReport.serialize(throwBuffer.subarray(0, expected.length - 1))
+	).toThrow(TypeError);
+	expect(() =>
+		extendedReport.clone(throwBuffer.subarray(0, expected.length - 1))
 	).toThrow(TypeError);
 	expect(
 		areBuffersEqual(

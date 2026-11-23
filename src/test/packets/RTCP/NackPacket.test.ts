@@ -1,7 +1,7 @@
 import { NackPacket } from '../../../packets/RTCP/NackPacket';
 import { TransportLayerFeedbackMessageType } from '../../../packets/RTCP/AnyTransportLayerFeedbackPacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { checkRtcpPacket, type ExpectedPacket } from './rtcpCommon';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
 import {
 	factoryBuffer,
 	serializeBuffer,
@@ -40,7 +40,7 @@ describe('RTCP Generic NACK Packet', () => {
 			0xff, 0xff, 0x00, 0x00,
 		]);
 		const packet = NackPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 20,
@@ -104,7 +104,7 @@ describe('RTCP Generic NACK Packet', () => {
 			0x00, 0x00, 0x00, 0x04,
 		]);
 		const packet = NackPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 20,
@@ -213,7 +213,7 @@ describe('RTCP Generic NACK Packet', () => {
 		factoryBuffer.fill(0xff);
 
 		const packet = NackPacket.factory(factoryBuffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 12,

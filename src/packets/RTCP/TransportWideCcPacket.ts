@@ -24,36 +24,24 @@ export const DELTA_TICK_US = 250;
 
 /**
  * The reference time is expressed in multiples of this (in microseconds).
- *
- * @internal
- * @knipignore
  */
-export const BASE_TIME_TICK_US = DELTA_TICK_US * (1 << 8);
+const BASE_TIME_TICK_US = DELTA_TICK_US * (1 << 8);
 
 /**
  * Period (in microseconds) after which the reference time wraps around.
- *
- * @internal
- * @knipignore
  */
-export const TIME_WRAP_PERIOD_US = BASE_TIME_TICK_US * 2 ** 24;
+const TIME_WRAP_PERIOD_US = BASE_TIME_TICK_US * 2 ** 24;
 
 /**
  * Maximum number of RTP packets a feedback packet can contain status for.
- *
- * @internal
- * @knipignore
  */
-export const MAX_REPORTED_RTP_PACKETS = 0xffff;
+const MAX_REPORTED_RTP_PACKETS = 0xffff;
 
 /**
  * Length (in bytes) of the fixed header that precedes the packet chunks, RTCP
  * Common Header included.
- *
- * @internal
- * @knipignore
  */
-export const TRANSPORT_WIDE_CC_HEADER_LENGTH = 20;
+const TRANSPORT_WIDE_CC_HEADER_LENGTH = 20;
 
 /**
  * Length (in bytes) of a packet chunk.

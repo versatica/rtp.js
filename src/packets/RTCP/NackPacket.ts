@@ -13,11 +13,8 @@ import { isUnsignedInteger } from '../../utils/numbers';
 
 /**
  * Length (in bytes) of a NACK item.
- *
- * @internal
- * @knipignore
  */
-export const NACK_ITEM_LENGTH = 4;
+const NACK_ITEM_LENGTH = 4;
 
 /**
  * NACK item.

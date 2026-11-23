@@ -1,7 +1,7 @@
 import { UnknownPayloadSpecificFeedbackPacket } from '../../../packets/RTCP/UnknownPayloadSpecificFeedbackPacket';
 import { PayloadSpecificFeedbackMessageType } from '../../../packets/RTCP/AnyPayloadSpecificFeedbackPacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { checkRtcpPacket, type ExpectedPacket } from './rtcpCommon';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
 import { serializeBuffer, cloneBuffer, resetBuffers } from '../../testHelpers';
 
 beforeEach(resetBuffers);
@@ -33,7 +33,7 @@ describe('RTCP Unknown Payload-Specific Feedback Packet', () => {
 			0x55, 0x66, 0x77, 0x88,
 		]);
 		const packet = UnknownPayloadSpecificFeedbackPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 20,

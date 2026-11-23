@@ -168,6 +168,7 @@ const config = tsEslint.config(
 						'checkRtpPacket',
 						'checkRtcpPacket',
 						'checkRtcpFeedbackPacket',
+						'checkRtcpExtendedReport',
 					],
 				},
 			],

@@ -2,7 +2,7 @@ import { FirPacket } from '../../../packets/RTCP/FirPacket';
 import { PayloadSpecificFeedbackMessageType } from '../../../packets/RTCP/AnyPayloadSpecificFeedbackPacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
 import { areBuffersEqual } from '../../../utils/buffers';
-import { checkRtcpPacket, type ExpectedPacket } from './rtcpCommon';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
 import {
 	factoryBuffer,
 	serializeBuffer,
@@ -45,7 +45,7 @@ describe('RTCP FIR Packet', () => {
 			0x0d, 0x00, 0x00, 0x00,
 		]);
 		const packet = FirPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 28,
@@ -116,7 +116,7 @@ describe('RTCP FIR Packet', () => {
 			0x00, 0x00, 0x00, 0x00,
 		]);
 		const packet = FirPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 24,
@@ -219,7 +219,7 @@ describe('RTCP FIR Packet', () => {
 		factoryBuffer.fill(0xff);
 
 		const packet = FirPacket.factory(factoryBuffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 12,

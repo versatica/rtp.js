@@ -308,6 +308,12 @@ export abstract class Serializable {
 	 * Copy the bytes of this serializable into the given one, which must be a
 	 * new instance of the same subclass, and set its length.
 	 *
+	 * @param serializable - The new instance.
+	 * @param copyBytes - If `false`, no byte is copied. Subclasses holding items
+	 *   within their buffer pass `false`, copy their own bytes and clone each
+	 *   item into the buffer of the given serializable, so each byte is copied
+	 *   once.
+	 *
 	 * @throws
 	 * - `Error` if some item is being built in place within this serializable
 	 *   (see {@link needsConsolidation}).
@@ -316,7 +322,10 @@ export abstract class Serializable {
 	 * - `TypeError` if the buffer of the given `serializable` overlaps the bytes
 	 *   of this serializable.
 	 */
-	protected cloneInto(serializable: Serializable): void {
+	protected cloneInto(
+		serializable: Serializable,
+		copyBytes: boolean = true
+	): void {
 		// An item being built in place is beyond the current length, so it would
 		// not be cloned.
 		this.assertDoesNotNeedConsolidation();
@@ -341,7 +350,10 @@ export abstract class Serializable {
 			);
 		}
 
-		serializable.#buffer.set(this.#buffer.subarray(0, this.#length));
+		if (copyBytes) {
+			serializable.#buffer.set(this.#buffer.subarray(0, this.#length));
+		}
+
 		serializable.#length = this.#length;
 	}
 

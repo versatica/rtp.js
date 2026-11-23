@@ -1,7 +1,7 @@
 import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket';
 import type { ReceptionReport } from '../../../packets/RTCP/AnyReportPacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { checkRtcpPacket, type ExpectedPacket } from './rtcpCommon';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
 import {
 	factoryBuffer,
 	serializeBuffer,
@@ -69,7 +69,7 @@ describe('RTCP Sender Report Packet', () => {
 			0x00, 0x00, 0x80, 0x00,
 		]);
 		const packet = SenderReportPacket.parse(buffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 52,
@@ -219,7 +219,7 @@ describe('RTCP Sender Report Packet', () => {
 		factoryBuffer.fill(0xff);
 
 		const packet = SenderReportPacket.factory(factoryBuffer);
-		const expected: ExpectedPacket = {
+		const expected: ExpectedRtcpPacket = {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 28,

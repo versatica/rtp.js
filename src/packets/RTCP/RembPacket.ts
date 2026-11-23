@@ -24,11 +24,8 @@ const UNIQUE_IDENTIFIER = 0x52454d42;
 /**
  * Length (in bytes) of the fixed header that precedes the SSRCs, RTCP Common
  * Header included.
- *
- * @internal
- * @knipignore
  */
-export const REMB_HEADER_LENGTH = 20;
+const REMB_HEADER_LENGTH = 20;
 
 /**
  * Maximum number of SSRCs in a packet (the Num SSRC field has 8 bits).

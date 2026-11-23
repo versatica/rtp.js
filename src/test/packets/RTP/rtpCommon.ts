@@ -2,7 +2,7 @@ import { RtpPacket, isRtp } from '../../../packets/RTP/RtpPacket';
 import { areBuffersEqual } from '../../../utils/buffers';
 import { throwBuffer } from '../../testHelpers';
 
-export type ExpectedPacket = {
+export type ExpectedRtpPacket = {
 	buffer: Uint8Array;
 	bufferLength: number;
 	length: number;
@@ -24,7 +24,7 @@ export type ExpectedPacket = {
 
 export function checkRtpPacket(
 	packet: RtpPacket,
-	expected: ExpectedPacket
+	expected: ExpectedRtpPacket
 ): void {
 	const packetBuffer = packet.getBuffer();
 	const view = new DataView(
