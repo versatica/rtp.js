@@ -39,6 +39,16 @@ export {
 	type AnyPayloadSpecificFeedbackPacket,
 } from './AnyPayloadSpecificFeedbackPacket';
 
+export {
+	type UnknownTransportLayerFeedbackPacketDump,
+	UnknownTransportLayerFeedbackPacket,
+} from './UnknownTransportLayerFeedbackPacket';
+
+export {
+	type UnknownPayloadSpecificFeedbackPacketDump,
+	UnknownPayloadSpecificFeedbackPacket,
+} from './UnknownPayloadSpecificFeedbackPacket';
+
 export { type PliPacketDump, PliPacket } from './PliPacket';
 
 export { type NackItem, type NackPacketDump, NackPacket } from './NackPacket';
