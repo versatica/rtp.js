@@ -21,10 +21,15 @@ const config = {
 	treatWarningsAsErrors: true,
 	cacheBust: true,
 	categorizeByGroup: false,
-	categoryOrder: ['RTP', 'RTCP', 'RTCP Extended Reports', 'Utils', '*'],
 	searchInComments: true,
 	readme: 'README.md',
 	projectDocuments: ['README.md', 'LICENSE.md'],
+	navigation: {
+		includeCategories: false,
+		includeGroups: false,
+		includeFolders: true,
+		compactFolders: true,
+	},
 	navigationLinks: {
 		GitHub: 'https://github.com/versatica/rtp.js',
 		NPM: 'https://www.npmjs.com/package/rtp.js',

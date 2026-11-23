@@ -1,5 +1,5 @@
-import { Packet, isRtp } from '../../../packets/RTP/Packet';
-import { RtpExtensionType } from '../../../packets/RTP/rtpExtensions';
+import { RtpPacket, isRtp } from '../../../packets/RTP/RtpPacket';
+import { ExtensionType } from '../../../packets/RTP/extensions';
 import { checkPacket, type ExpectedPacket } from './rtpCommon';
 import {
 	factoryBuffer,
@@ -14,7 +14,7 @@ const textEncoder = new TextEncoder();
 beforeEach(resetBuffers);
 
 describe('RTP Packet', () => {
-	test('Packet.parse() with a One-Byte extension and payload succeeds', () => {
+	test('RtpPacket.parse() with a One-Byte extension and payload succeeds', () => {
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			0x90, 0x6f, 0x5c, 0x41, 0x62, 0xf5, 0x47, 0xda, 0x9f, 0x71, 0x08, 0xe2,
@@ -23,7 +23,7 @@ describe('RTP Packet', () => {
 			0xf1, 0xe7, 0x8a, 0x69, 0x9a, 0xf0, 0xee, 0x8f, 0x98, 0x7c, 0xd5, 0x17,
 			0xc2, 0x2b, 0x92, 0xdc, 0x9b, 0x23,
 		]);
-		const packet = Packet.parse(buffer);
+		const packet = RtpPacket.parse(buffer);
 		const expected: ExpectedPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
@@ -37,7 +37,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: true,
 			headerExtensionValueLength: 4,
 			hasOneByteExtensions: true,
-			hasTwoBytesExtensions: false,
+			hasTwoByteExtensions: false,
 			hasPayload: true,
 			payloadLength: 34,
 			hasPadding: false,
@@ -85,7 +85,7 @@ describe('RTP Packet', () => {
 		expect(clonedPacket.getPayload()).toEqual(dataBuffer.subarray(0, 16));
 	});
 
-	test('Packet.parse() with payload and padding succeeds', () => {
+	test('RtpPacket.parse() with payload and padding succeeds', () => {
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			0xa0, 0x64, 0x6f, 0x3e, 0x0a, 0x45, 0x65, 0x88, 0xc5, 0xab, 0xdf, 0x5a,
@@ -109,7 +109,7 @@ describe('RTP Packet', () => {
 			0xc9, 0x32, 0xe3, 0x94, 0xb9, 0x78, 0xc4, 0x37, 0xfd, 0x0e, 0x77, 0xce,
 			0xec, 0x09, 0xf5, 0x76, 0x4b, 0xfc, 0x11, 0x99, 0xe6, 0x4c, 0x95,
 		]);
-		const packet = Packet.parse(buffer);
+		const packet = RtpPacket.parse(buffer);
 		const expected: ExpectedPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
@@ -123,7 +123,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: false,
 			headerExtensionValueLength: 0,
 			hasOneByteExtensions: false,
-			hasTwoBytesExtensions: false,
+			hasTwoByteExtensions: false,
 			hasPayload: true,
 			payloadLength: 78,
 			hasPadding: true,
@@ -173,7 +173,7 @@ describe('RTP Packet', () => {
 		expect(clonedPacket.getPayload()).toEqual(dataBuffer.subarray(0, 16));
 	});
 
-	test('Packet.parse() with two One-Byte extensions and payload succeeds', () => {
+	test('RtpPacket.parse() with two One-Byte extensions and payload succeeds', () => {
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			0x90, 0x6f, 0x4b, 0x9a, 0x33, 0x77, 0x72, 0x3d, 0x0e, 0x0d, 0xfa, 0xd2,
@@ -186,7 +186,7 @@ describe('RTP Packet', () => {
 			0x37, 0xd7, 0x0a, 0x1e, 0xea, 0x6e, 0xe5, 0x38, 0x4a, 0xf3, 0xce, 0xa2,
 			0x2a, 0xb4, 0xc6, 0x21, 0x02, 0x11,
 		]);
-		const packet = Packet.parse(buffer);
+		const packet = RtpPacket.parse(buffer);
 		const expected: ExpectedPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
@@ -200,7 +200,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: true,
 			headerExtensionValueLength: 8,
 			hasOneByteExtensions: true,
-			hasTwoBytesExtensions: false,
+			hasTwoByteExtensions: false,
 			hasPayload: true,
 			payloadLength: 78,
 			hasPadding: false,
@@ -248,14 +248,14 @@ describe('RTP Packet', () => {
 		expect(clonedPacket.getPayload()).toEqual(dataBuffer.subarray(0, 16));
 	});
 
-	test('Packet.parse() without extensions or payload succeeds', () => {
+	test('RtpPacket.parse() without extensions or payload succeeds', () => {
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			0x80, 0x01, 0x00, 0x08,
 			0x00, 0x00, 0x00, 0x04,
 			0x00, 0x00, 0x00, 0x05,
 		]);
-		const packet = Packet.parse(buffer);
+		const packet = RtpPacket.parse(buffer);
 		const expected: ExpectedPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
@@ -269,7 +269,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: false,
 			headerExtensionValueLength: 0,
 			hasOneByteExtensions: false,
-			hasTwoBytesExtensions: false,
+			hasTwoByteExtensions: false,
 			hasPayload: false,
 			payloadLength: 0,
 			hasPadding: false,
@@ -325,7 +325,7 @@ describe('RTP Packet', () => {
 		expect(clonedPacket.getLength() % 4).toBe(0);
 	});
 
-	test('Packet.parse() with One-Byte extensions succeeds', () => {
+	test('RtpPacket.parse() with One-Byte extensions succeeds', () => {
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			0x90, 0x01, 0x00, 0x08,
@@ -337,7 +337,7 @@ describe('RTP Packet', () => {
 			0xff, 0xff, 0xff, 0xff, // - id: 3, len: 4
 			0x12, 0x23,
 		]);
-		const packet = Packet.parse(buffer);
+		const packet = RtpPacket.parse(buffer);
 		const expected: ExpectedPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
@@ -351,7 +351,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: true,
 			headerExtensionValueLength: 12,
 			hasOneByteExtensions: true,
-			hasTwoBytesExtensions: false,
+			hasTwoByteExtensions: false,
 			hasPayload: true,
 			payloadLength: 2,
 			hasPadding: false,
@@ -418,7 +418,7 @@ describe('RTP Packet', () => {
 		expect(clonedPacket.getLength() % 4).toBe(0);
 	});
 
-	test('Packet.parse() with Two-Bytes extensions succeeds', () => {
+	test('RtpPacket.parse() with Two-Byte extensions succeeds', () => {
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			0x90, 0x01, 0x00, 0x08,
@@ -430,7 +430,7 @@ describe('RTP Packet', () => {
 			0x03, 0x02, 0x11, 0x22, // - id: 3, len: 2
 			0x00, 0x00, 0x04, 0x00, // - id: 4, len: 0
 		]);
-		const packet = Packet.parse(buffer);
+		const packet = RtpPacket.parse(buffer);
 		const expected: ExpectedPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
@@ -444,7 +444,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: true,
 			headerExtensionValueLength: 16,
 			hasOneByteExtensions: false,
-			hasTwoBytesExtensions: true,
+			hasTwoByteExtensions: true,
 			hasPayload: false,
 			payloadLength: 0,
 			hasPadding: false,
@@ -515,7 +515,7 @@ describe('RTP Packet', () => {
 		expect(clonedPacket.getLength() % 4).not.toBe(0);
 	});
 
-	test('Packet.parse() padding-only packet succeeds', () => {
+	test('RtpPacket.parse() padding-only packet succeeds', () => {
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			0xa0, 0x01, 0x00, 0x09,
@@ -524,7 +524,7 @@ describe('RTP Packet', () => {
 			0x00, 0x00, 0x00, 0x00, // Padding (8 bytes)
 			0x00, 0x00, 0x00, 0x08,
 		]);
-		const packet = Packet.parse(buffer);
+		const packet = RtpPacket.parse(buffer);
 		const expected: ExpectedPacket = {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
@@ -538,7 +538,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: false,
 			headerExtensionValueLength: 0,
 			hasOneByteExtensions: false,
-			hasTwoBytesExtensions: false,
+			hasTwoByteExtensions: false,
 			hasPayload: false,
 			payloadLength: 0,
 			hasPadding: true,
@@ -614,7 +614,7 @@ describe('RTP Packet', () => {
 		expect(clonedPacket.getLength() % 4).toBe(0);
 	});
 
-	test('Packet.parse() with wrong arguments fails', () => {
+	test('RtpPacket.parse() with wrong arguments fails', () => {
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			0x90, 0x01, 0x00, 0x08,
@@ -629,20 +629,23 @@ describe('RTP Packet', () => {
 
 		// Buffer length is lower than packet length.
 		expect(() =>
-			Packet.parse(buffer.subarray(0, buffer.byteLength - 1), buffer.byteLength)
+			RtpPacket.parse(
+				buffer.subarray(0, buffer.byteLength - 1),
+				buffer.byteLength
+			)
 		).toThrow(TypeError);
 
 		// Packet length is not an unsigned integer.
 		expect(isRtp(buffer, NaN)).toBe(false);
 		expect(isRtp(buffer, 12.5)).toBe(false);
 		expect(isRtp(buffer, -1)).toBe(false);
-		expect(() => Packet.parse(buffer, NaN)).toThrow(TypeError);
-		expect(() => Packet.parse(buffer, 12.5)).toThrow(TypeError);
-		expect(() => Packet.parse(buffer, -1)).toThrow(TypeError);
+		expect(() => RtpPacket.parse(buffer, NaN)).toThrow(TypeError);
+		expect(() => RtpPacket.parse(buffer, 12.5)).toThrow(TypeError);
+		expect(() => RtpPacket.parse(buffer, -1)).toThrow(TypeError);
 
 		// Packet shorter than the fixed header.
 		expect(isRtp(buffer, 11)).toBe(false);
-		expect(() => Packet.parse(buffer, 11)).toThrow(TypeError);
+		expect(() => RtpPacket.parse(buffer, 11)).toThrow(TypeError);
 
 		// RTP version is not 2.
 		// prettier-ignore
@@ -653,7 +656,7 @@ describe('RTP Packet', () => {
 		]);
 
 		expect(isRtp(wrongVersionBuffer)).toBe(false);
-		expect(() => Packet.parse(wrongVersionBuffer)).toThrow(TypeError);
+		expect(() => RtpPacket.parse(wrongVersionBuffer)).toThrow(TypeError);
 
 		// Not enough space for the announced CSRC list.
 		// prettier-ignore
@@ -663,7 +666,7 @@ describe('RTP Packet', () => {
 			0x00, 0x00, 0x00, 0x05,
 		]);
 
-		expect(() => Packet.parse(wrongCsrcsBuffer)).toThrow(TypeError);
+		expect(() => RtpPacket.parse(wrongCsrcsBuffer)).toThrow(TypeError);
 
 		// Not enough space for the announced header extension.
 		// prettier-ignore
@@ -674,7 +677,9 @@ describe('RTP Packet', () => {
 			0xbe, 0xde,
 		]);
 
-		expect(() => Packet.parse(wrongHeaderExtensionBuffer)).toThrow(TypeError);
+		expect(() => RtpPacket.parse(wrongHeaderExtensionBuffer)).toThrow(
+			TypeError
+		);
 
 		// Not enough space for the announced header extension value.
 		// prettier-ignore
@@ -686,7 +691,7 @@ describe('RTP Packet', () => {
 			0x10, 0xaa, 0x00, 0x00,
 		]);
 
-		expect(() => Packet.parse(wrongHeaderExtensionValueBuffer)).toThrow(
+		expect(() => RtpPacket.parse(wrongHeaderExtensionValueBuffer)).toThrow(
 			TypeError
 		);
 
@@ -700,11 +705,13 @@ describe('RTP Packet', () => {
 			0x13, 0x01, 0x02, 0x03, // - id: 1, len: 4
 		]);
 
-		expect(() => Packet.parse(wrongOneByteExtensionBuffer)).toThrow(TypeError);
+		expect(() => RtpPacket.parse(wrongOneByteExtensionBuffer)).toThrow(
+			TypeError
+		);
 
-		// Not enough space for the announced value of a Two-Bytes extension.
+		// Not enough space for the announced value of a Two-Byte extension.
 		// prettier-ignore
-		const wrongTwoBytesExtensionBuffer = new Uint8Array([
+		const wrongTwoByteExtensionBuffer = new Uint8Array([
 			0x90, 0x01, 0x00, 0x08,
 			0x00, 0x00, 0x00, 0x04,
 			0x00, 0x00, 0x00, 0x05,
@@ -712,7 +719,9 @@ describe('RTP Packet', () => {
 			0x01, 0x03, 0xaa, 0xbb, // - id: 1, len: 3
 		]);
 
-		expect(() => Packet.parse(wrongTwoBytesExtensionBuffer)).toThrow(TypeError);
+		expect(() => RtpPacket.parse(wrongTwoByteExtensionBuffer)).toThrow(
+			TypeError
+		);
 
 		// Padding byte is 0.
 		// prettier-ignore
@@ -723,7 +732,7 @@ describe('RTP Packet', () => {
 			0x11, 0x22, 0x33, 0x00,
 		]);
 
-		expect(() => Packet.parse(zeroPaddingBuffer)).toThrow(TypeError);
+		expect(() => RtpPacket.parse(zeroPaddingBuffer)).toThrow(TypeError);
 
 		// Padding bigger than the available space for payload and padding.
 		// prettier-ignore
@@ -734,10 +743,10 @@ describe('RTP Packet', () => {
 			0x11, 0x22, 0x33, 0x05,
 		]);
 
-		expect(() => Packet.parse(tooBigPaddingBuffer)).toThrow(TypeError);
+		expect(() => RtpPacket.parse(tooBigPaddingBuffer)).toThrow(TypeError);
 	});
 
-	test('Packet.parse() stops parsing One-Byte extensions at id 15', () => {
+	test('RtpPacket.parse() stops parsing One-Byte extensions at id 15', () => {
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			0x90, 0x01, 0x00, 0x08,
@@ -747,15 +756,15 @@ describe('RTP Packet', () => {
 			0x10, 0xaa, 0xf3, 0x21, // - id: 1, len: 1, then id 15
 			0xbb, 0xcc, 0x00, 0x00, // - ignored
 		]);
-		const packet = Packet.parse(buffer);
+		const packet = RtpPacket.parse(buffer);
 
 		expect([...packet.getExtensions().keys()]).toEqual([1]);
 		expect(packet.getExtension(1)).toEqual(new Uint8Array([0xaa]));
 		expect(packet.getExtension(2)).toBeUndefined();
 	});
 
-	test('Packet.factory() succeeds', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.factory() succeeds', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 		const expected: ExpectedPacket = {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
@@ -769,7 +778,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: false,
 			headerExtensionValueLength: 0,
 			hasOneByteExtensions: false,
-			hasTwoBytesExtensions: false,
+			hasTwoByteExtensions: false,
 			hasPayload: false,
 			payloadLength: 0,
 			hasPadding: false,
@@ -792,7 +801,7 @@ describe('RTP Packet', () => {
 		// - Header extension value length: 1 + 1 + 1 + 2 + 1 + 3 = 9 => 12 (padded)
 		// - Header extension length: 4 + 12 = 16
 		//
-		// Using Two-Bytes extensions:
+		// Using Two-Byte extensions:
 		// - Header extension value length: 2 + 1 + 2 + 2 + 2 + 3 = 12
 		// - Header extension length: 4 + 12 = 16
 		//
@@ -947,9 +956,9 @@ describe('RTP Packet', () => {
 		expect(clonedPacket.getPayload()).toEqual(dataBuffer.subarray(0, 1));
 		expect(clonedPacket.getLength() % 4).toBe(0);
 
-		/* Add Two-Bytes extensions. */
+		/* Add Two-Byte extensions. */
 
-		clonedPacket.setExtensionsType('two-bytes');
+		clonedPacket.setExtensionsForm('two-byte');
 		clonedPacket.setExtension(1, dataBuffer.subarray(0, 1));
 		clonedPacket.setExtension(2, dataBuffer.subarray(1, 3));
 		clonedPacket.setExtension(14, dataBuffer.subarray(3, 6));
@@ -960,7 +969,7 @@ describe('RTP Packet', () => {
 			bufferLength: cloneBuffer.byteLength,
 			length: 12 + 16 + 1 + 3,
 			hasOneByteExtensions: false,
-			hasTwoBytesExtensions: true,
+			hasTwoByteExtensions: true,
 			payloadLength: 1,
 			hasPadding: true,
 			padding: 3,
@@ -976,10 +985,10 @@ describe('RTP Packet', () => {
 		expect(clonedPacket.getLength() % 4).toBe(0);
 	});
 
-	test('Packet.setExtensionsType() rewrites the extensions', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.setExtensionsForm() rewrites the extensions', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
-		expect(packet.getExtensionsType()).toBe('one-byte');
+		expect(packet.getExtensionsForm()).toBe('one-byte');
 
 		// Can fit into One-Byte extensions.
 		packet.setExtension(1, dataBuffer.subarray(0, 1));
@@ -1001,14 +1010,14 @@ describe('RTP Packet', () => {
 		);
 		expect(packet.getBuffer()).toEqual(oneByteBuffer);
 
-		packet.setExtensionsType('two-bytes');
+		packet.setExtensionsForm('two-byte');
 
-		expect(packet.getExtensionsType()).toBe('two-bytes');
+		expect(packet.getExtensionsForm()).toBe('two-byte');
 		expect(packet.dump().headerExtensionId).toBe(0b0001000000000000);
 		expect(packet.getExtension(1)).toEqual(dataBuffer.subarray(0, 1));
 		expect(packet.getExtension(14)).toEqual(dataBuffer.subarray(0, 16));
 
-		// They fit into Two-Bytes extensions.
+		// They fit into Two-Byte extensions.
 		packet.setExtension(15, dataBuffer.subarray(0, 2));
 		packet.setExtension(3, dataBuffer.subarray(0, 0));
 		packet.setExtension(4, dataBuffer.subarray(0, 17));
@@ -1017,25 +1026,25 @@ describe('RTP Packet', () => {
 		expect(packet.getExtension(3)?.byteLength).toBe(0);
 		expect(packet.getExtension(4)).toEqual(dataBuffer.subarray(0, 17));
 
-		const twoBytesBuffer = packet.getBuffer().slice();
+		const twoByteBuffer = packet.getBuffer().slice();
 
 		// They cannot be rewritten as One-Byte extensions.
-		expect(() => packet.setExtensionsType('one-byte')).toThrow(TypeError);
-		expect(packet.getExtensionsType()).toBe('two-bytes');
-		expect(packet.getBuffer()).toEqual(twoBytesBuffer);
+		expect(() => packet.setExtensionsForm('one-byte')).toThrow(TypeError);
+		expect(packet.getExtensionsForm()).toBe('two-byte');
+		expect(packet.getBuffer()).toEqual(twoByteBuffer);
 
 		packet.deleteExtension(15);
 		packet.deleteExtension(3);
 		packet.deleteExtension(4);
-		packet.setExtensionsType('one-byte');
+		packet.setExtensionsForm('one-byte');
 
-		expect(packet.getExtensionsType()).toBe('one-byte');
+		expect(packet.getExtensionsForm()).toBe('one-byte');
 		expect(packet.getBuffer()).toEqual(oneByteBuffer);
 		expect(packet.getExtension(1)).toEqual(dataBuffer.subarray(0, 1));
 		expect(packet.getExtension(14)).toEqual(dataBuffer.subarray(0, 16));
 	});
 
-	test('Packet.setExtensionsType() rewrites the id of a header extension without extensions', () => {
+	test('RtpPacket.setExtensionsForm() rewrites the id of a header extension without extensions', () => {
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			0x90, 0x01, 0x00, 0x08,
@@ -1045,29 +1054,29 @@ describe('RTP Packet', () => {
 			0x00, 0x00, 0x00, 0x00, // - padding
 			0x11, 0x22, 0x33, 0x44, // Payload
 		]);
-		const packet = Packet.parse(buffer);
+		const packet = RtpPacket.parse(buffer);
 
-		expect(packet.getExtensionsType()).toBe('one-byte');
+		expect(packet.getExtensionsForm()).toBe('one-byte');
 		expect(packet.getExtensions().size).toBe(0);
 
-		packet.setExtensionsType('two-bytes');
+		packet.setExtensionsForm('two-byte');
 
-		expect(packet.getExtensionsType()).toBe('two-bytes');
+		expect(packet.getExtensionsForm()).toBe('two-byte');
 		expect(packet.dump().headerExtensionId).toBe(0b0001000000000000);
 		expect(packet.getLength()).toBe(buffer.byteLength);
-		expect(Packet.parse(packet.getBuffer()).getExtensionsType()).toBe(
-			'two-bytes'
+		expect(RtpPacket.parse(packet.getBuffer()).getExtensionsForm()).toBe(
+			'two-byte'
 		);
 		expect(packet.getPayload()).toEqual(
 			new Uint8Array([0x11, 0x22, 0x33, 0x44])
 		);
 
-		packet.setExtensionsType('one-byte');
+		packet.setExtensionsForm('one-byte');
 
-		expect(packet.getExtensionsType()).toBe('one-byte');
+		expect(packet.getExtensionsForm()).toBe('one-byte');
 		expect(packet.dump().headerExtensionId).toBe(0xbede);
 		expect(packet.getLength()).toBe(buffer.byteLength);
-		expect(Packet.parse(packet.getBuffer()).getExtensionsType()).toBe(
+		expect(RtpPacket.parse(packet.getBuffer()).getExtensionsForm()).toBe(
 			'one-byte'
 		);
 		expect(packet.getPayload()).toEqual(
@@ -1076,14 +1085,14 @@ describe('RTP Packet', () => {
 	});
 
 	test('Packet extension setters and getters succeed', () => {
-		const packet = Packet.factory(factoryBuffer);
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		packet.setExtensionMapping({
-			[RtpExtensionType.MID]: 1,
-			[RtpExtensionType.RTP_STREAM_ID]: 2,
-			[RtpExtensionType.ABS_SEND_TIME]: 3,
-			[RtpExtensionType.TRANSPORT_WIDE_CC_01]: 4,
-			[RtpExtensionType.ABS_CAPTURE_TIME]: 5,
+			[ExtensionType.MID]: 1,
+			[ExtensionType.RTP_STREAM_ID]: 2,
+			[ExtensionType.ABS_SEND_TIME]: 3,
+			[ExtensionType.TRANSPORT_WIDE_CC_01]: 4,
+			[ExtensionType.ABS_CAPTURE_TIME]: 5,
 		});
 
 		packet.setMidExtension('mid-€1');
@@ -1094,7 +1103,7 @@ describe('RTP Packet', () => {
 			absCaptureTimestamp: { seconds: 0x83aa7e80, fractions: 0 },
 		});
 
-		expect(packet.getExtensionsType()).toBe('one-byte');
+		expect(packet.getExtensionsForm()).toBe('one-byte');
 		expect(packet.getMidExtension()).toBe('mid-€1');
 		expect(packet.getRidExtension()).toBe('r1-ß');
 		expect(packet.getAbsSendTimeExtension()).toBe(12345678);
@@ -1130,37 +1139,37 @@ describe('RTP Packet', () => {
 			absCaptureTimestamp: { seconds: 0x83aa7e81, fractions: 0 },
 		});
 
-		const packet2 = Packet.parse(packet.getBuffer());
+		const packet2 = RtpPacket.parse(packet.getBuffer());
 
 		packet2.serialize(serializeBuffer);
 
 		packet2.setExtensionMapping({
-			[RtpExtensionType.MID]: 1,
-			[RtpExtensionType.RTP_STREAM_ID]: 2,
-			[RtpExtensionType.ABS_SEND_TIME]: 3,
-			[RtpExtensionType.TRANSPORT_WIDE_CC_01]: 4,
+			[ExtensionType.MID]: 1,
+			[ExtensionType.RTP_STREAM_ID]: 2,
+			[ExtensionType.ABS_SEND_TIME]: 3,
+			[ExtensionType.TRANSPORT_WIDE_CC_01]: 4,
 		});
 
-		expect(packet2.getExtensionsType()).toBe('one-byte');
+		expect(packet2.getExtensionsForm()).toBe('one-byte');
 		expect(packet2.getMidExtension()).toBe('mid-®2');
 		expect(packet2.getRidExtension()).toBe('r1-ß');
 		expect(packet2.getAbsSendTimeExtension()).toBe(10485563);
 		expect(packet2.getTransportWideCc01Extension()).toBe(5556);
 	});
 
-	test('Packet.getRidExtension() and Packet.getRridExtension() read the RID and RRID extensions', () => {
+	test('RtpPacket.getRidExtension() and RtpPacket.getRridExtension() read the RID and RRID extensions', () => {
 		const extensionMapping = {
-			[RtpExtensionType.RTP_STREAM_ID]: 1,
-			[RtpExtensionType.REPAIRED_RTP_STREAM_ID]: 2,
+			[ExtensionType.RTP_STREAM_ID]: 1,
+			[ExtensionType.REPAIRED_RTP_STREAM_ID]: 2,
 		};
 
 		// Packet with just the RID extension.
-		const ridPacket = Packet.factory(factoryBuffer);
+		const ridPacket = RtpPacket.factory(factoryBuffer);
 
 		ridPacket.setExtensionMapping(extensionMapping);
 		ridPacket.setRidExtension('r1');
 
-		const parsedRidPacket = Packet.parse(ridPacket.getBuffer());
+		const parsedRidPacket = RtpPacket.parse(ridPacket.getBuffer());
 
 		parsedRidPacket.setExtensionMapping(extensionMapping);
 
@@ -1168,12 +1177,12 @@ describe('RTP Packet', () => {
 		expect(parsedRidPacket.getRridExtension()).toBeUndefined();
 
 		// Packet with just the RRID extension.
-		const rridPacket = Packet.factory(cloneBuffer);
+		const rridPacket = RtpPacket.factory(cloneBuffer);
 
 		rridPacket.setExtensionMapping(extensionMapping);
 		rridPacket.setRridExtension('r2');
 
-		const parsedRridPacket = Packet.parse(rridPacket.getBuffer());
+		const parsedRridPacket = RtpPacket.parse(rridPacket.getBuffer());
 
 		parsedRridPacket.setExtensionMapping(extensionMapping);
 
@@ -1181,8 +1190,8 @@ describe('RTP Packet', () => {
 		expect(parsedRridPacket.getRridExtension()).toBe('r2');
 	});
 
-	test('Packet.setExtension() fails if wrong extensions are given', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.setExtension() fails if wrong extensions are given', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		packet.setPayload(dataBuffer.subarray(0, 10));
 		packet.padTo4Bytes();
@@ -1192,11 +1201,11 @@ describe('RTP Packet', () => {
 		// Invalid extension id 0.
 		expect(() => packet.setExtension(0, d.subarray(0, 4))).toThrow(TypeError);
 
-		packet.setExtensionsType('two-bytes');
+		packet.setExtensionsForm('two-byte');
 
 		expect(() => packet.setExtension(0, d.subarray(0, 4))).toThrow(TypeError);
 
-		packet.setExtensionsType('one-byte');
+		packet.setExtensionsForm('one-byte');
 
 		// Invalid extension id > 14 in One-Byte.
 		expect(() => packet.setExtension(15, d.subarray(0, 2))).toThrow(TypeError);
@@ -1207,7 +1216,7 @@ describe('RTP Packet', () => {
 		// Invalid extension length > 16 in One-Byte.
 		expect(() => packet.setExtension(3, d.subarray(0, 17))).toThrow(TypeError);
 
-		packet.setExtensionsType('two-bytes');
+		packet.setExtensionsForm('two-byte');
 
 		expect(() => packet.setExtension(15, d.subarray(0, 2))).not.toThrow();
 		expect(() => packet.setExtension(3, d.subarray(0, 0))).not.toThrow();
@@ -1233,7 +1242,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: true,
 			headerExtensionValueLength: 72,
 			hasOneByteExtensions: false,
-			hasTwoBytesExtensions: true,
+			hasTwoByteExtensions: true,
 			hasPayload: true,
 			payloadLength: 10,
 			hasPadding: true,
@@ -1252,7 +1261,7 @@ describe('RTP Packet', () => {
 		expect(packet.getLength() % 4).toBe(0);
 	});
 
-	test('Packet.setExtension() shrinks a huge header extension', () => {
+	test('RtpPacket.setExtension() shrinks a huge header extension', () => {
 		const extensionValueLength = 40000;
 		const payloadLength = 8;
 		const packetLength = 12 + 4 + extensionValueLength + payloadLength;
@@ -1270,7 +1279,7 @@ describe('RTP Packet', () => {
 		view.setUint16(14, extensionValueLength / 4);
 		factoryBuffer.fill(0, 16, 16 + extensionValueLength);
 
-		const packet = Packet.parse(factoryBuffer, packetLength);
+		const packet = RtpPacket.parse(factoryBuffer, packetLength);
 
 		expect(packet.dump().headerExtensionId).toBe(0xbede);
 
@@ -1282,27 +1291,27 @@ describe('RTP Packet', () => {
 		expect(packet.getLength()).toBe(36);
 	});
 
-	test('Packet.setExtension() keeps Two-Bytes extensions with length 0', () => {
+	test('RtpPacket.setExtension() keeps Two-Byte extensions with length 0', () => {
 		// prettier-ignore
 		const receivedBuffer = new Uint8Array([
 			0x90, 0x6f, 0x00, 0x01, // Version 2, extension flag set, payload type 111, sequence number 1.
 			0x00, 0x00, 0x00, 0x01, // Timestamp.
 			0x00, 0x00, 0x00, 0x01, // SSRC.
-			0x10, 0x00, 0x00, 0x01, // Two-Bytes header extension, length 1 (4 bytes).
+			0x10, 0x00, 0x00, 0x01, // Two-Byte header extension, length 1 (4 bytes).
 			0x02, 0x00, 0x00, 0x00, // Extension id 2 with length 0, then padding.
 			0x11, 0x22, 0x33, 0x44, // Payload.
 		]);
 
 		factoryBuffer.set(receivedBuffer);
 
-		const packet = Packet.parse(factoryBuffer, receivedBuffer.byteLength);
+		const packet = RtpPacket.parse(factoryBuffer, receivedBuffer.byteLength);
 
-		expect(packet.getExtensionsType()).toBe('two-bytes');
+		expect(packet.getExtensionsForm()).toBe('two-byte');
 		expect(packet.getExtension(2)?.byteLength).toBe(0);
 
 		packet.setExtension(1, textEncoder.encode('abcdefgh'));
 
-		expect(packet.getExtensionsType()).toBe('two-bytes');
+		expect(packet.getExtensionsForm()).toBe('two-byte');
 		expect(packet.dump().headerExtensionId).toBe(0b0001000000000000);
 		expect(packet.getExtension(1)).toEqual(textEncoder.encode('abcdefgh'));
 		expect(packet.getExtension(2)?.byteLength).toBe(0);
@@ -1311,11 +1320,11 @@ describe('RTP Packet', () => {
 		);
 	});
 
-	test('Packet.setExtension() fails without modifying the packet if it does not fit', () => {
+	test('RtpPacket.setExtension() fails without modifying the packet if it does not fit', () => {
 		// 12 (fixed header) + 10 (payload) = 22 bytes. Setting the extension needs
 		// 12 more: 4 (ext header) + 8 (one 5-byte One-Byte element padded to 4).
 		// So a buffer of 33 bytes is one byte short.
-		let packet = Packet.factory(factoryBuffer.subarray(0, 33));
+		let packet = RtpPacket.factory(factoryBuffer.subarray(0, 33));
 
 		packet.setPayload(dataBuffer.subarray(0, 10));
 
@@ -1327,7 +1336,7 @@ describe('RTP Packet', () => {
 		expect(packet.getPayload()).toEqual(dataBuffer.subarray(0, 10));
 
 		// A buffer of 34 bytes is exactly what it needs.
-		packet = Packet.factory(factoryBuffer.subarray(0, 34));
+		packet = RtpPacket.factory(factoryBuffer.subarray(0, 34));
 
 		packet.setPayload(dataBuffer.subarray(0, 10));
 		packet.setExtension(1, dataBuffer.subarray(0, 4));
@@ -1349,7 +1358,7 @@ describe('RTP Packet', () => {
 		expect(packet.getPayload()).toEqual(dataBuffer.subarray(0, 10));
 	});
 
-	test('Packet.setExtension() replaces a header extension without One-Byte or Two-Bytes extensions', () => {
+	test('RtpPacket.setExtension() replaces a header extension without One-Byte or Two-Byte extensions', () => {
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			0x90, 0x01, 0x00, 0x08,
@@ -1362,7 +1371,7 @@ describe('RTP Packet', () => {
 
 		factoryBuffer.set(buffer);
 
-		const packet = Packet.parse(factoryBuffer, buffer.byteLength);
+		const packet = RtpPacket.parse(factoryBuffer, buffer.byteLength);
 
 		checkPacket(packet, {
 			buffer: factoryBuffer,
@@ -1377,7 +1386,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: true,
 			headerExtensionValueLength: 4,
 			hasOneByteExtensions: false,
-			hasTwoBytesExtensions: false,
+			hasTwoByteExtensions: false,
 			hasPayload: true,
 			payloadLength: 4,
 			hasPadding: false,
@@ -1398,12 +1407,12 @@ describe('RTP Packet', () => {
 		);
 	});
 
-	test('Packet.setExtension() and Packet.clearExtensions() in a new packet succeed', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.setExtension() and RtpPacket.clearExtensions() in a new packet succeed', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		packet.setExtension(1, new Uint8Array([1, 2, 3, 4]));
 
-		expect(packet.getExtensionsType()).toBe('one-byte');
+		expect(packet.getExtensionsForm()).toBe('one-byte');
 		expect(packet.getExtensions().size).toBe(1);
 		expect(packet.getExtension(1)).toEqual(new Uint8Array([1, 2, 3, 4]));
 		// 12 (fixed header) + 4 (ext header) + 5 (extension id 1) = 21 => 24.
@@ -1417,8 +1426,8 @@ describe('RTP Packet', () => {
 		expect(packet.getLength()).toBe(12);
 	});
 
-	test('Packet.setCsrcs() succeeds', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.setCsrcs() succeeds', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		packet.setPayload(new Uint8Array([1, 2, 3, 4]));
 		packet.setExtension(1, new Uint8Array([5, 6]));
@@ -1432,7 +1441,7 @@ describe('RTP Packet', () => {
 		expect(packet.getLength()).toBe(length + 8);
 		expect(packet.getExtension(1)).toEqual(new Uint8Array([5, 6]));
 		expect(packet.getPayload()).toEqual(new Uint8Array([1, 2, 3, 4]));
-		expect(() => Packet.parse(packet.getBuffer())).not.toThrow();
+		expect(() => RtpPacket.parse(packet.getBuffer())).not.toThrow();
 
 		packet.setCsrcs();
 
@@ -1447,13 +1456,13 @@ describe('RTP Packet', () => {
 	});
 
 	test('Packet extension setters fail if the extension type is not in the extension mapping', () => {
-		const packet = Packet.factory(factoryBuffer);
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		expect(packet.getMidExtension()).toBeUndefined();
 		expect(() => packet.setMidExtension('foo')).toThrow(Error);
 		expect(() => packet.setMidExtension()).toThrow(Error);
 
-		packet.setExtensionMapping({ [RtpExtensionType.RTP_STREAM_ID]: 1 });
+		packet.setExtensionMapping({ [ExtensionType.RTP_STREAM_ID]: 1 });
 
 		expect(packet.getMidExtension()).toBeUndefined();
 		expect(() => packet.setMidExtension('foo')).toThrow(Error);
@@ -1462,13 +1471,13 @@ describe('RTP Packet', () => {
 	});
 
 	test('Packet audio level, video orientation, playout delay and abs capture time extensions succeed', () => {
-		const packet = Packet.factory(factoryBuffer);
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		packet.setExtensionMapping({
-			[RtpExtensionType.SSRC_AUDIO_LEVEL]: 1,
-			[RtpExtensionType.VIDEO_ORIENTATION]: 2,
-			[RtpExtensionType.PLAYOUT_DELAY]: 3,
-			[RtpExtensionType.ABS_CAPTURE_TIME]: 4,
+			[ExtensionType.SSRC_AUDIO_LEVEL]: 1,
+			[ExtensionType.VIDEO_ORIENTATION]: 2,
+			[ExtensionType.PLAYOUT_DELAY]: 3,
+			[ExtensionType.ABS_CAPTURE_TIME]: 4,
 		});
 
 		packet.setSsrcAudioLevelExtension({ volume: 100, voice: true });
@@ -1524,7 +1533,7 @@ describe('RTP Packet', () => {
 			estimatedCaptureClockOffset: { seconds: -1, fractions: 5 },
 		});
 
-		expect(() => Packet.parse(packet.getBuffer())).not.toThrow();
+		expect(() => RtpPacket.parse(packet.getBuffer())).not.toThrow();
 
 		packet.setSsrcAudioLevelExtension();
 		packet.setVideoOrientationExtension();
@@ -1536,14 +1545,14 @@ describe('RTP Packet', () => {
 	});
 
 	test('Packet setters fail if wrong values are given', () => {
-		const packet = Packet.factory(factoryBuffer);
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		packet.setExtensionMapping({
-			[RtpExtensionType.ABS_SEND_TIME]: 1,
-			[RtpExtensionType.TRANSPORT_WIDE_CC_01]: 2,
-			[RtpExtensionType.SSRC_AUDIO_LEVEL]: 3,
-			[RtpExtensionType.ABS_CAPTURE_TIME]: 4,
-			[RtpExtensionType.PLAYOUT_DELAY]: 5,
+			[ExtensionType.ABS_SEND_TIME]: 1,
+			[ExtensionType.TRANSPORT_WIDE_CC_01]: 2,
+			[ExtensionType.SSRC_AUDIO_LEVEL]: 3,
+			[ExtensionType.ABS_CAPTURE_TIME]: 4,
+			[ExtensionType.PLAYOUT_DELAY]: 5,
 		});
 		packet.setPayload(new Uint8Array([1, 2, 3, 4]));
 
@@ -1619,8 +1628,8 @@ describe('RTP Packet', () => {
 		expect(packet.getBuffer()).toEqual(buffer);
 	});
 
-	test('Packet.setPayload() and Packet.removePayload() succeed', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.setPayload() and RtpPacket.removePayload() succeed', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 		// prettier-ignore
 		const payload = new Uint8Array([
 			0x11, 0x22, 0x33, 0x44,
@@ -1640,7 +1649,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: false,
 			headerExtensionValueLength: 0,
 			hasOneByteExtensions: false,
-			hasTwoBytesExtensions: false,
+			hasTwoByteExtensions: false,
 			hasPayload: true,
 			payloadLength: 10,
 			hasPadding: true,
@@ -1681,8 +1690,8 @@ describe('RTP Packet', () => {
 		});
 	});
 
-	test('Packet.padTo4Bytes() succeeds', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.padTo4Bytes() succeeds', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		packet.setPayload(new Uint8Array([1, 2, 3, 4]));
 
@@ -1707,8 +1716,8 @@ describe('RTP Packet', () => {
 		);
 	});
 
-	test('Packet.shiftPayload() succeeds', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.shiftPayload() succeeds', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		packet.setSsrc(12344321);
 
@@ -1746,7 +1755,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: true,
 			headerExtensionValueLength: 12,
 			hasOneByteExtensions: true,
-			hasTwoBytesExtensions: false,
+			hasTwoByteExtensions: false,
 			hasPayload: true,
 			payloadLength: 10,
 			hasPadding: true,
@@ -1831,8 +1840,8 @@ describe('RTP Packet', () => {
 		expect(packet.getPayload()).toEqual(payload);
 	});
 
-	test('Packet.shiftPayload() fails if wrong values are given', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.shiftPayload() fails if wrong values are given', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		// prettier-ignore
 		const payload = new Uint8Array([
@@ -1868,8 +1877,8 @@ describe('RTP Packet', () => {
 		expect(packet.getBuffer()).toEqual(buffer);
 	});
 
-	test('Packet.rtxEncode() and Packet.rtxDecode() succeed', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.rtxEncode() and RtpPacket.rtxDecode() succeed', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		packet.setPayloadType(100);
 		packet.setSequenceNumber(12345);
@@ -1899,7 +1908,7 @@ describe('RTP Packet', () => {
 			hasHeaderExtension: false,
 			headerExtensionValueLength: 0,
 			hasOneByteExtensions: false,
-			hasTwoBytesExtensions: false,
+			hasTwoByteExtensions: false,
 			hasPayload: true,
 			payloadLength: 10,
 			hasPadding: true,
@@ -1944,8 +1953,8 @@ describe('RTP Packet', () => {
 		expect(packet.getLength() % 4).not.toBe(0);
 	});
 
-	test('Packet.rtxDecode() of a packet received as RTX succeeds', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.rtxDecode() of a packet received as RTX succeeds', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		// What arrives over RTX: the RTX payload type and SSRC, and the original
 		// sequence number at the beginning of the payload.
@@ -1964,8 +1973,8 @@ describe('RTP Packet', () => {
 		);
 	});
 
-	test('Packet.rtxDecode() fails without modifying the packet if the payload is too short', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.rtxDecode() fails without modifying the packet if the payload is too short', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		packet.setPayloadType(111);
 		packet.setSequenceNumber(666);
@@ -1978,8 +1987,8 @@ describe('RTP Packet', () => {
 		expect(packet.getBuffer()).toEqual(buffer);
 	});
 
-	test('Packet.rtxEncode() does not write beyond the new packet length', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.rtxEncode() does not write beyond the new packet length', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		// prettier-ignore
 		const payload = new Uint8Array([
@@ -2010,8 +2019,8 @@ describe('RTP Packet', () => {
 		expect(packet.getPayload().subarray(2)).toEqual(payload);
 	});
 
-	test('Packet.serialize() into a given buffer succeeds', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.serialize() into a given buffer succeeds', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
 		packet.setPayload(new Uint8Array([1, 2, 3, 4]));
 
@@ -2028,9 +2037,9 @@ describe('RTP Packet', () => {
 		expect(packet.getPayload()).toEqual(new Uint8Array([1, 2, 3, 4]));
 	});
 
-	test('Packet.serialize() into its own buffer with overlapping bytes succeeds', () => {
+	test('RtpPacket.serialize() into its own buffer with overlapping bytes succeeds', () => {
 		const buffer = new Uint8Array(100);
-		const packet = Packet.factory(buffer.subarray(10));
+		const packet = RtpPacket.factory(buffer.subarray(10));
 
 		packet.setSequenceNumber(55555);
 		packet.setPayload(new Uint8Array([1, 2, 3, 4]));
@@ -2052,10 +2061,10 @@ describe('RTP Packet', () => {
 		expect(packet.getPayload()).toEqual(new Uint8Array([1, 2, 3, 4]));
 	});
 
-	test('Packet.clone() into a given buffer succeeds', () => {
-		const packet = Packet.factory(factoryBuffer);
+	test('RtpPacket.clone() into a given buffer succeeds', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
 
-		packet.setExtensionMapping({ [RtpExtensionType.MID]: 1 });
+		packet.setExtensionMapping({ [ExtensionType.MID]: 1 });
 		packet.setMidExtension('foo');
 		packet.setPayload(new Uint8Array([1, 2, 3, 4]));
 
@@ -2080,9 +2089,9 @@ describe('RTP Packet', () => {
 		expect(clonedPacket.getMidExtension()).toBe('foo');
 	});
 
-	test('Packet.clone() fails if the given buffer overlaps the packet', () => {
+	test('RtpPacket.clone() fails if the given buffer overlaps the packet', () => {
 		const buffer = new Uint8Array(100);
-		const packet = Packet.factory(buffer.subarray(0, 50));
+		const packet = RtpPacket.factory(buffer.subarray(0, 50));
 
 		packet.setSequenceNumber(7);
 		packet.setPayload(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]));

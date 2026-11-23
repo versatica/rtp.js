@@ -1,5 +1,5 @@
 import { ByePacket } from '../../../packets/RTCP/ByePacket';
-import { PacketType } from '../../../packets/RTCP/Packet';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
 import { checkPacket, type ExpectedPacket } from './rtcpCommon';
 import {
 	factoryBuffer,
@@ -32,7 +32,7 @@ describe('RTCP BYE Packet', () => {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 24,
-			packetType: PacketType.BYE,
+			packetType: RtcpPacketType.BYE,
 			hasPadding: false,
 			padding: 0,
 		};
@@ -156,7 +156,7 @@ describe('RTCP BYE Packet', () => {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 20,
-			packetType: PacketType.BYE,
+			packetType: RtcpPacketType.BYE,
 			hasPadding: true,
 			padding: 8,
 		};
@@ -197,7 +197,7 @@ describe('RTCP BYE Packet', () => {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 16,
-			packetType: PacketType.BYE,
+			packetType: RtcpPacketType.BYE,
 			hasPadding: true,
 			padding: 8,
 		};
@@ -319,7 +319,7 @@ describe('RTCP BYE Packet', () => {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 4,
-			packetType: PacketType.BYE,
+			packetType: RtcpPacketType.BYE,
 			hasPadding: false,
 			padding: 0,
 		};

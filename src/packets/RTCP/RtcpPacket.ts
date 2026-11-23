@@ -1,4 +1,4 @@
-import { Serializable, type SerializableDump } from '../Serializable';
+import { Serializable, type SerializableDump } from '../common/Serializable';
 import { isUnsignedInteger } from '../../utils/numbers';
 import { padTo4Bytes } from '../../utils/buffers';
 import {
@@ -8,17 +8,22 @@ import {
 	writeBitsInDataView,
 } from '../../utils/bits';
 
-// Length (in bytes) of the RTCP Common Header.
+/**
+ * Length (in bytes) of the RTCP Common Header.
+ *
+ * @internal
+ */
 export const COMMON_HEADER_LENGTH = 4;
-// Maximum length (in bytes) representable by the Length field.
+
+/**
+ * Maximum length (in bytes) representable by the Length field.
+ */
 const MAX_PACKET_LENGTH = (0xffff + 1) * 4;
 
 /**
  * RTCP packet type.
- *
- * @category RTCP
  */
-export enum PacketType {
+export enum RtcpPacketType {
 	/**
 	 * RTCP Sender Report.
 	 */
@@ -51,11 +56,9 @@ export enum PacketType {
 
 /**
  * RTCP packet info dump.
- *
- * @category RTCP
  */
-export type PacketDump = SerializableDump & {
-	packetType: PacketType;
+export type RtcpPacketDump = SerializableDump & {
+	packetType: RtcpPacketType;
 	count: number;
 	padding: number;
 };
@@ -67,8 +70,6 @@ export type PacketDump = SerializableDump & {
  * @param buffer - Buffer holding the packet.
  * @param packetLength - Exact length of the packet. If not given,
  *   `buffer.byteLength` is used.
- *
- * @category RTCP
  */
 export function isRtcp(
 	buffer: Uint8Array,
@@ -129,8 +130,6 @@ export function isRtcp(
  * - Body (variable length): Packet content, whose format depends on the
  *   packet type (PT).
  *
- * @category RTCP
- *
  * @remarks
  * - This class represents a single RTCP packet and not a compound packet.
  * - Every modification is applied in place within the buffer of the packet,
@@ -139,7 +138,7 @@ export function isRtcp(
  * @see
  * - [RFC 3550 section 6.4](https://datatracker.ietf.org/doc/html/rfc3550#section-6.4)
  */
-export abstract class Packet extends Serializable {
+export abstract class RtcpPacket extends Serializable {
 	protected constructor(buffer: Uint8Array) {
 		super(buffer);
 	}
@@ -147,7 +146,7 @@ export abstract class Packet extends Serializable {
 	/**
 	 * Dump RTCP packet info.
 	 */
-	override dump(): PacketDump {
+	override dump(): RtcpPacketDump {
 		return {
 			...super.dump(),
 			packetType: this.getPacketType(),
@@ -159,16 +158,16 @@ export abstract class Packet extends Serializable {
 	/**
 	 * @inheritDoc
 	 */
-	abstract override clone(buffer: Uint8Array): Packet;
+	abstract override clone(buffer: Uint8Array): RtcpPacket;
 
 	/**
 	 * Get the RTCP packet type.
 	 *
 	 * @remarks
 	 * - In a packet with unknown type, the returned value is not a member of
-	 *   {@link PacketType}.
+	 *   {@link RtcpPacketType}.
 	 */
-	getPacketType(): PacketType {
+	getPacketType(): RtcpPacketType {
 		return this.getView().getUint8(1);
 	}
 
@@ -200,11 +199,11 @@ export abstract class Packet extends Serializable {
 	 * - `TypeError` if the buffer has no space for the announced length.
 	 * - `TypeError` if the announced padding is not valid.
 	 */
-	protected parseCommonHeader(packetType?: PacketType): void {
+	protected parseCommonHeader(packetType?: RtcpPacketType): void {
 		const view = this.getView();
 
 		if (packetType !== undefined && this.getPacketType() !== packetType) {
-			throw new TypeError(`not a RTCP ${PacketType[packetType]} packet`);
+			throw new TypeError(`not a RTCP ${RtcpPacketType[packetType]} packet`);
 		}
 
 		const length = (view.getUint16(2) + 1) * 4;
@@ -243,7 +242,7 @@ export abstract class Packet extends Serializable {
 	 *   which case nothing changes.
 	 */
 	protected initializeHeader(
-		packetType: PacketType,
+		packetType: RtcpPacketType,
 		count: number,
 		length: number
 	): void {

@@ -1,14 +1,13 @@
-// Position of the lowest enabled bit of each byte mask (index), or -1 for mask
-// 0. Computed once so masks are not inspected on every call.
+/**
+ * Position of the lowest enabled bit of each byte mask (index), or -1 for mask
+ * 0. Computed once so masks are not inspected on every call.
+ */
 const FIRST_ENABLED_BIT_IN_MASK = new Int8Array(256).map((_, mask) =>
 	mask === 0 ? -1 : 31 - Math.clz32(mask & -mask)
 );
 
 /**
  * Read the value of `bit` position of `value`.
- *
- * @category Utils
- * @hidden
  */
 export function readBit(value: number, bit: number): boolean {
 	return (value & (1 << bit)) !== 0;
@@ -16,9 +15,6 @@ export function readBit(value: number, bit: number): boolean {
 
 /**
  * Write `flag` in `bit` position of `value` and return updated value.
- *
- * @category Utils
- * @hidden
  */
 export function writeBit(value: number, bit: number, flag: boolean): number {
 	if (flag) {
@@ -30,9 +26,6 @@ export function writeBit(value: number, bit: number, flag: boolean): number {
 
 /**
  * Toggle value of `bit` position of `value` and return updated value.
- *
- * @category Utils
- * @hidden
  */
 export function toggleBit(value: number, bit: number): number {
 	return value ^ (1 << bit);
@@ -40,9 +33,6 @@ export function toggleBit(value: number, bit: number): number {
 
 /**
  * Read the value of the enabled bits of `mask` of byte `byte`.
- *
- * @category Utils
- * @hidden
  */
 export function readBits(byte: number, mask: number): number {
 	const bitsToShift = getFirstEnabledBitInMask(mask);
@@ -53,9 +43,6 @@ export function readBits(byte: number, mask: number): number {
 /**
  * Write `value` in the enabled bits of `mask` of byte `byte` and return
  * updated value.
- *
- * @category Utils
- * @hidden
  */
 export function writeBits(byte: number, mask: number, value: number): number {
 	const inverseMask = mask ^ 0b11111111;
@@ -66,9 +53,6 @@ export function writeBits(byte: number, mask: number, value: number): number {
 
 /**
  * Read the value of `bit` position of byte `pos` in `view`.
- *
- * @category Utils
- * @hidden
  */
 export function readBitInDataView(
 	view: DataView,
@@ -80,9 +64,6 @@ export function readBitInDataView(
 
 /**
  * Write `flag` in `bit` position of byte `pos` in `view`.
- *
- * @category Utils
- * @hidden
  */
 export function writeBitInDataView(
 	view: DataView,
@@ -95,9 +76,6 @@ export function writeBitInDataView(
 
 /**
  * Toggle value of `bit` position of byte `pos` in `view`.
- *
- * @category Utils
- * @hidden
  */
 export function toggleBitInDataView(
 	view: DataView,
@@ -109,9 +87,6 @@ export function toggleBitInDataView(
 
 /**
  * Read the value of the enabled bits of `mask` of byte `pos` in `view`.
- *
- * @category Utils
- * @hidden
  */
 export function readBitsInDataView(
 	view: DataView,
@@ -123,9 +98,6 @@ export function readBitsInDataView(
 
 /**
  * Write `value` in the enabled bits of `mask` of byte `pos` in `view`.
- *
- * @category Utils
- * @hidden
  */
 export function writeBitsInDataView(
 	view: DataView,

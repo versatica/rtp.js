@@ -1,4 +1,4 @@
-import { Packet, isRtp } from '../../../packets/RTP/Packet';
+import { RtpPacket, isRtp } from '../../../packets/RTP/RtpPacket';
 import { areBuffersEqual } from '../../../utils/buffers';
 import { throwBuffer } from '../../testHelpers';
 
@@ -15,14 +15,14 @@ export type ExpectedPacket = {
 	hasHeaderExtension: boolean;
 	headerExtensionValueLength: number;
 	hasOneByteExtensions: boolean;
-	hasTwoBytesExtensions: boolean;
+	hasTwoByteExtensions: boolean;
 	hasPayload: boolean;
 	payloadLength: number;
 	hasPadding: boolean;
 	padding: number;
 };
 
-export function checkPacket(packet: Packet, expected: ExpectedPacket): void {
+export function checkPacket(packet: RtpPacket, expected: ExpectedPacket): void {
 	const packetBuffer = packet.getBuffer();
 	const view = new DataView(
 		packetBuffer.buffer,
@@ -67,7 +67,7 @@ export function checkPacket(packet: Packet, expected: ExpectedPacket): void {
 	expect(
 		headerExtensionId !== undefined &&
 			(headerExtensionId & 0b1111111111110000) === 0b0001000000000000
-	).toBe(expected.hasTwoBytesExtensions);
+	).toBe(expected.hasTwoByteExtensions);
 
 	if (!hasHeaderExtension) {
 		expect(packet.getExtensions().size).toBe(0);
@@ -82,7 +82,7 @@ export function checkPacket(packet: Packet, expected: ExpectedPacket): void {
 		expect(packet.getPadding()).toBe(0);
 	}
 
-	expect(() => Packet.parse(packetBuffer)).not.toThrow();
+	expect(() => RtpPacket.parse(packetBuffer)).not.toThrow();
 	expect(() => packet.setPayloadType(packet.getPayloadType())).not.toThrow();
 	expect(() => packet.setMarker(packet.getMarker())).not.toThrow();
 	expect(() =>
@@ -126,7 +126,7 @@ export function checkPacket(packet: Packet, expected: ExpectedPacket): void {
 	expect(() =>
 		packet.clone(throwBuffer.subarray(0, expected.length - 1))
 	).toThrow(TypeError);
-	expect(() => Packet.parse(packet.getBuffer())).not.toThrow();
+	expect(() => RtpPacket.parse(packet.getBuffer())).not.toThrow();
 	expect(
 		areBuffersEqual(
 			expected.buffer.subarray(0, expected.bufferLength),

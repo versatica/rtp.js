@@ -1,7 +1,5 @@
 /**
  * Returns the given size padded to 4 bytes.
- *
- * @category Utils
  */
 export function padTo4Bytes(size: number): number {
 	return (size + 3) & ~0x03;
@@ -9,9 +7,6 @@ export function padTo4Bytes(size: number): number {
 
 /**
  * Whether two buffers contain the same data.
- *
- * @category Utils
- * @hidden
  */
 export function areBuffersEqual(
 	buffer1: Uint8Array,

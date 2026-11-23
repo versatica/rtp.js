@@ -27,6 +27,7 @@ const PRETTIER_PATHS = [
 	'npm-scripts.mjs',
 	'package.json',
 	'tsconfig.json',
+	'tsconfig.build.json',
 	'typedoc.config.mjs',
 	'src',
 ];
@@ -168,15 +169,18 @@ function buildTypescript({ force, args = '' }) {
 	deleteLib();
 
 	// Generate .js CommonJS code and .d.ts TypeScript declaration files in lib/.
-	executeCmd(`tsc ${args}`);
+	// Type check everything, tests included, without generating anything.
+	executeCmd('tsc --noEmit');
+
+	// NOTE: tsconfig.build.json excludes tests, so they don't end in lib/.
+	executeCmd(`tsc -p tsconfig.build.json ${args}`);
 }
 
 function watchTypescript({ args = '' } = {}) {
 	logInfo('watchTypescript()');
 
-	deleteLib();
-
-	executeCmd(`tsc --watch ${args}`);
+	// Type check everything, tests included, without generating anything.
+	executeCmd(`tsc --watch --noEmit ${args}`);
 }
 
 function lint() {

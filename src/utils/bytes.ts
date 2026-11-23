@@ -1,8 +1,5 @@
 /**
  * Read 3 bytes starting from byte `pos` in `view` as unsigned value.
- *
- * @category Utils
- * @hidden
  */
 export function read3BytesInDataView(view: DataView, pos: number): number {
 	return (view.getUint8(pos) << 16) + view.getUint16(pos + 1);
@@ -10,9 +7,6 @@ export function read3BytesInDataView(view: DataView, pos: number): number {
 
 /**
  * Write an unsigned value in 3 bytes starting from byte `pos` in `view`.
- *
- * @category Utils
- * @hidden
  */
 export function write3BytesInDataView(
 	view: DataView,
@@ -25,9 +19,6 @@ export function write3BytesInDataView(
 
 /**
  * Read 3 bytes starting from byte `pos` in `view` as signed value.
- *
- * @category Utils
- * @hidden
  */
 export function readSigned3BytesInDataView(
 	view: DataView,
@@ -45,9 +36,6 @@ export function readSigned3BytesInDataView(
 
 /**
  * Write a signed value in 3 bytes starting from byte `pos` in `view`.
- *
- * @category Utils
- * @hidden
  */
 export function writeSigned3BytesInDataView(
 	view: DataView,

@@ -1,8 +1,8 @@
 import {
-	type Packet,
-	type PacketType,
+	type RtcpPacket,
+	type RtcpPacketType,
 	isRtcp,
-} from '../../../packets/RTCP/Packet';
+} from '../../../packets/RTCP/RtcpPacket';
 import { areBuffersEqual } from '../../../utils/buffers';
 import { throwBuffer } from '../../testHelpers';
 
@@ -10,12 +10,15 @@ export type ExpectedPacket = {
 	buffer: Uint8Array;
 	bufferLength: number;
 	length: number;
-	packetType: PacketType;
+	packetType: RtcpPacketType;
 	hasPadding: boolean;
 	padding: number;
 };
 
-export function checkPacket(packet: Packet, expected: ExpectedPacket): void {
+export function checkPacket(
+	packet: RtcpPacket,
+	expected: ExpectedPacket
+): void {
 	const packetBuffer = packet.getBuffer();
 	const view = new DataView(
 		packetBuffer.buffer,

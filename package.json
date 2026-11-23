@@ -1,29 +1,29 @@
 {
 	"name": "rtp.js",
-	"version": "0.15.7",
+	"version": "1.0.0-pre.1",
 	"description": "RTP stack for Node.js and browser written in TypeScript",
-	"contributors": [
-		"Iñaki Baz Castillo <ibc@aliax.net> (https://inakibaz.me)",
-		"José Luis Millán <jmillan@aliax.net> (https://github.com/jmillan)"
-	],
+	"author": "Iñaki Baz Castillo <ibc@aliax.net> (https://inakibaz.me)",
 	"homepage": "https://github.com/versatica/rtp.js",
 	"license": "ISC",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/versatica/rtp.js.git"
 	},
-	"main": "lib/index.js",
-	"types": "lib/index.d.ts",
 	"exports": {
-		".": {
-			"typedoc": "./src/index.ts",
-			"types": "./lib/index.d.ts",
-			"default": "./lib/index.js"
+		"./packets/common": {
+			"typedoc": "./src/packets/common/public.ts",
+			"types": "./lib/packets/common/public.d.ts",
+			"default": "./lib/packets/common/public.js"
 		},
-		"./packets": {
-			"typedoc": "./src/packets/public.ts",
-			"types": "./lib/packets/public.d.ts",
-			"default": "./lib/packets/public.js"
+		"./packets/RTP": {
+			"typedoc": "./src/packets/RTP/public.ts",
+			"types": "./lib/packets/RTP/public.d.ts",
+			"default": "./lib/packets/RTP/public.js"
+		},
+		"./packets/RTCP": {
+			"typedoc": "./src/packets/RTCP/public.ts",
+			"types": "./lib/packets/RTCP/public.d.ts",
+			"default": "./lib/packets/RTCP/public.js"
 		},
 		"./utils": {
 			"typedoc": "./src/utils/public.ts",
@@ -63,8 +63,10 @@
 		"docs:check": "node npm-scripts.mjs docs:check"
 	},
 	"dependencies": {
+		"@types/events-alias": "npm:@types/events@^3.0.3",
 		"@types/node": "^26.6.6",
 		"debug": "^4.4.3",
+		"events-alias": "npm:events@^3.3.0",
 		"supports-color": "^11.0.0"
 	},
 	"devDependencies": {

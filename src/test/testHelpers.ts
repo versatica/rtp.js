@@ -1,8 +1,28 @@
 // NOTE: Random size buffers since anyway we use their byteLength.
+
+/**
+ * Buffer for packets created with `factory()`.
+ */
 export const factoryBuffer = new Uint8Array(66661);
+
+/**
+ * Buffer for `serialize()`.
+ */
 export const serializeBuffer = new Uint8Array(66662);
+
+/**
+ * Buffer for `clone()`.
+ */
 export const cloneBuffer = new Uint8Array(66663);
+
+/**
+ * Buffer with arbitrary data to be written into packets.
+ */
 export const dataBuffer = new Uint8Array(66664);
+
+/**
+ * Buffer for operations that must throw.
+ */
 export const throwBuffer = new Uint8Array(66665);
 
 /**

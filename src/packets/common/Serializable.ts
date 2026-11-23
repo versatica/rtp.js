@@ -1,4 +1,4 @@
-import { isUnsignedInteger } from '../utils/numbers';
+import { isUnsignedInteger } from '../../utils/numbers';
 
 /**
  * Serializable info dump.

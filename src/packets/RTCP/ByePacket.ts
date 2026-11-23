@@ -1,16 +1,21 @@
 import {
-	Packet,
-	PacketType,
+	RtcpPacket,
+	RtcpPacketType,
 	isRtcp,
 	COMMON_HEADER_LENGTH,
-	type PacketDump,
-} from './Packet';
+	type RtcpPacketDump,
+} from './RtcpPacket';
 import { isUnsignedInteger } from '../../utils/numbers';
 import { padTo4Bytes } from '../../utils/buffers';
 
-// Maximum number of SSRC/CSRC values (the Count field has 5 bits).
+/**
+ * Maximum number of SSRC/CSRC values (the Count field has 5 bits).
+ */
 const MAX_SSRCS = 31;
-// Maximum length (in bytes) of the Reason field.
+
+/**
+ * Maximum length (in bytes) of the Reason field.
+ */
 const MAX_REASON_LENGTH = 255;
 
 const textEncoder = new TextEncoder();
@@ -18,10 +23,8 @@ const textDecoder = new TextDecoder();
 
 /**
  * RTCP BYE packet info dump.
- *
- * @category RTCP
  */
-export type ByePacketDump = PacketDump & {
+export type ByePacketDump = RtcpPacketDump & {
 	ssrcs: number[];
 	reason?: string;
 };
@@ -51,8 +54,6 @@ export type ByePacketDump = PacketDump & {
  *   the next 32-bit boundary, the string is not null terminated. If not, the
  *   BYE packet MUST be padded with null octets to the next 32-bit boundary.
  *
- * @category RTCP
- *
  * @remarks
  * - Every modification is applied in place within the buffer of the packet,
  *   so it's always serialized. Modifications that need more bytes throw if
@@ -62,7 +63,7 @@ export type ByePacketDump = PacketDump & {
  * @see
  * - [RFC 3550 section 6.6](https://datatracker.ietf.org/doc/html/rfc3550#section-6.6)
  */
-export class ByePacket extends Packet {
+export class ByePacket extends RtcpPacket {
 	/**
 	 * Parse a RTCP BYE packet.
 	 *
@@ -80,7 +81,7 @@ export class ByePacket extends Packet {
 
 		const packet = new ByePacket(buffer);
 
-		packet.parseCommonHeader(PacketType.BYE);
+		packet.parseCommonHeader(RtcpPacketType.BYE);
 		packet.#validate();
 
 		return packet;
@@ -99,7 +100,7 @@ export class ByePacket extends Packet {
 	static factory(buffer: Uint8Array): ByePacket {
 		const packet = new ByePacket(buffer);
 
-		packet.initializeHeader(PacketType.BYE, 0, COMMON_HEADER_LENGTH);
+		packet.initializeHeader(RtcpPacketType.BYE, 0, COMMON_HEADER_LENGTH);
 
 		return packet;
 	}

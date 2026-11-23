@@ -1,11 +1,14 @@
-import type { Ntp } from '../../types';
+import type { Ntp } from '../../utils/types';
+
+/**
+ * One-Byte and Two-Byte header forms of extensions (RFC 8285).
+ */
+export type ExtensionsForm = 'one-byte' | 'two-byte';
 
 /**
  * RTP extensions.
- *
- * @category RTP
  */
-export enum RtpExtensionType {
+export enum ExtensionType {
 	/**
 	 * Media identification.
 	 *
@@ -110,23 +113,19 @@ export enum RtpExtensionType {
 /**
  * Mapping of RTP extension types and their corresponding RTP extension ids.
  *
- * @category RTP
- *
  * @example
  * ```ts
- * const rtpExtensionMapping: RtpExtensionMapping =
+ * const extensionMapping: ExtensionMapping =
  * {
- *   [RtpExtensionType.MID]: 1,
- *   [RtpExtensionType.RTP_STREAM_ID]: 3
+ *   [ExtensionType.MID]: 1,
+ *   [ExtensionType.RTP_STREAM_ID]: 3
  * };
  * ```
  */
-export type RtpExtensionMapping = Partial<Record<RtpExtensionType, number>>;
+export type ExtensionMapping = Partial<Record<ExtensionType, number>>;
 
 /**
  * SSRC Audio Level data.
- *
- * @category RTP
  *
  * @see
  * - [RFC 6464](https://datatracker.ietf.org/doc/html/rfc6464)
@@ -146,8 +145,6 @@ export type SsrcAudioLevelExtension = {
 
 /**
  * Video Orientation data.
- *
- * @category RTP
  *
  * @see
  * - [3GPP TS 26.114 V13.2.0](https://www.etsi.org/deliver/etsi_ts/126100_126199/126114/13.02.00_60/ts_126114v130200p.pdf)
@@ -173,9 +170,25 @@ export type VideoOrientationExtension = {
 };
 
 /**
- * Absolute Capture Time data.
+ * Playout Delay data.
  *
- * @category RTP
+ * @see
+ * - [Google Source](https://webrtc.googlesource.com/src/+/refs/heads/main/docs/native-code/rtp-hdrext/playout-delay)
+ */
+export type PlayoutDelayExtension = {
+	/**
+	 * Minimum playout delay in 10 ms units (12 bits).
+	 */
+	minDelay: number;
+
+	/**
+	 * Maximum playout delay in 10 ms units (12 bits).
+	 */
+	maxDelay: number;
+};
+
+/**
+ * Absolute Capture Time data.
  *
  * @see
  * - [Google Source](https://webrtc.googlesource.com/src/+/refs/heads/main/docs/native-code/rtp-hdrext/abs-capture-time)
@@ -194,72 +207,48 @@ export type AbsCaptureTimeExtension = {
 };
 
 /**
- * Playout Delay data.
- *
- * @category RTP
- *
- * @see
- * - [Google Source](https://webrtc.googlesource.com/src/+/refs/heads/main/docs/native-code/rtp-hdrext/playout-delay)
- */
-export type PlayoutDelayExtension = {
-	/**
-	 * Minimum playout delay in 10 ms units (12 bits).
-	 */
-	minDelay: number;
-
-	/**
-	 * Maximum playout delay in 10 ms units (12 bits).
-	 */
-	maxDelay: number;
-};
-
-/**
  * Get the RTP extension type associated to the given RTP extension URI.
- *
- * @category RTP
  */
-export function rtpExtensionUriToType(
-	uri: string
-): RtpExtensionType | undefined {
+export function extensionUriToType(uri: string): ExtensionType | undefined {
 	switch (uri) {
 		case 'urn:ietf:params:rtp-hdrext:sdes:mid': {
-			return RtpExtensionType.MID;
+			return ExtensionType.MID;
 		}
 
 		case 'urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id': {
-			return RtpExtensionType.RTP_STREAM_ID;
+			return ExtensionType.RTP_STREAM_ID;
 		}
 
 		case 'urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id': {
-			return RtpExtensionType.REPAIRED_RTP_STREAM_ID;
+			return ExtensionType.REPAIRED_RTP_STREAM_ID;
 		}
 
 		case 'http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time': {
-			return RtpExtensionType.ABS_SEND_TIME;
+			return ExtensionType.ABS_SEND_TIME;
 		}
 
 		case 'http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01': {
-			return RtpExtensionType.TRANSPORT_WIDE_CC_01;
+			return ExtensionType.TRANSPORT_WIDE_CC_01;
 		}
 
 		case 'urn:ietf:params:rtp-hdrext:ssrc-audio-level': {
-			return RtpExtensionType.SSRC_AUDIO_LEVEL;
+			return ExtensionType.SSRC_AUDIO_LEVEL;
 		}
 
 		case 'https://aomediacodec.github.io/av1-rtp-spec/#dependency-descriptor-rtp-header-extension': {
-			return RtpExtensionType.DEPENDENCY_DESCRIPTOR;
+			return ExtensionType.DEPENDENCY_DESCRIPTOR;
 		}
 
 		case 'urn:3gpp:video-orientation': {
-			return RtpExtensionType.VIDEO_ORIENTATION;
+			return ExtensionType.VIDEO_ORIENTATION;
 		}
 
 		case 'http://www.webrtc.org/experiments/rtp-hdrext/abs-capture-time': {
-			return RtpExtensionType.ABS_CAPTURE_TIME;
+			return ExtensionType.ABS_CAPTURE_TIME;
 		}
 
 		case 'http://www.webrtc.org/experiments/rtp-hdrext/playout-delay': {
-			return RtpExtensionType.PLAYOUT_DELAY;
+			return ExtensionType.PLAYOUT_DELAY;
 		}
 
 		default: {

@@ -1,12 +1,13 @@
-import { Serializable, type SerializableDump } from '../Serializable';
+import { Serializable, type SerializableDump } from '../common/Serializable';
 import {
-	RtpExtensionType,
-	type RtpExtensionMapping,
+	ExtensionType,
+	type ExtensionsForm,
+	type ExtensionMapping,
 	type SsrcAudioLevelExtension,
 	type VideoOrientationExtension,
 	type AbsCaptureTimeExtension,
 	type PlayoutDelayExtension,
-} from './rtpExtensions';
+} from './extensions';
 import { isUnsignedInteger } from '../../utils/numbers';
 import { padTo4Bytes } from '../../utils/buffers';
 import {
@@ -17,33 +18,35 @@ import {
 } from '../../utils/bits';
 import { read3BytesInDataView, write3BytesInDataView } from '../../utils/bytes';
 
-// Minimum length (in bytes) of the RTP fixed header (without CSRC fields).
+/**
+ * Minimum length (in bytes) of the RTP fixed header (without CSRC fields).
+ */
 const FIXED_HEADER_LENGTH = 12;
-// Header extension id announcing One-Byte extensions.
+
+/**
+ * Header extension id announcing One-Byte extensions.
+ */
 const ONE_BYTE_EXTENSIONS_ID = 0xbede;
-// Header extension id announcing Two-Bytes extensions (the 4 lowest bits are
-// "appbits" and can have any value).
-const TWO_BYTES_EXTENSIONS_ID = 0b0001000000000000;
-// Length (in bytes) of the original sequence number added by RTX at the
-// beginning of the payload.
+
+/**
+ * Header extension id announcing Two-Byte extensions (the 4 lowest bits are
+ * "appbits" and can have any value).
+ */
+const TWO_BYTE_EXTENSIONS_ID = 0b0001000000000000;
+
+/**
+ * Length (in bytes) of the original sequence number added by RTX at the
+ * beginning of the payload.
+ */
 const RTX_OVERHEAD = 2;
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 
 /**
- * One-Byte and Two-Bytes extensions (RFC 8285).
- *
- * @category RTP
- */
-export type ExtensionsType = 'one-byte' | 'two-bytes';
-
-/**
  * RTP packet info dump.
- *
- * @category RTP
  */
-export type PacketDump = SerializableDump & {
+export type RtpPacketDump = SerializableDump & {
 	payloadType: number;
 	sequenceNumber: number;
 	timestamp: number;
@@ -51,7 +54,7 @@ export type PacketDump = SerializableDump & {
 	csrcs: number[];
 	marker: boolean;
 	headerExtensionId?: number;
-	extensionsType: ExtensionsType;
+	extensionsForm: ExtensionsForm;
 	extensions: { id: number; length: number }[];
 	midExt?: string;
 	ridExt?: string;
@@ -78,8 +81,6 @@ export type PacketDump = SerializableDump & {
  * @param buffer - Buffer holding the packet.
  * @param packetLength - Exact length of the packet. If not given,
  *   `buffer.byteLength` is used.
- *
- * @category RTP
  */
 export function isRtp(
 	buffer: Uint8Array,
@@ -127,8 +128,6 @@ export function isRtp(
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
  *
- * @category RTP
- *
  * @remarks
  * - Every modification is applied in place within the buffer of the packet,
  *   so it's always serialized. Modifications that need more bytes throw if
@@ -139,13 +138,13 @@ export function isRtp(
  * - [RFC 3550 section 5.1](https://datatracker.ietf.org/doc/html/rfc3550#section-5.1)
  * - [RFC 8285](https://datatracker.ietf.org/doc/html/rfc8285)
  */
-export class Packet extends Serializable {
-	// Type of the extensions in the packet, or type that will be used once an
+export class RtpPacket extends Serializable {
+	// Form of the extensions in the packet, or form that will be used once an
 	// extension is added.
-	#extensionsType: ExtensionsType = 'one-byte';
+	#extensionsForm: ExtensionsForm = 'one-byte';
 	// Mapping of RTP extension types and their corresponding RTP extension ids.
-	#extensionMapping: RtpExtensionMapping = {};
-	// One-Byte or Two-Bytes extensions. Key is the extension id and value is the
+	#extensionMapping: ExtensionMapping = {};
+	// One-Byte or Two-Byte extensions. Key is the extension id and value is the
 	// offset (in bytes) from the beginning of the header extension value to the
 	// beginning of the extension.
 	readonly #extensions: Map<number, number> = new Map();
@@ -165,7 +164,7 @@ export class Packet extends Serializable {
 	static parse(
 		buffer: Uint8Array,
 		packetLength: number = buffer.byteLength
-	): Packet {
+	): RtpPacket {
 		if (packetLength > buffer.byteLength) {
 			throw new TypeError(
 				`packetLength (${packetLength} bytes) cannot be greater than buffer length (${buffer.byteLength} bytes)`
@@ -176,7 +175,7 @@ export class Packet extends Serializable {
 			throw new TypeError('not a RTP packet');
 		}
 
-		const packet = new Packet(buffer);
+		const packet = new RtpPacket(buffer);
 
 		packet.setLength(packetLength);
 		packet.#validate();
@@ -194,12 +193,12 @@ export class Packet extends Serializable {
 	 * - `TypeError` if `buffer.byteLength` is lower than the length of the
 	 *   fixed header.
 	 */
-	static factory(buffer: Uint8Array): Packet {
+	static factory(buffer: Uint8Array): RtpPacket {
 		if (buffer.byteLength < FIXED_HEADER_LENGTH) {
 			throw new TypeError('no space for fixed header');
 		}
 
-		const packet = new Packet(buffer);
+		const packet = new RtpPacket(buffer);
 
 		buffer.fill(0, 0, FIXED_HEADER_LENGTH);
 		// Set version 2.
@@ -217,7 +216,7 @@ export class Packet extends Serializable {
 	/**
 	 * Dump RTP packet info.
 	 */
-	override dump(): PacketDump {
+	override dump(): RtpPacketDump {
 		return {
 			...super.dump(),
 			payloadType: this.getPayloadType(),
@@ -229,7 +228,7 @@ export class Packet extends Serializable {
 			headerExtensionId: this.#hasHeaderExtensionBit()
 				? this.getView().getUint16(this.#getHeaderExtensionOffset())
 				: undefined,
-			extensionsType: this.#extensionsType,
+			extensionsForm: this.#extensionsForm,
 			extensions: Array.from(this.getExtensions()).map(([id, value]) => ({
 				id,
 				length: value.byteLength,
@@ -253,12 +252,12 @@ export class Packet extends Serializable {
 	/**
 	 * @inheritDoc
 	 */
-	clone(buffer: Uint8Array): Packet {
-		const clonedPacket = new Packet(buffer);
+	clone(buffer: Uint8Array): RtpPacket {
+		const clonedPacket = new RtpPacket(buffer);
 
 		this.cloneInto(clonedPacket);
 
-		clonedPacket.#extensionsType = this.#extensionsType;
+		clonedPacket.#extensionsForm = this.#extensionsForm;
 		clonedPacket.#extensionMapping = { ...this.#extensionMapping };
 
 		for (const [id, offset] of this.#extensions) {
@@ -491,35 +490,35 @@ export class Packet extends Serializable {
 	}
 
 	/**
-	 * Get the type of the extensions in the packet, or the type that will be
+	 * Get the form of the extensions in the packet, or the form that will be
 	 * used once an extension is added. Default is `'one-byte'`.
 	 */
-	getExtensionsType(): ExtensionsType {
-		return this.#extensionsType;
+	getExtensionsForm(): ExtensionsForm {
+		return this.#extensionsForm;
 	}
 
 	/**
-	 * Set the type of the extensions. If the packet has extensions, they are
-	 * rewritten with the given type.
+	 * Set the form of the extensions. If the packet has extensions, they are
+	 * rewritten with the given form.
 	 *
 	 * @throws
 	 * - `TypeError` if some existing extension cannot be represented with the
-	 *   given type (for example, an extension with id greater than 14 or with
+	 *   given form (for example, an extension with id greater than 14 or with
 	 *   length greater than 16 bytes in One-Byte extensions).
 	 * - `TypeError` if the buffer has no space for the rewritten extensions.
 	 */
-	setExtensionsType(type: ExtensionsType): void {
-		if (type === this.#extensionsType) {
+	setExtensionsForm(form: ExtensionsForm): void {
+		if (form === this.#extensionsForm) {
 			return;
 		}
 
 		if (this.#extensions.size > 0) {
-			this.#writeExtensions(this.#collectExtensions(), type);
+			this.#writeExtensions(this.#collectExtensions(), form);
 		}
-		// A One-Byte or Two-Bytes header extension without extensions must also
-		// announce the new type. Its value is filled with zeros (padding) since
-		// it may contain bytes that are ignored with the current type (those
-		// after an id 15 in One-Byte extensions or a trailing byte in Two-Bytes
+		// A One-Byte or Two-Byte header extension without extensions must also
+		// announce the new form. Its value is filled with zeros (padding) since
+		// it may contain bytes that are ignored with the current form (those
+		// after an id 15 in One-Byte extensions or a trailing byte in Two-Byte
 		// extensions) but not with the new one.
 		else if (this.#hasHeaderExtensionBit()) {
 			const view = this.getView();
@@ -528,17 +527,17 @@ export class Packet extends Serializable {
 
 			if (
 				headerExtensionId === ONE_BYTE_EXTENSIONS_ID ||
-				(headerExtensionId & 0b1111111111110000) === TWO_BYTES_EXTENSIONS_ID
+				(headerExtensionId & 0b1111111111110000) === TWO_BYTE_EXTENSIONS_ID
 			) {
-				switch (type) {
+				switch (form) {
 					case 'one-byte': {
 						view.setUint16(headerExtensionOffset, ONE_BYTE_EXTENSIONS_ID);
 
 						break;
 					}
 
-					case 'two-bytes': {
-						view.setUint16(headerExtensionOffset, TWO_BYTES_EXTENSIONS_ID);
+					case 'two-byte': {
+						view.setUint16(headerExtensionOffset, TWO_BYTE_EXTENSIONS_ID);
 
 						break;
 					}
@@ -552,7 +551,7 @@ export class Packet extends Serializable {
 			}
 		}
 
-		this.#extensionsType = type;
+		this.#extensionsForm = form;
 	}
 
 	/**
@@ -592,15 +591,15 @@ export class Packet extends Serializable {
 	 *
 	 * @remarks
 	 * - If the packet has a header extension that doesn't contain One-Byte or
-	 *   Two-Bytes extensions, it's replaced.
+	 *   Two-Byte extensions, it's replaced.
 	 *
 	 * @throws
 	 * - `TypeError` if the given id or value length cannot be represented with
-	 *   the current extensions type.
+	 *   the current extensions form.
 	 * - `TypeError` if the buffer has no space for the extension.
 	 */
 	setExtension(id: number, value: Uint8Array): void {
-		this.#assertExtension(id, value.byteLength, this.#extensionsType);
+		this.#assertExtension(id, value.byteLength, this.#extensionsForm);
 
 		const extension = this.#findExtension(id);
 
@@ -617,7 +616,7 @@ export class Packet extends Serializable {
 
 		extensions.push([id, value]);
 
-		this.#writeExtensions(extensions, this.#extensionsType);
+		this.#writeExtensions(extensions, this.#extensionsForm);
 	}
 
 	/**
@@ -630,7 +629,7 @@ export class Packet extends Serializable {
 
 		this.#writeExtensions(
 			this.#collectExtensions().filter(([extId]) => extId !== id),
-			this.#extensionsType
+			this.#extensionsForm
 		);
 	}
 
@@ -642,14 +641,14 @@ export class Packet extends Serializable {
 			return;
 		}
 
-		this.#writeExtensions([], this.#extensionsType);
+		this.#writeExtensions([], this.#extensionsForm);
 	}
 
 	/**
 	 * Get RTP extension mapping (association of RTP extension types and their
 	 * numeric ids in this RTP packet).
 	 */
-	getExtensionMapping(): RtpExtensionMapping {
+	getExtensionMapping(): ExtensionMapping {
 		return { ...this.#extensionMapping };
 	}
 
@@ -661,19 +660,19 @@ export class Packet extends Serializable {
 	 * - Calling this method is needed before using methods that read or write
 	 *   specific RTP extensions.
 	 */
-	setExtensionMapping(extensionMapping: RtpExtensionMapping): void {
+	setExtensionMapping(extensionMapping: ExtensionMapping): void {
 		this.#extensionMapping = { ...extensionMapping };
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.MID} RTP extension.
+	 * Read the value of the {@link ExtensionType.MID} RTP extension.
 	 */
 	getMidExtension(): string | undefined {
-		return this.#readStringExtension(RtpExtensionType.MID);
+		return this.#readStringExtension(ExtensionType.MID);
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.MID} RTP extension. If not
+	 * Set the value of the {@link ExtensionType.MID} RTP extension. If not
 	 * given (or if it's an empty string), the extension is deleted.
 	 *
 	 * @throws
@@ -682,21 +681,21 @@ export class Packet extends Serializable {
 	 */
 	setMidExtension(mid?: string): void {
 		this.#writeMappedExtension(
-			RtpExtensionType.MID,
+			ExtensionType.MID,
 			mid ? textEncoder.encode(mid) : undefined
 		);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.RTP_STREAM_ID} RTP
+	 * Read the value of the {@link ExtensionType.RTP_STREAM_ID} RTP
 	 * extension.
 	 */
 	getRidExtension(): string | undefined {
-		return this.#readStringExtension(RtpExtensionType.RTP_STREAM_ID);
+		return this.#readStringExtension(ExtensionType.RTP_STREAM_ID);
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.RTP_STREAM_ID} RTP
+	 * Set the value of the {@link ExtensionType.RTP_STREAM_ID} RTP
 	 * extension. If not given (or if it's an empty string), the extension is
 	 * deleted.
 	 *
@@ -706,21 +705,21 @@ export class Packet extends Serializable {
 	 */
 	setRidExtension(rid?: string): void {
 		this.#writeMappedExtension(
-			RtpExtensionType.RTP_STREAM_ID,
+			ExtensionType.RTP_STREAM_ID,
 			rid ? textEncoder.encode(rid) : undefined
 		);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.REPAIRED_RTP_STREAM_ID} RTP
+	 * Read the value of the {@link ExtensionType.REPAIRED_RTP_STREAM_ID} RTP
 	 * extension.
 	 */
 	getRridExtension(): string | undefined {
-		return this.#readStringExtension(RtpExtensionType.REPAIRED_RTP_STREAM_ID);
+		return this.#readStringExtension(ExtensionType.REPAIRED_RTP_STREAM_ID);
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.REPAIRED_RTP_STREAM_ID} RTP
+	 * Set the value of the {@link ExtensionType.REPAIRED_RTP_STREAM_ID} RTP
 	 * extension. If not given (or if it's an empty string), the extension is
 	 * deleted.
 	 *
@@ -730,17 +729,17 @@ export class Packet extends Serializable {
 	 */
 	setRridExtension(rrid?: string): void {
 		this.#writeMappedExtension(
-			RtpExtensionType.REPAIRED_RTP_STREAM_ID,
+			ExtensionType.REPAIRED_RTP_STREAM_ID,
 			rrid ? textEncoder.encode(rrid) : undefined
 		);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.ABS_SEND_TIME} RTP
+	 * Read the value of the {@link ExtensionType.ABS_SEND_TIME} RTP
 	 * extension, which is the raw 3 bytes unsigned integer stored in it.
 	 */
 	getAbsSendTimeExtension(): number | undefined {
-		const extension = this.#findMappedExtension(RtpExtensionType.ABS_SEND_TIME);
+		const extension = this.#findMappedExtension(ExtensionType.ABS_SEND_TIME);
 
 		if (extension?.length !== 3) {
 			return undefined;
@@ -750,7 +749,7 @@ export class Packet extends Serializable {
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.ABS_SEND_TIME} RTP
+	 * Set the value of the {@link ExtensionType.ABS_SEND_TIME} RTP
 	 * extension, which is the raw 3 bytes unsigned integer stored in it. If not
 	 * given, the extension is deleted.
 	 *
@@ -774,16 +773,16 @@ export class Packet extends Serializable {
 			write3BytesInDataView(new DataView(value.buffer), 0, absSendTime);
 		}
 
-		this.#writeMappedExtension(RtpExtensionType.ABS_SEND_TIME, value);
+		this.#writeMappedExtension(ExtensionType.ABS_SEND_TIME, value);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.TRANSPORT_WIDE_CC_01} RTP
+	 * Read the value of the {@link ExtensionType.TRANSPORT_WIDE_CC_01} RTP
 	 * extension.
 	 */
 	getTransportWideCc01Extension(): number | undefined {
 		const extension = this.#findMappedExtension(
-			RtpExtensionType.TRANSPORT_WIDE_CC_01
+			ExtensionType.TRANSPORT_WIDE_CC_01
 		);
 
 		if (extension?.length !== 2) {
@@ -794,7 +793,7 @@ export class Packet extends Serializable {
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.TRANSPORT_WIDE_CC_01} RTP
+	 * Set the value of the {@link ExtensionType.TRANSPORT_WIDE_CC_01} RTP
 	 * extension. If not given, the extension is deleted.
 	 *
 	 * @throws
@@ -817,17 +816,15 @@ export class Packet extends Serializable {
 			new DataView(value.buffer).setUint16(0, sequenceNumber);
 		}
 
-		this.#writeMappedExtension(RtpExtensionType.TRANSPORT_WIDE_CC_01, value);
+		this.#writeMappedExtension(ExtensionType.TRANSPORT_WIDE_CC_01, value);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.SSRC_AUDIO_LEVEL} RTP
+	 * Read the value of the {@link ExtensionType.SSRC_AUDIO_LEVEL} RTP
 	 * extension.
 	 */
 	getSsrcAudioLevelExtension(): SsrcAudioLevelExtension | undefined {
-		const extension = this.#findMappedExtension(
-			RtpExtensionType.SSRC_AUDIO_LEVEL
-		);
+		const extension = this.#findMappedExtension(ExtensionType.SSRC_AUDIO_LEVEL);
 
 		if (extension?.length !== 1) {
 			return undefined;
@@ -842,7 +839,7 @@ export class Packet extends Serializable {
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.SSRC_AUDIO_LEVEL} RTP
+	 * Set the value of the {@link ExtensionType.SSRC_AUDIO_LEVEL} RTP
 	 * extension. If not given, the extension is deleted.
 	 *
 	 * @throws
@@ -868,16 +865,16 @@ export class Packet extends Serializable {
 			writeBitsInDataView(view, 0, 0b01111111, ssrcAudioLevel.volume);
 		}
 
-		this.#writeMappedExtension(RtpExtensionType.SSRC_AUDIO_LEVEL, value);
+		this.#writeMappedExtension(ExtensionType.SSRC_AUDIO_LEVEL, value);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.VIDEO_ORIENTATION} RTP
+	 * Read the value of the {@link ExtensionType.VIDEO_ORIENTATION} RTP
 	 * extension.
 	 */
 	getVideoOrientationExtension(): VideoOrientationExtension | undefined {
 		const extension = this.#findMappedExtension(
-			RtpExtensionType.VIDEO_ORIENTATION
+			ExtensionType.VIDEO_ORIENTATION
 		);
 
 		if (extension?.length !== 1) {
@@ -895,7 +892,7 @@ export class Packet extends Serializable {
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.VIDEO_ORIENTATION} RTP
+	 * Set the value of the {@link ExtensionType.VIDEO_ORIENTATION} RTP
 	 * extension. If not given, the extension is deleted.
 	 *
 	 * @throws
@@ -924,17 +921,15 @@ export class Packet extends Serializable {
 			writeBitsInDataView(view, 0, 0b00000011, rotation / 90);
 		}
 
-		this.#writeMappedExtension(RtpExtensionType.VIDEO_ORIENTATION, value);
+		this.#writeMappedExtension(ExtensionType.VIDEO_ORIENTATION, value);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.ABS_CAPTURE_TIME} RTP
+	 * Read the value of the {@link ExtensionType.ABS_CAPTURE_TIME} RTP
 	 * extension.
 	 */
 	getAbsCaptureTimeExtension(): AbsCaptureTimeExtension | undefined {
-		const extension = this.#findMappedExtension(
-			RtpExtensionType.ABS_CAPTURE_TIME
-		);
+		const extension = this.#findMappedExtension(ExtensionType.ABS_CAPTURE_TIME);
 
 		// Extension value can be 8 or 16 bytes depending on whether it contains
 		// estimated capture clock offset or not.
@@ -961,7 +956,7 @@ export class Packet extends Serializable {
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.ABS_CAPTURE_TIME} RTP
+	 * Set the value of the {@link ExtensionType.ABS_CAPTURE_TIME} RTP
 	 * extension. If not given, the extension is deleted.
 	 *
 	 * @throws
@@ -1012,15 +1007,15 @@ export class Packet extends Serializable {
 			}
 		}
 
-		this.#writeMappedExtension(RtpExtensionType.ABS_CAPTURE_TIME, value);
+		this.#writeMappedExtension(ExtensionType.ABS_CAPTURE_TIME, value);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.PLAYOUT_DELAY} RTP
+	 * Read the value of the {@link ExtensionType.PLAYOUT_DELAY} RTP
 	 * extension.
 	 */
 	getPlayoutDelayExtension(): PlayoutDelayExtension | undefined {
-		const extension = this.#findMappedExtension(RtpExtensionType.PLAYOUT_DELAY);
+		const extension = this.#findMappedExtension(ExtensionType.PLAYOUT_DELAY);
 
 		if (extension?.length !== 3) {
 			return undefined;
@@ -1035,7 +1030,7 @@ export class Packet extends Serializable {
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.PLAYOUT_DELAY} RTP
+	 * Set the value of the {@link ExtensionType.PLAYOUT_DELAY} RTP
 	 * extension. If not given, the extension is deleted.
 	 *
 	 * @throws
@@ -1067,11 +1062,11 @@ export class Packet extends Serializable {
 			);
 		}
 
-		this.#writeMappedExtension(RtpExtensionType.PLAYOUT_DELAY, value);
+		this.#writeMappedExtension(ExtensionType.PLAYOUT_DELAY, value);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.DEPENDENCY_DESCRIPTOR} RTP
+	 * Read the value of the {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP
 	 * extension.
 	 *
 	 * @todo Implement it.
@@ -1079,7 +1074,7 @@ export class Packet extends Serializable {
 	// getDependencyDescriptorExtension() {}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.DEPENDENCY_DESCRIPTOR} RTP
+	 * Set the value of the {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP
 	 * extension.
 	 *
 	 * @todo Implement it.
@@ -1311,14 +1306,14 @@ export class Packet extends Serializable {
 			}
 
 			if (headerExtensionId === ONE_BYTE_EXTENSIONS_ID) {
-				this.#extensionsType = 'one-byte';
+				this.#extensionsForm = 'one-byte';
 				this.#parseOneByteExtensions(pos, headerExtensionValueLength);
 			} else if (
 				(headerExtensionId & 0b1111111111110000) ===
-				TWO_BYTES_EXTENSIONS_ID
+				TWO_BYTE_EXTENSIONS_ID
 			) {
-				this.#extensionsType = 'two-bytes';
-				this.#parseTwoBytesExtensions(pos, headerExtensionValueLength);
+				this.#extensionsForm = 'two-byte';
+				this.#parseTwoByteExtensions(pos, headerExtensionValueLength);
 			}
 
 			pos += headerExtensionValueLength;
@@ -1378,13 +1373,13 @@ export class Packet extends Serializable {
 		}
 	}
 
-	#parseTwoBytesExtensions(valuePos: number, valueLength: number): void {
+	#parseTwoByteExtensions(valuePos: number, valueLength: number): void {
 		const view = this.getView();
 		const end = valuePos + valueLength;
 
 		let pos = valuePos;
 
-		// Two-Bytes extensions can have length 0.
+		// Two-Byte extensions can have length 0.
 		while (pos + 1 < end) {
 			const id = view.getUint8(pos);
 			const len = view.getUint8(pos + 1);
@@ -1397,7 +1392,7 @@ export class Packet extends Serializable {
 			else {
 				if (pos + 2 + len > end) {
 					throw new TypeError(
-						`not enough space for the announced value of the Two-Bytes extension with id ${id}`
+						`not enough space for the announced value of the Two-Byte extension with id ${id}`
 					);
 				}
 
@@ -1531,7 +1526,7 @@ export class Packet extends Serializable {
 		const view = this.getView();
 		const pos = this.#getHeaderExtensionOffset() + 4 + offset;
 
-		switch (this.#extensionsType) {
+		switch (this.#extensionsForm) {
 			case 'one-byte': {
 				return {
 					pos: pos + 1,
@@ -1539,7 +1534,7 @@ export class Packet extends Serializable {
 				};
 			}
 
-			case 'two-bytes': {
+			case 'two-byte': {
 				return { pos: pos + 2, length: view.getUint8(pos + 1) };
 			}
 		}
@@ -1566,16 +1561,16 @@ export class Packet extends Serializable {
 
 	/**
 	 * Rewrite the header extension with the given extensions using the given
-	 * type, or remove it if no extensions are given.
+	 * form, or remove it if no extensions are given.
 	 *
 	 * @throws
 	 * - `TypeError` if some extension cannot be represented with the given
-	 *   type or if the buffer has no space for the extensions, in which case
+	 *   form or if the buffer has no space for the extensions, in which case
 	 *   nothing changes.
 	 */
 	#writeExtensions(
 		extensions: [number, Uint8Array][],
-		type: ExtensionsType
+		form: ExtensionsForm
 	): void {
 		const headerExtensionOffset = this.#getHeaderExtensionOffset();
 		const previousHeaderExtensionLength = this.#getHeaderExtensionLength();
@@ -1595,7 +1590,7 @@ export class Packet extends Serializable {
 		let extensionHeaderLength: number;
 		let headerExtensionId: number;
 
-		switch (type) {
+		switch (form) {
 			case 'one-byte': {
 				extensionHeaderLength = 1;
 				headerExtensionId = ONE_BYTE_EXTENSIONS_ID;
@@ -1603,11 +1598,11 @@ export class Packet extends Serializable {
 				break;
 			}
 
-			case 'two-bytes': {
+			case 'two-byte': {
 				extensionHeaderLength = 2;
-				headerExtensionId = TWO_BYTES_EXTENSIONS_ID;
+				headerExtensionId = TWO_BYTE_EXTENSIONS_ID;
 
-				// If the packet already has Two-Bytes extensions, keep the header
+				// If the packet already has Two-Byte extensions, keep the header
 				// extension id (its appbits).
 				if (this.#hasHeaderExtensionBit()) {
 					const previousHeaderExtensionId = view.getUint16(
@@ -1616,7 +1611,7 @@ export class Packet extends Serializable {
 
 					if (
 						(previousHeaderExtensionId & 0b1111111111110000) ===
-						TWO_BYTES_EXTENSIONS_ID
+						TWO_BYTE_EXTENSIONS_ID
 					) {
 						headerExtensionId = previousHeaderExtensionId;
 					}
@@ -1629,7 +1624,7 @@ export class Packet extends Serializable {
 		let extensionsLength = 0;
 
 		for (const [id, value] of extensions) {
-			this.#assertExtension(id, value.byteLength, type);
+			this.#assertExtension(id, value.byteLength, form);
 
 			extensionsLength += extensionHeaderLength + value.byteLength;
 		}
@@ -1662,7 +1657,7 @@ export class Packet extends Serializable {
 		for (const [id, value] of values) {
 			this.#extensions.set(id, pos - valuePos);
 
-			switch (type) {
+			switch (form) {
 				case 'one-byte': {
 					writeBitsInDataView(view, pos, 0xf0, id);
 					writeBitsInDataView(view, pos, 0x0f, value.byteLength - 1);
@@ -1670,7 +1665,7 @@ export class Packet extends Serializable {
 					break;
 				}
 
-				case 'two-bytes': {
+				case 'two-byte': {
 					view.setUint8(pos, id);
 					view.setUint8(pos + 1, value.byteLength);
 
@@ -1689,10 +1684,10 @@ export class Packet extends Serializable {
 	/**
 	 * @throws
 	 * - `TypeError` if the given extension id or value length cannot be
-	 *   represented with the given type.
+	 *   represented with the given form.
 	 */
-	#assertExtension(id: number, length: number, type: ExtensionsType): void {
-		switch (type) {
+	#assertExtension(id: number, length: number, form: ExtensionsForm): void {
+		switch (form) {
 			case 'one-byte': {
 				if (!Number.isInteger(id) || id < 1 || id > 14) {
 					throw new TypeError(
@@ -1707,14 +1702,14 @@ export class Packet extends Serializable {
 				break;
 			}
 
-			case 'two-bytes': {
+			case 'two-byte': {
 				if (!Number.isInteger(id) || id < 1 || id > 255) {
 					throw new TypeError(
-						`invalid extension id ${id} in Two-Bytes extensions (must be 1..255)`
+						`invalid extension id ${id} in Two-Byte extensions (must be 1..255)`
 					);
 				} else if (length > 255) {
 					throw new TypeError(
-						`invalid length ${length} of extension with id ${id} in Two-Bytes extensions (must be 0..255)`
+						`invalid length ${length} of extension with id ${id} in Two-Byte extensions (must be 0..255)`
 					);
 				}
 
@@ -1723,12 +1718,12 @@ export class Packet extends Serializable {
 		}
 	}
 
-	#getMappedExtensionId(type: RtpExtensionType): number | undefined {
+	#getMappedExtensionId(type: ExtensionType): number | undefined {
 		return this.#extensionMapping[type];
 	}
 
 	#findMappedExtension(
-		type: RtpExtensionType
+		type: ExtensionType
 	): { pos: number; length: number } | undefined {
 		const id = this.#getMappedExtensionId(type);
 
@@ -1739,7 +1734,7 @@ export class Packet extends Serializable {
 		return this.#findExtension(id);
 	}
 
-	#readStringExtension(type: RtpExtensionType): string | undefined {
+	#readStringExtension(type: ExtensionType): string | undefined {
 		const extension = this.#findMappedExtension(type);
 
 		if (!extension || extension.length === 0) {
@@ -1759,14 +1754,14 @@ export class Packet extends Serializable {
 	 * - `Error` if the extension type is not in the extension mapping.
 	 */
 	#writeMappedExtension(
-		type: RtpExtensionType,
+		type: ExtensionType,
 		value: Uint8Array | undefined
 	): void {
 		const id = this.#getMappedExtensionId(type);
 
 		if (id === undefined) {
 			throw new Error(
-				`extension type ${RtpExtensionType[type]} is not in the extension mapping`
+				`extension type ${ExtensionType[type]} is not in the extension mapping`
 			);
 		}
 
