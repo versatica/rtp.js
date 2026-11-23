@@ -7,17 +7,15 @@ import {
 	type AbsCaptureTimeExtension,
 	type PlayoutDelayExtension,
 } from './rtpExtensions';
-import { padTo4Bytes, isUnsignedInteger } from '../../utils/helpers';
+import { isUnsignedInteger } from '../../utils/numbers';
+import { padTo4Bytes } from '../../utils/buffers';
 import {
 	readBitInDataView,
 	writeBitInDataView,
 	readBitsInDataView,
 	writeBitsInDataView,
-} from '../../utils/bitOps';
-import {
-	read3BytesInDataView,
-	write3BytesInDataView,
-} from '../../utils/byteOps';
+} from '../../utils/bits';
+import { read3BytesInDataView, write3BytesInDataView } from '../../utils/bytes';
 
 // Minimum length (in bytes) of the RTP fixed header (without CSRC fields).
 const FIXED_HEADER_LENGTH = 12;
@@ -454,7 +452,7 @@ export class Packet extends Serializable {
 	 * - `TypeError` if the buffer has no space for the given padding.
 	 */
 	setPadding(padding: number): void {
-		if (!Number.isInteger(padding) || padding < 0 || padding > 255) {
+		if (!isUnsignedInteger(padding, 255)) {
 			throw new TypeError(
 				`padding (${padding}) must be an integer between 0 and 255`
 			);
@@ -748,7 +746,7 @@ export class Packet extends Serializable {
 			return undefined;
 		}
 
-		return read3BytesInDataView({ view: this.getView(), pos: extension.pos });
+		return read3BytesInDataView(this.getView(), extension.pos);
 	}
 
 	/**
@@ -773,11 +771,7 @@ export class Packet extends Serializable {
 
 			value = new Uint8Array(3);
 
-			write3BytesInDataView({
-				view: new DataView(value.buffer),
-				pos: 0,
-				value: absSendTime,
-			});
+			write3BytesInDataView(new DataView(value.buffer), 0, absSendTime);
 		}
 
 		this.#writeMappedExtension(RtpExtensionType.ABS_SEND_TIME, value);
@@ -1032,10 +1026,7 @@ export class Packet extends Serializable {
 			return undefined;
 		}
 
-		const value = read3BytesInDataView({
-			view: this.getView(),
-			pos: extension.pos,
-		});
+		const value = read3BytesInDataView(this.getView(), extension.pos);
 
 		return {
 			minDelay: value >> 12,
@@ -1069,11 +1060,11 @@ export class Packet extends Serializable {
 
 			value = new Uint8Array(3);
 
-			write3BytesInDataView({
-				view: new DataView(value.buffer),
-				pos: 0,
-				value: (minDelay << 12) | maxDelay,
-			});
+			write3BytesInDataView(
+				new DataView(value.buffer),
+				0,
+				(minDelay << 12) | maxDelay
+			);
 		}
 
 		this.#writeMappedExtension(RtpExtensionType.PLAYOUT_DELAY, value);

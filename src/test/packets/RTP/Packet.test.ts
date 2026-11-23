@@ -1,20 +1,17 @@
 import { Packet, isRtp } from '../../../packets/RTP/Packet';
 import { RtpExtensionType } from '../../../packets/RTP/rtpExtensions';
 import { checkPacket, type ExpectedPacket } from './rtpCommon';
+import {
+	factoryBuffer,
+	serializeBuffer,
+	cloneBuffer,
+	dataBuffer,
+	resetBuffers,
+} from '../../testHelpers';
 
 const textEncoder = new TextEncoder();
 
-let factoryBuffer: Uint8Array;
-let serializeBuffer: Uint8Array;
-let cloneBuffer: Uint8Array;
-let dataBuffer: Uint8Array;
-
-beforeEach(() => {
-	factoryBuffer = new Uint8Array(66661).fill(0xaa);
-	serializeBuffer = new Uint8Array(66662).fill(0xbb);
-	cloneBuffer = new Uint8Array(66663).fill(0xcc);
-	dataBuffer = new Uint8Array(66664).fill(0x00);
-});
+beforeEach(resetBuffers);
 
 describe('RTP Packet', () => {
 	test('Packet.parse() with a One-Byte extension and payload succeeds', () => {

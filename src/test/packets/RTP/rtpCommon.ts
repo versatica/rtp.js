@@ -1,5 +1,6 @@
 import { Packet, isRtp } from '../../../packets/RTP/Packet';
-import { areBuffersEqual } from '../../../utils/helpers';
+import { areBuffersEqual } from '../../../utils/buffers';
+import { throwBuffer } from '../../testHelpers';
 
 export type ExpectedPacket = {
 	buffer: Uint8Array;
@@ -119,12 +120,12 @@ export function checkPacket(packet: Packet, expected: ExpectedPacket): void {
 		).toBe(true);
 	}
 
-	expect(() => packet.serialize(new Uint8Array(expected.length - 1))).toThrow(
-		TypeError
-	);
-	expect(() => packet.clone(new Uint8Array(expected.length - 1))).toThrow(
-		TypeError
-	);
+	expect(() =>
+		packet.serialize(throwBuffer.subarray(0, expected.length - 1))
+	).toThrow(TypeError);
+	expect(() =>
+		packet.clone(throwBuffer.subarray(0, expected.length - 1))
+	).toThrow(TypeError);
 	expect(() => Packet.parse(packet.getBuffer())).not.toThrow();
 	expect(
 		areBuffersEqual(

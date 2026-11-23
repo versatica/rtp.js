@@ -1,9 +1,14 @@
 import {
+	readBit,
+	writeBit,
+	toggleBit,
+	readBits,
+	writeBits,
 	readBitInDataView,
 	writeBitInDataView,
 	readBitsInDataView,
 	writeBitsInDataView,
-} from '../../utils/bitOps';
+} from '../../utils/bits';
 
 let view: DataView;
 
@@ -14,6 +19,72 @@ beforeEach(() => {
 	]);
 
 	view = new DataView(array.buffer, array.byteOffset, array.byteLength);
+});
+
+test('readBit()', () => {
+	expect(readBit(0b0101, 0)).toBe(true);
+	expect(readBit(0b0101, 1)).toBe(false);
+	expect(readBit(0b0101, 2)).toBe(true);
+	expect(readBit(0b0101, 3)).toBe(false);
+	expect(readBit(0x8000, 15)).toBe(true);
+	expect(readBit(0x8000, 14)).toBe(false);
+});
+
+test('writeBit()', () => {
+	expect(writeBit(0, 0, true)).toBe(1);
+	expect(writeBit(1, 0, true)).toBe(1);
+	expect(writeBit(1, 0, false)).toBe(0);
+	expect(writeBit(0b1111, 1, false)).toBe(0b1101);
+	expect(writeBit(0, 15, true)).toBe(0x8000);
+	expect(writeBit(0xffff, 15, false)).toBe(0x7fff);
+});
+
+test('toggleBit()', () => {
+	expect(toggleBit(0, 0)).toBe(1);
+	expect(toggleBit(1, 0)).toBe(0);
+	expect(toggleBit(0b1010, 1)).toBe(0b1000);
+	expect(toggleBit(0b1010, 2)).toBe(0b1110);
+	expect(toggleBit(0, 15)).toBe(0x8000);
+	expect(toggleBit(0x8000, 15)).toBe(0);
+});
+
+test('readBits()', () => {
+	// Must throw if mask has no enabled bit.
+	expect(() => readBits(0, 0b00000000)).toThrow(TypeError);
+
+	// Must throw if mask has is bigger than 0b11111111.
+	expect(() => readBits(0, 0b100000000)).toThrow(TypeError);
+
+	// Must throw if mask is negative.
+	expect(() => readBits(0, -1)).toThrow(TypeError);
+
+	// Must throw if mask is not an integer.
+	expect(() => readBits(0, 1.5)).toThrow(TypeError);
+
+	expect(readBits(0b10110100, 0b00111100)).toBe(0b1101);
+	expect(readBits(0b10110100, 0b11000000)).toBe(0b10);
+	expect(readBits(0b10110100, 0b00000001)).toBe(0);
+	expect(readBits(0b10110100, 0b11111111)).toBe(0b10110100);
+});
+
+test('writeBits()', () => {
+	// Must throw if mask has no enabled bit.
+	expect(() => writeBits(0, 0b00000000, 1)).toThrow(TypeError);
+
+	// Must throw if mask has is bigger than 0b11111111.
+	expect(() => writeBits(0, 0b100000000, 1)).toThrow(TypeError);
+
+	// Must throw if mask is negative.
+	expect(() => writeBits(0, -1, 1)).toThrow(TypeError);
+
+	// Must throw if mask is not an integer.
+	expect(() => writeBits(0, 1.5, 1)).toThrow(TypeError);
+
+	expect(writeBits(0b10110100, 0b00111100, 0b0011)).toBe(0b10001100);
+	expect(writeBits(0b00000000, 0b11000000, 0b11)).toBe(0b11000000);
+	expect(writeBits(0b11111111, 0b00010000, 0)).toBe(0b11101111);
+	// Bits of value that don't fit into the mask are ignored.
+	expect(writeBits(0b00000000, 0b00000110, 0b111)).toBe(0b00000110);
 });
 
 test('readBitInDataView()', () => {

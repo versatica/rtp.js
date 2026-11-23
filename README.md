@@ -2,6 +2,7 @@
 
 [![][npm-shield-rtp.js]][npm-rtp.js]
 [![][github-actions-shield-rtp.js]][github-actions-rtp.js]
+[![][github-actions-shield-rtp.js-npm-publish]][github-actions-rtp.js-npm-publish]
 [![][github-actions-shield-docs]][github-actions-docs]
 
 RTP stack for Node.js and browser written in TypeScript. **rtp.js** provides with an API to parse, generate and modify RTP and RTCP packets.
@@ -102,5 +103,7 @@ npm install rtp.js
 [npm-rtp.js]: https://npmjs.org/package/rtp.js
 [github-actions-shield-rtp.js]: https://github.com/versatica/rtp.js/actions/workflows/rtp.js.yaml/badge.svg?branch=master
 [github-actions-rtp.js]: https://github.com/versatica/rtp.js/actions/workflows/rtp.js.yaml?query=branch%3Amaster
+[github-actions-shield-rtp.js-npm-publish]: https://github.com/versatica/rtp.js/actions/workflows/rtp.js-npm-publish.yaml/badge.svg
+[github-actions-rtp.js-npm-publish]: https://github.com/versatica/rtp.js/actions/workflows/rtp.js-npm-publish.yaml
 [github-actions-shield-docs]: https://github.com/versatica/rtp.js/actions/workflows/docs.yaml/badge.svg?branch=master
 [github-actions-docs]: https://github.com/versatica/rtp.js/actions/workflows/docs.yaml?query=branch%3Amaster
