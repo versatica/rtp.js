@@ -12,7 +12,7 @@ const config = {
 	skipErrorChecking: false,
 	excludePrivate: true,
 	excludeProtected: true,
-	excludeNotDocumented: true,
+	excludeNotDocumented: false,
 	excludeInternal: true,
 	excludeExternals: true,
 	includeVersion: true,
@@ -24,6 +24,14 @@ const config = {
 	searchInComments: true,
 	readme: 'README.md',
 	projectDocuments: ['README.md', 'LICENSE.md'],
+	validation: {
+		notExported: true,
+		invalidLink: true,
+		invalidPath: true,
+		rewrittenLink: true,
+		notDocumented: true,
+		unusedMergeModuleWith: true,
+	},
 	navigation: {
 		includeCategories: false,
 		includeGroups: false,

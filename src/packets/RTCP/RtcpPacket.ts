@@ -58,8 +58,17 @@ export enum RtcpPacketType {
  * RTCP packet info dump.
  */
 export type RtcpPacketDump = SerializableDump & {
+	/**
+	 * Packet type.
+	 */
 	packetType: RtcpPacketType;
+	/**
+	 * Value of the Count field, whose meaning depends on the packet type.
+	 */
 	count: number;
+	/**
+	 * Padding (in bytes) at the end of the packet.
+	 */
 	padding: number;
 };
 

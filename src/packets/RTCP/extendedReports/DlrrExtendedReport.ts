@@ -38,6 +38,9 @@ export type DlrrSubBlock = {
  * RTCP XR DLRR Report Block info dump.
  */
 export type DlrrExtendedReportDump = ExtendedReportDump & {
+	/**
+	 * DLRR sub-blocks.
+	 */
 	subBlocks: DlrrSubBlock[];
 };
 

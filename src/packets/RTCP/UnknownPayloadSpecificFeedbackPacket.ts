@@ -9,9 +9,22 @@ import {
  * RTCP Unknown Payload-Specific Feedback packet info dump.
  */
 export type UnknownPayloadSpecificFeedbackPacketDump = RtcpPacketDump & {
+	/**
+	 * Feedback message type.
+	 */
 	messageType: PayloadSpecificFeedbackMessageType;
+	/**
+	 * SSRC of the packet sender.
+	 */
 	senderSsrc: number;
+	/**
+	 * SSRC of the media source.
+	 */
 	mediaSsrc: number;
+	/**
+	 * Length (in bytes) of the value that follows the SSRC of the media
+	 * source.
+	 */
 	unknownValueLength: number;
 };
 

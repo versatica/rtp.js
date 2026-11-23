@@ -32,7 +32,14 @@ export enum ExtendedReportBlockType {
  * RTCP XR Extended Report block info dump.
  */
 export type ExtendedReportDump = SerializableDump & {
+	/**
+	 * Block type.
+	 */
 	blockType: ExtendedReportBlockType;
+	/**
+	 * Value of the type-specific field, whose meaning depends on the block
+	 * type.
+	 */
 	typeSpecific: number;
 };
 

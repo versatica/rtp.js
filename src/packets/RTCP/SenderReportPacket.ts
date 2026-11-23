@@ -22,11 +22,29 @@ const HEADER_LENGTH = 28;
  * RTCP Sender Report packet info dump.
  */
 export type SenderReportPacketDump = RtcpPacketDump & {
+	/**
+	 * SSRC of the packet sender.
+	 */
 	ssrc: number;
+	/**
+	 * NTP timestamp.
+	 */
 	ntp: Ntp;
+	/**
+	 * RTP timestamp.
+	 */
 	rtpTimestamp: number;
+	/**
+	 * Sender's packet count.
+	 */
 	packetCount: number;
+	/**
+	 * Sender's octet count.
+	 */
 	octetCount: number;
+	/**
+	 * Reception reports.
+	 */
 	reports: ReceptionReport[];
 };
 

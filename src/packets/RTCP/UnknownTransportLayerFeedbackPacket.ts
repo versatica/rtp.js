@@ -9,9 +9,22 @@ import {
  * RTCP Unknown Transport Layer Feedback packet info dump.
  */
 export type UnknownTransportLayerFeedbackPacketDump = RtcpPacketDump & {
+	/**
+	 * Feedback message type.
+	 */
 	messageType: TransportLayerFeedbackMessageType;
+	/**
+	 * SSRC of the packet sender.
+	 */
 	senderSsrc: number;
+	/**
+	 * SSRC of the media source.
+	 */
 	mediaSsrc: number;
+	/**
+	 * Length (in bytes) of the value that follows the SSRC of the media
+	 * source.
+	 */
 	unknownValueLength: number;
 };
 

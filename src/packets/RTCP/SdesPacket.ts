@@ -94,6 +94,9 @@ export type SdesChunk = {
  * RTCP SDES packet info dump.
  */
 export type SdesPacketDump = RtcpPacketDump & {
+	/**
+	 * SDES chunks.
+	 */
 	chunks: SdesChunk[];
 };
 

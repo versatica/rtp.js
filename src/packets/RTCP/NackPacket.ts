@@ -35,9 +35,21 @@ export type NackItem = {
  * RTCP NACK packet info dump.
  */
 export type NackPacketDump = RtcpPacketDump & {
+	/**
+	 * Feedback message type.
+	 */
 	messageType: TransportLayerFeedbackMessageType;
+	/**
+	 * SSRC of the packet sender.
+	 */
 	senderSsrc: number;
+	/**
+	 * SSRC of the media source.
+	 */
 	mediaSsrc: number;
+	/**
+	 * NACK items.
+	 */
 	items: NackItem[];
 };
 

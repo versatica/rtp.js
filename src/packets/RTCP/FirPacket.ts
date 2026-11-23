@@ -36,9 +36,21 @@ export type FirItem = {
  * RTCP FIR packet info dump.
  */
 export type FirPacketDump = RtcpPacketDump & {
+	/**
+	 * Feedback message type.
+	 */
 	messageType: PayloadSpecificFeedbackMessageType;
+	/**
+	 * SSRC of the packet sender.
+	 */
 	senderSsrc: number;
+	/**
+	 * SSRC of the media source.
+	 */
 	mediaSsrc: number;
+	/**
+	 * FIR items.
+	 */
 	items: FirItem[];
 };
 

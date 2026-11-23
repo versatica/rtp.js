@@ -8,6 +8,15 @@ import {
 	type AbsCaptureTimeExtension,
 	type PlayoutDelayExtension,
 } from './extensions';
+import {
+	type DependencyDescriptorExtension,
+	type DependencyDescriptorMandatoryFields,
+	type DependencyDescriptorStructure,
+	type DependencyDescriptorContext,
+	readDependencyDescriptor,
+	readDependencyDescriptorMandatoryFields,
+	writeDependencyDescriptor,
+} from './dependencyDescriptor';
 import { isUnsignedInteger } from '../../utils/numbers';
 import { padTo4Bytes } from '../../utils/buffers';
 import {
@@ -47,28 +56,115 @@ const textDecoder = new TextDecoder();
  * RTP packet info dump.
  */
 export type RtpPacketDump = SerializableDump & {
+	/**
+	 * Payload type.
+	 */
 	payloadType: number;
+	/**
+	 * Sequence number.
+	 */
 	sequenceNumber: number;
+	/**
+	 * Timestamp.
+	 */
 	timestamp: number;
+	/**
+	 * SSRC.
+	 */
 	ssrc: number;
+	/**
+	 * CSRCs.
+	 */
 	csrcs: number[];
+	/**
+	 * Marker bit.
+	 */
 	marker: boolean;
+	/**
+	 * Id of the header extension (the "defined by profile" field), if the
+	 * packet has a header extension.
+	 */
 	headerExtensionId?: number;
+	/**
+	 * Form of the extensions in the packet.
+	 */
 	extensionsForm: ExtensionsForm;
-	extensions: { id: number; length: number }[];
+	/**
+	 * Id and length (in bytes) of each extension in the packet.
+	 */
+	extensions: {
+		/**
+		 * Extension id.
+		 */
+		id: number;
+		/**
+		 * Extension length (in bytes).
+		 */
+		length: number;
+	}[];
+	/**
+	 * Value of the {@link ExtensionType.MID} extension.
+	 */
 	midExt?: string;
+	/**
+	 * Value of the {@link ExtensionType.RTP_STREAM_ID} extension.
+	 */
 	ridExt?: string;
+	/**
+	 * Value of the {@link ExtensionType.REPAIRED_RTP_STREAM_ID} extension.
+	 */
 	rridExt?: string;
+	/**
+	 * Value of the {@link ExtensionType.ABS_SEND_TIME} extension.
+	 */
 	absSendTimeExt?: number;
+	/**
+	 * Value of the {@link ExtensionType.TRANSPORT_WIDE_CC_01} extension.
+	 */
 	transportWideCc01Ext?: number;
+	/**
+	 * Value of the {@link ExtensionType.SSRC_AUDIO_LEVEL} extension.
+	 */
 	ssrcAudioLevelExt?: SsrcAudioLevelExtension;
+	/**
+	 * Value of the {@link ExtensionType.VIDEO_ORIENTATION} extension.
+	 */
 	videoOrientationExt?: VideoOrientationExtension;
+	/**
+	 * Value of the {@link ExtensionType.ABS_CAPTURE_TIME} extension.
+	 */
 	absCaptureTimeExt?: AbsCaptureTimeExtension;
+	/**
+	 * Value of the {@link ExtensionType.PLAYOUT_DELAY} extension.
+	 */
 	playoutDelayExt?: PlayoutDelayExtension;
-	// @todo Implement it.
-	// dependencyDescriptorExt: DependencyDescriptor;
+	/**
+	 * Value of the {@link ExtensionType.DEPENDENCY_DESCRIPTOR} extension: the
+	 * whole Dependency Descriptor if a context is given in
+	 * {@link RtpPacketDumpOptions}, otherwise just its mandatory fields.
+	 */
+	dependencyDescriptorExt?:
+		DependencyDescriptorExtension | DependencyDescriptorMandatoryFields;
+	/**
+	 * Length (in bytes) of the payload.
+	 */
 	payloadLength: number;
+	/**
+	 * Padding (in bytes) at the end of the packet.
+	 */
 	padding: number;
+};
+
+/**
+ * Options for {@link RtpPacket.dump}.
+ */
+export type RtpPacketDumpOptions = {
+	/**
+	 * Context of the stream, needed to dump the whole
+	 * {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP extension. The context is
+	 * not modified.
+	 */
+	dependencyDescriptorContext?: DependencyDescriptorContext;
 };
 
 /**
@@ -216,7 +312,7 @@ export class RtpPacket extends Serializable {
 	/**
 	 * Dump RTP packet info.
 	 */
-	override dump(): RtpPacketDump {
+	override dump(options?: RtpPacketDumpOptions): RtpPacketDump {
 		return {
 			...super.dump(),
 			payloadType: this.getPayloadType(),
@@ -242,8 +338,9 @@ export class RtpPacket extends Serializable {
 			videoOrientationExt: this.getVideoOrientationExtension(),
 			absCaptureTimeExt: this.getAbsCaptureTimeExtension(),
 			playoutDelayExt: this.getPlayoutDelayExtension(),
-			// @todo Implement it.
-			// dependencyDescriptorExt: xxx;
+			dependencyDescriptorExt: this.#dumpDependencyDescriptorExtension(
+				options?.dependencyDescriptorContext
+			),
 			payloadLength: this.#getPayloadLength(),
 			padding: this.getPadding(),
 		};
@@ -1069,17 +1166,67 @@ export class RtpPacket extends Serializable {
 	 * Read the value of the {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP
 	 * extension.
 	 *
-	 * @todo Implement it.
+	 * @param context - Context of the stream the packet belongs to. It's
+	 *   updated with the template dependency structure carried by the
+	 *   descriptor (if any).
+	 *
+	 * @returns `undefined` if the extension is not present or is malformed. If
+	 *   the template dependency structure of the frame is unknown, only the
+	 *   mandatory fields are given.
 	 */
-	// getDependencyDescriptorExtension() {}
+	getDependencyDescriptorExtension(
+		context: DependencyDescriptorContext
+	): DependencyDescriptorExtension | undefined {
+		const id = this.#getMappedExtensionId(ExtensionType.DEPENDENCY_DESCRIPTOR);
+		const value = id === undefined ? undefined : this.getExtension(id);
+
+		if (!value) {
+			return undefined;
+		}
+
+		return readDependencyDescriptor(value, context, /* updateContext */ true);
+	}
 
 	/**
 	 * Set the value of the {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP
-	 * extension.
+	 * extension. If `descriptor` is not given, the extension is deleted.
 	 *
-	 * @todo Implement it.
+	 * @param descriptor - Dependency Descriptor. Its `frameDependencies` must
+	 *   be given. If its `attachedStructure` is given, `structure` is written
+	 *   in the extension.
+	 * @param structure - Template dependency structure in use. Required if
+	 *   `descriptor` is given.
+	 * @param activeChainsBitmask - Bitmask of the active chains (bit i is chain
+	 *   i). The chain diffs of inactive chains are written as 0. By default all
+	 *   chains are active.
+	 *
+	 * @throws
+	 * - `Error` if the extension type is not in the extension mapping.
+	 * - `TypeError` if `structure` is not given, if the descriptor or the
+	 *   structure is not valid or if the descriptor cannot be represented.
+	 * - Same as {@link setExtension}.
 	 */
-	// setDependencyDescriptorExtension() {}
+	setDependencyDescriptorExtension(
+		descriptor?: Omit<DependencyDescriptorExtension, 'isKeyFrame'>,
+		structure?: DependencyDescriptorStructure,
+		activeChainsBitmask: number = 0xffffffff
+	): void {
+		let value: Uint8Array | undefined;
+
+		if (descriptor) {
+			if (!structure) {
+				throw new TypeError('structure must be given');
+			}
+
+			value = writeDependencyDescriptor(
+				descriptor,
+				structure,
+				activeChainsBitmask
+			);
+		}
+
+		this.#writeMappedExtension(ExtensionType.DEPENDENCY_DESCRIPTOR, value);
+	}
 
 	/**
 	 * Get the packet payload (excluding padding).
@@ -1770,5 +1917,34 @@ export class RtpPacket extends Serializable {
 		} else {
 			this.deleteExtension(id);
 		}
+	}
+
+	/**
+	 * Dump the {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP extension: the
+	 * whole descriptor if a context is given (which is not modified), or just
+	 * its mandatory fields otherwise.
+	 */
+	#dumpDependencyDescriptorExtension(
+		context: DependencyDescriptorContext | undefined
+	):
+		| DependencyDescriptorExtension
+		| DependencyDescriptorMandatoryFields
+		| undefined {
+		const id = this.#getMappedExtensionId(ExtensionType.DEPENDENCY_DESCRIPTOR);
+		const value = id === undefined ? undefined : this.getExtension(id);
+
+		if (!value) {
+			return undefined;
+		}
+
+		if (context) {
+			return readDependencyDescriptor(
+				value,
+				context,
+				/* updateContext */ false
+			);
+		}
+
+		return readDependencyDescriptorMandatoryFields(value);
 	}
 }

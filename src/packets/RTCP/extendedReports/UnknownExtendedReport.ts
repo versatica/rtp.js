@@ -8,6 +8,9 @@ import {
  * RTCP XR Unknown Extended Report block info dump.
  */
 export type UnknownExtendedReportDump = ExtendedReportDump & {
+	/**
+	 * Length (in bytes) of the value that follows the block header.
+	 */
 	unknownValueLength: number;
 };
 

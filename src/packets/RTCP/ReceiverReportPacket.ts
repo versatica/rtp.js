@@ -15,7 +15,13 @@ const HEADER_LENGTH = 8;
  * RTCP Receiver Report packet info dump.
  */
 export type ReceiverReportPacketDump = RtcpPacketDump & {
+	/**
+	 * SSRC of the packet sender.
+	 */
 	ssrc: number;
+	/**
+	 * Reception reports.
+	 */
 	reports: ReceptionReport[];
 };
 

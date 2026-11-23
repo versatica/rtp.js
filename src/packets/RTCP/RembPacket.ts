@@ -46,10 +46,25 @@ const MAX_MANTISSA = 0x3ffff;
  * RTCP REMB packet info dump.
  */
 export type RembPacketDump = RtcpPacketDump & {
+	/**
+	 * Feedback message type.
+	 */
 	messageType: PayloadSpecificFeedbackMessageType;
+	/**
+	 * SSRC of the packet sender.
+	 */
 	senderSsrc: number;
+	/**
+	 * SSRC of the media source.
+	 */
 	mediaSsrc: number;
+	/**
+	 * Estimated maximum bitrate (in bits per second).
+	 */
 	bitrate: number;
+	/**
+	 * SSRCs the estimation applies to.
+	 */
 	ssrcs: number[];
 };
 

@@ -14,8 +14,17 @@ import {
  * RTCP PLI packet info dump.
  */
 export type PliPacketDump = RtcpPacketDump & {
+	/**
+	 * Feedback message type.
+	 */
 	messageType: PayloadSpecificFeedbackMessageType;
+	/**
+	 * SSRC of the packet sender.
+	 */
 	senderSsrc: number;
+	/**
+	 * SSRC of the media source.
+	 */
 	mediaSsrc: number;
 };
 

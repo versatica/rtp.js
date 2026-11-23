@@ -97,14 +97,41 @@ export type ReceivedRtpPacket = {
  * RTCP Transport-wide Congestion Control packet info dump.
  */
 export type TransportWideCcPacketDump = RtcpPacketDump & {
+	/**
+	 * Feedback message type.
+	 */
 	messageType: TransportLayerFeedbackMessageType;
+	/**
+	 * SSRC of the packet sender.
+	 */
 	senderSsrc: number;
+	/**
+	 * SSRC of the media source.
+	 */
 	mediaSsrc: number;
+	/**
+	 * Transport-wide sequence number of the first RTP packet in the feedback.
+	 */
 	baseSequenceNumber: number;
+	/**
+	 * Number of RTP packets the feedback contains status for.
+	 */
 	packetStatusCount: number;
+	/**
+	 * Reference time (in microseconds).
+	 */
 	baseTimeUs: number;
+	/**
+	 * Feedback packet count.
+	 */
 	feedbackPacketCount: number;
+	/**
+	 * Whether the packet includes receive deltas.
+	 */
 	hasDeltas: boolean;
+	/**
+	 * Received RTP packets.
+	 */
 	receivedRtpPackets: ReceivedRtpPacket[];
 };
 

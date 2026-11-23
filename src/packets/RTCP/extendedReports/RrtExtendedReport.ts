@@ -17,6 +17,9 @@ const RRT_EXTENDED_REPORT_LENGTH = 12;
  * RTCP XR Receiver Reference Time Report Block info dump.
  */
 export type RrtExtendedReportDump = ExtendedReportDump & {
+	/**
+	 * NTP timestamp.
+	 */
 	ntp: Ntp;
 };
 

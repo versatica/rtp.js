@@ -25,7 +25,13 @@ const textDecoder = new TextDecoder();
  * RTCP BYE packet info dump.
  */
 export type ByePacketDump = RtcpPacketDump & {
+	/**
+	 * SSRCs of the sources leaving.
+	 */
 	ssrcs: number[];
+	/**
+	 * Reason for leaving, if any.
+	 */
 	reason?: string;
 };
 

@@ -25,7 +25,13 @@ const XR_HEADER_LENGTH = 8;
  * RTCP XR packet info dump.
  */
 export type XrPacketDump = RtcpPacketDump & {
+	/**
+	 * SSRC of the originator of the packet.
+	 */
 	ssrc: number;
+	/**
+	 * Extended Report blocks.
+	 */
 	extendedReports: ExtendedReportDump[];
 };
 
