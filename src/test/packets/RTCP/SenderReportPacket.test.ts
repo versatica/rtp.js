@@ -13,7 +13,7 @@ beforeEach(resetBuffers);
 
 describe('RTCP Sender Report Packet', () => {
 	test('SenderReportPacket.parse() succeeds', () => {
-		const checkFields = (packet: SenderReportPacket): void => {
+		function checkFields(packet: SenderReportPacket): void {
 			const reports = packet.getReports();
 
 			expect(packet.getSsrc()).toBe(0x5d931534);
@@ -36,7 +36,7 @@ describe('RTCP Sender Report Packet', () => {
 				lsr: 0xb2c31234,
 				dlsr: 32768,
 			});
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([
@@ -182,7 +182,7 @@ describe('RTCP Sender Report Packet', () => {
 	});
 
 	test('SenderReportPacket.factory() succeeds', () => {
-		const checkFields = (packet: SenderReportPacket): void => {
+		function checkFields(packet: SenderReportPacket): void {
 			const reports = packet.getReports();
 
 			expect(packet.getSsrc()).toBe(1111);
@@ -212,7 +212,7 @@ describe('RTCP Sender Report Packet', () => {
 				lsr: 0xffffffff,
 				dlsr: 0xffffffff,
 			});
-		};
+		}
 
 		// Dirty the buffer to check that factory() writes zeros in the fixed
 		// header.
@@ -299,7 +299,7 @@ describe('RTCP Sender Report Packet', () => {
 		checkFields(clonedPacket);
 	});
 
-	test('SenderReportPacket.addReport() throws if there is no space in the buffer', () => {
+	test('senderReportPacket.addReport() throws if there is no space in the buffer', () => {
 		const report: ReceptionReport = {
 			ssrc: 1111,
 			fractionLost: 0,

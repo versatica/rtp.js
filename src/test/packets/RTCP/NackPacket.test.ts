@@ -13,7 +13,7 @@ beforeEach(resetBuffers);
 
 describe('RTCP Generic NACK Packet', () => {
 	test('NackPacket.parse() succeeds', () => {
-		const checkFields = (packet: NackPacket): void => {
+		function checkFields(packet: NackPacket): void {
 			expect(packet.getMessageType()).toBe(
 				TransportLayerFeedbackMessageType.NACK
 			);
@@ -24,7 +24,7 @@ describe('RTCP Generic NACK Packet', () => {
 				{ pid: 1000, bitmask: 0x8001 },
 				{ pid: 65535, bitmask: 0 },
 			]);
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([
@@ -195,7 +195,7 @@ describe('RTCP Generic NACK Packet', () => {
 	});
 
 	test('NackPacket.factory() succeeds', () => {
-		const checkFields = (packet: NackPacket): void => {
+		function checkFields(packet: NackPacket): void {
 			expect(packet.getMessageType()).toBe(
 				TransportLayerFeedbackMessageType.NACK
 			);
@@ -206,7 +206,7 @@ describe('RTCP Generic NACK Packet', () => {
 				{ pid: 3333, bitmask: 0x0001 },
 				{ pid: 4444, bitmask: 0xffff },
 			]);
-		};
+		}
 
 		// Dirty the buffer to check that factory() writes zeros in the feedback
 		// header.
@@ -274,7 +274,7 @@ describe('RTCP Generic NACK Packet', () => {
 		checkFields(clonedPacket);
 	});
 
-	test('NackPacket.addItem() throws if there is no space in the buffer', () => {
+	test('nackPacket.addItem() throws if there is no space in the buffer', () => {
 		const packet = NackPacket.factory(factoryBuffer.subarray(0, 15));
 
 		expect(packet.getLength()).toBe(12);

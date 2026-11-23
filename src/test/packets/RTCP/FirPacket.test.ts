@@ -14,7 +14,7 @@ beforeEach(resetBuffers);
 
 describe('RTCP FIR Packet', () => {
 	test('FirPacket.parse() succeeds', () => {
-		const checkFields = (packet: FirPacket): void => {
+		function checkFields(packet: FirPacket): void {
 			expect(packet.getMessageType()).toBe(
 				PayloadSpecificFeedbackMessageType.FIR
 			);
@@ -25,7 +25,7 @@ describe('RTCP FIR Packet', () => {
 				{ ssrc: 0x02d03702, sequenceNumber: 4 },
 				{ ssrc: 0x23456789, sequenceNumber: 13 },
 			]);
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([
@@ -266,7 +266,7 @@ describe('RTCP FIR Packet', () => {
 		);
 	});
 
-	test('FirPacket.addItem() throws if there is no space in the buffer', () => {
+	test('firPacket.addItem() throws if there is no space in the buffer', () => {
 		const packet = FirPacket.factory(factoryBuffer.subarray(0, 19));
 
 		expect(packet.getLength()).toBe(12);

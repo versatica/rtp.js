@@ -8,9 +8,7 @@ beforeEach(resetBuffers);
 
 describe('RTCP Unknown Payload-Specific Feedback Packet', () => {
 	test('UnknownPayloadSpecificFeedbackPacket.parse() succeeds', () => {
-		const checkFields = (
-			packet: UnknownPayloadSpecificFeedbackPacket
-		): void => {
+		function checkFields(packet: UnknownPayloadSpecificFeedbackPacket): void {
 			expect(packet.getMessageType()).toBe(2);
 			expect(packet.getSenderSsrc()).toBe(0x5d931534);
 			expect(packet.getMediaSsrc()).toBe(0x01932db4);
@@ -18,7 +16,7 @@ describe('RTCP Unknown Payload-Specific Feedback Packet', () => {
 			expect(packet.getUnknownValue()[0]).toBe(0x11);
 			expect(packet.getUnknownValue()[1]).toBe(0x22);
 			expect(packet.getUnknownValue()[7]).toBe(0x88);
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([

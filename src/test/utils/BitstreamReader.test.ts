@@ -1,7 +1,23 @@
 import { BitstreamReader } from '../../utils/BitstreamReader';
 
 describe('BitstreamReader', () => {
-	test('BitstreamReader.readBit()', () => {
+	test('bitstreamReader.invalidate() makes every later read fail', () => {
+		const reader = new BitstreamReader(new Uint8Array([0xff, 0xff]));
+
+		expect(reader.ok()).toBe(true);
+		expect(reader.remainingBitCount()).toBe(16);
+
+		reader.invalidate();
+
+		expect(reader.ok()).toBe(false);
+		expect(reader.remainingBitCount()).toBe(-1);
+		expect(reader.readBit()).toBe(0);
+		expect(reader.readBits(8)).toBe(0);
+		expect(reader.ok()).toBe(false);
+		expect(reader.remainingBitCount()).toBe(-1);
+	});
+
+	test('bitstreamReader.readBit()', () => {
 		const reader = new BitstreamReader(
 			new Uint8Array([0b01000001, 0b10110001])
 		);
@@ -35,7 +51,7 @@ describe('BitstreamReader', () => {
 		expect(reader.ok()).toBe(false);
 	});
 
-	test('BitstreamReader.readBits() of aligned bytes', () => {
+	test('bitstreamReader.readBits() of aligned bytes', () => {
 		const reader = new BitstreamReader(
 			new Uint8Array([0x0a, 0xbc, 0xde, 0xf1, 0x23, 0x45, 0x67, 0x89])
 		);
@@ -47,7 +63,7 @@ describe('BitstreamReader', () => {
 		expect(reader.ok()).toBe(true);
 	});
 
-	test('BitstreamReader.readBits() of bytes with offset 4', () => {
+	test('bitstreamReader.readBits() of bytes with offset 4', () => {
 		const reader = new BitstreamReader(
 			new Uint8Array([0x0a, 0xbc, 0xde, 0xf1, 0x23, 0x45, 0x67, 0x89, 0x0a])
 		);
@@ -61,7 +77,7 @@ describe('BitstreamReader', () => {
 		expect(reader.ok()).toBe(true);
 	});
 
-	test('BitstreamReader.readBits() of bytes with offset 3', () => {
+	test('bitstreamReader.readBits() of bytes with offset 3', () => {
 		// The pattern we'll check against is counting down from 0b1111. It looks
 		// weird here because it's all offset by 3.
 		const reader = new BitstreamReader(
@@ -81,7 +97,7 @@ describe('BitstreamReader', () => {
 		expect(reader.ok()).toBe(false);
 	});
 
-	test('BitstreamReader.readBits()', () => {
+	test('bitstreamReader.readBits()', () => {
 		const reader = new BitstreamReader(
 			new Uint8Array([0b01001101, 0b00110010])
 		);
@@ -98,28 +114,28 @@ describe('BitstreamReader', () => {
 		expect(reader.ok()).toBe(false);
 	});
 
-	test('BitstreamReader.readBits() of zero bits', () => {
+	test('bitstreamReader.readBits() of zero bits', () => {
 		const reader = new BitstreamReader(new Uint8Array(0));
 
 		expect(reader.readBits(0)).toBe(0);
 		expect(reader.ok()).toBe(true);
 	});
 
-	test('BitstreamReader.readBit() from empty array', () => {
+	test('bitstreamReader.readBit() from empty array', () => {
 		const reader = new BitstreamReader(new Uint8Array(0));
 
 		expect(reader.readBit()).toBe(0);
 		expect(reader.ok()).toBe(false);
 	});
 
-	test('BitstreamReader.readBits() from empty array', () => {
+	test('bitstreamReader.readBits() from empty array', () => {
 		const reader = new BitstreamReader(new Uint8Array(0));
 
 		expect(reader.readBits(1)).toBe(0);
 		expect(reader.ok()).toBe(false);
 	});
 
-	test('BitstreamReader.readNonSymmetric() reads the same number of bits when the number of values is a power of 2', () => {
+	test('bitstreamReader.readNonSymmetric() reads the same number of bits when the number of values is a power of 2', () => {
 		const reader = new BitstreamReader(new Uint8Array([0xf3, 0xa0]));
 
 		expect(reader.remainingBitCount()).toBe(16);
@@ -131,7 +147,7 @@ describe('BitstreamReader', () => {
 		expect(reader.ok()).toBe(true);
 	});
 
-	test('BitstreamReader.readNonSymmetric() of the only value consumes zero bits', () => {
+	test('bitstreamReader.readNonSymmetric() of the only value consumes zero bits', () => {
 		const reader = new BitstreamReader(new Uint8Array(2));
 
 		expect(reader.remainingBitCount()).toBe(16);

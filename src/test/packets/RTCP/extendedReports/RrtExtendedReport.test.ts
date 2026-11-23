@@ -16,12 +16,12 @@ beforeEach(resetBuffers);
 
 describe('RTCP XR Receiver Reference Time Extended Report', () => {
 	test('RrtExtendedReport.parse() succeeds', () => {
-		const checkFields = (extendedReport: RrtExtendedReport): void => {
+		function checkFields(extendedReport: RrtExtendedReport): void {
 			expect(extendedReport.getNtp()).toEqual({
 				seconds: 0x12345678,
 				fractions: 0x23456789,
 			});
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([

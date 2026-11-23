@@ -181,7 +181,7 @@ describe('RTCP BYE Packet', () => {
 		expect(packet.getReason()).toBe('abc');
 	});
 
-	test('ByePacket.parse() with padding and setReason() succeeds', () => {
+	test('ByePacket.parse() with padding and byePacket.setReason() succeeds', () => {
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			// V=2, P=1, SC=1, PT:203, Length: 3
@@ -392,7 +392,7 @@ describe('RTCP BYE Packet', () => {
 		);
 	});
 
-	test('ByePacket.addSsrc() and setSsrcs() fail with more than 31 SSRCs', () => {
+	test('byePacket.addSsrc() and byePacket.setSsrcs() fail with more than 31 SSRCs', () => {
 		const packet = ByePacket.factory(factoryBuffer);
 		const ssrcs = Array.from({ length: 31 }, (_, idx) => idx + 1);
 

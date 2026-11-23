@@ -7,8 +7,16 @@ import type {
 	ExtendedReport,
 	ExtendedReportBlockType,
 } from '../../../packets/RTCP/ExtendedReport';
+import type { CompoundPacket } from '../../../packets/RTCP/CompoundPacket';
 import { areBuffersEqual } from '../../../utils/buffers';
 import { throwBuffer } from '../../testHelpers';
+
+export type ExpectedRtcpCompoundPacket = {
+	buffer: Uint8Array;
+	bufferLength: number;
+	length: number;
+	packetsCount: number;
+};
 
 export type ExpectedRtcpExtendedReport = {
 	buffer: Uint8Array;
@@ -25,6 +33,39 @@ export type ExpectedRtcpPacket = {
 	hasPadding: boolean;
 	padding: number;
 };
+
+export function checkRtcpCompoundPacket(
+	compoundPacket: CompoundPacket,
+	expected: ExpectedRtcpCompoundPacket
+): void {
+	const compoundPacketBuffer = compoundPacket.getBuffer();
+	const originalBuffer = expected.buffer.slice(0, expected.bufferLength);
+
+	expect(isRtcp(compoundPacketBuffer, expected.length)).toBe(true);
+	expect(compoundPacketBuffer.buffer).toBe(expected.buffer.buffer);
+	expect(compoundPacketBuffer.byteOffset).toBe(expected.buffer.byteOffset);
+	expect(compoundPacket.getBufferLength()).not.toBe(0);
+	expect(compoundPacket.getBufferLength()).toBe(expected.bufferLength);
+	expect(compoundPacket.getLength()).not.toBe(0);
+	expect(compoundPacket.getLength()).toBe(expected.length);
+	expect(compoundPacket.getAvailableLength()).toBe(
+		compoundPacket.getBufferLength() - compoundPacket.getLength()
+	);
+	expect(compoundPacket.getLength() % 4).toBe(0);
+	expect(compoundPacket.getPackets().length).toBe(expected.packetsCount);
+	expect(() =>
+		compoundPacket.serialize(throwBuffer.subarray(0, expected.length - 1))
+	).toThrow(TypeError);
+	expect(() =>
+		compoundPacket.clone(throwBuffer.subarray(0, expected.length - 1))
+	).toThrow(TypeError);
+	expect(
+		areBuffersEqual(
+			expected.buffer.subarray(0, expected.bufferLength),
+			originalBuffer
+		)
+	).toBe(true);
+}
 
 export function checkRtcpPacket(
 	packet: RtcpPacket,

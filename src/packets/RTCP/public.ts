@@ -22,6 +22,10 @@
  *   SenderReportPacket,
  *   type XrPacketDump,
  *   XrPacket,
+ *   type UnknownPacketDump,
+ *   UnknownPacket,
+ *   type CompoundPacketDump,
+ *   CompoundPacket,
  *   type AnyFeedbackPacket,
  *   TransportLayerFeedbackMessageType,
  *   type AnyTransportLayerFeedbackPacket,
@@ -90,6 +94,10 @@ export {
 } from './SenderReportPacket';
 
 export { type XrPacketDump, XrPacket } from './XrPacket';
+
+export { type UnknownPacketDump, UnknownPacket } from './UnknownPacket';
+
+export { type CompoundPacketDump, CompoundPacket } from './CompoundPacket';
 
 export { type AnyFeedbackPacket } from './AnyFeedbackPacket';
 

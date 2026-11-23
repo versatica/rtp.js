@@ -1297,11 +1297,14 @@ class DependencyDescriptorWriter {
 	#findBestTemplate(): TemplateMatch {
 		const templates = this.#structure.templates;
 		const { spatialId, temporalId } = this.#frameDependencies;
-		const isSameLayer = (
-			frameTemplate: DependencyDescriptorTemplate
-		): boolean =>
-			frameTemplate.spatialId === spatialId &&
-			frameTemplate.temporalId === temporalId;
+
+		function isSameLayer(frameTemplate: DependencyDescriptorTemplate): boolean {
+			return (
+				frameTemplate.spatialId === spatialId &&
+				frameTemplate.temporalId === temporalId
+			);
+		}
+
 		// Find range of templates with matching spatial id and temporal id.
 		const first = templates.findIndex(isSameLayer);
 

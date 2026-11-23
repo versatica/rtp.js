@@ -38,7 +38,7 @@ function isAtOffset(
 
 describe('RTCP XR Packet', () => {
 	test('XrPacket.parse() succeeds', () => {
-		const checkFields = (packet: XrPacket): void => {
+		function checkFields(packet: XrPacket): void {
 			const extendedReports = packet.getExtendedReports();
 
 			expect(packet.getSsrc()).toBe(0x5d931534);
@@ -85,7 +85,7 @@ describe('RTCP XR Packet', () => {
 			expect(extendedReport3.getUnknownValue().byteLength).toBe(4);
 			expect(extendedReport3.getUnknownValue()[0]).toBe(0x01);
 			expect(extendedReport3.getUnknownValue()[3]).toBe(0x04);
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([
@@ -416,7 +416,7 @@ describe('RTCP XR Packet', () => {
 			0x63, 0x00, 0x00, 0x00,
 		]);
 
-		const checkFields = (packet: XrPacket): void => {
+		function checkFields(packet: XrPacket): void {
 			const extendedReports = packet.getExtendedReports();
 
 			expect(packet.getSsrc()).toBe(1234);
@@ -437,7 +437,7 @@ describe('RTCP XR Packet', () => {
 			expect(extendedReport2.getLength()).toBe(4);
 			expect(extendedReport2.getBlockType()).toBe(99);
 			expect(extendedReport2.getUnknownValue().byteLength).toBe(0);
-		};
+		}
 
 		const packet = XrPacket.factory(factoryBuffer);
 		const expected: ExpectedRtcpPacket = {
@@ -536,10 +536,10 @@ describe('RTCP XR Packet', () => {
 		expect(areBuffersEqual(packet.getBuffer(), expectedBuffer)).toBe(true);
 	});
 
-	test('XrPacket.buildExtendedReportInPlace() succeeds', () => {
+	test('xrPacket.buildExtendedReportInPlace() succeeds', () => {
 		const numberOfSubBlocks = 50;
 
-		const checkFields = (packet: XrPacket): void => {
+		function checkFields(packet: XrPacket): void {
 			const extendedReports = packet.getExtendedReports();
 
 			expect(packet.getSsrc()).toBe(0x12345678);
@@ -577,7 +577,7 @@ describe('RTCP XR Packet', () => {
 				lastReceiverReport: 1050,
 				delaySinceLastReceiverReport: 2050,
 			});
-		};
+		}
 
 		const packet = XrPacket.factory(factoryBuffer);
 
@@ -651,7 +651,7 @@ describe('RTCP XR Packet', () => {
 		checkFields(clonedPacket);
 	});
 
-	test('XrPacket.addExtendedReport() throws if there is no space in the buffer', () => {
+	test('xrPacket.addExtendedReport() throws if there is no space in the buffer', () => {
 		// prettier-ignore
 		const extendedReportBuffer = new Uint8Array([
 			// BT: 42, Type-specific: 0, Block length: 1
@@ -678,7 +678,7 @@ describe('RTCP XR Packet', () => {
 		expect(packet.getExtendedReports()).toEqual([]);
 	});
 
-	test('XrPacket.addExtendedReport() throws if the Extended Report block lives where it would be cloned', () => {
+	test('xrPacket.addExtendedReport() throws if the Extended Report block lives where it would be cloned', () => {
 		const packet = XrPacket.factory(factoryBuffer);
 
 		// The Extended Report block lives in the free space of the buffer of the

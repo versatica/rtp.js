@@ -18,7 +18,7 @@ beforeEach(resetBuffers);
 
 describe('RTCP SDES Packet', () => {
 	test('SdesPacket.parse() succeeds', () => {
-		const checkChunks = (packet: SdesPacket): void => {
+		function checkChunks(packet: SdesPacket): void {
 			expect(packet.getChunksCount()).toBe(3);
 			expect(packet.getChunks()).toEqual([
 				{
@@ -37,7 +37,7 @@ describe('RTCP SDES Packet', () => {
 					items: [],
 				},
 			]);
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([
@@ -291,7 +291,7 @@ describe('RTCP SDES Packet', () => {
 	});
 
 	test('SdesPacket.factory() succeeds', () => {
-		const checkChunks = (packet: SdesPacket): void => {
+		function checkChunks(packet: SdesPacket): void {
 			const packetBuffer = packet.getBuffer();
 
 			expect(packet.getChunksCount()).toBe(2);
@@ -309,7 +309,7 @@ describe('RTCP SDES Packet', () => {
 			expect(packetBuffer[29]).toBe(0);
 			expect(packetBuffer[30]).toBe(0);
 			expect(packetBuffer[31]).toBe(0);
-		};
+		}
 
 		const packet = SdesPacket.factory(factoryBuffer);
 		const expected: ExpectedRtcpPacket = {
@@ -372,7 +372,7 @@ describe('RTCP SDES Packet', () => {
 		checkChunks(clonedPacket);
 	});
 
-	test('SdesPacket.addChunk() and SdesPacket.setChunks() throw', () => {
+	test('sdesPacket.addChunk() and sdesPacket.setChunks() throw', () => {
 		const packet = SdesPacket.factory(factoryBuffer);
 
 		for (let ssrc = 1; ssrc <= MAX_CHUNKS; ++ssrc) {
@@ -428,7 +428,7 @@ describe('RTCP SDES Packet', () => {
 		expect(packet.getLength()).toBe(4 + 30 * 8 + 264);
 	});
 
-	test('SdesPacket.setChunks() throws if there is no space in the buffer', () => {
+	test('sdesPacket.setChunks() throws if there is no space in the buffer', () => {
 		const packet = SdesPacket.factory(factoryBuffer.subarray(0, 12));
 
 		packet.addChunk({ ssrc: 1111, items: [] });
@@ -448,7 +448,7 @@ describe('RTCP SDES Packet', () => {
 	});
 
 	test('SdesPacket with a chunk whose null octet ends at a 32-bit boundary', () => {
-		const checkChunks = (packet: SdesPacket): void => {
+		function checkChunks(packet: SdesPacket): void {
 			expect(packet.getChunksCount()).toBe(2);
 			expect(packet.getChunks()).toEqual([
 				{
@@ -457,7 +457,7 @@ describe('RTCP SDES Packet', () => {
 				},
 				{ ssrc: 5678, items: [{ type: SdesItemType.CNAME, text: 'ab' }] },
 			]);
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([

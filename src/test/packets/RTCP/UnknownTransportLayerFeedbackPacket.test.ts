@@ -7,7 +7,7 @@ beforeEach(resetBuffers);
 
 describe('RTCP Unknown Transport Layer Feedback Packet', () => {
 	test('UnknownTransportLayerFeedbackPacket.parse() succeeds', () => {
-		const checkFields = (packet: UnknownTransportLayerFeedbackPacket): void => {
+		function checkFields(packet: UnknownTransportLayerFeedbackPacket): void {
 			expect(packet.getMessageType()).toBe(3);
 			expect(packet.getSenderSsrc()).toBe(0x5d931534);
 			expect(packet.getMediaSsrc()).toBe(0x01932db4);
@@ -15,7 +15,7 @@ describe('RTCP Unknown Transport Layer Feedback Packet', () => {
 			expect(packet.getUnknownValue()[0]).toBe(0x11);
 			expect(packet.getUnknownValue()[1]).toBe(0x22);
 			expect(packet.getUnknownValue()[7]).toBe(0x88);
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([

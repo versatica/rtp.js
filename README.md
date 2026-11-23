@@ -50,6 +50,7 @@ npm install rtp.js
   ```
 
 - Every packet lives within the `Uint8Array` given to `parse()` or `factory()` and every modification is applied in place within it, so `getBuffer()` always returns the serialized packet.
+- In Node.js a `Buffer` can be given instead, since it's a `Uint8Array`.
 
 ## Note about TypeScript
 

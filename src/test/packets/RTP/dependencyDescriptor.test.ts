@@ -738,10 +738,11 @@ describe('Dependency Descriptor', () => {
 			/* updateContext */ true
 		);
 		const structure = keyFrame!.attachedStructure!;
-		const read = (
+
+		function read(
 			frameNumber: number,
 			activeDecodeTargetsBitmask?: number
-		): DependencyDescriptorExtension | undefined => {
+		): DependencyDescriptorExtension | undefined {
 			const data = writeDependencyDescriptor(
 				{
 					...createDescriptor(structure.templates[0]!),
@@ -757,7 +758,7 @@ describe('Dependency Descriptor', () => {
 				context,
 				/* updateContext */ true
 			);
-		};
+		}
 
 		// The key frame carrying the structure makes all decode targets active.
 		expect(keyFrame!.activeDecodeTargetsBitmask).toBe(0b11);
@@ -789,7 +790,7 @@ describe('Dependency Descriptor', () => {
 		expect(read(257)!.activeDecodeTargetsBitmask).toBe(0b11);
 	});
 
-	test('RtpPacket.setDependencyDescriptorExtension() and RtpPacket.getDependencyDescriptorExtension() succeed', () => {
+	test('rtpPacket.setDependencyDescriptorExtension() and rtpPacket.getDependencyDescriptorExtension() succeed', () => {
 		const structure = createStructure({
 			templateIdOffset: 10,
 			decodeTargetCount: 2,
@@ -896,7 +897,7 @@ describe('Dependency Descriptor', () => {
 		expect(packet.getDependencyDescriptorExtension(context)).toBeUndefined();
 	});
 
-	test('RtpPacket.setDependencyDescriptorExtension() throws if the structure is not given', () => {
+	test('rtpPacket.setDependencyDescriptorExtension() throws if the structure is not given', () => {
 		const structure = createStructure({
 			decodeTargetCount: 1,
 			templates: [createTemplate({ decodeTargetIndications: [SWITCH] })],

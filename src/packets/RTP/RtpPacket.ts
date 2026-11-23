@@ -160,9 +160,16 @@ export type RtpPacketDump = SerializableDump & {
  */
 export type RtpPacketDumpOptions = {
 	/**
-	 * Context of the stream, needed to dump the whole
-	 * {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP extension. The context is
-	 * not modified.
+	 * Context of the stream (SSRC) the packet belongs to, needed to dump the
+	 * whole {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP extension. It must
+	 * be the same context the application passes to
+	 * {@link RtpPacket.getDependencyDescriptorExtension} for the packets of that
+	 * stream, since most descriptors can only be read with the template
+	 * dependency structure carried by a previous one. If not given, just the
+	 * mandatory fields of the descriptor are dumped.
+	 *
+	 * @remarks
+	 * - The context is not modified.
 	 */
 	dependencyDescriptorContext?: DependencyDescriptorContext;
 };
@@ -1166,9 +1173,14 @@ export class RtpPacket extends Serializable {
 	 * Read the value of the {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP
 	 * extension.
 	 *
-	 * @param context - Context of the stream the packet belongs to. It's
-	 *   updated with the template dependency structure carried by the
-	 *   descriptor (if any).
+	 * @param context - Context of the stream (SSRC) the packet belongs to. The
+	 *   application must create one per stream and pass that same context
+	 *   every time it reads the descriptor of a packet of that stream, since
+	 *   most descriptors can only be read with the template dependency
+	 *   structure carried by a previous one (in the first packet of the last
+	 *   key frame). The context is updated with the template dependency
+	 *   structure and the active decode targets carried by the descriptor (if
+	 *   any).
 	 *
 	 * @returns `undefined` if the extension is not present or is malformed. If
 	 *   the template dependency structure of the frame is unknown, only the

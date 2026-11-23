@@ -16,7 +16,7 @@ beforeEach(resetBuffers);
 
 describe('RTCP XR DLRR Extended Report', () => {
 	test('DlrrExtendedReport.parse() succeeds', () => {
-		const checkFields = (extendedReport: DlrrExtendedReport): void => {
+		function checkFields(extendedReport: DlrrExtendedReport): void {
 			expect(extendedReport.getNumberOfSubBlocks()).toBe(2);
 			expect(extendedReport.getSubBlocks()).toEqual([
 				{
@@ -30,7 +30,7 @@ describe('RTCP XR DLRR Extended Report', () => {
 					delaySinceLastReceiverReport: 0x22002200,
 				},
 			]);
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([

@@ -14,13 +14,13 @@ beforeEach(resetBuffers);
 
 describe('RTCP PLI Packet', () => {
 	test('PliPacket.parse() succeeds', () => {
-		const checkFields = (packet: PliPacket): void => {
+		function checkFields(packet: PliPacket): void {
 			expect(packet.getMessageType()).toBe(
 				PayloadSpecificFeedbackMessageType.PLI
 			);
 			expect(packet.getSenderSsrc()).toBe(0x12345678);
 			expect(packet.getMediaSsrc()).toBe(0x23456789);
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([

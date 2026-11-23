@@ -2,7 +2,7 @@ import { BitBufferWriter } from '../../utils/BitBufferWriter';
 import { BitstreamReader } from '../../utils/BitstreamReader';
 
 describe('BitBufferWriter', () => {
-	test('BitBufferWriter.writeNonSymmetric() writes the same number of bits when the number of values is a power of 2', () => {
+	test('bitBufferWriter.writeNonSymmetric() writes the same number of bits when the number of values is a power of 2', () => {
 		const bytes = new Uint8Array(2);
 		const writer = new BitBufferWriter(bytes);
 
@@ -18,7 +18,7 @@ describe('BitBufferWriter', () => {
 		expect(Array.from(bytes)).toEqual([0xf3, 0xa0]);
 	});
 
-	test('BitBufferWriter.writeNonSymmetric() reads match writes', () => {
+	test('bitBufferWriter.writeNonSymmetric() reads match writes', () => {
 		const bytes = new Uint8Array(2);
 		const writer = new BitBufferWriter(bytes);
 
@@ -72,7 +72,7 @@ describe('BitBufferWriter', () => {
 		expect(reader.ok()).toBe(true);
 	});
 
-	test('BitBufferWriter.writeNonSymmetric() of the only value consumes no bits', () => {
+	test('bitBufferWriter.writeNonSymmetric() of the only value consumes no bits', () => {
 		const writer = new BitBufferWriter(new Uint8Array(2));
 
 		expect(writer.remainingBitCount()).toBe(16);
@@ -80,7 +80,31 @@ describe('BitBufferWriter', () => {
 		expect(writer.remainingBitCount()).toBe(16);
 	});
 
-	test('BitBufferWriter.writeBits() reads match writes', () => {
+	test('bitBufferWriter.zeroBits() zeroes the newly written bytes', () => {
+		const bytes = new Uint8Array([0xff, 0xff, 0xff, 0xff, 0xff]);
+		const writer = new BitBufferWriter(bytes.subarray(0, 4));
+
+		// The first write in a byte overwrites the whole byte, so its bits after
+		// the written ones are zero.
+		expect(writer.writeBits(0b101, 3)).toBe(true);
+		expect(writer.remainingBitCount()).toBe(29);
+		expect(writer.zeroBits(7)).toBe(true);
+		expect(writer.remainingBitCount()).toBe(22);
+		expect(writer.writeBits(0b111111, 6)).toBe(true);
+		expect(writer.remainingBitCount()).toBe(16);
+		// Not enough bits left, so nothing changes.
+		expect(writer.zeroBits(17)).toBe(false);
+		expect(writer.remainingBitCount()).toBe(16);
+		expect(Array.from(bytes)).toEqual([
+			0b10100000, 0b00111111, 0xff, 0xff, 0xff,
+		]);
+		expect(writer.zeroBits(16)).toBe(true);
+		expect(writer.remainingBitCount()).toBe(0);
+		// The byte after the buffer of the writer is untouched.
+		expect(Array.from(bytes)).toEqual([0b10100000, 0b00111111, 0, 0, 0xff]);
+	});
+
+	test('bitBufferWriter.writeBits() reads match writes', () => {
 		const bytes = new Uint8Array(16);
 		const writer = new BitBufferWriter(bytes.subarray(0, 4));
 

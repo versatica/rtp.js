@@ -14,12 +14,12 @@ beforeEach(resetBuffers);
 
 describe('RTCP XR Unknown Extended Report', () => {
 	test('UnknownExtendedReport.parse() succeeds', () => {
-		const checkFields = (extendedReport: UnknownExtendedReport): void => {
+		function checkFields(extendedReport: UnknownExtendedReport): void {
 			expect(extendedReport.getUnknownValue().byteLength).toBe(8);
 			expect(extendedReport.getUnknownValue()[0]).toBe(0x11);
 			expect(extendedReport.getUnknownValue()[1]).toBe(0x22);
 			expect(extendedReport.getUnknownValue()[7]).toBe(0x88);
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([

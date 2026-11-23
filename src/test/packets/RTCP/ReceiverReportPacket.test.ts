@@ -16,7 +16,7 @@ beforeEach(resetBuffers);
 
 describe('RTCP Receiver Report Packet', () => {
 	test('ReceiverReportPacket.parse() succeeds', () => {
-		const checkReports = (packet: ReceiverReportPacket): void => {
+		function checkReports(packet: ReceiverReportPacket): void {
 			const reports = packet.getReports();
 
 			expect(packet.getSsrc()).toBe(0x5d931534);
@@ -42,7 +42,7 @@ describe('RTCP Receiver Report Packet', () => {
 				lsr: 0,
 				dlsr: 0,
 			});
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([
@@ -240,7 +240,7 @@ describe('RTCP Receiver Report Packet', () => {
 	});
 
 	test('ReceiverReportPacket.factory() succeeds', () => {
-		const checkReports = (packet: ReceiverReportPacket): void => {
+		function checkReports(packet: ReceiverReportPacket): void {
 			const reports = packet.getReports();
 
 			expect(packet.getSsrc()).toBe(1111);
@@ -266,7 +266,7 @@ describe('RTCP Receiver Report Packet', () => {
 				lsr: 0xffffffff,
 				dlsr: 0xffffffff,
 			});
-		};
+		}
 
 		const packet = ReceiverReportPacket.factory(factoryBuffer);
 		const expected: ExpectedRtcpPacket = {
@@ -341,7 +341,7 @@ describe('RTCP Receiver Report Packet', () => {
 		checkReports(clonedPacket);
 	});
 
-	test('ReceiverReportPacket.addReport() throws if totalLost is out of range', () => {
+	test('receiverReportPacket.addReport() throws if totalLost is out of range', () => {
 		const packet = ReceiverReportPacket.factory(factoryBuffer);
 		const report: ReceptionReport = {
 			ssrc: 1111,
@@ -372,7 +372,7 @@ describe('RTCP Receiver Report Packet', () => {
 		expect(reports[1]!.totalLost).toBe(-8388608);
 	});
 
-	test('ReceiverReportPacket.addReport() throws', () => {
+	test('receiverReportPacket.addReport() throws', () => {
 		const report: ReceptionReport = {
 			ssrc: 1111,
 			fractionLost: 0,
@@ -398,7 +398,7 @@ describe('RTCP Receiver Report Packet', () => {
 		expect(packet.getLength()).toBe(8 + 31 * 24);
 	});
 
-	test('ReceiverReportPacket.addReport() throws if there is no space in the buffer', () => {
+	test('receiverReportPacket.addReport() throws if there is no space in the buffer', () => {
 		const report: ReceptionReport = {
 			ssrc: 1111,
 			fractionLost: 0,

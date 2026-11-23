@@ -146,7 +146,7 @@ describe('RTCP REMB Packet', () => {
 	});
 
 	test('RembPacket.parse() succeeds', () => {
-		const checkFields = (packet: RembPacket): void => {
+		function checkFields(packet: RembPacket): void {
 			expect(packet.getMessageType()).toBe(
 				PayloadSpecificFeedbackMessageType.AFB
 			);
@@ -154,7 +154,7 @@ describe('RTCP REMB Packet', () => {
 			expect(packet.getMediaSsrc()).toBe(0);
 			expect(packet.getBitrate()).toBe(122754);
 			expect(packet.getSsrcs()).toEqual([0x02d03702, 0x04a76747]);
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([
@@ -454,7 +454,7 @@ describe('RTCP REMB Packet', () => {
 	});
 
 	test('RembPacket bitrate survives a round trip', () => {
-		const checkBitrate = (bitrate: number): void => {
+		function checkBitrate(bitrate: number): void {
 			const packet = RembPacket.factory(factoryBuffer);
 
 			packet.setBitrate(bitrate);
@@ -463,7 +463,7 @@ describe('RTCP REMB Packet', () => {
 
 			expect(parsedPacket.getBitrate()).toBe(bitrate);
 			expect(parsedPacket.getSsrcs()).toEqual([]);
-		};
+		}
 
 		checkBitrate(0);
 		// Exponent 0 with the 2 high bits of the mantissa in use.
@@ -473,7 +473,7 @@ describe('RTCP REMB Packet', () => {
 		checkBitrate(0x3fb93 * 2 ** 30);
 	});
 
-	test('RembPacket.addSsrc() and RembPacket.setBitrate() throw', () => {
+	test('rembPacket.addSsrc() and rembPacket.setBitrate() throw', () => {
 		const packet = RembPacket.factory(factoryBuffer);
 
 		for (let ssrc = 1; ssrc <= 255; ++ssrc) {
@@ -493,7 +493,7 @@ describe('RTCP REMB Packet', () => {
 		expect(() => packet.setBitrate(-1)).toThrow(TypeError);
 	});
 
-	test('RembPacket.addSsrc() throws if there is no space in the buffer', () => {
+	test('rembPacket.addSsrc() throws if there is no space in the buffer', () => {
 		const packet = RembPacket.factory(factoryBuffer.subarray(0, 23));
 
 		expect(packet.getLength()).toBe(20);

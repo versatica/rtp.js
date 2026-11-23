@@ -11,8 +11,9 @@ const config = {
 		'@types/events-alias',
 		// TODO: Remove once src/Logger.ts is used.
 		'debug',
-		// TODO: Remove once src/enhancedEvents.ts is used.
-		'events-alias',
+		// Imported as `events`, which knip takes as the Node.js built-in module,
+		// but bundlers for the browser resolve it to this npm package.
+		'events',
 		// Used by npm-scripts.mjs as a shell command, which knip doesn't detect.
 		'open-cli',
 		// Optionally required by debug to enable colors.

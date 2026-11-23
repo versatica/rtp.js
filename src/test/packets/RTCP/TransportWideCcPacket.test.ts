@@ -156,7 +156,7 @@ function checkRtcpFeedbackPacket(
 		);
 	}
 
-	const verify = (packetToVerify: TransportWideCcPacket): void => {
+	function verify(packetToVerify: TransportWideCcPacket): void {
 		if (expectedSize !== undefined) {
 			expect(packetToVerify.getLength()).toBe(padTo4Bytes(expectedSize));
 		}
@@ -176,7 +176,7 @@ function checkRtcpFeedbackPacket(
 				);
 			}
 		}
-	};
+	}
 
 	verify(packet);
 
@@ -317,7 +317,7 @@ function verifyParsedPacket(
 
 describe('RTCP Transport-wide CC Feedback Packet', () => {
 	test('TransportWideCcPacket.parse() succeeds', () => {
-		const checkFields = (packet: TransportWideCcPacket): void => {
+		function checkFields(packet: TransportWideCcPacket): void {
 			expect(packet.getMessageType()).toBe(
 				TransportLayerFeedbackMessageType.TCC
 			);
@@ -342,7 +342,7 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 				{ sequenceNumber: 50, deltaTicks: 4 },
 				{ sequenceNumber: 51, deltaTicks: 0 },
 			]);
-		};
+		}
 
 		// prettier-ignore
 		const buffer = new Uint8Array([
@@ -729,7 +729,7 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 	});
 
 	test('TransportWideCcPacket.factory() succeeds', () => {
-		const checkFields = (packet: TransportWideCcPacket): void => {
+		function checkFields(packet: TransportWideCcPacket): void {
 			expect(packet.getMessageType()).toBe(
 				TransportLayerFeedbackMessageType.TCC
 			);
@@ -745,7 +745,7 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 				{ sequenceNumber: 1001, deltaTicks: 4 },
 				{ sequenceNumber: 1003, deltaTicks: 4 },
 			]);
-		};
+		}
 
 		// prettier-ignore
 		const expectedBuffer = new Uint8Array([
@@ -915,7 +915,7 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 		expect(areBuffersEqual(packet.getBuffer(), expectedBuffer)).toBe(true);
 	});
 
-	test('TransportWideCcPacket.addReceivedRtpPacket() returns false if there is no space in the buffer', () => {
+	test('transportWideCcPacket.addReceivedRtpPacket() returns false if there is no space in the buffer', () => {
 		const packet = TransportWideCcPacket.factory(
 			factoryBuffer.subarray(0, 24),
 			true
@@ -937,7 +937,7 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 		expect(packet.getReceivedRtpPackets().length).toBe(2);
 	});
 
-	test('TransportWideCcPacket.addReceivedRtpPacket() does not add missing RTP packets if the received one does not fit', () => {
+	test('transportWideCcPacket.addReceivedRtpPacket() does not add missing RTP packets if the received one does not fit', () => {
 		const packet = TransportWideCcPacket.factory(
 			factoryBuffer.subarray(0, 24),
 			true
@@ -968,7 +968,7 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 		]);
 	});
 
-	test('TransportWideCcPacket.addReceivedRtpPacket() does not add missing RTP packets if the received one does not fit after inserting packet chunks', () => {
+	test('transportWideCcPacket.addReceivedRtpPacket() does not add missing RTP packets if the received one does not fit after inserting packet chunks', () => {
 		const packet = TransportWideCcPacket.factory(
 			factoryBuffer.subarray(0, 28),
 			true
@@ -1008,7 +1008,7 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 		).toThrow(TypeError);
 	});
 
-	test('TransportWideCcPacket.setBase() and TransportWideCcPacket.addReceivedRtpPacket() throw if timestamps are not safe integers', () => {
+	test('transportWideCcPacket.setBase() and transportWideCcPacket.addReceivedRtpPacket() throw if timestamps are not safe integers', () => {
 		const packet = TransportWideCcPacket.factory(factoryBuffer, true);
 
 		expect(() => packet.setBase(0, 2 ** 53)).toThrow(TypeError);
@@ -1933,7 +1933,7 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 		}
 	});
 
-	test('getBaseDeltaUs() compensates the wrap around', () => {
+	test('transportWideCcPacket.getBaseDeltaUs() compensates the wrap around', () => {
 		const maxBaseTimeUs = BASE_TIME_WRAP_PERIOD_US - BASE_TIME_TICK_US;
 		const packet1 = TransportWideCcPacket.factory(factoryBuffer, true);
 		const packet2 = TransportWideCcPacket.factory(serializeBuffer, true);
@@ -1954,7 +1954,7 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 		expect(packet3.getBaseDeltaUs(packet1.getBaseTimeUs())).toBe(128000);
 	});
 
-	test('setBase() wraps the reference time over the whole period getBaseDeltaUs() compensates for', () => {
+	test('transportWideCcPacket.setBase() wraps the reference time over the whole period transportWideCcPacket.getBaseDeltaUs() compensates for', () => {
 		// Timestamp sitting on the last whole base time tick before the reference
 		// time wraps around.
 		const lastTickUs = BASE_TIME_WRAP_PERIOD_US - BASE_TIME_TICK_US;
