@@ -162,7 +162,14 @@ const config = tsEslint.config(
 			'jest/no-disabled-tests': 2,
 			'jest/expect-expect': [
 				1,
-				{ assertFunctionNames: ['expect', 'checkPacket'] },
+				{
+					assertFunctionNames: [
+						'expect',
+						'checkRtpPacket',
+						'checkRtcpPacket',
+						'checkRtcpFeedbackPacket',
+					],
+				},
 			],
 			'jest/prefer-expect-assertions': 0,
 			'@typescript-eslint/no-unnecessary-type-assertion': 0,

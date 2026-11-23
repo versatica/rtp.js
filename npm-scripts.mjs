@@ -327,15 +327,15 @@ async function release({ args = '' } = {}) {
 
 	// Commit the bump, tag it, and push both. The pushed tag triggers
 	// `rtp.js-npm-publish` workflow, which checks, creates the GitHub release
-	// and publishes to NPM. The pushed commit (which changes the version in
-	// package.json) triggers the `docs` workflow, which deploys the docs.
+	// and publishes to NPM. Once it succeeds, it triggers the `docs` workflow,
+	// which deploys the docs.
 	//
 	// The commit message carries a "[no-ci]" marker so the regular branch CI
 	// workflow skips this commit.
 	//
 	// NOTE: "[no-ci]" (with a hyphen) is a custom marker, NOT GitHub's native
-	// "[skip ci]"/"[no ci]" (which would also skip `rtp.js-npm-publish` and
-	// `docs` workflows, since the tag push shares this same commit).
+	// "[skip ci]"/"[no ci]" (which would also skip `rtp.js-npm-publish` workflow,
+	// and hence `docs` workflow, since the tag push shares this same commit).
 	executeCmd(`git commit -am 'release ${version} [no-ci]'`);
 	executeCmd(`git tag -a ${version} -m '${version}'`);
 	executeCmd(`git push origin ${MAIN_BRANCH}`);

@@ -26,3 +26,29 @@ export {
 	type SenderReportPacketDump,
 	SenderReportPacket,
 } from './SenderReportPacket';
+
+export { type AnyFeedbackPacket } from './AnyFeedbackPacket';
+
+export {
+	TransportLayerFeedbackMessageType,
+	type AnyTransportLayerFeedbackPacket,
+} from './AnyTransportLayerFeedbackPacket';
+
+export {
+	PayloadSpecificFeedbackMessageType,
+	type AnyPayloadSpecificFeedbackPacket,
+} from './AnyPayloadSpecificFeedbackPacket';
+
+export { type PliPacketDump, PliPacket } from './PliPacket';
+
+export { type NackItem, type NackPacketDump, NackPacket } from './NackPacket';
+
+export { type FirItem, type FirPacketDump, FirPacket } from './FirPacket';
+
+export { type RembPacketDump, RembPacket } from './RembPacket';
+
+export {
+	type ReceivedRtpPacket,
+	type TransportWideCcPacketDump,
+	TransportWideCcPacket,
+} from './TransportWideCcPacket';

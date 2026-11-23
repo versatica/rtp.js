@@ -6,7 +6,7 @@ import {
 } from '../../../packets/RTCP/SdesPacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
 import { areBuffersEqual } from '../../../utils/buffers';
-import { checkPacket, type ExpectedPacket } from './rtcpCommon';
+import { checkRtcpPacket, type ExpectedPacket } from './rtcpCommon';
 import {
 	factoryBuffer,
 	serializeBuffer,
@@ -80,7 +80,7 @@ describe('RTCP SDES Packet', () => {
 			padding: 0,
 		};
 
-		checkPacket(packet, expected);
+		checkRtcpPacket(packet, expected);
 
 		checkChunks(packet);
 
@@ -103,7 +103,7 @@ describe('RTCP SDES Packet', () => {
 
 		buffer.fill(0xff);
 
-		checkPacket(packet, {
+		checkRtcpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -117,7 +117,7 @@ describe('RTCP SDES Packet', () => {
 
 		serializeBuffer.fill(0xff);
 
-		checkPacket(clonedPacket, {
+		checkRtcpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -134,7 +134,7 @@ describe('RTCP SDES Packet', () => {
 
 		clonedPacket.setChunks(chunks);
 
-		checkPacket(clonedPacket, {
+		checkRtcpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -184,7 +184,7 @@ describe('RTCP SDES Packet', () => {
 			padding: 4,
 		};
 
-		checkPacket(packet, expected);
+		checkRtcpPacket(packet, expected);
 
 		expect(packet.getChunksCount()).toBe(1);
 		expect(packet.getChunks()).toEqual([
@@ -195,7 +195,7 @@ describe('RTCP SDES Packet', () => {
 
 		packet.addChunk({ ssrc: 5678, items: [] });
 
-		checkPacket(packet, {
+		checkRtcpPacket(packet, {
 			...expected,
 			length: 24,
 			hasPadding: false,
@@ -321,7 +321,7 @@ describe('RTCP SDES Packet', () => {
 			padding: 0,
 		};
 
-		checkPacket(packet, expected);
+		checkRtcpPacket(packet, expected);
 
 		expect(packet.getChunksCount()).toBe(0);
 		expect(packet.getChunks()).toEqual([]);
@@ -337,7 +337,7 @@ describe('RTCP SDES Packet', () => {
 			items: [{ type: SdesItemType.NOTE, text: 'bar baz' }],
 		});
 
-		checkPacket(packet, { ...expected, length: 32 });
+		checkRtcpPacket(packet, { ...expected, length: 32 });
 
 		checkChunks(packet);
 
@@ -347,7 +347,7 @@ describe('RTCP SDES Packet', () => {
 
 		factoryBuffer.fill(0xff);
 
-		checkPacket(packet, {
+		checkRtcpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -362,7 +362,7 @@ describe('RTCP SDES Packet', () => {
 
 		serializeBuffer.fill(0xff);
 
-		checkPacket(clonedPacket, {
+		checkRtcpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -486,7 +486,7 @@ describe('RTCP SDES Packet', () => {
 
 		const parsedPacket = SdesPacket.parse(buffer);
 
-		checkPacket(parsedPacket, {
+		checkRtcpPacket(parsedPacket, {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 40,
@@ -513,7 +513,7 @@ describe('RTCP SDES Packet', () => {
 			items: [{ type: SdesItemType.CNAME, text: 'ab' }],
 		});
 
-		checkPacket(packet, {
+		checkRtcpPacket(packet, {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 40,

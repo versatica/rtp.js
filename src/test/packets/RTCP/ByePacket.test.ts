@@ -1,6 +1,6 @@
 import { ByePacket } from '../../../packets/RTCP/ByePacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { checkPacket, type ExpectedPacket } from './rtcpCommon';
+import { checkRtcpPacket, type ExpectedPacket } from './rtcpCommon';
 import {
 	factoryBuffer,
 	serializeBuffer,
@@ -37,7 +37,7 @@ describe('RTCP BYE Packet', () => {
 			padding: 0,
 		};
 
-		checkPacket(packet, expected);
+		checkRtcpPacket(packet, expected);
 
 		expect(packet.getSsrcs()).toEqual([1111111, 2222222, 12345678]);
 		expect(packet.getReason()).toBe('foobar');
@@ -56,7 +56,7 @@ describe('RTCP BYE Packet', () => {
 
 		buffer.fill(0xff);
 
-		checkPacket(packet, {
+		checkRtcpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -74,7 +74,7 @@ describe('RTCP BYE Packet', () => {
 
 		serializeBuffer.fill(0xff);
 
-		checkPacket(clonedPacket, {
+		checkRtcpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -92,7 +92,7 @@ describe('RTCP BYE Packet', () => {
 
 		clonedPacket.addSsrc(3333);
 
-		checkPacket(clonedPacket, {
+		checkRtcpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -109,7 +109,7 @@ describe('RTCP BYE Packet', () => {
 
 		clonedPacket.setReason('');
 
-		checkPacket(clonedPacket, {
+		checkRtcpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -121,7 +121,7 @@ describe('RTCP BYE Packet', () => {
 
 		clonedPacket.setReason('abcde');
 
-		checkPacket(clonedPacket, {
+		checkRtcpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -161,7 +161,7 @@ describe('RTCP BYE Packet', () => {
 			padding: 8,
 		};
 
-		checkPacket(packet, expected);
+		checkRtcpPacket(packet, expected);
 
 		expect(packet.getSsrcs()).toEqual([1111]);
 		expect(packet.getReason()).toBe('abc');
@@ -170,7 +170,7 @@ describe('RTCP BYE Packet', () => {
 
 		packet.addSsrc(2222);
 
-		checkPacket(packet, {
+		checkRtcpPacket(packet, {
 			...expected,
 			length: 16,
 			hasPadding: false,
@@ -202,7 +202,7 @@ describe('RTCP BYE Packet', () => {
 			padding: 8,
 		};
 
-		checkPacket(packet, expected);
+		checkRtcpPacket(packet, expected);
 
 		expect(packet.getSsrcs()).toEqual([1111]);
 		expect(packet.getReason()).toBeUndefined();
@@ -211,7 +211,7 @@ describe('RTCP BYE Packet', () => {
 
 		packet.setReason('abc');
 
-		checkPacket(packet, {
+		checkRtcpPacket(packet, {
 			...expected,
 			length: 12,
 			hasPadding: false,
@@ -324,7 +324,7 @@ describe('RTCP BYE Packet', () => {
 			padding: 0,
 		};
 
-		checkPacket(packet, expected);
+		checkRtcpPacket(packet, expected);
 
 		expect(packet.getSsrcs()).toEqual([]);
 		expect(packet.getReason()).toBeUndefined();
@@ -337,7 +337,7 @@ describe('RTCP BYE Packet', () => {
 		packet.setReason("amazing reason, isn't it?");
 		packet.addSsrc(3333);
 
-		checkPacket(packet, {
+		checkRtcpPacket(packet, {
 			...expected,
 			length: 4 + 4 + 4 + 4 + 28,
 		});
@@ -355,7 +355,7 @@ describe('RTCP BYE Packet', () => {
 
 		factoryBuffer.fill(0xff);
 
-		checkPacket(packet, {
+		checkRtcpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -375,7 +375,7 @@ describe('RTCP BYE Packet', () => {
 
 		serializeBuffer.fill(0xff);
 
-		checkPacket(clonedPacket, {
+		checkRtcpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,

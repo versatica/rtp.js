@@ -22,7 +22,10 @@ export type ExpectedPacket = {
 	padding: number;
 };
 
-export function checkPacket(packet: RtpPacket, expected: ExpectedPacket): void {
+export function checkRtpPacket(
+	packet: RtpPacket,
+	expected: ExpectedPacket
+): void {
 	const packetBuffer = packet.getBuffer();
 	const view = new DataView(
 		packetBuffer.buffer,

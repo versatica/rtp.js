@@ -15,7 +15,7 @@ export type ExpectedPacket = {
 	padding: number;
 };
 
-export function checkPacket(
+export function checkRtcpPacket(
 	packet: RtcpPacket,
 	expected: ExpectedPacket
 ): void {

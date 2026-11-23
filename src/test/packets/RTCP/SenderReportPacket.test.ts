@@ -1,7 +1,7 @@
 import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket';
 import type { ReceptionReport } from '../../../packets/RTCP/AnyReportPacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { checkPacket, type ExpectedPacket } from './rtcpCommon';
+import { checkRtcpPacket, type ExpectedPacket } from './rtcpCommon';
 import {
 	factoryBuffer,
 	serializeBuffer,
@@ -78,7 +78,7 @@ describe('RTCP Sender Report Packet', () => {
 			padding: 0,
 		};
 
-		checkPacket(packet, expected);
+		checkRtcpPacket(packet, expected);
 
 		checkFields(packet);
 
@@ -88,7 +88,7 @@ describe('RTCP Sender Report Packet', () => {
 
 		buffer.fill(0xff);
 
-		checkPacket(packet, {
+		checkRtcpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -102,7 +102,7 @@ describe('RTCP Sender Report Packet', () => {
 
 		serializeBuffer.fill(0xff);
 
-		checkPacket(clonedPacket, {
+		checkRtcpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -133,7 +133,7 @@ describe('RTCP Sender Report Packet', () => {
 		]);
 		const packet = SenderReportPacket.parse(buffer);
 
-		checkPacket(packet, {
+		checkRtcpPacket(packet, {
 			buffer: buffer,
 			bufferLength: buffer.byteLength,
 			length: 32,
@@ -228,7 +228,7 @@ describe('RTCP Sender Report Packet', () => {
 			padding: 0,
 		};
 
-		checkPacket(packet, expected);
+		checkRtcpPacket(packet, expected);
 
 		expect(packet.getSsrc()).toBe(0);
 		expect(packet.getNtp()).toEqual({ seconds: 0, fractions: 0 });
@@ -264,7 +264,7 @@ describe('RTCP Sender Report Packet', () => {
 			dlsr: 0xffffffff,
 		});
 
-		checkPacket(packet, { ...expected, length: 76 });
+		checkRtcpPacket(packet, { ...expected, length: 76 });
 
 		checkFields(packet);
 
@@ -274,7 +274,7 @@ describe('RTCP Sender Report Packet', () => {
 
 		factoryBuffer.fill(0xff);
 
-		checkPacket(packet, {
+		checkRtcpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -289,7 +289,7 @@ describe('RTCP Sender Report Packet', () => {
 
 		serializeBuffer.fill(0xff);
 
-		checkPacket(clonedPacket, {
+		checkRtcpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,

@@ -1,6 +1,6 @@
 import { RtpPacket, isRtp } from '../../../packets/RTP/RtpPacket';
 import { ExtensionType } from '../../../packets/RTP/extensions';
-import { checkPacket, type ExpectedPacket } from './rtpCommon';
+import { checkRtpPacket, type ExpectedPacket } from './rtpCommon';
 import {
 	factoryBuffer,
 	serializeBuffer,
@@ -44,7 +44,7 @@ describe('RTP Packet', () => {
 			padding: 0,
 		};
 
-		checkPacket(packet, expected);
+		checkRtpPacket(packet, expected);
 
 		/* Serialize it. */
 
@@ -52,7 +52,7 @@ describe('RTP Packet', () => {
 
 		buffer.fill(0xaa);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -64,7 +64,7 @@ describe('RTP Packet', () => {
 
 		serializeBuffer.fill(0xaa);
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -74,7 +74,7 @@ describe('RTP Packet', () => {
 
 		clonedPacket.setPayload(dataBuffer.subarray(0, 16));
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -130,7 +130,7 @@ describe('RTP Packet', () => {
 			padding: 149,
 		};
 
-		checkPacket(packet, expected);
+		checkRtpPacket(packet, expected);
 
 		/* Serialize it. */
 
@@ -138,7 +138,7 @@ describe('RTP Packet', () => {
 
 		buffer.fill(0xaa);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -150,7 +150,7 @@ describe('RTP Packet', () => {
 
 		serializeBuffer.fill(0xaa);
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -160,7 +160,7 @@ describe('RTP Packet', () => {
 
 		clonedPacket.setPayload(dataBuffer.subarray(0, 16));
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -207,7 +207,7 @@ describe('RTP Packet', () => {
 			padding: 0,
 		};
 
-		checkPacket(packet, expected);
+		checkRtpPacket(packet, expected);
 
 		/* Serialize it. */
 
@@ -215,7 +215,7 @@ describe('RTP Packet', () => {
 
 		buffer.fill(0xaa);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -227,7 +227,7 @@ describe('RTP Packet', () => {
 
 		serializeBuffer.fill(0xaa);
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -237,7 +237,7 @@ describe('RTP Packet', () => {
 
 		clonedPacket.setPayload(dataBuffer.subarray(0, 16));
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -276,7 +276,7 @@ describe('RTP Packet', () => {
 			padding: 0,
 		};
 
-		checkPacket(packet, expected);
+		checkRtpPacket(packet, expected);
 
 		expect(packet.getLength() % 4).toBe(0);
 
@@ -286,7 +286,7 @@ describe('RTP Packet', () => {
 
 		buffer.fill(0xaa);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -300,7 +300,7 @@ describe('RTP Packet', () => {
 
 		serializeBuffer.fill(0xaa);
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -312,7 +312,7 @@ describe('RTP Packet', () => {
 
 		clonedPacket.setPayload(dataBuffer.subarray(0, 16));
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -358,7 +358,7 @@ describe('RTP Packet', () => {
 			padding: 0,
 		};
 
-		checkPacket(packet, expected);
+		checkRtpPacket(packet, expected);
 
 		expect(packet.getExtension(1)).toEqual(buffer.subarray(17, 18));
 		expect(packet.getExtension(2)).toEqual(buffer.subarray(19, 21));
@@ -372,7 +372,7 @@ describe('RTP Packet', () => {
 
 		buffer.fill(0xaa);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -390,7 +390,7 @@ describe('RTP Packet', () => {
 
 		serializeBuffer.fill(0xaa);
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -406,7 +406,7 @@ describe('RTP Packet', () => {
 
 		clonedPacket.setPayload(dataBuffer.subarray(0, 16));
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -451,7 +451,7 @@ describe('RTP Packet', () => {
 			padding: 0,
 		};
 
-		checkPacket(packet, expected);
+		checkRtpPacket(packet, expected);
 
 		expect(packet.getExtension(1)?.byteLength).toBe(0);
 		expect(packet.getExtension(2)).toEqual(buffer.subarray(22, 23));
@@ -466,7 +466,7 @@ describe('RTP Packet', () => {
 
 		buffer.fill(0xaa);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -485,7 +485,7 @@ describe('RTP Packet', () => {
 
 		serializeBuffer.fill(0xaa);
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -502,7 +502,7 @@ describe('RTP Packet', () => {
 
 		clonedPacket.setPayload(dataBuffer.subarray(0, 15));
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -545,7 +545,7 @@ describe('RTP Packet', () => {
 			padding: 8,
 		};
 
-		checkPacket(packet, expected);
+		checkRtpPacket(packet, expected);
 
 		expect(packet.getLength() % 4).toBe(0);
 
@@ -555,7 +555,7 @@ describe('RTP Packet', () => {
 
 		buffer.fill(0xaa);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -569,7 +569,7 @@ describe('RTP Packet', () => {
 
 		serializeBuffer.fill(0xaa);
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -581,7 +581,7 @@ describe('RTP Packet', () => {
 
 		clonedPacket.setPayload(dataBuffer.subarray(0, 1));
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -599,7 +599,7 @@ describe('RTP Packet', () => {
 
 		clonedPacket.padTo4Bytes();
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expected,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -785,7 +785,7 @@ describe('RTP Packet', () => {
 			padding: 0,
 		};
 
-		checkPacket(packet, expected);
+		checkRtpPacket(packet, expected);
 
 		expect(packet.getLength() % 4).toBe(0);
 
@@ -840,7 +840,7 @@ describe('RTP Packet', () => {
 			padding: 2,
 		};
 
-		checkPacket(packet, expectedWithExtensions);
+		checkRtpPacket(packet, expectedWithExtensions);
 
 		expect(packet.getExtension(1)).toEqual(new Uint8Array([11]));
 		expect(packet.getExtension(2)).toEqual(new Uint8Array([22, 0xaa]));
@@ -854,7 +854,7 @@ describe('RTP Packet', () => {
 
 		factoryBuffer.fill(0xaa);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expectedWithExtensions,
 			buffer: serializeBuffer,
 			bufferLength: serializeBuffer.byteLength,
@@ -872,7 +872,7 @@ describe('RTP Packet', () => {
 
 		serializeBuffer.fill(0xaa);
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expectedWithExtensions,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -890,7 +890,7 @@ describe('RTP Packet', () => {
 
 		clonedPacket.setPayload(dataBuffer.subarray(0, 1));
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expectedWithExtensions,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -913,7 +913,7 @@ describe('RTP Packet', () => {
 
 		clonedPacket.padTo4Bytes();
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expectedWithExtensions,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -936,7 +936,7 @@ describe('RTP Packet', () => {
 
 		clonedPacket.clearExtensions();
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expectedWithExtensions,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -963,7 +963,7 @@ describe('RTP Packet', () => {
 		clonedPacket.setExtension(2, dataBuffer.subarray(1, 3));
 		clonedPacket.setExtension(14, dataBuffer.subarray(3, 6));
 
-		checkPacket(clonedPacket, {
+		checkRtpPacket(clonedPacket, {
 			...expectedWithExtensions,
 			buffer: cloneBuffer,
 			bufferLength: cloneBuffer.byteLength,
@@ -1229,7 +1229,7 @@ describe('RTP Packet', () => {
 		packet.setExtension(9, d.subarray(0, 9));
 		packet.setExtension(100, d.subarray(0, 10));
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: 12 + 4 + 72 + 10 + 2,
@@ -1373,7 +1373,7 @@ describe('RTP Packet', () => {
 
 		const packet = RtpPacket.parse(factoryBuffer, buffer.byteLength);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			buffer: factoryBuffer,
 			bufferLength: factoryBuffer.byteLength,
 			length: buffer.byteLength,
@@ -1661,13 +1661,13 @@ describe('RTP Packet', () => {
 		packet.setPayload(payload);
 		packet.padTo4Bytes();
 
-		checkPacket(packet, expected);
+		checkRtpPacket(packet, expected);
 
 		/* Set a bigger payload. */
 
 		packet.setPayload(new Uint8Array(501));
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			length: 12 + 501,
 			payloadLength: 501,
@@ -1680,7 +1680,7 @@ describe('RTP Packet', () => {
 		// This method removes padding.
 		packet.removePayload();
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			length: 12,
 			hasPayload: false,
@@ -1762,7 +1762,7 @@ describe('RTP Packet', () => {
 			padding: 2,
 		};
 
-		checkPacket(packet, expected);
+		checkRtpPacket(packet, expected);
 
 		expect(packet.getExtension(1)).toEqual(extension1);
 		expect(packet.getExtension(2)).toEqual(extension2);
@@ -1785,7 +1785,7 @@ describe('RTP Packet', () => {
 			0x88, 0x99, 0xaa,
 		]);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			length: 12 + 16 + 10 + 1,
 			payloadLength: 11,
@@ -1814,7 +1814,7 @@ describe('RTP Packet', () => {
 			0x77, 0x88, 0x99, 0xaa,
 		]);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			length: 12 + 16 + 10 - 2,
 			payloadLength: 8,
@@ -1915,7 +1915,7 @@ describe('RTP Packet', () => {
 			padding: 2,
 		};
 
-		checkPacket(packet, expected);
+		checkRtpPacket(packet, expected);
 
 		expect(packet.getLength() % 4).toBe(0);
 
@@ -1924,7 +1924,7 @@ describe('RTP Packet', () => {
 		// This method removes padding.
 		packet.rtxEncode(111, 999999, 666);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			length: 12 + 10 + 2,
 			payloadType: 111,
@@ -1942,7 +1942,7 @@ describe('RTP Packet', () => {
 		// This method removes padding.
 		expect(packet.rtxDecode(100, 1234567890)).toBe(true);
 
-		checkPacket(packet, {
+		checkRtpPacket(packet, {
 			...expected,
 			length: 12 + 10,
 			hasPadding: false,
