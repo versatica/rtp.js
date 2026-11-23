@@ -4,8 +4,6 @@ import { padTo4Bytes } from '../../utils/buffers';
 
 /**
  * Length (in bytes) of the Extended Report block header.
- *
- * @internal
  */
 export const EXTENDED_REPORT_HEADER_LENGTH = 4;
 
@@ -48,8 +46,6 @@ export type ExtendedReportDump = SerializableDump & {
  *
  * @param buffer - Buffer holding the Extended Report block. Its `byteLength`
  *   can be greater than the length of the Extended Report block.
- *
- * @internal
  */
 export function isExtendedReport(buffer: Uint8Array): boolean {
 	if (buffer.byteLength < EXTENDED_REPORT_HEADER_LENGTH) {

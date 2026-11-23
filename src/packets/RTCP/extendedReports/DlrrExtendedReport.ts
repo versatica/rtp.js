@@ -24,12 +24,22 @@ export type DlrrSubBlock = {
 	 * Last RR timestamp (LRR): The middle 32 bits of the NTP timestamp received
 	 * in the last Receiver Reference Time Report Block from the receiver (0 if
 	 * none was received).
+	 *
+	 * @see
+	 * - {@link utils!ntpToCompactNtp} to obtain it from the NTP timestamp.
+	 * - {@link utils!compactNtpRttToTimeUs} to convert the round trip time
+	 *   computed with it into microseconds.
 	 */
 	lastReceiverReport: number;
 	/**
 	 * Delay since last RR (DLRR): Delay, in units of 1/65536 seconds, between
 	 * receiving the last Receiver Reference Time Report Block from the receiver
 	 * and sending this DLRR Report Block (0 if none was received).
+	 *
+	 * @see
+	 * - {@link utils!timeUsToCompactNtpInterval} and
+	 *   {@link utils!compactNtpIntervalToTimeUs} to convert it from and into
+	 *   microseconds.
 	 */
 	delaySinceLastReceiverReport: number;
 };

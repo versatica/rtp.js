@@ -192,6 +192,9 @@ export class SenderReportPacket extends AnyReportPacket {
 
 	/**
 	 * Get the NTP timestamp.
+	 *
+	 * @see
+	 * - {@link utils!ntpToTimeUs} to convert it into microseconds.
 	 */
 	getNtp(): Ntp {
 		const view = this.getView();
@@ -208,6 +211,9 @@ export class SenderReportPacket extends AnyReportPacket {
 	 * @throws
 	 * - `TypeError` if `seconds` or `fractions` is not an integer between 0 and
 	 *   4294967295.
+	 *
+	 * @see
+	 * - {@link utils!timeUsToNtp} to convert microseconds into it.
 	 */
 	setNtp(ntp: Ntp): void {
 		if (

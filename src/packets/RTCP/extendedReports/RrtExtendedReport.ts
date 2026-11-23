@@ -124,6 +124,9 @@ export class RrtExtendedReport extends ExtendedReport {
 
 	/**
 	 * Get the NTP timestamp.
+	 *
+	 * @see
+	 * - {@link utils!ntpToTimeUs} to convert it into microseconds.
 	 */
 	getNtp(): Ntp {
 		const view = this.getView();
@@ -140,6 +143,9 @@ export class RrtExtendedReport extends ExtendedReport {
 	 * @throws
 	 * - `TypeError` if `ntp.seconds` or `ntp.fractions` is not an integer
 	 *   between 0 and 4294967295.
+	 *
+	 * @see
+	 * - {@link utils!timeUsToNtp} to convert microseconds into it.
 	 */
 	setNtp(ntp: Ntp): void {
 		if (

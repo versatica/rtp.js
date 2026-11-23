@@ -196,12 +196,20 @@ export type PlayoutDelayExtension = {
 export type AbsCaptureTimeExtension = {
 	/**
 	 * Capture time in NTP format (unsigned Q32.32).
+	 *
+	 * @see
+	 * - {@link utils!timeUsToNtp} and {@link utils!ntpToTimeUs} to convert it
+	 *   from and into microseconds.
 	 */
 	absCaptureTimestamp: Ntp;
 
 	/**
 	 * Estimated offset between the capture clock and the sender clock (signed
 	 * Q32.32, so `seconds` is a signed 32 bits value).
+	 *
+	 * @see
+	 * - {@link utils!timeUsToQ32x32} and {@link utils!q32x32ToTimeUs} to
+	 *   convert it from and into microseconds.
 	 */
 	estimatedCaptureClockOffset?: Ntp;
 };

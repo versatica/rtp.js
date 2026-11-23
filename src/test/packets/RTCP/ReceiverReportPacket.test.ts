@@ -1,8 +1,5 @@
 import { ReceiverReportPacket } from '../../../packets/RTCP/ReceiverReportPacket';
-import {
-	MAX_REPORTS,
-	type ReceptionReport,
-} from '../../../packets/RTCP/AnyReportPacket';
+import { type ReceptionReport } from '../../../packets/RTCP/AnyReportPacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
 import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
 import {
@@ -11,6 +8,10 @@ import {
 	cloneBuffer,
 	resetBuffers,
 } from '../../testHelpers';
+
+// Maximum number of reception report blocks in a packet (the RC field has 5
+// bits).
+const MAX_REPORTS = 31;
 
 beforeEach(resetBuffers);
 

@@ -7,6 +7,8 @@ export function padTo4Bytes(size: number): number {
 
 /**
  * Whether two buffers contain the same data.
+ *
+ * @internal Exported only for the tests.
  */
 export function areBuffersEqual(
 	buffer1: Uint8Array,

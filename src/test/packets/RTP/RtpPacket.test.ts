@@ -1084,6 +1084,27 @@ describe('RTP Packet', () => {
 		);
 	});
 
+	test('rtpPacket.setExtensionsForm() rewrites the extensions of a packet in a Node.js Buffer', () => {
+		// NOTE: Values of the extensions are views over the buffer of the packet,
+		// so they are Node.js Buffers too, whose slice() doesn't copy.
+		const packet = RtpPacket.factory(Buffer.alloc(1500));
+
+		packet.setExtension(1, new Uint8Array([0x11, 0x22]));
+		packet.setExtension(2, new Uint8Array([0xaa, 0xbb, 0xcc, 0xdd]));
+		packet.setExtension(3, new Uint8Array([0x77, 0x88]));
+
+		// Each extension header grows by 1 byte, so each extension is written
+		// over the bytes of the next one, before they are copied.
+		packet.setExtensionsForm('two-byte');
+
+		expect(packet.getExtensionsForm()).toBe('two-byte');
+		expect(Array.from(packet.getExtension(1)!)).toEqual([0x11, 0x22]);
+		expect(Array.from(packet.getExtension(2)!)).toEqual([
+			0xaa, 0xbb, 0xcc, 0xdd,
+		]);
+		expect(Array.from(packet.getExtension(3)!)).toEqual([0x77, 0x88]);
+	});
+
 	test('Packet extension setters and getters succeed', () => {
 		const packet = RtpPacket.factory(factoryBuffer);
 

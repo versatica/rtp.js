@@ -4,8 +4,6 @@ import { isUnsignedInteger } from '../../utils/numbers';
 /**
  * Length (in bytes) of the common header of every feedback packet, RTCP
  * Common Header included.
- *
- * @internal
  */
 export const FEEDBACK_HEADER_LENGTH = 12;
 

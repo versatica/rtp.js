@@ -2,9 +2,11 @@ import {
 	timeUsToNtp,
 	ntpToTimeUs,
 	ntpToCompactNtp,
+	timeUsToCompactNtpInterval,
 	compactNtpIntervalToTimeUs,
 	compactNtpRttToTimeUs,
 	timeUsToAbsSendTime,
+	absSendTimeToTimeUs,
 	timeUsToQ32x32,
 	q32x32ToTimeUs,
 } from '../../utils/time';
@@ -64,6 +66,29 @@ test('ntpToCompactNtp()', () => {
 
 	// One second and a half in 1/65536 seconds units.
 	expect(ntpToCompactNtp(timeUsToNtp(1500000))).toBe(0x18000);
+});
+
+test('timeUsToCompactNtpInterval()', () => {
+	// Converts negative to zero.
+	expect(timeUsToCompactNtpInterval(-1)).toBe(0);
+	expect(timeUsToCompactNtpInterval(0)).toBe(0);
+
+	// Converts values just above and just below max uint32_t.
+	expect(timeUsToCompactNtpInterval(65536000000)).toBe(0xffffffff);
+	expect(timeUsToCompactNtpInterval(65535999985)).toBe(0xffffffff);
+	expect(timeUsToCompactNtpInterval(65535999970)).toBe(0xfffffffe);
+
+	// Converts half-seconds.
+	expect(timeUsToCompactNtpInterval(500000)).toBe(0x8000);
+	expect(timeUsToCompactNtpInterval(1000000)).toBe(0x10000);
+	expect(timeUsToCompactNtpInterval(1500000)).toBe(0x18000);
+
+	// Convert us -> compact NTP -> us. Compact NTP precision is ~15us.
+	for (const us of [1516, 15000, 5485, 5515]) {
+		expect(
+			Math.abs(compactNtpRttToTimeUs(timeUsToCompactNtpInterval(us)) - us)
+		).toBeLessThanOrEqual(16);
+	}
 });
 
 test('compactNtpIntervalToTimeUs()', () => {
@@ -169,6 +194,25 @@ test('timeUsToAbsSendTime()', () => {
 		timeUsToAbsSendTime(wrapPeriodUs - 1000000)
 	);
 	expect(timeUsToAbsSendTime(-wrapPeriodUs)).toBe(0);
+});
+
+test('absSendTimeToTimeUs()', () => {
+	// A whole second is the fractional unit itself, being the format 6.18 fixed
+	// point seconds.
+	expect(absSendTimeToTimeUs(262144)).toBe(1000000);
+	expect(absSendTimeToTimeUs(393216)).toBe(1500000);
+	expect(absSendTimeToTimeUs(0)).toBe(0);
+	// The result is truncated, being the resolution 1/262144 of a second.
+	expect(absSendTimeToTimeUs(1)).toBe(3);
+	// The highest value is right below the 64 seconds of the wrap period.
+	expect(absSendTimeToTimeUs(0xffffff)).toBe(63999996);
+
+	// Convert us -> abs-send-time -> us. Resolution is ~3.8us.
+	for (const us of [1, 1000, 123456, 1000000, 63999990]) {
+		expect(
+			Math.abs(absSendTimeToTimeUs(timeUsToAbsSendTime(us)) - us)
+		).toBeLessThanOrEqual(4);
+	}
 });
 
 test('timeUsToQ32x32()', () => {

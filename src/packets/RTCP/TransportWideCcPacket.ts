@@ -17,10 +17,8 @@ import {
 
 /**
  * Receive deltas are expressed in multiples of this (in microseconds).
- *
- * @internal
  */
-export const DELTA_TICK_US = 250;
+const DELTA_TICK_US = 250;
 
 /**
  * The reference time is expressed in multiples of this (in microseconds).

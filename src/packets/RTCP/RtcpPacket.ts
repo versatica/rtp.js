@@ -10,8 +10,6 @@ import {
 
 /**
  * Length (in bytes) of the RTCP Common Header.
- *
- * @internal
  */
 export const COMMON_HEADER_LENGTH = 4;
 

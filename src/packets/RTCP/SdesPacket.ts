@@ -10,10 +10,8 @@ import { padTo4Bytes } from '../../utils/buffers';
 
 /**
  * Maximum number of chunks in a SDES packet (the SC field has 5 bits).
- *
- * @internal
  */
-export const MAX_CHUNKS = 31;
+const MAX_CHUNKS = 31;
 
 /**
  * Maximum length (in bytes) of the text of a SDES item.

@@ -1,7 +1,4 @@
-import {
-	TransportWideCcPacket,
-	DELTA_TICK_US,
-} from '../../../packets/RTCP/TransportWideCcPacket';
+import { TransportWideCcPacket } from '../../../packets/RTCP/TransportWideCcPacket';
 import { TransportLayerFeedbackMessageType } from '../../../packets/RTCP/AnyTransportLayerFeedbackPacket';
 import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
 import { areBuffersEqual, padTo4Bytes } from '../../../utils/buffers';
@@ -26,6 +23,9 @@ const SMALL_DELTA_SIZE = 1;
 
 // Length (in bytes) of a large receive delta.
 const LARGE_DELTA_SIZE = 2;
+
+// Receive deltas are expressed in multiples of this (in microseconds).
+const DELTA_TICK_US = 250;
 
 // Largest receive delta (in microseconds) that fits in a small receive delta.
 const DELTA_LIMIT_US = 0xff * DELTA_TICK_US;

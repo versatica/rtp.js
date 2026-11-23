@@ -6,8 +6,6 @@
  *   later read fails too and {@link ok} returns `false`. Parsers can read all
  *   the fields and check {@link ok} once at the end.
  * - Reads of up to 32 bits are supported.
- *
- * @internal
  */
 export class BitstreamReader {
 	readonly #bytes: Uint8Array;

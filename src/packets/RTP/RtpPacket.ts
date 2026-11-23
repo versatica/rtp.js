@@ -841,6 +841,9 @@ export class RtpPacket extends Serializable {
 	/**
 	 * Read the value of the {@link ExtensionType.ABS_SEND_TIME} RTP
 	 * extension, which is the raw 3 bytes unsigned integer stored in it.
+	 *
+	 * @see
+	 * - {@link utils!absSendTimeToTimeUs} to convert it into microseconds.
 	 */
 	getAbsSendTimeExtension(): number | undefined {
 		const extension = this.#findMappedExtension(ExtensionType.ABS_SEND_TIME);
@@ -861,6 +864,9 @@ export class RtpPacket extends Serializable {
 	 * - `Error` if the extension type is not in the extension mapping.
 	 * - `TypeError` if `absSendTime` is not an integer between 0 and 16777215.
 	 * - Same as {@link setExtension}.
+	 *
+	 * @see
+	 * - {@link utils!timeUsToAbsSendTime} to convert microseconds into it.
 	 */
 	setAbsSendTimeExtension(absSendTime?: number): void {
 		let value: Uint8Array | undefined;
@@ -1791,9 +1797,10 @@ export class RtpPacket extends Serializable {
 		const headerExtensionValueLength = padTo4Bytes(extensionsLength);
 
 		// NOTE: Values are views over the area that is going to be rewritten, so
-		// they must be copied first.
+		// they must be copied first. `slice()` is not used since it doesn't copy
+		// if the buffer of the packet is a Node.js Buffer.
 		const values = extensions.map(
-			([id, value]) => [id, value.slice()] as const
+			([id, value]) => [id, new Uint8Array(value)] as const
 		);
 
 		// NOTE: This throws if there is no space in the buffer.

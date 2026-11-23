@@ -3,8 +3,6 @@
  *
  * @remarks
  * - Writes of up to 32 bits are supported.
- *
- * @internal
  */
 export class BitBufferWriter {
 	readonly #bytes: Uint8Array;

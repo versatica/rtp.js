@@ -203,6 +203,10 @@ function lint() {
 
 	executeCmd(`prettier --check ${prettierFiles}`);
 	executeCmd('knip --config knip.config.mjs --treat-config-hints-as-errors');
+	// NOTE: Exports only used by tests are reported in production mode.
+	executeCmd(
+		'knip --config knip.config.mjs --production --treat-config-hints-as-errors'
+	);
 }
 
 function format() {

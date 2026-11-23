@@ -1,7 +1,10 @@
 /** @type {import('knip').KnipConfig} */
 const config = {
 	$schema: 'https://unpkg.com/knip@6/schema.json',
-	project: ['src/**/*.ts'],
+	// NOTE: The `!` suffix marks production files, so `knip --production`
+	// reports exports that are only used by tests.
+	entry: ['src/**/public.ts!'],
+	project: ['src/**/*.ts!'],
 	// TODO: Remove these files from here once they are used.
 	ignore: ['src/Logger.ts', 'src/enhancedEvents.ts'],
 	ignoreDependencies: [

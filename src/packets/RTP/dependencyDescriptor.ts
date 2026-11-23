@@ -300,8 +300,6 @@ export function getDependencyDescriptorDecodeTargetLayers(
 
 /**
  * Read the mandatory descriptor fields of the given Dependency Descriptor.
- *
- * @internal
  */
 export function readDependencyDescriptorMandatoryFields(
 	data: Uint8Array
@@ -326,8 +324,6 @@ export function readDependencyDescriptorMandatoryFields(
  *   (its template dependency structure and its frame number).
  *
  * @returns `undefined` if the descriptor is malformed.
- *
- * @internal
  */
 export function readDependencyDescriptor(
 	data: Uint8Array,
@@ -520,8 +516,6 @@ export function readDependencyDescriptor(
  * @throws
  * - `TypeError` if the descriptor or the structure is not valid or if the
  *   descriptor cannot be represented.
- *
- * @internal
  */
 export function writeDependencyDescriptor(
 	descriptor: Omit<DependencyDescriptorExtension, 'isKeyFrame'>,

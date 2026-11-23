@@ -15,6 +15,8 @@ export function readBit(value: number, bit: number): boolean {
 
 /**
  * Write `flag` in `bit` position of `value` and return updated value.
+ *
+ * @internal Exported only for the tests.
  */
 export function writeBit(value: number, bit: number, flag: boolean): number {
 	if (flag) {
@@ -26,6 +28,8 @@ export function writeBit(value: number, bit: number, flag: boolean): number {
 
 /**
  * Toggle value of `bit` position of `value` and return updated value.
+ *
+ * @internal Exported only for the tests.
  */
 export function toggleBit(value: number, bit: number): number {
 	return value ^ (1 << bit);
@@ -43,6 +47,8 @@ export function readBits(byte: number, mask: number): number {
 /**
  * Write `value` in the enabled bits of `mask` of byte `byte` and return
  * updated value.
+ *
+ * @internal Exported only for the tests.
  */
 export function writeBits(byte: number, mask: number, value: number): number {
 	const inverseMask = mask ^ 0b11111111;
@@ -76,6 +82,8 @@ export function writeBitInDataView(
 
 /**
  * Toggle value of `bit` position of byte `pos` in `view`.
+ *
+ * @internal Exported only for the tests.
  */
 export function toggleBitInDataView(
 	view: DataView,

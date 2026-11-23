@@ -7,18 +7,14 @@ import {
 
 /**
  * Length (in bytes) of a reception report block.
- *
- * @internal
  */
 export const REPORT_LENGTH = 24;
 
 /**
  * Maximum number of reception report blocks in a packet (the RC field has 5
  * bits).
- *
- * @internal
  */
-export const MAX_REPORTS = 31;
+const MAX_REPORTS = 31;
 
 /**
  * Minimum value of the cumulative number of packets lost (24 bits signed
@@ -58,11 +54,24 @@ export type ReceptionReport = {
 	 */
 	jitter: number;
 	/**
-	 * Last SR timestamp (LSR).
+	 * Last SR timestamp (LSR): The middle 32 bits of the NTP timestamp of the
+	 * last Sender Report received from the source (0 if none was received).
+	 *
+	 * @see
+	 * - {@link utils!ntpToCompactNtp} to obtain it from the NTP timestamp.
+	 * - {@link utils!compactNtpRttToTimeUs} to convert the round trip time
+	 *   computed with it into microseconds.
 	 */
 	lsr: number;
 	/**
-	 * Delay since last SR (DLSR).
+	 * Delay since last SR (DLSR): Delay, in units of 1/65536 seconds, between
+	 * receiving the last Sender Report from the source and sending this
+	 * reception report block (0 if none was received).
+	 *
+	 * @see
+	 * - {@link utils!timeUsToCompactNtpInterval} and
+	 *   {@link utils!compactNtpIntervalToTimeUs} to convert it from and into
+	 *   microseconds.
 	 */
 	dlsr: number;
 };
