@@ -285,9 +285,9 @@ export class CompoundPacket extends Serializable {
 	 * @throws
 	 * - `Error` if some packet is being built in place within the compound
 	 *   packet, or within the given packet (see {@link needsConsolidation}).
-	 * - `TypeError` if the given packet lives where it would be cloned (in the
-	 *   free space of the buffer of the compound packet), in which case nothing
-	 *   changes.
+	 * - `TypeError` if the buffer of the given packet shares memory with the
+	 *   position where it would be cloned (in the free space of the buffer of
+	 *   the compound packet), in which case nothing changes.
 	 * - `TypeError` if the buffer has no space for the packet, in which case
 	 *   nothing changes.
 	 */
@@ -312,11 +312,11 @@ export class CompoundPacket extends Serializable {
 		// throw once the length of the compound packet has been updated.
 		if (
 			packetBuffer.buffer === view.buffer &&
-			byteOffset < packetBuffer.byteOffset + packetLength &&
+			byteOffset < packetBuffer.byteOffset + packet.getBufferLength() &&
 			packetBuffer.byteOffset < byteOffset + packetLength
 		) {
 			throw new TypeError(
-				'given packet overlaps the position where it would be cloned'
+				'buffer of given packet shares memory with the position where it would be cloned'
 			);
 		}
 

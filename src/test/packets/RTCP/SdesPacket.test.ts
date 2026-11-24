@@ -574,4 +574,38 @@ describe('RTCP SDES Packet', () => {
 		expect(length).toBe(28);
 		expect(packet.getLength()).toBe(length);
 	});
+
+	test('sdesPacket.getChunks() keeps a leading byte order mark', () => {
+		// prettier-ignore
+		const buffer = new Uint8Array([
+			// V=2, P=0, SC=1, PT:202, Length: 3
+			0b10000001, 0xca, 0x00, 0x03,
+			// SSRC: 1
+			0x00, 0x00, 0x00, 0x01,
+			// Item Type: 1 (CNAME), Length: 4, Text: U+FEFF (byte order mark)
+			0x01, 0x04, 0xef, 0xbb,
+			// Text: 'a', null octet, padding
+			0xbf, 0x61, 0x00, 0x00,
+		]);
+		const packet = SdesPacket.parse(buffer);
+
+		expect(packet.getChunks()).toEqual([
+			{
+				ssrc: 1,
+				items: [
+					{
+						type: SdesItemType.CNAME,
+						text: `${String.fromCharCode(0xfeff)}a`,
+					},
+				],
+			},
+		]);
+
+		// Writing it back gives the same bytes.
+		const packet2 = SdesPacket.factory(factoryBuffer);
+
+		packet2.setChunks(packet.getChunks());
+
+		expect(Array.from(packet2.getBuffer())).toEqual(Array.from(buffer));
+	});
 });

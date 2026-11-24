@@ -6,7 +6,7 @@ import {
 	type ExtendedReportDump,
 } from '../ExtendedReport';
 import type { Ntp } from '../../../utils/types';
-import { isUnsignedInteger } from '../../../utils/numbers';
+import { isUnsignedInteger32 } from '../../../utils/numbers';
 
 /**
  * Length (in bytes) of the Receiver Reference Time Report Block.
@@ -149,8 +149,8 @@ export class RrtExtendedReport extends ExtendedReport {
 	 */
 	setNtp(ntp: Ntp): void {
 		if (
-			!isUnsignedInteger(ntp.seconds, 0xffffffff) ||
-			!isUnsignedInteger(ntp.fractions, 0xffffffff)
+			!isUnsignedInteger32(ntp.seconds) ||
+			!isUnsignedInteger32(ntp.fractions)
 		) {
 			throw new TypeError(
 				'ntp seconds and fractions must be integers between 0 and 4294967295'

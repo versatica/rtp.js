@@ -9,7 +9,7 @@ import {
 	AnyTransportLayerFeedbackPacket,
 	TransportLayerFeedbackMessageType,
 } from './AnyTransportLayerFeedbackPacket';
-import { isUnsignedInteger } from '../../utils/numbers';
+import { isUnsignedInteger16 } from '../../utils/numbers';
 
 /**
  * Length (in bytes) of a NACK item.
@@ -287,11 +287,11 @@ export class NackPacket extends AnyTransportLayerFeedbackPacket {
 	 *   65535.
 	 */
 	#assertItem(item: NackItem): void {
-		if (!isUnsignedInteger(item.pid, 0xffff)) {
+		if (!isUnsignedInteger16(item.pid)) {
 			throw new TypeError(
 				`pid (${item.pid}) must be an integer between 0 and 65535`
 			);
-		} else if (!isUnsignedInteger(item.bitmask, 0xffff)) {
+		} else if (!isUnsignedInteger16(item.bitmask)) {
 			throw new TypeError(
 				`bitmask (${item.bitmask}) must be an integer between 0 and 65535`
 			);

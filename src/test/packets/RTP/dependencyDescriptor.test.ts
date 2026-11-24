@@ -10,6 +10,7 @@ import {
 } from '../../../packets/RTP/dependencyDescriptor';
 import { RtpPacket } from '../../../packets/RTP/RtpPacket';
 import { ExtensionType } from '../../../packets/RTP/extensions';
+import { writeBit } from '../../../utils/bits';
 import { factoryBuffer, resetBuffers } from '../../testHelpers';
 
 const { NOT_PRESENT, DISCARDABLE, SWITCH, REQUIRED } =
@@ -481,6 +482,14 @@ describe('Dependency Descriptor', () => {
 	});
 
 	test('a new template dependency structure replaces the previous one', () => {
+		// Key frame of an L1T2 stream, frame number 242.
+		// prettier-ignore
+		const newKeyFrame = new Uint8Array([
+			0x80, 0x00, 0xf2, 0x80,
+			0x01, 0x1e, 0xa8, 0x51,
+			0x41, 0x01, 0x0c, 0x13,
+			0xfc, 0x0b, 0x3c,
+		]);
 		const context = new DependencyDescriptorContext();
 		const first = readDependencyDescriptor(
 			L1T2_KEY_FRAME,
@@ -493,7 +502,7 @@ describe('Dependency Descriptor', () => {
 
 		// A second key frame comes with its own structure.
 		const second = readDependencyDescriptor(
-			L1T2_KEY_FRAME,
+			newKeyFrame,
 			context,
 			/* updateContext */ true
 		);
@@ -651,15 +660,22 @@ describe('Dependency Descriptor', () => {
 		).toBeDefined();
 		expect(context.getStructure()).toBe(newStructure);
 
-		// Neither does a newer one that is not in the first packet of its frame.
+		// Neither does a newer one that is not in the first packet of its frame,
+		// which is a malformed descriptor since only the first packet can carry
+		// it. Nothing in the context changes.
+		const activeDecodeTargetsBitmask = context.getActiveDecodeTargetsBitmask();
+
 		expect(
 			readDependencyDescriptor(
 				newestKeyFrameNotStartOfFrame,
 				context,
 				/* updateContext */ true
 			)
-		).toBeDefined();
+		).toBeUndefined();
 		expect(context.getStructure()).toBe(newStructure);
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(
+			activeDecodeTargetsBitmask
+		);
 	});
 
 	/* Own tests. */
@@ -762,17 +778,25 @@ describe('Dependency Descriptor', () => {
 
 		// The key frame carrying the structure makes all decode targets active.
 		expect(keyFrame!.activeDecodeTargetsBitmask).toBe(0b11);
-		expect(read(233)!.activeDecodeTargetsBitmask).toBe(0b11);
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b11);
+
+		// A descriptor only gives the bitmask it carries.
+		expect(read(233)!.activeDecodeTargetsBitmask).toBeUndefined();
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b11);
 
 		// A frame carrying a bitmask changes it.
 		expect(read(234, 0b01)!.activeDecodeTargetsBitmask).toBe(0b01);
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b01);
 
 		// It's valid for the following frames that don't carry one.
-		expect(read(235)!.activeDecodeTargetsBitmask).toBe(0b01);
+		expect(read(235)!.activeDecodeTargetsBitmask).toBeUndefined();
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b01);
 
 		// A bitmask carried by an older frame doesn't replace it.
 		expect(read(233, 0b11)!.activeDecodeTargetsBitmask).toBe(0b11);
-		expect(read(236)!.activeDecodeTargetsBitmask).toBe(0b01);
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b01);
+		expect(read(236)!.activeDecodeTargetsBitmask).toBeUndefined();
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b01);
 
 		// A new structure makes all decode targets active again.
 		// prettier-ignore
@@ -787,7 +811,170 @@ describe('Dependency Descriptor', () => {
 			readDependencyDescriptor(newKeyFrame, context, /* updateContext */ true)!
 				.activeDecodeTargetsBitmask
 		).toBe(0b11);
-		expect(read(257)!.activeDecodeTargetsBitmask).toBe(0b11);
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b11);
+		expect(read(257)!.activeDecodeTargetsBitmask).toBeUndefined();
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b11);
+	});
+
+	test('a retransmitted first packet of the key frame does not reset the active decode targets bitmask', () => {
+		const context = new DependencyDescriptorContext();
+		const keyFrame = readDependencyDescriptor(
+			L1T2_KEY_FRAME,
+			context,
+			/* updateContext */ true
+		);
+		const structure = keyFrame!.attachedStructure!;
+		// Next frame, frame number 233, carrying bitmask 0b01.
+		const data = writeDependencyDescriptor(
+			{
+				...createDescriptor(structure.templates[0]!),
+				frameNumber: 233,
+				activeDecodeTargetsBitmask: 0b01,
+			},
+			structure,
+			ALL_CHAINS_ACTIVE
+		);
+
+		expect(
+			readDependencyDescriptor(data.slice(), context, /* updateContext */ true)
+		).toBeDefined();
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b01);
+
+		// The first packet of the key frame comes again.
+		expect(
+			readDependencyDescriptor(
+				L1T2_KEY_FRAME,
+				context,
+				/* updateContext */ true
+			)
+		).toBeDefined();
+		expect(context.getStructure()).toBe(structure);
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b01);
+	});
+
+	test('a delayed first packet of the key frame does not replace a newer active decode targets bitmask', () => {
+		// Key frame of an L1T2 stream, frame number 242.
+		// prettier-ignore
+		const newKeyFrame = new Uint8Array([
+			0x80, 0x00, 0xf2, 0x80,
+			0x01, 0x1e, 0xa8, 0x51,
+			0x41, 0x01, 0x0c, 0x13,
+			0xfc, 0x0b, 0x3c,
+		]);
+		const context = new DependencyDescriptorContext();
+		const keyFrame = readDependencyDescriptor(
+			L1T2_KEY_FRAME,
+			context,
+			/* updateContext */ true
+		);
+		const structure = keyFrame!.attachedStructure!;
+		// Frame number 243, after the new key frame, carrying bitmask 0b01. It
+		// arrives before the first packet of the new key frame.
+		const data = writeDependencyDescriptor(
+			{
+				...createDescriptor(structure.templates[0]!),
+				frameNumber: 243,
+				activeDecodeTargetsBitmask: 0b01,
+			},
+			structure,
+			ALL_CHAINS_ACTIVE
+		);
+
+		expect(
+			readDependencyDescriptor(data.slice(), context, /* updateContext */ true)
+		).toBeDefined();
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b01);
+
+		// The first packet of the new key frame hands its structure over, but the
+		// bitmask of the newer frame is kept.
+		expect(
+			readDependencyDescriptor(newKeyFrame, context, /* updateContext */ true)
+		).toBeDefined();
+		expect(context.getStructure()).not.toBe(structure);
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b01);
+	});
+
+	test('a descriptor carrying a structure in a packet that is not the first one of its frame is malformed', () => {
+		const context = new DependencyDescriptorContext();
+		const keyFrame = readDependencyDescriptor(
+			L1T2_KEY_FRAME,
+			context,
+			/* updateContext */ true
+		);
+		const structure = keyFrame!.attachedStructure!;
+		// Frame number 260, carrying a structure and bitmask 0b01.
+		const data = writeDependencyDescriptor(
+			{
+				...createDescriptor(structure.templates[0]!),
+				frameNumber: 260,
+				activeDecodeTargetsBitmask: 0b01,
+				attachedStructure: structure,
+			},
+			structure,
+			ALL_CHAINS_ACTIVE
+		).slice();
+
+		// Clear the start_of_frame bit, so it's not in the first packet of its
+		// frame (the writer doesn't allow writing it).
+		data[0] = writeBit(data[0]!, 7, false);
+
+		expect(
+			readDependencyDescriptor(data, context, /* updateContext */ true)
+		).toBeUndefined();
+		// Nothing in the context changes.
+		expect(context.getStructure()).toBe(structure);
+		expect(context.getActiveDecodeTargetsBitmask()).toBe(0b11);
+	});
+
+	test('a descriptor carrying a structure in a packet that is not the first one of its frame cannot be written', () => {
+		const context = new DependencyDescriptorContext();
+		const keyFrame = readDependencyDescriptor(
+			L1T2_KEY_FRAME,
+			context,
+			/* updateContext */ true
+		);
+		const structure = keyFrame!.attachedStructure!;
+
+		expect(() =>
+			writeDependencyDescriptor(
+				{
+					...createDescriptor(structure.templates[0]!),
+					startOfFrame: false,
+					frameNumber: 260,
+					attachedStructure: structure,
+				},
+				structure,
+				ALL_CHAINS_ACTIVE
+			)
+		).toThrow(TypeError);
+	});
+
+	test('a descriptor read and written back is the same', () => {
+		const context = new DependencyDescriptorContext();
+		const keyFrame = readDependencyDescriptor(
+			L1T2_KEY_FRAME,
+			context,
+			/* updateContext */ true
+		);
+		const structure = keyFrame!.attachedStructure!;
+		// Delta frame of the L1T2 stream, frame number 233, with just the
+		// mandatory fields.
+		const deltaFrameData = new Uint8Array([0xc0, 0x00, 0xe9]);
+		const deltaFrame = readDependencyDescriptor(
+			deltaFrameData,
+			context,
+			/* updateContext */ true
+		);
+
+		expect(deltaFrame).toBeDefined();
+
+		const data = writeDependencyDescriptor(
+			deltaFrame!,
+			structure,
+			ALL_CHAINS_ACTIVE
+		);
+
+		expect(Array.from(data)).toEqual(Array.from(deltaFrameData));
 	});
 
 	test('rtpPacket.setDependencyDescriptorExtension() and rtpPacket.getDependencyDescriptorExtension() succeed', () => {

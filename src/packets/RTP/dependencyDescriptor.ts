@@ -1,6 +1,10 @@
 import { BitstreamReader } from '../../utils/BitstreamReader';
 import { BitBufferWriter } from '../../utils/BitBufferWriter';
-import { isUnsignedInteger } from '../../utils/numbers';
+import {
+	isUnsignedInteger,
+	isUnsignedInteger16,
+	isUnsignedInteger32,
+} from '../../utils/numbers';
 
 /**
  * Length (in bytes) of the mandatory descriptor fields.
@@ -220,8 +224,12 @@ export type DependencyDescriptorExtension =
 		resolution?: DependencyDescriptorRenderResolution;
 		/**
 		 * Bitmask of the decode targets available for decoding (bit i is decode
-		 * target i). If the descriptor doesn't carry it, it's the last one the
-		 * context got, which is valid until the next one.
+		 * target i), if the descriptor carries it. If it carries a template
+		 * dependency structure without a bitmask, all decode targets are active.
+		 *
+		 * @see
+		 * - {@link DependencyDescriptorContext.getActiveDecodeTargetsBitmask} to
+		 *   get the one in use in the stream, which is valid until the next one.
 		 */
 		activeDecodeTargetsBitmask?: number;
 		/**
@@ -321,7 +329,8 @@ export function readDependencyDescriptorMandatoryFields(
  * @param data - Value of the RTP extension.
  * @param context - Context of the stream.
  * @param updateContext - Whether the context is updated with this descriptor
- *   (its template dependency structure and its frame number).
+ *   (its template dependency structure, its active decode targets bitmask
+ *   and its frame number).
  *
  * @returns `undefined` if the descriptor is malformed.
  */
@@ -359,6 +368,12 @@ export function readDependencyDescriptor(
 		customChains = reader.readBit() === 1;
 
 		if (templateDependencyStructurePresent) {
+			// Only the first packet of a frame can carry a template dependency
+			// structure.
+			if (!startOfFrame) {
+				return undefined;
+			}
+
 			attachedStructure = readTemplateDependencyStructure(reader);
 
 			if (!reader.ok()) {
@@ -460,15 +475,15 @@ export function readDependencyDescriptor(
 		context.unwrapFrameNumber(frameNumber);
 	}
 
-	// A template dependency structure only counts in the first packet of its
-	// frame, and only if its frame is not older than the one that brought the
-	// structure in use.
-	if (updateContext && attachedStructure && startOfFrame) {
+	// A template dependency structure only counts if its frame is newer than
+	// the one that brought the structure in use (so a retransmitted first
+	// packet of that same frame doesn't bring it again).
+	if (updateContext && attachedStructure) {
 		const structureFrameNumber = context.getStructureFrameNumber();
 
 		if (
 			structureFrameNumber === undefined ||
-			unwrappedFrameNumber >= structureFrameNumber
+			unwrappedFrameNumber > structureFrameNumber
 		) {
 			context.setStructure(attachedStructure, unwrappedFrameNumber);
 		}
@@ -491,8 +506,7 @@ export function readDependencyDescriptor(
 		frameNumber,
 		frameDependencies,
 		resolution: spatialResolution ? { ...spatialResolution } : undefined,
-		activeDecodeTargetsBitmask:
-			activeDecodeTargetsBitmask ?? context.getActiveDecodeTargetsBitmask(),
+		activeDecodeTargetsBitmask,
 		attachedStructure,
 		isKeyFrame:
 			attachedStructure !== undefined ||
@@ -957,6 +971,19 @@ export class DependencyDescriptorContext {
 	}
 
 	/**
+	 * Get the bitmask of the decode targets available for decoding in the
+	 * stream (bit i is decode target i), if any.
+	 *
+	 * @remarks
+	 * - It's the last bitmask carried by a descriptor of the stream, which is
+	 *   valid until the next one, or all decode targets active since the last
+	 *   template dependency structure.
+	 */
+	getActiveDecodeTargetsBitmask(): number | undefined {
+		return this.#activeDecodeTargetsBitmask;
+	}
+
+	/**
 	 * Get the unwrapped frame number of the frame that brought the template
 	 * dependency structure in use, if any.
 	 *
@@ -979,18 +1006,12 @@ export class DependencyDescriptorContext {
 		this.#structure = structure;
 		this.#structureFrameNumber = unwrappedFrameNumber;
 
-		// A new structure makes all its decode targets active.
-		this.#activeDecodeTargetsBitmask = 2 ** structure.decodeTargetCount - 1;
-		this.#activeDecodeTargetsFrameNumber = unwrappedFrameNumber;
-	}
-
-	/**
-	 * Get the bitmask of the active decode targets in use, if any.
-	 *
-	 * @internal
-	 */
-	getActiveDecodeTargetsBitmask(): number | undefined {
-		return this.#activeDecodeTargetsBitmask;
+		// A new structure makes all its decode targets active, unless a newer
+		// frame already brought a bitmask.
+		this.updateActiveDecodeTargetsBitmask(
+			2 ** structure.decodeTargetCount - 1,
+			unwrappedFrameNumber
+		);
 	}
 
 	/**
@@ -1075,12 +1096,21 @@ class DependencyDescriptorWriter {
 			/* writeStructure */ descriptor.attachedStructure !== undefined
 		);
 
-		const { frameNumber, frameDependencies, activeDecodeTargetsBitmask } =
-			descriptor;
+		const {
+			startOfFrame,
+			frameNumber,
+			frameDependencies,
+			activeDecodeTargetsBitmask,
+			attachedStructure,
+		} = descriptor;
 
-		if (!isUnsignedInteger(frameNumber, 0xffff)) {
+		if (!isUnsignedInteger16(frameNumber)) {
 			throw new TypeError(
 				`frameNumber (${frameNumber}) must be an integer between 0 and 65535`
+			);
+		} else if (attachedStructure && !startOfFrame) {
+			throw new TypeError(
+				'only the first packet of a frame can carry a template dependency structure'
 			);
 		} else if (!frameDependencies) {
 			throw new TypeError('frameDependencies must be given');
@@ -1094,7 +1124,7 @@ class DependencyDescriptorWriter {
 			throw new TypeError(
 				`activeDecodeTargetsBitmask (${activeDecodeTargetsBitmask}) must be an integer with at most decodeTargetCount (${structure.decodeTargetCount}) bits`
 			);
-		} else if (!isUnsignedInteger(activeChainsBitmask, 0xffffffff)) {
+		} else if (!isUnsignedInteger32(activeChainsBitmask)) {
 			throw new TypeError(
 				`activeChainsBitmask (${activeChainsBitmask}) must be an integer between 0 and 4294967295`
 			);

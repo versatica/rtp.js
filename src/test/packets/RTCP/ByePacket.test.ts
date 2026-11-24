@@ -404,4 +404,27 @@ describe('RTCP BYE Packet', () => {
 		expect(packet.getSsrcs()).toEqual(ssrcs);
 		expect(packet.getLength()).toBe(4 + 31 * 4);
 	});
+
+	test('byePacket.getReason() keeps a leading byte order mark', () => {
+		// prettier-ignore
+		const buffer = new Uint8Array([
+			// V=2, P=0, SC=1, PT:203, Length: 2
+			0b10000001, 0xcb, 0x00, 0x02,
+			// SSRC 1: 1
+			0x00, 0x00, 0x00, 0x01,
+			// Reason length: 3, Reason: U+FEFF (byte order mark)
+			0x03, 0xef, 0xbb, 0xbf,
+		]);
+		const packet = ByePacket.parse(buffer);
+
+		expect(packet.getReason()).toBe(String.fromCharCode(0xfeff));
+
+		// Writing it back gives the same bytes.
+		const packet2 = ByePacket.factory(factoryBuffer);
+
+		packet2.addSsrc(1);
+		packet2.setReason(packet.getReason());
+
+		expect(Array.from(packet2.getBuffer())).toEqual(Array.from(buffer));
+	});
 });

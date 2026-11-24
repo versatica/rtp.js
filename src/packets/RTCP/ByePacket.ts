@@ -5,7 +5,7 @@ import {
 	COMMON_HEADER_LENGTH,
 	type RtcpPacketDump,
 } from './RtcpPacket';
-import { isUnsignedInteger } from '../../utils/numbers';
+import { isUnsignedInteger32 } from '../../utils/numbers';
 import { padTo4Bytes } from '../../utils/buffers';
 
 /**
@@ -19,7 +19,9 @@ const MAX_SSRCS = 31;
 const MAX_REASON_LENGTH = 255;
 
 const textEncoder = new TextEncoder();
-const textDecoder = new TextDecoder();
+// NOTE: `ignoreBOM` keeps a leading byte order mark in the decoded text, so
+// valid UTF-8 is written back byte by byte as it was.
+const textDecoder = new TextDecoder('utf-8', { ignoreBOM: true });
 
 /**
  * RTCP BYE packet info dump.
@@ -172,7 +174,7 @@ export class ByePacket extends RtcpPacket {
 		}
 
 		for (const ssrc of ssrcs) {
-			if (!isUnsignedInteger(ssrc, 0xffffffff)) {
+			if (!isUnsignedInteger32(ssrc)) {
 				throw new TypeError(
 					`SSRC/CSRC (${ssrc}) must be an integer between 0 and 4294967295`
 				);

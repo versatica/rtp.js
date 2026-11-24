@@ -14,7 +14,7 @@ import {
 import { RrtExtendedReport } from './extendedReports/RrtExtendedReport';
 import { DlrrExtendedReport } from './extendedReports/DlrrExtendedReport';
 import { UnknownExtendedReport } from './extendedReports/UnknownExtendedReport';
-import { isUnsignedInteger } from '../../utils/numbers';
+import { isUnsignedInteger32 } from '../../utils/numbers';
 
 /**
  * Length (in bytes) of the XR header, RTCP Common Header included.
@@ -196,7 +196,7 @@ export class XrPacket extends RtcpPacket {
 	 * - `TypeError` if `ssrc` is not an integer between 0 and 4294967295.
 	 */
 	setSsrc(ssrc: number): void {
-		if (!isUnsignedInteger(ssrc, 0xffffffff)) {
+		if (!isUnsignedInteger32(ssrc)) {
 			throw new TypeError(
 				`ssrc (${ssrc}) must be an integer between 0 and 4294967295`
 			);
@@ -248,9 +248,9 @@ export class XrPacket extends RtcpPacket {
 	 * @throws
 	 * - `Error` if some Extended Report block is being built in place within
 	 *   the packet (see {@link needsConsolidation}).
-	 * - `TypeError` if the given Extended Report block lives where it would be
-	 *   cloned (in the free space of the buffer of the packet), in which case
-	 *   nothing changes.
+	 * - `TypeError` if the buffer of the given Extended Report block shares
+	 *   memory with the position where it would be cloned (in the free space of
+	 *   the buffer of the packet), in which case nothing changes.
 	 * - `TypeError` if the buffer has no space for the Extended Report block,
 	 *   in which case nothing changes.
 	 */
@@ -269,11 +269,12 @@ export class XrPacket extends RtcpPacket {
 		// throw once the length of the packet has been updated.
 		if (
 			extendedReportBuffer.buffer === view.buffer &&
-			byteOffset < extendedReportBuffer.byteOffset + extendedReportLength &&
+			byteOffset <
+				extendedReportBuffer.byteOffset + extendedReport.getBufferLength() &&
 			extendedReportBuffer.byteOffset < byteOffset + extendedReportLength
 		) {
 			throw new TypeError(
-				'given Extended Report block overlaps the position where it would be cloned'
+				'buffer of given Extended Report block shares memory with the position where it would be cloned'
 			);
 		}
 
@@ -292,7 +293,8 @@ export class XrPacket extends RtcpPacket {
 	 * of the buffer of the packet. The application can modify it and the
 	 * changes are written in the buffer of the packet. Once completed, the
 	 * application must call {@link consolidate} on it so the packet adds it,
-	 * or {@link discard} so the packet is left as it was.
+	 * or {@link discard} so the packet is left as it was, except that its
+	 * padding (if any) is removed.
 	 *
 	 * @param type - Class of the Extended Report block, whose `factory()` is
 	 *   used to create it.

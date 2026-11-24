@@ -270,42 +270,6 @@ describe('RTCP REMB Packet', () => {
 		expect(packet.getSsrcs()).toEqual([3333, 4444]);
 	});
 
-	test('RembPacket.parse() with a bitrate bigger than 64 bits succeeds', () => {
-		// Num SSRC: 0, BR Exp: 63, BR Mantissa: 0x3fb93
-		// prettier-ignore
-		const buffer1 = new Uint8Array([
-			// V=2, P=0, FMT=15, PT:206, Length: 4
-			0b10001111, 0xce, 0x00, 0x04,
-			// SSRC of packet sender: 0x12345678
-			0x12, 0x34, 0x56, 0x78,
-			// SSRC of media source: 0
-			0x00, 0x00, 0x00, 0x00,
-			// Unique identifier: 'R' 'E' 'M' 'B'
-			0x52, 0x45, 0x4d, 0x42,
-			// Num SSRC: 0, BR Exp: 63, BR Mantissa: 0x3fb93
-			0x00, 0xff, 0xfb, 0x93,
-		]);
-
-		expect(RembPacket.parse(buffer1).getBitrate()).toBe(0x3fb93 * 2 ** 63);
-
-		// Bitrate (200 * 2^56) does not fit in a signed 64 bits integer.
-		// prettier-ignore
-		const buffer2 = new Uint8Array([
-			// V=2, P=0, FMT=15, PT:206, Length: 4
-			0b10001111, 0xce, 0x00, 0x04,
-			// SSRC of packet sender: 0x12345678
-			0x12, 0x34, 0x56, 0x78,
-			// SSRC of media source: 0
-			0x00, 0x00, 0x00, 0x00,
-			// Unique identifier: 'R' 'E' 'M' 'B'
-			0x52, 0x45, 0x4d, 0x42,
-			// Num SSRC: 0, BR Exp: 56, BR Mantissa: 200
-			0x00, 0xe0, 0x00, 0xc8,
-		]);
-
-		expect(RembPacket.parse(buffer2).getBitrate()).toBe(200 * 2 ** 56);
-	});
-
 	test('RembPacket.parse() fails', () => {
 		// No space for Num SSRC, BR Exp and BR Mantissa.
 		// prettier-ignore
@@ -374,6 +338,40 @@ describe('RTCP REMB Packet', () => {
 		]);
 
 		expect(() => RembPacket.parse(buffer4)).toThrow(TypeError);
+
+		// Bitrate does not fit in 64 bits.
+		// prettier-ignore
+		const buffer5 = new Uint8Array([
+			// V=2, P=0, FMT=15, PT:206, Length: 4
+			0b10001111, 0xce, 0x00, 0x04,
+			// SSRC of packet sender: 0x12345678
+			0x12, 0x34, 0x56, 0x78,
+			// SSRC of media source: 0
+			0x00, 0x00, 0x00, 0x00,
+			// Unique identifier: 'R' 'E' 'M' 'B'
+			0x52, 0x45, 0x4d, 0x42,
+			// Num SSRC: 0, BR Exp: 63, BR Mantissa: 0x3fb93
+			0x00, 0xff, 0xfb, 0x93,
+		]);
+
+		expect(() => RembPacket.parse(buffer5)).toThrow(TypeError);
+
+		// Bitrate (200 * 2^56) does not fit in a signed 64 bits integer.
+		// prettier-ignore
+		const buffer6 = new Uint8Array([
+			// V=2, P=0, FMT=15, PT:206, Length: 4
+			0b10001111, 0xce, 0x00, 0x04,
+			// SSRC of packet sender: 0x12345678
+			0x12, 0x34, 0x56, 0x78,
+			// SSRC of media source: 0
+			0x00, 0x00, 0x00, 0x00,
+			// Unique identifier: 'R' 'E' 'M' 'B'
+			0x52, 0x45, 0x4d, 0x42,
+			// Num SSRC: 0, BR Exp: 56, BR Mantissa: 200
+			0x00, 0xe0, 0x00, 0xc8,
+		]);
+
+		expect(() => RembPacket.parse(buffer6)).toThrow(TypeError);
 	});
 
 	test('RembPacket.factory() succeeds', () => {
@@ -471,6 +469,9 @@ describe('RTCP REMB Packet', () => {
 		checkBitrate(522022);
 		// A bitrate that needs more than 32 bits.
 		checkBitrate(0x3fb93 * 2 ** 30);
+		// The highest bitrate that fits in a signed 64 bits integer (BR Exp: 45,
+		// BR Mantissa: 0x3ffff).
+		checkBitrate(2 ** 63 - 2 ** 45);
 	});
 
 	test('rembPacket.addSsrc() and rembPacket.setBitrate() throw', () => {
@@ -491,6 +492,9 @@ describe('RTCP REMB Packet', () => {
 
 		// Negative bitrate.
 		expect(() => packet.setBitrate(-1)).toThrow(TypeError);
+
+		// Bitrate that does not fit in a signed 64 bits integer.
+		expect(() => packet.setBitrate(2 ** 63)).toThrow(TypeError);
 	});
 
 	test('rembPacket.addSsrc() throws if there is no space in the buffer', () => {

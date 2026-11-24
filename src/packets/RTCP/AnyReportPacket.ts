@@ -1,5 +1,5 @@
 import { RtcpPacket, COMMON_HEADER_LENGTH } from './RtcpPacket';
-import { isUnsignedInteger } from '../../utils/numbers';
+import { isUnsignedInteger8, isUnsignedInteger32 } from '../../utils/numbers';
 import {
 	readSigned3BytesInDataView,
 	writeSigned3BytesInDataView,
@@ -136,7 +136,7 @@ export abstract class AnyReportPacket extends RtcpPacket {
 	 * - `TypeError` if `ssrc` is not an integer between 0 and 4294967295.
 	 */
 	setSsrc(ssrc: number): void {
-		if (!isUnsignedInteger(ssrc, 0xffffffff)) {
+		if (!isUnsignedInteger32(ssrc)) {
 			throw new TypeError(
 				`ssrc (${ssrc}) must be an integer between 0 and 4294967295`
 			);
@@ -184,6 +184,8 @@ export abstract class AnyReportPacket extends RtcpPacket {
 	 *
 	 * @remarks
 	 * - This method removes existing padding (if any).
+	 * - `totalLost` is clamped to the range of a 24 bits signed integer as
+	 *   stated in the appendix A.3 of RFC 3550.
 	 *
 	 * @throws
 	 * - `TypeError` if more than 31 reception report blocks are given.
@@ -225,6 +227,8 @@ export abstract class AnyReportPacket extends RtcpPacket {
 	 *
 	 * @remarks
 	 * - This method removes existing padding (if any).
+	 * - `totalLost` is clamped to the range of a 24 bits signed integer as
+	 *   stated in the appendix A.3 of RFC 3550.
 	 *
 	 * @throws
 	 * - `TypeError` if the packet already has 31 reception report blocks.
@@ -318,18 +322,12 @@ export abstract class AnyReportPacket extends RtcpPacket {
 		const { ssrc, fractionLost, totalLost, highestSeq, jitter, lsr, dlsr } =
 			report;
 
-		if (!isUnsignedInteger(fractionLost, 0xff)) {
+		if (!isUnsignedInteger8(fractionLost)) {
 			throw new TypeError(
 				`fractionLost (${fractionLost}) must be an integer between 0 and 255`
 			);
-		} else if (
-			!Number.isInteger(totalLost) ||
-			totalLost < MIN_TOTAL_LOST ||
-			totalLost > MAX_TOTAL_LOST
-		) {
-			throw new TypeError(
-				`totalLost (${totalLost}) must be an integer between ${MIN_TOTAL_LOST} and ${MAX_TOTAL_LOST}`
-			);
+		} else if (!Number.isInteger(totalLost)) {
+			throw new TypeError(`totalLost (${totalLost}) must be an integer`);
 		}
 
 		for (const [name, value] of Object.entries({
@@ -339,7 +337,7 @@ export abstract class AnyReportPacket extends RtcpPacket {
 			lsr,
 			dlsr,
 		})) {
-			if (!isUnsignedInteger(value, 0xffffffff)) {
+			if (!isUnsignedInteger32(value)) {
 				throw new TypeError(
 					`${name} (${value}) must be an integer between 0 and 4294967295`
 				);
@@ -352,7 +350,14 @@ export abstract class AnyReportPacket extends RtcpPacket {
 
 		view.setUint32(pos, report.ssrc);
 		view.setUint8(pos + 4, report.fractionLost);
-		writeSigned3BytesInDataView(view, pos + 5, report.totalLost);
+		// The cumulative number of packets lost is a 24 bits signed integer, so a
+		// value out of its range is clamped as stated in the appendix A.3 of RFC
+		// 3550.
+		writeSigned3BytesInDataView(
+			view,
+			pos + 5,
+			Math.min(Math.max(report.totalLost, MIN_TOTAL_LOST), MAX_TOTAL_LOST)
+		);
 		view.setUint32(pos + 8, report.highestSeq);
 		view.setUint32(pos + 12, report.jitter);
 		view.setUint32(pos + 16, report.lsr);

@@ -1,5 +1,5 @@
 import { Serializable, type SerializableDump } from '../common/Serializable';
-import { isUnsignedInteger } from '../../utils/numbers';
+import { isUnsignedInteger, isUnsignedInteger8 } from '../../utils/numbers';
 import { padTo4Bytes } from '../../utils/buffers';
 
 /**
@@ -165,7 +165,7 @@ export abstract class ExtendedReport extends Serializable {
 		typeSpecific: number,
 		length: number
 	): void {
-		if (!isUnsignedInteger(typeSpecific, 0xff)) {
+		if (!isUnsignedInteger8(typeSpecific)) {
 			throw new TypeError(
 				`typeSpecific (${typeSpecific}) must be an integer between 0 and 255`
 			);
@@ -205,7 +205,7 @@ export abstract class ExtendedReport extends Serializable {
 	 * - `TypeError` if `typeSpecific` is not an integer between 0 and 255.
 	 */
 	protected setTypeSpecific(typeSpecific: number): void {
-		if (!isUnsignedInteger(typeSpecific, 0xff)) {
+		if (!isUnsignedInteger8(typeSpecific)) {
 			throw new TypeError(
 				`typeSpecific (${typeSpecific}) must be an integer between 0 and 255`
 			);

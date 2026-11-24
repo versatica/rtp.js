@@ -5,7 +5,7 @@ import {
 	isExtendedReport,
 	type ExtendedReportDump,
 } from '../ExtendedReport';
-import { isUnsignedInteger } from '../../../utils/numbers';
+import { isUnsignedInteger32 } from '../../../utils/numbers';
 
 /**
  * Length (in bytes) of a DLRR sub-block.
@@ -205,9 +205,9 @@ export class DlrrExtendedReport extends ExtendedReport {
 	 */
 	addSubBlock(subBlock: DlrrSubBlock): void {
 		if (
-			!isUnsignedInteger(subBlock.ssrc, 0xffffffff) ||
-			!isUnsignedInteger(subBlock.lastReceiverReport, 0xffffffff) ||
-			!isUnsignedInteger(subBlock.delaySinceLastReceiverReport, 0xffffffff)
+			!isUnsignedInteger32(subBlock.ssrc) ||
+			!isUnsignedInteger32(subBlock.lastReceiverReport) ||
+			!isUnsignedInteger32(subBlock.delaySinceLastReceiverReport)
 		) {
 			throw new TypeError(
 				'ssrc, lastReceiverReport and delaySinceLastReceiverReport must be integers between 0 and 4294967295'

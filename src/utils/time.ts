@@ -32,6 +32,14 @@ const Q32X32_OUT_OF_RANGE_US = 2 ** 31 * 1000000;
 
 /**
  * Convert microseconds into an NTP timestamp.
+ *
+ * @param timeUs - Microseconds since the NTP epoch (Jan 1, 1900). From the
+ *   Unix clock it's `(Date.now() + 2208988800000) * 1000`.
+ *
+ * @remarks
+ * - `Date.now()` steps if the system clock is adjusted, and so do the NTP
+ *   timestamps taken from it. To avoid it, the offset to the NTP epoch can be
+ *   taken once and added to the monotonic `performance.now()` afterwards.
  */
 export function timeUsToNtp(timeUs: number): Ntp {
 	// NOTE: The truncation of the seconds is intended. Seconds are 32 bits wide
@@ -39,7 +47,9 @@ export function timeUsToNtp(timeUs: number): Ntp {
 	// 2036 the next time it happens. That is the NTP era and receivers deal with
 	// it by doing modular arithmetic, so there is nothing to protect against
 	// here.
-	const remainderUs = timeUs % 1000000;
+	// NOTE: The remainder is taken non-negative so a negative time also gives
+	// the timestamp it's congruent with modulo 2^32 seconds.
+	const remainderUs = ((timeUs % 1000000) + 1000000) % 1000000;
 
 	return {
 		seconds: ((timeUs - remainderUs) / 1000000) >>> 0,
@@ -48,7 +58,8 @@ export function timeUsToNtp(timeUs: number): Ntp {
 }
 
 /**
- * Convert an NTP timestamp into microseconds.
+ * Convert an NTP timestamp into microseconds since the NTP epoch (Jan 1,
+ * 1900).
  */
 export function ntpToTimeUs(ntp: Ntp): number {
 	return (
@@ -142,10 +153,13 @@ export function timeUsToAbsSendTime(timeUs: number): number {
  * Convert the 6.18 fixed point seconds of the `abs-send-time` RTP header
  * extension into microseconds.
  *
+ * @param absSendTime - The 24 bits value of the extension.
+ *
  * @remarks
  * - The result is truncated to the microsecond.
- * - The value wraps around every 64 seconds, so the result is within the
- *   current 64 seconds period.
+ * - The value wraps around every 64 seconds, so the result is the time
+ *   elapsed since the start of the 64 seconds period it belongs to, between
+ *   0 and 64 seconds. Telling which period that is is up to the application.
  */
 export function absSendTimeToTimeUs(absSendTime: number): number {
 	// NOTE: The product fits in the range of integers that a number holds

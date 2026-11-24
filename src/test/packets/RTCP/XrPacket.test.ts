@@ -707,6 +707,20 @@ describe('RTCP XR Packet', () => {
 		expect(areBuffersEqual(packet.getBuffer(), buffer)).toBe(true);
 	});
 
+	test('xrPacket.addExtendedReport() throws if the buffer of the Extended Report block covers where it would be cloned', () => {
+		// The Extended Report block would be cloned at [208, 220).
+		const packet = XrPacket.factory(factoryBuffer.subarray(200, 1200));
+		// The bytes of the Extended Report block, [150, 162), don't overlap where
+		// it would be cloned, but its buffer, [150, 2000), does.
+		const extendedReport = RrtExtendedReport.factory(
+			factoryBuffer.subarray(150, 2000)
+		);
+
+		expect(() => packet.addExtendedReport(extendedReport)).toThrow(TypeError);
+		expect(packet.getLength()).toBe(8);
+		expect(packet.getExtendedReports()).toEqual([]);
+	});
+
 	test('XrPacket.factory() throws if the buffer is too small', () => {
 		expect(() => XrPacket.factory(factoryBuffer.subarray(0, 7))).toThrow(
 			TypeError

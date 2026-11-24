@@ -9,7 +9,7 @@ import {
 	AnyPayloadSpecificFeedbackPacket,
 	PayloadSpecificFeedbackMessageType,
 } from './AnyPayloadSpecificFeedbackPacket';
-import { isUnsignedInteger } from '../../utils/numbers';
+import { isUnsignedInteger, isUnsignedInteger32 } from '../../utils/numbers';
 import {
 	readBit,
 	readBitsInDataView,
@@ -33,14 +33,16 @@ const REMB_HEADER_LENGTH = 20;
 const MAX_SSRCS = 255;
 
 /**
- * Maximum value of the BR Exp field (6 bits).
- */
-const MAX_EXPONENT = 63;
-
-/**
  * Maximum value of the BR Mantissa field (18 bits).
  */
 const MAX_MANTISSA = 0x3ffff;
+
+/**
+ * From here on (in bps) a bitrate does not fit in the signed 64 bits integer
+ * in which receivers (such as libwebrtc and mediasoup) store it, so they
+ * discard the packet.
+ */
+const BITRATE_OUT_OF_RANGE = 2 ** 63;
 
 /**
  * RTCP REMB packet info dump.
@@ -274,12 +276,18 @@ export class RembPacket extends AnyPayloadSpecificFeedbackPacket {
 	 *   so the lowest bits of big values are lost.
 	 *
 	 * @throws
-	 * - `TypeError` if `bitrate` is not an unsigned integer or if it cannot be
-	 *   represented with an 18 bits mantissa and a 6 bits exponent.
+	 * - `TypeError` if `bitrate` is not an unsigned integer.
+	 * - `TypeError` if `bitrate` does not fit in a signed 64 bits integer,
+	 *   since receivers (such as libwebrtc and mediasoup) would discard the
+	 *   packet.
 	 */
 	setBitrate(bitrate: number): void {
 		if (!isUnsignedInteger(bitrate)) {
 			throw new TypeError(`bitrate (${bitrate}) must be an unsigned integer`);
+		} else if (bitrate >= BITRATE_OUT_OF_RANGE) {
+			throw new TypeError(
+				`bitrate (${bitrate}) does not fit in a signed 64 bits integer`
+			);
 		}
 
 		let mantissa = bitrate;
@@ -288,10 +296,6 @@ export class RembPacket extends AnyPayloadSpecificFeedbackPacket {
 		while (mantissa > MAX_MANTISSA) {
 			mantissa = Math.floor(mantissa / 2);
 			++exponent;
-		}
-
-		if (exponent > MAX_EXPONENT) {
-			throw new TypeError(`bitrate (${bitrate}) is too big`);
 		}
 
 		const view = this.getView();
@@ -410,6 +414,14 @@ export class RembPacket extends AnyPayloadSpecificFeedbackPacket {
 				`packet length (${contentLength} bytes, excluding padding) does not match the number of SSRCs (${ssrcsCount})`
 			);
 		}
+
+		const bitrate = this.getBitrate();
+
+		if (bitrate >= BITRATE_OUT_OF_RANGE) {
+			throw new TypeError(
+				`bitrate (${bitrate}) does not fit in a signed 64 bits integer`
+			);
+		}
 	}
 
 	/**
@@ -417,7 +429,7 @@ export class RembPacket extends AnyPayloadSpecificFeedbackPacket {
 	 * - `TypeError` if `ssrc` is not an integer between 0 and 4294967295.
 	 */
 	#assertSsrc(ssrc: number): void {
-		if (!isUnsignedInteger(ssrc, 0xffffffff)) {
+		if (!isUnsignedInteger32(ssrc)) {
 			throw new TypeError(
 				`ssrc (${ssrc}) must be an integer between 0 and 4294967295`
 			);

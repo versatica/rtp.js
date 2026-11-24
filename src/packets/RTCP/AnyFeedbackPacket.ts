@@ -1,5 +1,5 @@
 import { RtcpPacket } from './RtcpPacket';
-import { isUnsignedInteger } from '../../utils/numbers';
+import { isUnsignedInteger32 } from '../../utils/numbers';
 
 /**
  * Length (in bytes) of the common header of every feedback packet, RTCP
@@ -61,7 +61,7 @@ export abstract class AnyFeedbackPacket extends RtcpPacket {
 	 * - `TypeError` if `ssrc` is not an integer between 0 and 4294967295.
 	 */
 	setSenderSsrc(ssrc: number): void {
-		if (!isUnsignedInteger(ssrc, 0xffffffff)) {
+		if (!isUnsignedInteger32(ssrc)) {
 			throw new TypeError(
 				`ssrc (${ssrc}) must be an integer between 0 and 4294967295`
 			);
@@ -84,7 +84,7 @@ export abstract class AnyFeedbackPacket extends RtcpPacket {
 	 * - `TypeError` if `ssrc` is not an integer between 0 and 4294967295.
 	 */
 	setMediaSsrc(ssrc: number): void {
-		if (!isUnsignedInteger(ssrc, 0xffffffff)) {
+		if (!isUnsignedInteger32(ssrc)) {
 			throw new TypeError(
 				`ssrc (${ssrc}) must be an integer between 0 and 4294967295`
 			);

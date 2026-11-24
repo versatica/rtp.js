@@ -583,7 +583,9 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 		}
 	});
 
-	test('TransportWideCcPacket.parse() with no packet status succeeds', () => {
+	test('TransportWideCcPacket.parse() with no packet status fails', () => {
+		// A feedback that reports no RTP packet at all is not valid (libwebrtc
+		// rejects it too).
 		// prettier-ignore
 		const buffer = new Uint8Array([
 			// V=2, P=0, FMT=15, PT:205, Length: 4
@@ -597,41 +599,8 @@ describe('RTCP Transport-wide CC Feedback Packet', () => {
 			// Reference time: -2, Feedback packet count: 1
 			0xff, 0xff, 0xfe, 0x01,
 		]);
-		const packet = TransportWideCcPacket.parse(buffer);
 
-		checkRtcpPacket(packet, {
-			buffer: buffer,
-			bufferLength: buffer.byteLength,
-			length: 20,
-			packetType: RtcpPacketType.RTPFB,
-			hasPadding: false,
-			padding: 0,
-		});
-
-		expect(packet.getBaseSequenceNumber()).toBe(39);
-		expect(packet.getPacketStatusCount()).toBe(0);
-		// The Reference time field is a 24 bits signed integer.
-		expect(packet.getBaseTimeUs()).toBe(
-			BASE_TIME_WRAP_PERIOD_US + -2 * BASE_TIME_TICK_US
-		);
-		expect(packet.getFeedbackPacketCount()).toBe(1);
-		expect(packet.getReceivedRtpPackets()).toEqual([]);
-		expect(getRtpPacketStatuses(packet)).toEqual([]);
-
-		/* Serialize it. */
-
-		packet.serialize(serializeBuffer);
-
-		// prettier-ignore
-		const expectedBuffer = new Uint8Array([
-			0x8f, 0xcd, 0x00, 0x04,
-			0xfa, 0x17, 0xfa, 0x17,
-			0x09, 0xfa, 0xff, 0x67,
-			0x00, 0x27, 0x00, 0x00,
-			0xff, 0xff, 0xfe, 0x01,
-		]);
-
-		expect(areBuffersEqual(packet.getBuffer(), expectedBuffer)).toBe(true);
+		expect(() => TransportWideCcPacket.parse(buffer)).toThrow(TypeError);
 	});
 
 	test('TransportWideCcPacket.parse() fails', () => {

@@ -342,10 +342,10 @@ describe('RTCP Receiver Report Packet', () => {
 		checkReports(clonedPacket);
 	});
 
-	test('receiverReportPacket.addReport() throws if totalLost is out of range', () => {
+	test('receiverReportPacket.addReport() clamps the total lost', () => {
 		const packet = ReceiverReportPacket.factory(factoryBuffer);
 		const report: ReceptionReport = {
-			ssrc: 1111,
+			ssrc: 0,
 			fractionLost: 0,
 			totalLost: 0,
 			highestSeq: 0,
@@ -354,23 +354,18 @@ describe('RTCP Receiver Report Packet', () => {
 			dlsr: 0,
 		};
 
-		packet.addReport({ ...report, totalLost: 8388607 });
-
-		expect(() => packet.addReport({ ...report, totalLost: 8388608 })).toThrow(
-			TypeError
-		);
-
-		packet.addReport({ ...report, totalLost: -8388608 });
-
-		expect(() => packet.addReport({ ...report, totalLost: -8388609 })).toThrow(
-			TypeError
-		);
+		packet.addReport({ ...report, ssrc: 1111, totalLost: 8388607 });
+		packet.addReport({ ...report, ssrc: 2222, totalLost: 8388608 });
+		packet.addReport({ ...report, ssrc: 3333, totalLost: -8388608 });
+		packet.addReport({ ...report, ssrc: 4444, totalLost: -8388609 });
 
 		const reports = packet.getReports();
 
-		expect(reports.length).toBe(2);
+		expect(reports.length).toBe(4);
 		expect(reports[0]!.totalLost).toBe(8388607);
-		expect(reports[1]!.totalLost).toBe(-8388608);
+		expect(reports[1]!.totalLost).toBe(8388607);
+		expect(reports[2]!.totalLost).toBe(-8388608);
+		expect(reports[3]!.totalLost).toBe(-8388608);
 	});
 
 	test('receiverReportPacket.addReport() throws', () => {

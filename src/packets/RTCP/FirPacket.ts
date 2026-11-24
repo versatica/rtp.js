@@ -9,7 +9,7 @@ import {
 	AnyPayloadSpecificFeedbackPacket,
 	PayloadSpecificFeedbackMessageType,
 } from './AnyPayloadSpecificFeedbackPacket';
-import { isUnsignedInteger } from '../../utils/numbers';
+import { isUnsignedInteger8, isUnsignedInteger32 } from '../../utils/numbers';
 import { write3BytesInDataView } from '../../utils/bytes';
 
 /**
@@ -288,11 +288,11 @@ export class FirPacket extends AnyPayloadSpecificFeedbackPacket {
 	 *   `sequenceNumber` is not an integer between 0 and 255.
 	 */
 	#assertItem(item: FirItem): void {
-		if (!isUnsignedInteger(item.ssrc, 0xffffffff)) {
+		if (!isUnsignedInteger32(item.ssrc)) {
 			throw new TypeError(
 				`ssrc (${item.ssrc}) must be an integer between 0 and 4294967295`
 			);
-		} else if (!isUnsignedInteger(item.sequenceNumber, 0xff)) {
+		} else if (!isUnsignedInteger8(item.sequenceNumber)) {
 			throw new TypeError(
 				`sequenceNumber (${item.sequenceNumber}) must be an integer between 0 and 255`
 			);

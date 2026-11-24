@@ -5,7 +5,7 @@ import {
 	COMMON_HEADER_LENGTH,
 	type RtcpPacketDump,
 } from './RtcpPacket';
-import { isUnsignedInteger } from '../../utils/numbers';
+import { isUnsignedInteger8, isUnsignedInteger32 } from '../../utils/numbers';
 import { padTo4Bytes } from '../../utils/buffers';
 
 /**
@@ -19,7 +19,9 @@ const MAX_CHUNKS = 31;
 const MAX_ITEM_TEXT_LENGTH = 255;
 
 const textEncoder = new TextEncoder();
-const textDecoder = new TextDecoder();
+// NOTE: `ignoreBOM` keeps a leading byte order mark in the decoded text, so
+// valid UTF-8 is written back byte by byte as it was.
+const textDecoder = new TextDecoder('utf-8', { ignoreBOM: true });
 
 /**
  * SDES item type.
@@ -460,7 +462,7 @@ export class SdesPacket extends RtcpPacket {
 	 *   bytes.
 	 */
 	#encodeChunk(chunk: SdesChunk): EncodedSdesChunk {
-		if (!isUnsignedInteger(chunk.ssrc, 0xffffffff)) {
+		if (!isUnsignedInteger32(chunk.ssrc)) {
 			throw new TypeError(
 				`ssrc (${chunk.ssrc}) must be an integer between 0 and 4294967295`
 			);
@@ -468,7 +470,7 @@ export class SdesPacket extends RtcpPacket {
 
 		const items = chunk.items.map(({ type, text }) => {
 			// An item type of 0 terminates the list of items, so it's not valid.
-			if (!isUnsignedInteger(type, 255) || (type as number) === 0) {
+			if (!isUnsignedInteger8(type) || (type as number) === 0) {
 				throw new TypeError(
 					`item type (${type}) must be an integer between 1 and 255`
 				);

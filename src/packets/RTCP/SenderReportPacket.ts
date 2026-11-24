@@ -9,7 +9,7 @@ import {
 	REPORT_LENGTH,
 	type ReceptionReport,
 } from './AnyReportPacket';
-import { isUnsignedInteger } from '../../utils/numbers';
+import { isUnsignedInteger32 } from '../../utils/numbers';
 import type { Ntp } from '../../utils/types';
 
 /**
@@ -217,8 +217,8 @@ export class SenderReportPacket extends AnyReportPacket {
 	 */
 	setNtp(ntp: Ntp): void {
 		if (
-			!isUnsignedInteger(ntp.seconds, 0xffffffff) ||
-			!isUnsignedInteger(ntp.fractions, 0xffffffff)
+			!isUnsignedInteger32(ntp.seconds) ||
+			!isUnsignedInteger32(ntp.fractions)
 		) {
 			throw new TypeError(
 				'ntp seconds and fractions must be integers between 0 and 4294967295'
@@ -246,7 +246,7 @@ export class SenderReportPacket extends AnyReportPacket {
 	 *   4294967295.
 	 */
 	setRtpTimestamp(rtpTimestamp: number): void {
-		if (!isUnsignedInteger(rtpTimestamp, 0xffffffff)) {
+		if (!isUnsignedInteger32(rtpTimestamp)) {
 			throw new TypeError(
 				`rtpTimestamp (${rtpTimestamp}) must be an integer between 0 and 4294967295`
 			);
@@ -270,7 +270,7 @@ export class SenderReportPacket extends AnyReportPacket {
 	 *   4294967295.
 	 */
 	setPacketCount(packetCount: number): void {
-		if (!isUnsignedInteger(packetCount, 0xffffffff)) {
+		if (!isUnsignedInteger32(packetCount)) {
 			throw new TypeError(
 				`packetCount (${packetCount}) must be an integer between 0 and 4294967295`
 			);
@@ -293,7 +293,7 @@ export class SenderReportPacket extends AnyReportPacket {
 	 * - `TypeError` if `octetCount` is not an integer between 0 and 4294967295.
 	 */
 	setOctetCount(octetCount: number): void {
-		if (!isUnsignedInteger(octetCount, 0xffffffff)) {
+		if (!isUnsignedInteger32(octetCount)) {
 			throw new TypeError(
 				`octetCount (${octetCount}) must be an integer between 0 and 4294967295`
 			);

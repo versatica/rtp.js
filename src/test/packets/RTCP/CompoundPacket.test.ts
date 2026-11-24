@@ -1149,6 +1149,20 @@ describe('RTCP Compound Packet', () => {
 		expect(compoundPacket.getPackets()).toEqual([]);
 	});
 
+	test('compoundPacket.addPacket() throws if the buffer of the packet covers where it would be cloned', () => {
+		// The packet would be cloned at [200, 212).
+		const compoundPacket = CompoundPacket.factory(
+			factoryBuffer.subarray(200, 1200)
+		);
+		// The bytes of the packet, [150, 162), don't overlap where it would be
+		// cloned, but its buffer, [150, 2000), does.
+		const packet = PliPacket.factory(factoryBuffer.subarray(150, 2000));
+
+		expect(() => compoundPacket.addPacket(packet)).toThrow(TypeError);
+		expect(compoundPacket.getLength()).toBe(0);
+		expect(compoundPacket.getPackets()).toEqual([]);
+	});
+
 	test('compoundPacket.buildPacketInPlace() and compoundPacket.addPacket() throw if the CompoundPacket needs consolidation', () => {
 		const compoundPacket = CompoundPacket.factory(
 			factoryBuffer.subarray(0, 1000)

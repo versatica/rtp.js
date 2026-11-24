@@ -17,7 +17,14 @@ import {
 	readDependencyDescriptorMandatoryFields,
 	writeDependencyDescriptor,
 } from './dependencyDescriptor';
-import { isUnsignedInteger } from '../../utils/numbers';
+import {
+	isUnsignedInteger,
+	isUnsignedInteger8,
+	isUnsignedInteger16,
+	isUnsignedInteger24,
+	isUnsignedInteger32,
+	isSignedInteger32,
+} from '../../utils/numbers';
 import { padTo4Bytes } from '../../utils/buffers';
 import {
 	readBitInDataView,
@@ -408,7 +415,7 @@ export class RtpPacket extends Serializable {
 	 * - `TypeError` if `sequenceNumber` is not an integer between 0 and 65535.
 	 */
 	setSequenceNumber(sequenceNumber: number): void {
-		if (!isUnsignedInteger(sequenceNumber, 0xffff)) {
+		if (!isUnsignedInteger16(sequenceNumber)) {
 			throw new TypeError(
 				`sequenceNumber (${sequenceNumber}) must be an integer between 0 and 65535`
 			);
@@ -431,7 +438,7 @@ export class RtpPacket extends Serializable {
 	 * - `TypeError` if `timestamp` is not an integer between 0 and 4294967295.
 	 */
 	setTimestamp(timestamp: number): void {
-		if (!isUnsignedInteger(timestamp, 0xffffffff)) {
+		if (!isUnsignedInteger32(timestamp)) {
 			throw new TypeError(
 				`timestamp (${timestamp}) must be an integer between 0 and 4294967295`
 			);
@@ -454,7 +461,7 @@ export class RtpPacket extends Serializable {
 	 * - `TypeError` if `ssrc` is not an integer between 0 and 4294967295.
 	 */
 	setSsrc(ssrc: number): void {
-		if (!isUnsignedInteger(ssrc, 0xffffffff)) {
+		if (!isUnsignedInteger32(ssrc)) {
 			throw new TypeError(
 				`ssrc (${ssrc}) must be an integer between 0 and 4294967295`
 			);
@@ -509,7 +516,7 @@ export class RtpPacket extends Serializable {
 		}
 
 		for (const csrc of csrcs) {
-			if (!isUnsignedInteger(csrc, 0xffffffff)) {
+			if (!isUnsignedInteger32(csrc)) {
 				throw new TypeError(
 					`CSRC (${csrc}) must be an integer between 0 and 4294967295`
 				);
@@ -555,7 +562,7 @@ export class RtpPacket extends Serializable {
 	 * - `TypeError` if the buffer has no space for the given padding.
 	 */
 	setPadding(padding: number): void {
-		if (!isUnsignedInteger(padding, 255)) {
+		if (!isUnsignedInteger8(padding)) {
 			throw new TypeError(
 				`padding (${padding}) must be an integer between 0 and 255`
 			);
@@ -763,8 +770,22 @@ export class RtpPacket extends Serializable {
 	 * @remarks
 	 * - Calling this method is needed before using methods that read or write
 	 *   specific RTP extensions.
+	 * - Ids above 14 can only be written with Two-Byte extensions, which is
+	 *   checked when the extension is written.
+	 *
+	 * @throws
+	 * - `TypeError` if some id is not an integer between 1 and 255, in which
+	 *   case the extension mapping is not modified.
 	 */
 	setExtensionMapping(extensionMapping: ExtensionMapping): void {
+		for (const [type, id] of Object.entries(extensionMapping)) {
+			if (id !== undefined && (id === 0 || !isUnsignedInteger8(id))) {
+				throw new TypeError(
+					`invalid id ${id} of extension type ${ExtensionType[Number(type)]} (must be 1..255)`
+				);
+			}
+		}
+
 		this.#extensionMapping = { ...extensionMapping };
 	}
 
@@ -872,7 +893,7 @@ export class RtpPacket extends Serializable {
 		let value: Uint8Array | undefined;
 
 		if (absSendTime !== undefined) {
-			if (!isUnsignedInteger(absSendTime, 0xffffff)) {
+			if (!isUnsignedInteger24(absSendTime)) {
 				throw new TypeError(
 					`absSendTime (${absSendTime}) must be an integer between 0 and 16777215`
 				);
@@ -915,7 +936,7 @@ export class RtpPacket extends Serializable {
 		let value: Uint8Array | undefined;
 
 		if (sequenceNumber !== undefined) {
-			if (!isUnsignedInteger(sequenceNumber, 0xffff)) {
+			if (!isUnsignedInteger16(sequenceNumber)) {
 				throw new TypeError(
 					`sequenceNumber (${sequenceNumber}) must be an integer between 0 and 65535`
 				);
@@ -1084,8 +1105,8 @@ export class RtpPacket extends Serializable {
 				absCaptureTime;
 
 			if (
-				!isUnsignedInteger(absCaptureTimestamp.seconds, 0xffffffff) ||
-				!isUnsignedInteger(absCaptureTimestamp.fractions, 0xffffffff)
+				!isUnsignedInteger32(absCaptureTimestamp.seconds) ||
+				!isUnsignedInteger32(absCaptureTimestamp.fractions)
 			) {
 				throw new TypeError(
 					'absCaptureTimestamp seconds and fractions must be integers between 0 and 4294967295'
@@ -1094,10 +1115,8 @@ export class RtpPacket extends Serializable {
 
 			if (
 				estimatedCaptureClockOffset &&
-				(!Number.isInteger(estimatedCaptureClockOffset.seconds) ||
-					estimatedCaptureClockOffset.seconds < -0x80000000 ||
-					estimatedCaptureClockOffset.seconds > 0x7fffffff ||
-					!isUnsignedInteger(estimatedCaptureClockOffset.fractions, 0xffffffff))
+				(!isSignedInteger32(estimatedCaptureClockOffset.seconds) ||
+					!isUnsignedInteger32(estimatedCaptureClockOffset.fractions))
 			) {
 				throw new TypeError(
 					'estimatedCaptureClockOffset seconds must be an integer between -2147483648 and 2147483647 and fractions an integer between 0 and 4294967295'
@@ -1211,7 +1230,8 @@ export class RtpPacket extends Serializable {
 	 *
 	 * @param descriptor - Dependency Descriptor. Its `frameDependencies` must
 	 *   be given. If its `attachedStructure` is given, `structure` is written
-	 *   in the extension.
+	 *   in the extension, which is only allowed in the first packet of the
+	 *   frame (`startOfFrame`).
 	 * @param structure - Template dependency structure in use. Required if
 	 *   `descriptor` is given.
 	 * @param activeChainsBitmask - Bitmask of the active chains (bit i is chain
@@ -1368,8 +1388,8 @@ export class RtpPacket extends Serializable {
 	rtxEncode(payloadType: number, ssrc: number, sequenceNumber: number): void {
 		if (
 			!isUnsignedInteger(payloadType, 127) ||
-			!isUnsignedInteger(ssrc, 0xffffffff) ||
-			!isUnsignedInteger(sequenceNumber, 0xffff)
+			!isUnsignedInteger32(ssrc) ||
+			!isUnsignedInteger16(sequenceNumber)
 		) {
 			throw new TypeError(
 				`invalid payloadType (${payloadType}), ssrc (${ssrc}) or sequenceNumber (${sequenceNumber})`
@@ -1413,10 +1433,7 @@ export class RtpPacket extends Serializable {
 	 *   not modified.
 	 */
 	rtxDecode(payloadType: number, ssrc: number): boolean {
-		if (
-			!isUnsignedInteger(payloadType, 127) ||
-			!isUnsignedInteger(ssrc, 0xffffffff)
-		) {
+		if (!isUnsignedInteger(payloadType, 127) || !isUnsignedInteger32(ssrc)) {
 			throw new TypeError(
 				`invalid payloadType (${payloadType}) or ssrc (${ssrc})`
 			);
@@ -1706,10 +1723,11 @@ export class RtpPacket extends Serializable {
 	}
 
 	/**
-	 * Extensions (id and value) in the order they are in the packet.
+	 * Extensions (id and value).
 	 *
 	 * @remarks
 	 * - Each value is a view over the buffer of the packet.
+	 * - If an id is repeated in the packet, its last value is taken.
 	 */
 	#collectExtensions(): [number, Uint8Array][] {
 		const buffer = this.getBuffer();
@@ -1869,7 +1887,7 @@ export class RtpPacket extends Serializable {
 			}
 
 			case 'two-byte': {
-				if (!Number.isInteger(id) || id < 1 || id > 255) {
+				if (!isUnsignedInteger8(id) || id === 0) {
 					throw new TypeError(
 						`invalid extension id ${id} in Two-Byte extensions (must be 1..255)`
 					);

@@ -112,6 +112,11 @@ export abstract class Serializable {
 	 *   length the serializable can take. It may share memory with the current
 	 *   buffer.
 	 *
+	 * @remarks
+	 * - It must not be called on an item of another serializable or on an item
+	 *   being built in place, since it would move the item out of the buffer of
+	 *   its parent.
+	 *
 	 * @throws
 	 * - `Error` if some item is being built in place within this serializable
 	 *   (see {@link needsConsolidation}).
@@ -148,7 +153,8 @@ export abstract class Serializable {
 	 *   (see {@link needsConsolidation}).
 	 * - `TypeError` if `buffer.byteLength` is lower than the current length of
 	 *   the serializable.
-	 * - `TypeError` if `buffer` overlaps the bytes of the serializable.
+	 * - `TypeError` if `buffer` shares memory with the buffer of the
+	 *   serializable.
 	 */
 	abstract clone(buffer: Uint8Array): Serializable;
 
@@ -181,7 +187,8 @@ export abstract class Serializable {
 	 * The application can call this method, instead of {@link consolidate}, on
 	 * a serializable that's been built in place within a parent serializable
 	 * in order to remove it from the parent. The parent is left as it was
-	 * before the serializable was built in place.
+	 * before the serializable was built in place, except that its padding (if
+	 * any) may have been removed.
 	 *
 	 * @remarks
 	 * - The serializable MUST NOT be used after calling this method (unless it
@@ -319,8 +326,8 @@ export abstract class Serializable {
 	 *   (see {@link needsConsolidation}).
 	 * - `TypeError` if the buffer length of the given `serializable` is lower
 	 *   than the current length of this serializable.
-	 * - `TypeError` if the buffer of the given `serializable` overlaps the bytes
-	 *   of this serializable.
+	 * - `TypeError` if the buffer of the given `serializable` shares memory with
+	 *   the buffer of this serializable.
 	 */
 	protected cloneInto(
 		serializable: Serializable,
@@ -339,14 +346,15 @@ export abstract class Serializable {
 		const byteOffset = this.#buffer.byteOffset;
 		const clonedByteOffset = serializable.#buffer.byteOffset;
 
-		// The clone would overwrite the bytes of this serializable.
+		// The clone would share memory with this serializable, so growing any of
+		// them would overwrite the other one.
 		if (
 			serializable.#buffer.buffer === this.#buffer.buffer &&
-			clonedByteOffset < byteOffset + this.#length &&
-			byteOffset < clonedByteOffset + this.#length
+			clonedByteOffset < byteOffset + this.#buffer.byteLength &&
+			byteOffset < clonedByteOffset + serializable.#buffer.byteLength
 		) {
 			throw new TypeError(
-				'given buffer overlaps the bytes of the serializable'
+				'given buffer shares memory with the buffer of the serializable'
 			);
 		}
 
@@ -383,7 +391,8 @@ export abstract class Serializable {
 	 * When the application calls {@link consolidate} on the item, its buffer
 	 * length is fixed to its length and `onConsolidate` is invoked so the
 	 * parent adds it and updates its own length. When the application calls
-	 * {@link discard} on the item, the parent is left as it was.
+	 * {@link discard} on the item, the parent is left as it was, except that
+	 * its padding (if any) may have been removed.
 	 *
 	 * @remarks
 	 * - The parent must call {@link assertDoesNotNeedConsolidation} before

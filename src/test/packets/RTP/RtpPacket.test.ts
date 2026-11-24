@@ -1491,6 +1491,39 @@ describe('RTP Packet', () => {
 		expect(packet.getRidExtension()).toBe('foo');
 	});
 
+	test('rtpPacket.setExtensionMapping() throws if some id is not valid', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
+
+		packet.setExtensionMapping({ [ExtensionType.MID]: 1 });
+
+		for (const id of [0, -1, 256, 1.5]) {
+			expect(() =>
+				packet.setExtensionMapping({ [ExtensionType.MID]: id })
+			).toThrow(TypeError);
+			// The mapping is left as it was.
+			expect(packet.getExtensionMapping()).toEqual({
+				[ExtensionType.MID]: 1,
+			});
+		}
+	});
+
+	test('rtpPacket.setExtensionMapping() accepts ids that only Two-Byte extensions can hold', () => {
+		const packet = RtpPacket.factory(factoryBuffer);
+
+		packet.setExtensionMapping({ [ExtensionType.MID]: 128 });
+
+		expect(packet.getExtensionMapping()).toEqual({ [ExtensionType.MID]: 128 });
+
+		// But the extension cannot be written with One-Byte extensions.
+		expect(packet.getExtensionsForm()).toBe('one-byte');
+		expect(() => packet.setMidExtension('a')).toThrow(TypeError);
+
+		packet.setExtensionsForm('two-byte');
+		packet.setMidExtension('a');
+
+		expect(packet.getMidExtension()).toBe('a');
+	});
+
 	test('Packet audio level, video orientation, playout delay and abs capture time extensions succeed', () => {
 		const packet = RtpPacket.factory(factoryBuffer);
 
@@ -2124,6 +2157,36 @@ describe('RTP Packet', () => {
 
 		// Same ArrayBuffer but without overlapping bytes.
 		const clonedPacket = packet.clone(buffer.subarray(50));
+
+		expect(clonedPacket.getBuffer()).toEqual(packetBuffer);
+		expect(packet.getBuffer()).toEqual(packetBuffer);
+	});
+
+	test('rtpPacket.clone() fails if the given buffer shares memory with the buffer of the packet', () => {
+		const buffer = new Uint8Array(200);
+		// The packet takes 20 bytes at [100, 120) and its buffer, with its free
+		// space, is [100, 150).
+		const packet = RtpPacket.factory(buffer.subarray(100, 150));
+
+		packet.setSequenceNumber(7);
+		packet.setPayload(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]));
+
+		expect(packet.getLength()).toBe(20);
+
+		const packetBuffer = packet.getBuffer().slice();
+
+		// The bytes of the clone, [0, 20), don't overlap the ones of the packet,
+		// but its buffer covers them, so growing the clone would overwrite them.
+		expect(() => packet.clone(buffer.subarray(0, 200))).toThrow(TypeError);
+		expect(packet.getBuffer()).toEqual(packetBuffer);
+
+		// The given buffer is within the free space of the packet, so growing
+		// the packet would overwrite the clone.
+		expect(() => packet.clone(buffer.subarray(130, 200))).toThrow(TypeError);
+		expect(packet.getBuffer()).toEqual(packetBuffer);
+
+		// Same ArrayBuffer but without sharing memory.
+		const clonedPacket = packet.clone(buffer.subarray(150, 200));
 
 		expect(clonedPacket.getBuffer()).toEqual(packetBuffer);
 		expect(packet.getBuffer()).toEqual(packetBuffer);

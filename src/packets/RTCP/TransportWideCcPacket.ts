@@ -8,7 +8,7 @@ import {
 	AnyTransportLayerFeedbackPacket,
 	TransportLayerFeedbackMessageType,
 } from './AnyTransportLayerFeedbackPacket';
-import { isUnsignedInteger } from '../../utils/numbers';
+import { isUnsignedInteger8, isUnsignedInteger16 } from '../../utils/numbers';
 import { padTo4Bytes } from '../../utils/buffers';
 import {
 	readSigned3BytesInDataView,
@@ -421,8 +421,8 @@ class LastChunk {
 }
 
 /**
- * RTCP Transport-wide Congestion Control (TWCC) feedback packet (RTPFB 205,
- * FMT 15).
+ * RTCP Transport-wide Congestion Control feedback packet (RTPFB 205, FMT
+ * 15).
  *
  * ```text
  *  0                   1                   2                   3
@@ -588,6 +588,11 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 
 	/**
 	 * Whether the packet includes receive deltas.
+	 *
+	 * @remarks
+	 * - In a parsed packet that reports no received RTP packet (all of them
+	 *   lost), it's always `true`, since there is no receive delta whose
+	 *   presence tells it.
 	 */
 	hasDeltas(): boolean {
 		return this.#hasDeltas;
@@ -621,7 +626,7 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 	 * - `TypeError` if `count` is not an integer between 0 and 255.
 	 */
 	setFeedbackPacketCount(count: number): void {
-		if (!isUnsignedInteger(count, 0xff)) {
+		if (!isUnsignedInteger8(count)) {
 			throw new TypeError(
 				`count (${count}) must be an integer between 0 and 255`
 			);
@@ -643,7 +648,7 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 	 * - `Error` if RTP packets have already been added.
 	 */
 	setBase(baseSequenceNumber: number, referenceTimestampUs: number): void {
-		if (!isUnsignedInteger(baseSequenceNumber, 0xffff)) {
+		if (!isUnsignedInteger16(baseSequenceNumber)) {
 			throw new TypeError(
 				`baseSequenceNumber (${baseSequenceNumber}) must be an integer between 0 and 65535`
 			);
@@ -693,7 +698,7 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 	 *   or if `timestampUs` is not a safe integer.
 	 */
 	addReceivedRtpPacket(sequenceNumber: number, timestampUs: number): boolean {
-		if (!isUnsignedInteger(sequenceNumber, 0xffff)) {
+		if (!isUnsignedInteger16(sequenceNumber)) {
 			throw new TypeError(
 				`sequenceNumber (${sequenceNumber}) must be an integer between 0 and 65535`
 			);
@@ -893,6 +898,12 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 		}
 
 		const packetStatusCount = this.getPacketStatusCount();
+
+		// A feedback that reports no RTP packet at all is not valid.
+		if (packetStatusCount === 0) {
+			throw new TypeError('packet status count cannot be 0');
+		}
+
 		const deltaSizes = new Uint8Array(packetStatusCount);
 		const lastChunk = new LastChunk();
 		let numDeltaSizes = 0;
@@ -1195,7 +1206,8 @@ export class TransportWideCcPacket extends AnyTransportLayerFeedbackPacket {
 	/**
 	 * Add the status of `numMissingRtpPackets` RTP packets not received and the
 	 * delta size of the received RTP packet that follows them. If any of them
-	 * cannot be added, the packet is left as it was.
+	 * cannot be added, the packet is left as it was, except that its padding
+	 * (if any) may have been normalized.
 	 *
 	 * @remarks
 	 * - Missing RTP packets must not be reported without the received RTP

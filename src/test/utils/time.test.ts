@@ -52,6 +52,18 @@ test('timeUsToNtp()', () => {
 		timeUsToNtp(1001000).fractions
 	);
 	expect(ntpToTimeUs(timeUsToNtp(1000500))).toBe(1000500);
+
+	// A negative time gives the timestamp it's congruent with modulo 2^32
+	// seconds.
+	expect(timeUsToNtp(-1)).toEqual({
+		seconds: 0xffffffff,
+		fractions: 4294963001,
+	});
+	expect(timeUsToNtp(-1500000)).toEqual({
+		seconds: 0xfffffffe,
+		fractions: 0x80000000,
+	});
+	expect(timeUsToNtp(-1000000)).toEqual({ seconds: 0xffffffff, fractions: 0 });
 });
 
 test('ntpToCompactNtp()', () => {
