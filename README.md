@@ -23,11 +23,11 @@ npm install rtp.js
   import { isRtp, RtpPacket, ExtensionType } from 'rtp.js/packets/RTP';
 
   if (isRtp(buffer)) {
-  	const rtpPacket = RtpPacket.parse(buffer);
+    const rtpPacket = RtpPacket.parse(buffer);
 
-  	rtpPacket.setExtensionMapping({ [ExtensionType.MID]: 1 });
+    rtpPacket.setExtensionMapping({ [ExtensionType.MID]: 1 });
 
-  	const mid = rtpPacket.getMidExtension();
+    const mid = rtpPacket.getMidExtension();
   }
   ```
 
@@ -35,12 +35,12 @@ npm install rtp.js
 
   ```ts
   import {
-  	isRtcp,
-  	ReceiverReportPacket,
-  	SenderReportPacket,
-  	SdesPacket,
-  	ByePacket,
-  	// [...]
+    isRtcp,
+    ReceiverReportPacket,
+    SenderReportPacket,
+    SdesPacket,
+    ByePacket,
+    // [...]
   } from 'rtp.js/packets/RTCP';
 
   const byePacket = ByePacket.factory(new Uint8Array(1500));
@@ -54,7 +54,7 @@ npm install rtp.js
 
 ## Note about TypeScript
 
-**rtp.js** exposes its entry points ("rtp.js/packets/RTP", "rtp.js/packets/RTCP", "rtp.js/packets/common" and "rtp.js/utils") via the `exports` field of its `package.json` file, so TypeScript projects importing them must have `moduleResolution` set to "node16", "NodeNext" or "bundler" in their `tsconfig.json` file.
+**rtp.js** exposes its entry points via the `exports` field of its `package.json` file, so TypeScript projects importing them must have `moduleResolution` set to "node16", "NodeNext" or "bundler" in their `tsconfig.json` file.
 
 ## Author
 
