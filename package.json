@@ -1,29 +1,29 @@
 {
 	"name": "rtp.js",
-	"version": "0.15.7",
+	"version": "1.0.0-pre.1",
 	"description": "RTP stack for Node.js and browser written in TypeScript",
-	"contributors": [
-		"Iñaki Baz Castillo <ibc@aliax.net> (https://inakibaz.me)",
-		"José Luis Millán <jmillan@aliax.net> (https://github.com/jmillan)"
-	],
+	"author": "Iñaki Baz Castillo <ibc@aliax.net> (https://inakibaz.me)",
 	"homepage": "https://github.com/versatica/rtp.js",
 	"license": "ISC",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/versatica/rtp.js.git"
 	},
-	"main": "lib/index.js",
-	"types": "lib/index.d.ts",
 	"exports": {
-		".": {
-			"typedoc": "./src/index.ts",
-			"types": "./lib/index.d.ts",
-			"default": "./lib/index.js"
+		"./packets/common": {
+			"typedoc": "./src/packets/common/public.ts",
+			"types": "./lib/packets/common/public.d.ts",
+			"default": "./lib/packets/common/public.js"
 		},
-		"./packets": {
-			"typedoc": "./src/packets/public.ts",
-			"types": "./lib/packets/public.d.ts",
-			"default": "./lib/packets/public.js"
+		"./packets/RTP": {
+			"typedoc": "./src/packets/RTP/public.ts",
+			"types": "./lib/packets/RTP/public.d.ts",
+			"default": "./lib/packets/RTP/public.js"
+		},
+		"./packets/RTCP": {
+			"typedoc": "./src/packets/RTCP/public.ts",
+			"types": "./lib/packets/RTCP/public.d.ts",
+			"default": "./lib/packets/RTCP/public.js"
 		},
 		"./utils": {
 			"typedoc": "./src/utils/public.ts",
@@ -48,12 +48,14 @@
 	},
 	"scripts": {
 		"prepare": "node npm-scripts.mjs prepare",
+		"prepublishOnly": "node npm-scripts.mjs prepublishOnly",
 		"typescript:build": "node npm-scripts.mjs typescript:build",
 		"typescript:watch": "node npm-scripts.mjs typescript:watch",
 		"lint": "node npm-scripts.mjs lint",
 		"format": "node npm-scripts.mjs format",
 		"test": "node npm-scripts.mjs test",
 		"coverage": "node npm-scripts.mjs coverage",
+		"publish:dry-run": "node npm-scripts.mjs publish:dry-run",
 		"release:check": "node npm-scripts.mjs release:check",
 		"release": "node npm-scripts.mjs release",
 		"docs": "node npm-scripts.mjs docs",
@@ -61,20 +63,23 @@
 		"docs:check": "node npm-scripts.mjs docs:check"
 	},
 	"dependencies": {
-		"@types/node": "^26.6.6",
+		"@types/events-alias": "npm:@types/events@^3.0.3",
 		"debug": "^4.4.3",
+		"events": "^3.3.0",
 		"supports-color": "^11.0.0"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
 		"@types/debug": "^4.1.13",
 		"@types/jest": "^30.0.0",
+		"@types/node": "^26.6.6",
 		"eslint": "^10.15.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-jest": "^29.17.1",
 		"eslint-plugin-prettier": "^5.5.7",
 		"globals": "^17.14.0",
 		"jest": "^30.5.2",
+		"knip": "^6.48.0",
 		"open-cli": "^9.0.0",
 		"prettier": "^3.10.1",
 		"ts-jest": "^29.4.15",

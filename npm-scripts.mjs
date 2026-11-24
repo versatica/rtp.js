@@ -1,35 +1,36 @@
 import * as process from 'node:process';
 import * as fs from 'node:fs';
 import { execSync } from 'node:child_process';
-import pkg from './package.json' with { type: 'json' };
 
-const RELEASE_BRANCH = 'master';
+const MAIN_BRANCH = 'master';
 
-// Paths for ESLint to check. Converted to string for convenience.
+// Paths for ESLint to check.
 const ESLINT_PATHS = [
 	'eslint.config.mjs',
 	'jest.config.mjs',
+	'knip.config.mjs',
 	'npm-scripts.mjs',
 	'typedoc.config.mjs',
 	'src',
-].join(' ');
+];
 
-// Paths for ESLint to ignore. Converted to string argument for convenience.
-const ESLINT_IGNORE_PATTERN_ARGS = []
-	.map(entry => `--ignore-pattern ${entry}`)
-	.join(' ');
+// Paths for ESLint to ignore.
+const ESLINT_IGNORE_PATHS = [];
 
-// Paths for Prettier to check/write. Converted to string for convenience.
+// Paths for Prettier to check/write.
+// NOTE: Prettier ignores paths in .gitignore.
 const PRETTIER_PATHS = [
 	'README.md',
 	'eslint.config.mjs',
 	'jest.config.mjs',
+	'knip.config.mjs',
 	'npm-scripts.mjs',
 	'package.json',
 	'tsconfig.json',
+	'tsconfig.build.json',
 	'typedoc.config.mjs',
 	'src',
-].join(' ');
+];
 
 const task = process.argv[2];
 const taskArgs = process.argv.slice(3).join(' ');
@@ -58,14 +59,20 @@ async function run() {
 			break;
 		}
 
+		case 'prepublishOnly': {
+			prepublishOnly();
+
+			break;
+		}
+
 		case 'typescript:build': {
-			buildTypescript({ force: true });
+			buildTypescript({ force: true, args: taskArgs });
 
 			break;
 		}
 
 		case 'typescript:watch': {
-			watchTypescript();
+			watchTypescript({ args: taskArgs });
 
 			break;
 		}
@@ -83,13 +90,19 @@ async function run() {
 		}
 
 		case 'test': {
-			test();
+			test({ args: taskArgs });
 
 			break;
 		}
 
 		case 'coverage': {
-			coverage();
+			coverage({ args: taskArgs });
+
+			break;
+		}
+
+		case 'publish:dry-run': {
+			publishDryRun();
 
 			break;
 		}
@@ -101,7 +114,7 @@ async function run() {
 		}
 
 		case 'release': {
-			release();
+			await release({ args: taskArgs });
 
 			break;
 		}
@@ -145,8 +158,9 @@ function deleteLib() {
 	fs.rmSync('lib', { recursive: true, force: true });
 }
 
-function buildTypescript({ force }) {
-	if (!force && fs.existsSync('node/lib')) {
+function buildTypescript({ force, args = '' }) {
+	// Skip JavaScript code generation if the output already exists, unless forced.
+	if (!force && fs.existsSync('lib')) {
 		return;
 	}
 
@@ -155,15 +169,18 @@ function buildTypescript({ force }) {
 	deleteLib();
 
 	// Generate .js CommonJS code and .d.ts TypeScript declaration files in lib/.
-	executeCmd('tsc');
+	// Type check everything, tests included, without generating anything.
+	executeCmd('tsc --noEmit');
+
+	// NOTE: tsconfig.build.json excludes tests, so they don't end in lib/.
+	executeCmd(`tsc -p tsconfig.build.json ${args}`);
 }
 
-function watchTypescript() {
+function watchTypescript({ args = '' } = {}) {
 	logInfo('watchTypescript()');
 
-	deleteLib();
-
-	executeCmd('tsc --watch');
+	// Type check everything, tests included, without generating anything.
+	executeCmd(`tsc --watch --noEmit ${args}`);
 }
 
 function lint() {
@@ -173,29 +190,43 @@ function lint() {
 	// rules.
 	executeCmd('eslint-config-prettier eslint.config.mjs');
 
+	const eslintIgnorePatternArgs = ESLINT_IGNORE_PATHS.map(
+		entry => `--ignore-pattern ${entry}`
+	).join(' ');
+	const eslintFiles = ESLINT_PATHS.join(' ');
+
 	executeCmd(
-		`eslint -c eslint.config.mjs --max-warnings 0 ${ESLINT_IGNORE_PATTERN_ARGS} ${ESLINT_PATHS}`
+		`eslint -c eslint.config.mjs --max-warnings 0 ${eslintIgnorePatternArgs} ${eslintFiles}`
 	);
 
-	executeCmd(`prettier --check ${PRETTIER_PATHS}`);
+	const prettierFiles = PRETTIER_PATHS.join(' ');
+
+	executeCmd(`prettier --check ${prettierFiles}`);
+	executeCmd('knip --config knip.config.mjs --treat-config-hints-as-errors');
+	// NOTE: Exports only used by tests are reported in production mode.
+	executeCmd(
+		'knip --config knip.config.mjs --production --treat-config-hints-as-errors'
+	);
 }
 
 function format() {
 	logInfo('format()');
 
-	executeCmd(`prettier --write ${PRETTIER_PATHS}`);
+	const prettierFiles = PRETTIER_PATHS.join(' ');
+
+	executeCmd(`prettier --write ${prettierFiles}`);
 }
 
-function test() {
+function test({ args = '' } = {}) {
 	logInfo('test()');
 
-	executeCmd(`jest --silent false --detectOpenHandles ${taskArgs}`);
+	executeCmd(`jest --silent false --detectOpenHandles ${args}`);
 }
 
-function coverage() {
+function coverage({ args = '' } = {}) {
 	logInfo('coverage()');
 
-	executeCmd(`jest --coverage ${taskArgs}`);
+	executeCmd(`jest --coverage ${args}`);
 	executeCmd('open-cli coverage/lcov-report/index.html');
 }
 
@@ -212,6 +243,42 @@ function installDeps() {
 	executeCmd('npm audit --omit dev');
 }
 
+/**
+ * `prepublishOnly` is run by NPM only on `npm publish` (not on `npm pack`,
+ * `npm install` or `npm ci`). We use it to forbid publishing rtp.js from a
+ * local machine. The package must only be published by the `rtp.js-npm-publish`
+ * workflow, which runs inside GitHub Actions (where GITHUB_ACTIONS environment
+ * variable is set to 'true') and uses OIDC trusted publishing.
+ */
+function prepublishOnly() {
+	logInfo('prepublishOnly()');
+
+	if (process.env.GITHUB_ACTIONS !== 'true') {
+		logError(
+			"prepublishOnly() | refusing to 'npm publish' outside of GitHub Actions: rtp.js is published only by the rtp.js-npm-publish workflow (triggered by pushing a release tag via 'npm run release')"
+		);
+
+		exitWithError();
+	}
+}
+
+function publishDryRun() {
+	logInfo('publishDryRun()');
+
+	// NOTE: We use `npm pack --dry-run` rather than `npm publish --dry-run`
+	// because the latter contacts the registry and fails with "You cannot
+	// publish over the previously published versions" whenever the version in
+	// package.json is already published (which is the usual state between
+	// releases), making it useless in CI.
+	//
+	// `npm pack --dry-run` still runs the `prepare` script (TypeScript build)
+	// and assembles the tarball exactly as a real publish would, reporting its
+	// contents without writing any file or contacting the registry. Useful to
+	// validate the `files` list in package.json and that the package builds
+	// before tagging a release.
+	executeCmd('npm pack --dry-run --loglevel warn');
+}
+
 function checkRelease() {
 	logInfo('checkRelease()');
 
@@ -220,17 +287,78 @@ function checkRelease() {
 	lint();
 	test();
 	checkDocs();
+	// Validate packaging (the `files` list in package.json) before the
+	// irreversible release steps (git push, GitHub release, npm publish).
+	publishDryRun();
 }
 
-function release() {
+async function release({ args = '' } = {}) {
 	logInfo('release()');
 
+	const version = args.trim();
+
+	if (!/^\d+\.\d+\.\d+$/.test(version)) {
+		logError(
+			`release() | a SEMVER 'x.y.z' argument is required, but got '${version}'`
+		);
+
+		exitWithError();
+	}
+
+	// Must be on the main branch.
+	const branch = execSync('git rev-parse --abbrev-ref HEAD', {
+		encoding: 'utf-8',
+	}).trim();
+
+	if (branch !== MAIN_BRANCH) {
+		logError(
+			`release() | must be on '${MAIN_BRANCH}' branch, but it is on '${branch}' branch`
+		);
+
+		exitWithError();
+	}
+
+	// Clean working tree required before bumping the version.
+	checkGitClean();
+
+	// Lint, test, build, docs check, publish dry-run.
 	checkRelease();
-	executeCmd(`git commit -am '${pkg.version}'`);
-	executeCmd(`git tag -a ${pkg.version} -m '${pkg.version}'`);
-	executeCmd(`git push origin ${RELEASE_BRANCH}`);
-	executeCmd(`git push origin '${pkg.version}'`);
-	executeInteractiveCmd('npm publish');
+
+	// Bump the version in package.json + package-lock.json.
+	executeCmd(`npm version ${version} --no-git-tag-version`);
+
+	// Commit the bump, tag it, and push both. The pushed tag triggers
+	// `rtp.js-npm-publish` workflow, which checks, creates the GitHub release
+	// and publishes to NPM. Once it succeeds, it triggers the `docs` workflow,
+	// which deploys the docs.
+	//
+	// The commit message carries a "[no-ci]" marker so the regular branch CI
+	// workflow skips this commit.
+	//
+	// NOTE: "[no-ci]" (with a hyphen) is a custom marker, NOT GitHub's native
+	// "[skip ci]"/"[no ci]" (which would also skip `rtp.js-npm-publish` workflow,
+	// and hence `docs` workflow, since the tag push shares this same commit).
+	executeCmd(`git commit -am 'release ${version} [no-ci]'`);
+	executeCmd(`git tag -a ${version} -m '${version}'`);
+	executeCmd(`git push origin ${MAIN_BRANCH}`);
+	executeCmd(`git push origin '${version}'`);
+}
+
+function checkGitClean() {
+	logInfo('checkGitClean()');
+
+	const status = execSync('git status --porcelain', {
+		encoding: 'utf-8',
+		stdio: ['ignore', 'pipe', 'ignore'],
+	});
+
+	if (status.trim()) {
+		logError(
+			'checkGitClean() | Git working tree is not clean, commit or stash your changes first'
+		);
+
+		exitWithError();
+	}
 }
 
 function generateDocs() {
@@ -257,6 +385,7 @@ function executeCmd(command) {
 	}
 }
 
+// eslint-disable-next-line no-unused-vars
 function executeInteractiveCmd(command) {
 	logInfo(`executeInteractiveCmd(): ${command}`);
 

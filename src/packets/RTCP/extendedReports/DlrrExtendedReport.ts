@@ -1,41 +1,61 @@
 import {
 	ExtendedReport,
-	ExtendedReportType,
+	ExtendedReportBlockType,
+	EXTENDED_REPORT_HEADER_LENGTH,
+	isExtendedReport,
 	type ExtendedReportDump,
-	COMMON_HEADER_LENGTH,
-} from './ExtendedReport';
+} from '../ExtendedReport';
+import { isUnsignedInteger32 } from '../../../utils/numbers';
 
 /**
- * DLRR Extended Report dump.
- *
- * @category RTCP Extended Reports
+ * Length (in bytes) of a DLRR sub-block.
  */
-export type DlrrExtendedReportDump = ExtendedReportDump & {
-	subReports: DlrrSubReport[];
-};
+const DLRR_SUB_BLOCK_LENGTH = 12;
 
 /**
- * DLRR Sub-Report.
- *
- * @category RTCP Extended Reports
+ * DLRR sub-block.
  */
-export type DlrrSubReport = {
+export type DlrrSubBlock = {
 	/**
-	 * SSRC of receiver.
+	 * SSRC of the receiver.
 	 */
 	ssrc: number;
 	/**
-	 * Last RR timestamp.
+	 * Last RR timestamp (LRR): The middle 32 bits of the NTP timestamp received
+	 * in the last Receiver Reference Time Report Block from the receiver (0 if
+	 * none was received).
+	 *
+	 * @see
+	 * - {@link utils!ntpToCompactNtp} to obtain it from the NTP timestamp.
+	 * - {@link utils!compactNtpRttToTimeUs} to convert the round trip time
+	 *   computed with it into microseconds.
 	 */
-	lrr: number;
+	lastReceiverReport: number;
 	/**
-	 * Delay since last RR.
+	 * Delay since last RR (DLRR): Delay, in units of 1/65536 seconds, between
+	 * receiving the last Receiver Reference Time Report Block from the receiver
+	 * and sending this DLRR Report Block (0 if none was received).
+	 *
+	 * @see
+	 * - {@link utils!timeUsToCompactNtpInterval} and
+	 *   {@link utils!compactNtpIntervalToTimeUs} to convert it from and into
+	 *   microseconds.
 	 */
-	dlrr: number;
+	delaySinceLastReceiverReport: number;
 };
 
 /**
- * DLRR Extended Report.
+ * RTCP XR DLRR Report Block info dump.
+ */
+export type DlrrExtendedReportDump = ExtendedReportDump & {
+	/**
+	 * DLRR sub-blocks.
+	 */
+	subBlocks: DlrrSubBlock[];
+};
+
+/**
+ * RTCP XR DLRR Report Block (5).
  *
  * ```text
  *  0                   1                   2                   3
@@ -55,164 +75,165 @@ export type DlrrSubReport = {
  * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  * ```
  *
- * @category RTCP Extended Reports
+ * - Block type (BT) (8 bits): 5.
+ * - Reserved (8 bits): Must be set to zero and must be ignored by the
+ *   receiver.
+ * - Sub-blocks: One per receiver. See {@link DlrrSubBlock}.
  *
  * @see
  * - [RFC 3611 section 4.5](https://datatracker.ietf.org/doc/html/rfc3611#section-4.5)
  */
 export class DlrrExtendedReport extends ExtendedReport {
-	// Sub-reports.
-	#subReports: DlrrSubReport[] = [];
-
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty DLRR Extended
-	 *   Report will be created.
+	 * Parse a RTCP XR DLRR Report Block.
+	 *
+	 * @param buffer - Buffer holding the block. Its `byteLength` is the maximum
+	 *   length the block can take and it can be greater than the length of the
+	 *   block, which is given by its block length field.
+	 *
+	 * @throws
+	 * - `TypeError` if the buffer does not contain a valid RTCP XR DLRR Report
+	 *   Block.
 	 */
-	constructor(view?: DataView) {
-		super(ExtendedReportType.DLRR, view);
-
-		if (!this.view) {
-			this.view = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
-
-			// Write report type.
-			this.writeCommonHeader();
-
-			return;
+	static parse(buffer: Uint8Array): DlrrExtendedReport {
+		if (!isExtendedReport(buffer)) {
+			throw new TypeError('not a RTCP XR Extended Report block');
 		}
 
-		if (this.view.byteLength < COMMON_HEADER_LENGTH) {
-			throw new TypeError('wrong byte length for a DLRR Extended Report');
-		}
+		const extendedReport = new DlrrExtendedReport(buffer);
 
-		// Position relative to the DataView byte offset.
-		let pos = 0;
+		extendedReport.parseHeader(ExtendedReportBlockType.DLRR);
+		extendedReport.#validate();
 
-		// Move to sub-reports.
-		pos += COMMON_HEADER_LENGTH;
-
-		while (pos < this.view.byteLength) {
-			const ssrc = this.view.getUint32(pos);
-
-			pos += 4;
-
-			const lrr = this.view.getUint32(pos);
-
-			pos += 4;
-
-			const dlrr = this.view.getUint32(pos);
-
-			pos += 4;
-
-			this.#subReports.push({ ssrc, lrr, dlrr });
-		}
+		return extendedReport;
 	}
 
 	/**
-	 * Dump DLRR Extended Report info.
+	 * Create a RTCP XR DLRR Report Block without sub-blocks.
+	 *
+	 * @param buffer - Buffer for the block. Its `byteLength` is the maximum
+	 *   length the block can take.
+	 *
+	 * @throws
+	 * - `TypeError` if `buffer.byteLength` is lower than 4 bytes.
+	 */
+	static factory(buffer: Uint8Array): DlrrExtendedReport {
+		const extendedReport = new DlrrExtendedReport(buffer);
+
+		extendedReport.initializeHeader(
+			ExtendedReportBlockType.DLRR,
+			0,
+			EXTENDED_REPORT_HEADER_LENGTH
+		);
+
+		return extendedReport;
+	}
+
+	/**
+	 * Length (in bytes) of a RTCP XR DLRR Report Block with the given number of
+	 * sub-blocks.
+	 *
+	 * @internal
+	 */
+	static computeLengthFor(numSubBlocks: number): number {
+		// The sub-blocks go right after the block header, and each one is a
+		// multiple of 4 bytes, so the block never needs padding.
+		return EXTENDED_REPORT_HEADER_LENGTH + numSubBlocks * DLRR_SUB_BLOCK_LENGTH;
+	}
+
+	private constructor(buffer: Uint8Array) {
+		super(buffer);
+	}
+
+	/**
+	 * Dump RTCP XR DLRR Report Block info.
 	 */
 	override dump(): DlrrExtendedReportDump {
 		return {
 			...super.dump(),
-			subReports: this.getSubReports(),
+			subBlocks: this.getSubBlocks(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number {
-		if (!this.needsSerialization()) {
-			return this.view.byteLength;
-		}
+	clone(buffer: Uint8Array): DlrrExtendedReport {
+		const clonedExtendedReport = new DlrrExtendedReport(buffer);
 
-		let reportLength = COMMON_HEADER_LENGTH;
+		this.cloneInto(clonedExtendedReport);
 
-		// Add sub-reports.
-		reportLength += this.#subReports.length * 12;
-
-		return reportLength;
+		return clonedExtendedReport;
 	}
 
 	/**
-	 * @inheritDoc
+	 * Get the number of sub-blocks.
 	 */
-	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
-		const view = this.serializeBase(buffer, byteOffset);
+	getNumberOfSubBlocks(): number {
+		return this.getBodyLength() / DLRR_SUB_BLOCK_LENGTH;
+	}
 
-		// Position relative to the DataView byte offset.
-		let pos = 0;
+	/**
+	 * Get the sub-blocks.
+	 */
+	getSubBlocks(): DlrrSubBlock[] {
+		const view = this.getView();
+		const numberOfSubBlocks = this.getNumberOfSubBlocks();
+		const subBlocks: DlrrSubBlock[] = [];
 
-		// Move to sub-reports.
-		pos += COMMON_HEADER_LENGTH;
+		for (let idx = 0; idx < numberOfSubBlocks; ++idx) {
+			const pos = EXTENDED_REPORT_HEADER_LENGTH + idx * DLRR_SUB_BLOCK_LENGTH;
 
-		// Copy sub-reports.
-		for (const { ssrc, lrr, dlrr } of this.#subReports) {
-			view.setUint32(pos, ssrc);
-
-			pos += 4;
-
-			view.setUint32(pos, lrr);
-
-			pos += 4;
-
-			view.setUint32(pos, dlrr);
-
-			pos += 4;
+			subBlocks.push({
+				ssrc: view.getUint32(pos),
+				lastReceiverReport: view.getUint32(pos + 4),
+				delaySinceLastReceiverReport: view.getUint32(pos + 8),
+			});
 		}
 
-		if (pos !== view.byteLength) {
-			throw new RangeError(
-				`filled length (${pos} bytes) does not match the available buffer size (${view.byteLength} bytes)`
+		return subBlocks;
+	}
+
+	/**
+	 * Add a sub-block at the end of the block.
+	 *
+	 * @throws
+	 * - `TypeError` if `ssrc`, `lastReceiverReport` or
+	 *   `delaySinceLastReceiverReport` is not an integer between 0 and
+	 *   4294967295.
+	 * - `TypeError` if the buffer has no space for the sub-block.
+	 */
+	addSubBlock(subBlock: DlrrSubBlock): void {
+		if (
+			!isUnsignedInteger32(subBlock.ssrc) ||
+			!isUnsignedInteger32(subBlock.lastReceiverReport) ||
+			!isUnsignedInteger32(subBlock.delaySinceLastReceiverReport)
+		) {
+			throw new TypeError(
+				'ssrc, lastReceiverReport and delaySinceLastReceiverReport must be integers between 0 and 4294967295'
 			);
 		}
 
-		// Update DataView.
-		this.view = view;
+		const bodyLength = this.getBodyLength();
+		// The new sub-block goes right after the last one.
+		const pos = EXTENDED_REPORT_HEADER_LENGTH + bodyLength;
 
-		this.setSerializationNeeded(false);
+		// NOTE: This throws if there is no space in the buffer.
+		this.setBodyLength(bodyLength + DLRR_SUB_BLOCK_LENGTH);
+
+		const view = this.getView();
+
+		view.setUint32(pos, subBlock.ssrc);
+		view.setUint32(pos + 4, subBlock.lastReceiverReport);
+		view.setUint32(pos + 8, subBlock.delaySinceLastReceiverReport);
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	clone(
-		buffer?: ArrayBufferLike,
-		byteOffset?: number,
-		serializationBuffer?: ArrayBufferLike,
-		serializationByteOffset?: number
-	): DlrrExtendedReport {
-		const view = this.cloneInternal(
-			buffer,
-			byteOffset,
-			serializationBuffer,
-			serializationByteOffset
-		);
-
-		return new DlrrExtendedReport(view);
-	}
-
-	/**
-	 * Get sub-reports.
-	 */
-	getSubReports(): DlrrSubReport[] {
-		return Array.from(this.#subReports);
-	}
-
-	/**
-	 * Set sub-reports.
-	 */
-	setSubReports(subReports: DlrrSubReport[]): void {
-		this.#subReports = Array.from(subReports);
-
-		this.setSerializationNeeded(true);
-	}
-
-	/**
-	 * Add sub-report.
-	 */
-	addSubReport(subReport: DlrrSubReport): void {
-		this.#subReports.push(subReport);
-
-		this.setSerializationNeeded(true);
+	#validate(): void {
+		// The block must contain whole sub-blocks.
+		if (this.getBodyLength() % DLRR_SUB_BLOCK_LENGTH !== 0) {
+			throw new TypeError(
+				`sub-blocks length (${this.getBodyLength()} bytes) is not multiple of ${DLRR_SUB_BLOCK_LENGTH}`
+			);
+		}
 	}
 }

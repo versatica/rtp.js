@@ -1,362 +1,351 @@
 import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket';
+import type { ReceptionReport } from '../../../packets/RTCP/AnyReportPacket';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
 import {
-	ReceptionReport,
-	type ReceptionReportDump,
-} from '../../../packets/RTCP/ReceiverReportPacket';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { areDataViewsEqual } from '../../../utils/helpers';
+	factoryBuffer,
+	serializeBuffer,
+	cloneBuffer,
+	resetBuffers,
+} from '../../testHelpers';
 
-const receptionReportDump1: ReceptionReportDump = {
-	byteLength: 24,
-	ssrc: 0x01932db4,
-	fractionLost: 80,
-	totalLost: 216,
-	highestSeq: 342342,
-	jitter: 0,
-	lsr: 8234,
-	dlsr: 5,
-};
+beforeEach(resetBuffers);
 
-describe('parse RTCP Sender Report packet', () => {
-	// Sender info.
-	const ssrc = 0x5d931534;
-	const ntpSeconds = 3711615412;
-	const ntpFraction = 1985245553;
-	const rtpTimestamp = 577280;
-	const packetCount = 3608;
-	const octetCount = 577280;
+describe('RTCP Sender Report Packet', () => {
+	test('SenderReportPacket.parse() succeeds', () => {
+		function checkFields(packet: SenderReportPacket): void {
+			const reports = packet.getReports();
 
-	const array = new Uint8Array([
-		0x81,
-		0xc8,
-		0x00,
-		0x0c, // Type: 200 (Sender Report), Count: 1, Length: 12
-		0x5d,
-		0x93,
-		0x15,
-		0x34, // SSRC: 0x5d931534
-		0xdd,
-		0x3a,
-		0xc1,
-		0xb4, // NTP Sec: 3711615412
-		0x76,
-		0x54,
-		0x71,
-		0x71, // NTP Frac: 1985245553
-		0x00,
-		0x08,
-		0xcf,
-		0x00, // RTP timestamp: 577280
-		0x00,
-		0x00,
-		0x0e,
-		0x18, // Packet count: 3608
-		0x00,
-		0x08,
-		0xcf,
-		0x00, // Octet count: 577280
-		// Reception Report
-		0x01,
-		0x93,
-		0x2d,
-		0xb4, // SSRC: 0x01932db4
-		0x50,
-		0x00,
-		0x00,
-		0xd8, // Fraction lost: 0, Total lost: 1
-		0x00,
-		0x05,
-		0x39,
-		0x46, // Extended highest sequence number: 0
-		0x00,
-		0x00,
-		0x00,
-		0x00, // Jitter: 0
-		0x00,
-		0x00,
-		0x20,
-		0x2a, // Last SR: 8234
-		0x00,
-		0x00,
-		0x00,
-		0x05, // DLSR: 5
-	]);
+			expect(packet.getSsrc()).toBe(0x5d931534);
+			expect(packet.getNtp()).toEqual({
+				seconds: 0xe7a1b2c3,
+				fractions: 0x12345678,
+			});
+			expect(packet.getRtpTimestamp()).toBe(0x0a0b0c0d);
+			expect(packet.getPacketCount()).toBe(1000);
+			expect(packet.getOctetCount()).toBe(123456);
+			expect(packet.getReportsCount()).toBe(1);
+			expect(reports.length).toBe(1);
 
-	const view = new DataView(array.buffer, array.byteOffset, array.byteLength);
+			expect(reports[0]).toEqual({
+				ssrc: 0x01932db4,
+				fractionLost: 5,
+				totalLost: 258,
+				highestSeq: 131088,
+				jitter: 15,
+				lsr: 0xb2c31234,
+				dlsr: 32768,
+			});
+		}
 
-	test('buffer view is RTCP', () => {
-		expect(isRtcp(view)).toBe(true);
+		// prettier-ignore
+		const buffer = new Uint8Array([
+			// V=2, P=0, RC=1, PT:200, Length: 12
+			0b10000001, 0xc8, 0x00, 0x0c,
+			// SSRC of sender: 0x5d931534
+			0x5d, 0x93, 0x15, 0x34,
+			// NTP timestamp, most significant word: 0xe7a1b2c3
+			0xe7, 0xa1, 0xb2, 0xc3,
+			// NTP timestamp, least significant word: 0x12345678
+			0x12, 0x34, 0x56, 0x78,
+			// RTP timestamp: 0x0a0b0c0d
+			0x0a, 0x0b, 0x0c, 0x0d,
+			// Sender's packet count: 1000
+			0x00, 0x00, 0x03, 0xe8,
+			// Sender's octet count: 123456
+			0x00, 0x01, 0xe2, 0x40,
+			// Report block 1
+			// SSRC: 0x01932db4
+			0x01, 0x93, 0x2d, 0xb4,
+			// Fraction lost: 5, Total lost: 258
+			0x05, 0x00, 0x01, 0x02,
+			// Extended highest seq: 131088
+			0x00, 0x02, 0x00, 0x10,
+			// Jitter: 15
+			0x00, 0x00, 0x00, 0x0f,
+			// LSR: 0xb2c31234
+			0xb2, 0xc3, 0x12, 0x34,
+			// DLSR: 32768
+			0x00, 0x00, 0x80, 0x00,
+		]);
+		const packet = SenderReportPacket.parse(buffer);
+		const expected: ExpectedRtcpPacket = {
+			buffer: buffer,
+			bufferLength: buffer.byteLength,
+			length: 52,
+			packetType: RtcpPacketType.SR,
+			hasPadding: false,
+			padding: 0,
+		};
+
+		checkRtcpPacket(packet, expected);
+
+		checkFields(packet);
+
+		/* Serialize it. */
+
+		packet.serialize(serializeBuffer);
+
+		buffer.fill(0xff);
+
+		checkRtcpPacket(packet, {
+			...expected,
+			buffer: serializeBuffer,
+			bufferLength: serializeBuffer.byteLength,
+		});
+
+		checkFields(packet);
+
+		/* Clone it. */
+
+		const clonedPacket = packet.clone(cloneBuffer);
+
+		serializeBuffer.fill(0xff);
+
+		checkRtcpPacket(clonedPacket, {
+			...expected,
+			buffer: cloneBuffer,
+			bufferLength: cloneBuffer.byteLength,
+		});
+
+		checkFields(clonedPacket);
 	});
 
-	test('packet processing succeeds', () => {
-		const packet = new SenderReportPacket(view);
+	test('SenderReportPacket.parse() with padding succeeds', () => {
+		// prettier-ignore
+		const buffer = new Uint8Array([
+			// V=2, P=1, RC=0, PT:200, Length: 7
+			0b10100000, 0xc8, 0x00, 0x07,
+			// SSRC of packet sender: 0x5d931534
+			0x5d, 0x93, 0x15, 0x34,
+			// NTP timestamp (most significant word): 1111
+			0x00, 0x00, 0x04, 0x57,
+			// NTP timestamp (least significant word): 2222
+			0x00, 0x00, 0x08, 0xae,
+			// RTP timestamp: 3333
+			0x00, 0x00, 0x0d, 0x05,
+			// Sender's packet count: 4444
+			0x00, 0x00, 0x11, 0x5c,
+			// Sender's octet count: 5555
+			0x00, 0x00, 0x15, 0xb3,
+			// Padding: 4 bytes
+			0x00, 0x00, 0x00, 0x04,
+		]);
+		const packet = SenderReportPacket.parse(buffer);
 
-		expect(packet.needsSerialization()).toBe(false);
-		// Byte length must be 28 (fixed header) + 24 (1 report) = 52.
-		expect(packet.getByteLength()).toBe(52);
-		expect(packet.getPacketType()).toBe(RtcpPacketType.SR);
-		expect(packet.getCount()).toBe(1);
-		expect(packet.getPadding()).toBe(0);
-		expect(packet.getSsrc()).toBe(ssrc);
-		expect(packet.getNtpSeconds()).toBe(ntpSeconds);
-		expect(packet.getNtpFraction()).toBe(ntpFraction);
-		expect(packet.getRtpTimestamp()).toBe(rtpTimestamp);
-		expect(packet.getPacketCount()).toBe(packetCount);
-		expect(packet.getOctetCount()).toBe(octetCount);
-		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		checkRtcpPacket(packet, {
+			buffer: buffer,
+			bufferLength: buffer.byteLength,
+			length: 32,
+			packetType: RtcpPacketType.SR,
+			hasPadding: true,
+			padding: 4,
+		});
 
-		const report1 = packet.getReports()[0]!;
-
-		expect(report1.dump()).toEqual(receptionReportDump1);
-
-		// Also test the same after serializing.
-		packet.serialize();
-
-		expect(packet.needsSerialization()).toBe(false);
-		// Byte length must be 28 (fixed header) + 24 (1 report) = 52.
-		expect(packet.getByteLength()).toBe(52);
-		expect(packet.getPacketType()).toBe(RtcpPacketType.SR);
-		expect(packet.getCount()).toBe(1);
-		expect(packet.getPadding()).toBe(0);
-		expect(packet.getSsrc()).toBe(ssrc);
-		expect(packet.getNtpSeconds()).toBe(ntpSeconds);
-		expect(packet.getNtpFraction()).toBe(ntpFraction);
-		expect(packet.getRtpTimestamp()).toBe(rtpTimestamp);
-		expect(packet.getPacketCount()).toBe(packetCount);
-		expect(packet.getOctetCount()).toBe(octetCount);
-		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
-
-		const report1B = packet.getReports()[0]!;
-
-		expect(report1B.dump()).toEqual(receptionReportDump1);
-
-		// If a change is done in a Reception Report, the Receiver Report packet must
-		// need serialization.
-		report1B.setDelaySinceLastSR(6);
-		expect(report1B.needsSerialization()).toBe(true);
-		expect(packet.needsSerialization()).toBe(true);
-
-		// And if we serialize the packet, it should unset the serialization needed
-		// flag.
-		packet.serialize();
-		expect(report1B.needsSerialization()).toBe(false);
-		expect(packet.needsSerialization()).toBe(false);
+		expect(packet.getSsrc()).toBe(0x5d931534);
+		expect(packet.getNtp()).toEqual({ seconds: 1111, fractions: 2222 });
+		expect(packet.getRtpTimestamp()).toBe(3333);
+		expect(packet.getPacketCount()).toBe(4444);
+		expect(packet.getOctetCount()).toBe(5555);
+		expect(packet.getReportsCount()).toBe(0);
+		expect(packet.getReports()).toEqual([]);
 	});
 
-	test('packet processing succeeds for a buffer view with padding', () => {
-		const array2 = new Uint8Array([
-			0xa0,
-			0xc8,
-			0x00,
-			0x07, // Padding, Type: 200, Count: 0, Length: 7
-			0x5d,
-			0x93,
-			0x15,
-			0x34, // SSRC: 0x5d931534
-			0xdd,
-			0x3a,
-			0xc1,
-			0xb4, // NTP Sec: 3711615412
-			0x76,
-			0x54,
-			0x71,
-			0x71, // NTP Frac: 1985245553
-			0x00,
-			0x08,
-			0xcf,
-			0x00, // RTP timestamp: 577280
-			0x00,
-			0x00,
-			0x0e,
-			0x18, // Packet count: 3608
-			0x00,
-			0x08,
-			0xcf,
-			0x00, // Octet count: 577280
-			0x00,
-			0x00,
-			0x00,
-			0x04, // Padding (4 bytes)
+	test('SenderReportPacket.parse() fails', () => {
+		// No space for the sender info.
+		// prettier-ignore
+		const buffer1 = new Uint8Array([
+			// V=2, P=0, RC=0, PT:200, Length: 1
+			0b10000000, 0xc8, 0x00, 0x01,
+			// SSRC of sender: 1111
+			0x00, 0x00, 0x04, 0x57,
 		]);
 
-		const view2 = new DataView(
-			array2.buffer,
-			array2.byteOffset,
-			array2.byteLength
-		);
+		expect(() => SenderReportPacket.parse(buffer1)).toThrow(TypeError);
 
-		const packet = new SenderReportPacket(view2);
+		// RC field announces 1 report block but there is none.
+		// prettier-ignore
+		const buffer2 = new Uint8Array([
+			// V=2, P=0, RC=1, PT:200, Length: 6
+			0b10000001, 0xc8, 0x00, 0x06,
+			// SSRC of sender: 1111
+			0x00, 0x00, 0x04, 0x57,
+			// Sender info
+			0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00,
+		]);
 
-		expect(packet.needsSerialization()).toBe(false);
-		// Byte length must be 28 (fixed header) + 4 (padding) = 32.
-		expect(packet.getByteLength()).toBe(32);
-		expect(packet.getPacketType()).toBe(RtcpPacketType.SR);
-		expect(packet.getCount()).toBe(0);
-		expect(packet.getPadding()).toBe(4);
-		expect(packet.getSsrc()).toBe(ssrc);
-		expect(packet.getNtpSeconds()).toBe(ntpSeconds);
-		expect(packet.getNtpFraction()).toBe(ntpFraction);
-		expect(packet.getRtpTimestamp()).toBe(rtpTimestamp);
-		expect(packet.getPacketCount()).toBe(packetCount);
-		expect(packet.getOctetCount()).toBe(octetCount);
-		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
+		expect(() => SenderReportPacket.parse(buffer2)).toThrow(TypeError);
 	});
 
-	test('parsing a buffer view which length does not fit the indicated count throws', () => {
-		// Parse the first 8 bytes of buffer, indicating 1 Reception Report and
-		// holding no report at all.
-		const view3 = new DataView(array.buffer, array.byteOffset, 8);
+	test('SenderReportPacket.factory() succeeds', () => {
+		function checkFields(packet: SenderReportPacket): void {
+			const reports = packet.getReports();
 
-		expect(() => new SenderReportPacket(view3)).toThrow(RangeError);
-	});
-});
+			expect(packet.getSsrc()).toBe(1111);
+			expect(packet.getNtp()).toEqual({ seconds: 2222, fractions: 3333 });
+			expect(packet.getRtpTimestamp()).toBe(4444);
+			expect(packet.getPacketCount()).toBe(5555);
+			expect(packet.getOctetCount()).toBe(6666);
+			expect(packet.getReportsCount()).toBe(2);
+			expect(reports.length).toBe(2);
 
-describe('create RTCP Sender Report packet', () => {
-	test('creating a Sender Report packet succeeds', () => {
-		const packet = new SenderReportPacket();
+			expect(reports[0]).toEqual({
+				ssrc: 7777,
+				fractionLost: 1,
+				totalLost: 2,
+				highestSeq: 3,
+				jitter: 4,
+				lsr: 5,
+				dlsr: 6,
+			});
 
-		expect(isRtcp(packet.getView())).toBe(true);
-		expect(packet.needsSerialization()).toBe(false);
-		// Byte length must be 28 (fixed header).
-		expect(packet.getByteLength()).toBe(28);
-		expect(packet.getPacketType()).toBe(RtcpPacketType.SR);
-		expect(packet.getCount()).toBe(0);
-		expect(packet.getPadding()).toBe(0);
+			expect(reports[1]).toEqual({
+				ssrc: 8888,
+				fractionLost: 255,
+				totalLost: -2,
+				highestSeq: 0xffffffff,
+				jitter: 0xffffffff,
+				lsr: 0xffffffff,
+				dlsr: 0xffffffff,
+			});
+		}
+
+		// Dirty the buffer to check that factory() writes zeros in the fixed
+		// header.
+		factoryBuffer.fill(0xff);
+
+		const packet = SenderReportPacket.factory(factoryBuffer);
+		const expected: ExpectedRtcpPacket = {
+			buffer: factoryBuffer,
+			bufferLength: factoryBuffer.byteLength,
+			length: 28,
+			packetType: RtcpPacketType.SR,
+			hasPadding: false,
+			padding: 0,
+		};
+
+		checkRtcpPacket(packet, expected);
+
 		expect(packet.getSsrc()).toBe(0);
-		expect(packet.getNtpSeconds()).toBe(0);
-		expect(packet.getNtpFraction()).toBe(0);
+		expect(packet.getNtp()).toEqual({ seconds: 0, fractions: 0 });
 		expect(packet.getRtpTimestamp()).toBe(0);
 		expect(packet.getPacketCount()).toBe(0);
 		expect(packet.getOctetCount()).toBe(0);
-		expect(packet.needsSerialization()).toBe(false);
+		expect(packet.getReportsCount()).toBe(0);
+		expect(packet.getReports()).toEqual([]);
+
+		/* Modify it. */
 
 		packet.setSsrc(1111);
-		packet.setNtpSeconds(1234);
-		packet.setNtpFraction(2345);
-		packet.setRtpTimestamp(123456789);
-		packet.setPacketCount(666);
-		packet.setOctetCount(999);
+		packet.setNtp({ seconds: 2222, fractions: 3333 });
+		packet.setRtpTimestamp(4444);
+		packet.setPacketCount(5555);
+		packet.setOctetCount(6666);
+		packet.addReport({
+			ssrc: 7777,
+			fractionLost: 1,
+			totalLost: 2,
+			highestSeq: 3,
+			jitter: 4,
+			lsr: 5,
+			dlsr: 6,
+		});
+		packet.addReport({
+			ssrc: 8888,
+			fractionLost: 255,
+			totalLost: -2,
+			highestSeq: 0xffffffff,
+			jitter: 0xffffffff,
+			lsr: 0xffffffff,
+			dlsr: 0xffffffff,
+		});
 
-		expect(packet.getSsrc()).toBe(1111);
-		expect(packet.getNtpSeconds()).toBe(1234);
-		expect(packet.getNtpFraction()).toBe(2345);
-		expect(packet.getRtpTimestamp()).toBe(123456789);
-		expect(packet.getPacketCount()).toBe(666);
-		expect(packet.getOctetCount()).toBe(999);
+		checkRtcpPacket(packet, { ...expected, length: 76 });
 
-		packet.padTo4Bytes();
-		// After padding to 4 bytes, nothing should change since the rest of the
-		// packet always fits into groups of 4 bytes.
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.getByteLength()).toBe(28);
-		expect(packet.getPacketType()).toBe(RtcpPacketType.SR);
-		expect(packet.getCount()).toBe(0);
-		expect(packet.getPadding()).toBe(0);
-		expect(packet.getSsrc()).toBe(1111);
-		expect(packet.getNtpSeconds()).toBe(1234);
-		expect(packet.getNtpFraction()).toBe(2345);
-		expect(packet.getRtpTimestamp()).toBe(123456789);
-		expect(packet.getPacketCount()).toBe(666);
-		expect(packet.getOctetCount()).toBe(999);
-		expect(packet.needsSerialization()).toBe(false);
+		checkFields(packet);
 
-		packet.serialize();
+		/* Serialize it. */
 
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.getByteLength()).toBe(28);
-		expect(packet.getPacketType()).toBe(RtcpPacketType.SR);
-		expect(packet.getCount()).toBe(0);
-		expect(packet.getPadding()).toBe(0);
-		expect(packet.getSsrc()).toBe(1111);
-		expect(packet.getNtpSeconds()).toBe(1234);
-		expect(packet.getNtpFraction()).toBe(2345);
-		expect(packet.getRtpTimestamp()).toBe(123456789);
-		expect(packet.getPacketCount()).toBe(666);
-		expect(packet.getOctetCount()).toBe(999);
-		expect(packet.needsSerialization()).toBe(false);
-		expect(isRtcp(packet.getView())).toBe(true);
+		packet.serialize(serializeBuffer);
 
-		const report = new ReceptionReport();
+		factoryBuffer.fill(0xff);
 
-		report.setSsrc(1234);
-		report.setFractionLost(50);
-		report.setTotalLost(4);
-		report.setHighestSeqNumber(5663);
-		report.setJitter(43);
-		report.setLastSRTimestamp(10012312);
-		report.setDelaySinceLastSR(999983432);
+		checkRtcpPacket(packet, {
+			...expected,
+			buffer: serializeBuffer,
+			bufferLength: serializeBuffer.byteLength,
+			length: 76,
+		});
 
-		packet.setReports([report]);
-		expect(isRtcp(packet.getView())).toBe(true);
+		checkFields(packet);
 
-		const clonedPacket = packet.clone();
+		/* Clone it. */
 
-		expect(isRtcp(clonedPacket.getView())).toBe(true);
-		expect(clonedPacket.dump()).toEqual(packet.dump());
-		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
-			true
-		);
+		const clonedPacket = packet.clone(cloneBuffer);
+
+		serializeBuffer.fill(0xff);
+
+		checkRtcpPacket(clonedPacket, {
+			...expected,
+			buffer: cloneBuffer,
+			bufferLength: cloneBuffer.byteLength,
+			length: 76,
+		});
+
+		checkFields(clonedPacket);
 	});
 
-	test('packet.clone() succeeds', () => {
-		const array = new Uint8Array([
-			0xa0,
-			0xc8,
-			0x00,
-			0x08, // Padding, Type: 200, Count: 0, Length: 8
-			0x5d,
-			0x93,
-			0x15,
-			0x34, // SSRC: 0x5d931534
-			0xdd,
-			0x3a,
-			0xc1,
-			0xb4, // NTP Sec: 3711615412
-			0x76,
-			0x54,
-			0x71,
-			0x71, // NTP Frac: 1985245553
-			0x00,
-			0x08,
-			0xcf,
-			0x00, // RTP timestamp: 577280
-			0x00,
-			0x00,
-			0x0e,
-			0x18, // Packet count: 3608
-			0x00,
-			0x08,
-			0xcf,
-			0x00, // Octet count: 577280
-			0x00,
-			0x00,
-			0x00,
-			0x00, // Padding (8 bytes)
-			0x00,
-			0x00,
-			0x00,
-			0x08,
-		]);
+	test('senderReportPacket.addReport() throws if there is no space in the buffer', () => {
+		const report: ReceptionReport = {
+			ssrc: 1111,
+			fractionLost: 0,
+			totalLost: 0,
+			highestSeq: 0,
+			jitter: 0,
+			lsr: 0,
+			dlsr: 0,
+		};
+		const packet = SenderReportPacket.factory(factoryBuffer.subarray(0, 51));
 
-		const view = new DataView(array.buffer, array.byteOffset, array.byteLength);
+		expect(packet.getLength()).toBe(28);
 
-		const packet = new SenderReportPacket(view);
-		const clonedPacket = packet.clone();
+		// The report block would need 52 bytes in total.
+		expect(() => packet.addReport(report)).toThrow(TypeError);
 
-		expect(clonedPacket.needsSerialization()).toBe(false);
-		expect(clonedPacket.getByteLength()).toBe(36);
-		expect(clonedPacket.getPacketType()).toBe(RtcpPacketType.SR);
-		expect(clonedPacket.getCount()).toBe(0);
-		expect(clonedPacket.getPadding()).toBe(8);
-		expect(packet.getSsrc()).toBe(0x5d931534);
-		expect(packet.getNtpSeconds()).toBe(3711615412);
-		expect(packet.getNtpFraction()).toBe(1985245553);
-		expect(packet.getRtpTimestamp()).toBe(577280);
-		expect(packet.getPacketCount()).toBe(3608);
-		expect(packet.getOctetCount()).toBe(577280);
-		expect(clonedPacket.dump()).toEqual(packet.dump());
-		expect(areDataViewsEqual(clonedPacket.getView(), packet.getView())).toBe(
-			true
-		);
+		expect(packet.getLength()).toBe(28);
+		expect(packet.getReportsCount()).toBe(0);
+		expect(packet.getReports()).toEqual([]);
+	});
+
+	test('SenderReportPacket.factory() throws if the buffer is too small', () => {
+		expect(() =>
+			SenderReportPacket.factory(factoryBuffer.subarray(0, 27))
+		).toThrow(TypeError);
+	});
+
+	test('SenderReportPacket.computeLengthFor() succeeds', () => {
+		const report: ReceptionReport = {
+			ssrc: 0,
+			fractionLost: 0,
+			totalLost: 0,
+			highestSeq: 0,
+			jitter: 0,
+			lsr: 0,
+			dlsr: 0,
+		};
+
+		expect(SenderReportPacket.computeLengthFor(0)).toBe(28);
+
+		const packet = SenderReportPacket.factory(factoryBuffer);
+
+		packet.addReport({ ...report, ssrc: 7777 });
+		packet.addReport({ ...report, ssrc: 8888 });
+
+		expect(SenderReportPacket.computeLengthFor(2)).toBe(76);
+		expect(packet.getLength()).toBe(SenderReportPacket.computeLengthFor(2));
 	});
 });

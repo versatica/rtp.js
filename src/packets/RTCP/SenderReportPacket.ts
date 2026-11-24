@@ -1,367 +1,308 @@
 import {
-	RtcpPacket,
 	RtcpPacketType,
-	type RtcpPacketDump,
+	isRtcp,
 	COMMON_HEADER_LENGTH,
+	type RtcpPacketDump,
 } from './RtcpPacket';
 import {
-	ReceptionReport,
-	type ReceptionReportDump,
-	RECEPTION_REPORT_LENGTH,
-} from './ReceiverReportPacket';
+	AnyReportPacket,
+	REPORT_LENGTH,
+	type ReceptionReport,
+} from './AnyReportPacket';
+import { isUnsignedInteger32 } from '../../utils/numbers';
+import type { Ntp } from '../../utils/types';
 
-// Common RTCP header length + 24.
-const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 24;
+/**
+ * Length (in bytes) of the fixed header that precedes the reception report
+ * blocks (Common Header, SSRC of sender and sender info).
+ */
+const HEADER_LENGTH = 28;
 
 /**
  * RTCP Sender Report packet info dump.
- *
- * @category RTCP
  */
 export type SenderReportPacketDump = RtcpPacketDump & {
+	/**
+	 * SSRC of the packet sender.
+	 */
 	ssrc: number;
-	ntpSeq: number;
-	ntpFraction: number;
+	/**
+	 * NTP timestamp.
+	 */
+	ntp: Ntp;
+	/**
+	 * RTP timestamp.
+	 */
 	rtpTimestamp: number;
+	/**
+	 * Sender's packet count.
+	 */
 	packetCount: number;
+	/**
+	 * Sender's octet count.
+	 */
 	octetCount: number;
-	reports: ReceptionReportDump[];
+	/**
+	 * Reception reports.
+	 */
+	reports: ReceptionReport[];
 };
 
 /**
  * RTCP Sender Report packet.
  *
  * ```text
- *         0                   1                   2                   3
- *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * header |V=2|P|    RC   |   PT=SR=200   |             length            |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                         SSRC of sender                        |
- *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
- * sender |              NTP timestamp, most significant word             |
- * info   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |             NTP timestamp, least significant word             |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                         RTP timestamp                         |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                     sender's packet count                     |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                      sender's octet count                     |
- *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
- * report |                 SSRC_1 (SSRC of first source)                 |
- * block  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *   1    | fraction lost |       cumulative number of packets lost       |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |           extended highest sequence number received           |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                      interarrival jitter                      |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                         last SR (LSR)                         |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                   delay since last SR (DLSR)                  |
- *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
- * report |                 SSRC_2 (SSRC of second source)                |
- * block  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *   2    :                               ...                             :
- *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
- *        |                  profile-specific extensions                  |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |V=2|P|    RC   |   PT=SR=200   |             Length            |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                         SSRC of sender                        |
+ * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * |              NTP timestamp, most significant word             |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |             NTP timestamp, least significant word             |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                         RTP timestamp                         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                     sender's packet count                     |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                      sender's octet count                     |
+ * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * |                   Reception report block 1                    |
+ * |                              ...                              |
+ * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * |                   Reception report block 2                    |
+ * |                              ...                              |
+ * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * |                  profile-specific extensions                  |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
  *
- * @category RTCP
+ * - Reception report count (RC) (5 bits): The number of reception report
+ *   blocks contained in this packet.
+ * - SSRC of sender (32 bits).
+ * - NTP timestamp (64 bits): Wallclock time when this report was sent.
+ * - RTP timestamp (32 bits): Same time as the NTP timestamp but in the same
+ *   units and with the same random offset as the RTP timestamps in data
+ *   packets.
+ * - Sender's packet count (32 bits): Total number of RTP data packets
+ *   transmitted by the sender since starting transmission.
+ * - Sender's octet count (32 bits): Total number of payload octets
+ *   transmitted by the sender since starting transmission.
+ * - Reception report blocks: See {@link AnyReportPacket}.
+ *
+ * @remarks
+ * - Every modification is applied in place within the buffer of the packet,
+ *   so it's always serialized. Modifications that need more bytes throw if
+ *   the buffer has no space for them, in which case the packet is not
+ *   modified.
  *
  * @see
  * - [RFC 3550 section 6.4.1](https://datatracker.ietf.org/doc/html/rfc3550#section-6.4.1)
  */
-export class SenderReportPacket extends RtcpPacket {
-	// Reception Reports.
-	#reports: ReceptionReport[] = [];
-
+export class SenderReportPacket extends AnyReportPacket {
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTCP Sender
-	 *   Report packet will be created.
+	 * Parse a RTCP Sender Report packet.
+	 *
+	 * @param buffer - Buffer holding the packet. Its `byteLength` is the maximum
+	 *   length the packet can take and it can be greater than the length of the
+	 *   packet, which is given by its Length field.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid RTCP Sender Report packet.
+	 * - `TypeError` if the buffer does not contain a valid RTCP Sender Report
+	 *   packet.
 	 */
-	constructor(view?: DataView) {
-		super(RtcpPacketType.SR, view);
-
-		if (!this.view) {
-			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
-
-			// Write version and packet type.
-			this.writeCommonHeader();
-
-			return;
+	static parse(buffer: Uint8Array): SenderReportPacket {
+		if (!isRtcp(buffer)) {
+			throw new TypeError('not a RTCP packet');
 		}
 
-		// Position relative to the DataView byte offset.
-		let pos = 0;
+		const packet = new SenderReportPacket(buffer);
 
-		// Move to Reception Reports.
-		pos += FIXED_HEADER_LENGTH;
+		packet.parseCommonHeader(RtcpPacketType.SR);
+		packet.validateReports();
 
-		let count = this.getCount();
-
-		while (count-- > 0) {
-			const reportView = new DataView(
-				this.view.buffer,
-				this.view.byteOffset +
-					FIXED_HEADER_LENGTH +
-					this.#reports.length * RECEPTION_REPORT_LENGTH,
-				RECEPTION_REPORT_LENGTH
-			);
-
-			pos += RECEPTION_REPORT_LENGTH;
-
-			const report = new ReceptionReport(reportView);
-
-			this.#reports.push(report);
-		}
-
-		pos += this.padding;
-
-		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength) {
-			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
-			);
-		}
+		return packet;
 	}
 
 	/**
-	 * Dump Sender Report packet info.
+	 * Create a RTCP Sender Report packet with all fields set to 0 and no
+	 * reception report blocks.
+	 *
+	 * @param buffer - Buffer for the packet. Its `byteLength` is the maximum
+	 *   length the packet can take.
+	 *
+	 * @throws
+	 * - `TypeError` if `buffer.byteLength` is lower than the length of the
+	 *   fixed header (28 bytes).
+	 */
+	static factory(buffer: Uint8Array): SenderReportPacket {
+		const packet = new SenderReportPacket(buffer);
+
+		packet.initializeHeader(RtcpPacketType.SR, 0, HEADER_LENGTH);
+
+		// Set SSRC of sender and sender info to 0.
+		buffer.fill(0, COMMON_HEADER_LENGTH, HEADER_LENGTH);
+
+		return packet;
+	}
+
+	/**
+	 * Length (in bytes) of a RTCP Sender Report packet with the given number of
+	 * reception report blocks and no profile-specific extensions.
+	 *
+	 * @internal
+	 */
+	static computeLengthFor(numReports: number): number {
+		// The reception report blocks go right after the fixed header, and each
+		// one is a multiple of 4 bytes, so the packet never needs padding.
+		return HEADER_LENGTH + numReports * REPORT_LENGTH;
+	}
+
+	private constructor(buffer: Uint8Array) {
+		super(buffer);
+	}
+
+	/**
+	 * Dump RTCP Sender Report packet info.
 	 */
 	override dump(): SenderReportPacketDump {
 		return {
 			...super.dump(),
 			ssrc: this.getSsrc(),
-			ntpSeq: this.getNtpSeconds(),
-			ntpFraction: this.getNtpFraction(),
+			ntp: this.getNtp(),
 			rtpTimestamp: this.getRtpTimestamp(),
 			packetCount: this.getPacketCount(),
 			octetCount: this.getOctetCount(),
-			reports: this.#reports.map(report => report.dump()),
+			reports: this.getReports(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number {
-		if (!this.needsSerialization()) {
-			return this.view.byteLength;
-		}
+	clone(buffer: Uint8Array): SenderReportPacket {
+		const clonedPacket = new SenderReportPacket(buffer);
 
-		const packetLength =
-			FIXED_HEADER_LENGTH +
-			this.#reports.length * RECEPTION_REPORT_LENGTH +
-			this.padding;
+		this.cloneInto(clonedPacket);
 
-		return packetLength;
+		return clonedPacket;
 	}
 
 	/**
-	 * @inheritDoc
+	 * Get the NTP timestamp.
+	 *
+	 * @see
+	 * - {@link utils!ntpToTimeUs} to convert it into microseconds.
 	 */
-	override needsSerialization(): boolean {
-		return (
-			super.needsSerialization() ||
-			this.#reports.some(report => report.needsSerialization())
-		);
+	getNtp(): Ntp {
+		const view = this.getView();
+
+		return {
+			seconds: view.getUint32(8),
+			fractions: view.getUint32(12),
+		};
 	}
 
 	/**
-	 * @inheritDoc
+	 * Set the NTP timestamp.
+	 *
+	 * @throws
+	 * - `TypeError` if `seconds` or `fractions` is not an integer between 0 and
+	 *   4294967295.
+	 *
+	 * @see
+	 * - {@link utils!timeUsToNtp} to convert microseconds into it.
 	 */
-	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
-		const view = this.serializeBase(buffer, byteOffset);
-		const uint8Array = new Uint8Array(
-			view.buffer,
-			view.byteOffset,
-			view.byteLength
-		);
-
-		// Position relative to the DataView byte offset.
-		let pos = 0;
-
-		// Move to the fixed header fields after the common header.
-		pos += COMMON_HEADER_LENGTH;
-
-		// Copy the rest of the fixed header into the new buffer.
-		uint8Array.set(
-			new Uint8Array(
-				this.view.buffer,
-				this.view.byteOffset + pos,
-				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH
-			),
-			pos
-		);
-
-		// Move to Reception Reports.
-		pos += FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH;
-
-		// Write Reception Reports.
-		for (const report of this.#reports) {
-			report.serialize(view.buffer, view.byteOffset + pos);
-
-			pos += report.getByteLength();
-		}
-
-		pos += this.padding;
-
-		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength) {
-			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+	setNtp(ntp: Ntp): void {
+		if (
+			!isUnsignedInteger32(ntp.seconds) ||
+			!isUnsignedInteger32(ntp.fractions)
+		) {
+			throw new TypeError(
+				'ntp seconds and fractions must be integers between 0 and 4294967295'
 			);
 		}
 
-		// Update DataView.
-		this.view = view;
+		const view = this.getView();
 
-		this.setSerializationNeeded(false);
+		view.setUint32(8, ntp.seconds);
+		view.setUint32(12, ntp.fractions);
 	}
 
 	/**
-	 * @inheritDoc
-	 */
-	clone(
-		buffer?: ArrayBufferLike,
-		byteOffset?: number,
-		serializationBuffer?: ArrayBufferLike,
-		serializationByteOffset?: number
-	): SenderReportPacket {
-		const view = this.cloneInternal(
-			buffer,
-			byteOffset,
-			serializationBuffer,
-			serializationByteOffset
-		);
-
-		return new SenderReportPacket(view);
-	}
-
-	/**
-	 * Get sender SSRC.
-	 */
-	getSsrc(): number {
-		return this.view.getUint32(4);
-	}
-
-	/**
-	 * Set sender SSRC.
-	 */
-	setSsrc(ssrc: number): void {
-		this.view.setUint32(4, ssrc);
-	}
-
-	/**
-	 * Get NTP seconds.
-	 */
-	getNtpSeconds(): number {
-		return this.view.getUint32(8);
-	}
-
-	/**
-	 * Set NTP seconds.
-	 */
-	setNtpSeconds(seconds: number): void {
-		this.view.setUint32(8, seconds);
-	}
-
-	/**
-	 * Get NTP fraction.
-	 */
-	getNtpFraction(): number {
-		return this.view.getUint32(12);
-	}
-
-	/**
-	 * Set NTP fraction.
-	 */
-	setNtpFraction(fraction: number): void {
-		this.view.setUint32(12, fraction);
-	}
-
-	/**
-	 * Get RTP Timestamp.
+	 * Get the RTP timestamp.
 	 */
 	getRtpTimestamp(): number {
-		return this.view.getUint32(16);
+		return this.getView().getUint32(16);
 	}
 
 	/**
-	 * Set RTP Timestamp.
+	 * Set the RTP timestamp.
+	 *
+	 * @throws
+	 * - `TypeError` if `rtpTimestamp` is not an integer between 0 and
+	 *   4294967295.
 	 */
-	setRtpTimestamp(timestamp: number): void {
-		this.view.setUint32(16, timestamp);
+	setRtpTimestamp(rtpTimestamp: number): void {
+		if (!isUnsignedInteger32(rtpTimestamp)) {
+			throw new TypeError(
+				`rtpTimestamp (${rtpTimestamp}) must be an integer between 0 and 4294967295`
+			);
+		}
+
+		this.getView().setUint32(16, rtpTimestamp);
 	}
 
 	/**
-	 * Get RTP packet count.
+	 * Get the sender's packet count.
 	 */
 	getPacketCount(): number {
-		return this.view.getUint32(20);
+		return this.getView().getUint32(20);
 	}
 
 	/**
-	 * Set RTP packet count.
+	 * Set the sender's packet count.
+	 *
+	 * @throws
+	 * - `TypeError` if `packetCount` is not an integer between 0 and
+	 *   4294967295.
 	 */
-	setPacketCount(count: number): void {
-		this.view.setUint32(20, count);
+	setPacketCount(packetCount: number): void {
+		if (!isUnsignedInteger32(packetCount)) {
+			throw new TypeError(
+				`packetCount (${packetCount}) must be an integer between 0 and 4294967295`
+			);
+		}
+
+		this.getView().setUint32(20, packetCount);
 	}
 
 	/**
-	 * Get RTP octet count.
+	 * Get the sender's octet count.
 	 */
 	getOctetCount(): number {
-		return this.view.getUint32(24);
+		return this.getView().getUint32(24);
 	}
 
 	/**
-	 * Set RTP octet count.
-	 */
-	setOctetCount(count: number): void {
-		this.view.setUint32(24, count);
-	}
-
-	/**
-	 * Get Reception Reports.
-	 */
-	getReports(): ReceptionReport[] {
-		return Array.from(this.#reports);
-	}
-
-	/**
-	 * Set Reception Reports.
+	 * Set the sender's octet count.
 	 *
-	 * @remarks
-	 * - Serialization is needed after calling this method.
+	 * @throws
+	 * - `TypeError` if `octetCount` is not an integer between 0 and 4294967295.
 	 */
-	setReports(reports: ReceptionReport[]): void {
-		this.#reports = Array.from(reports);
+	setOctetCount(octetCount: number): void {
+		if (!isUnsignedInteger32(octetCount)) {
+			throw new TypeError(
+				`octetCount (${octetCount}) must be an integer between 0 and 4294967295`
+			);
+		}
 
-		// Update RTCP count.
-		this.setCount(this.#reports.length);
-
-		this.setSerializationNeeded(true);
+		this.getView().setUint32(24, octetCount);
 	}
 
-	/**
-	 * Add Reception Report.
-	 *
-	 * @remarks
-	 * - Serialization is needed after calling this method.
-	 */
-	addReport(report: ReceptionReport): void {
-		this.#reports.push(report);
-
-		// Update RTCP count.
-		this.setCount(this.#reports.length);
-
-		this.setSerializationNeeded(true);
+	protected getHeaderLength(): number {
+		return HEADER_LENGTH;
 	}
 }

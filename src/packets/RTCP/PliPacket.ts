@@ -1,124 +1,143 @@
-import { RtcpPacketType } from './RtcpPacket';
 import {
-	FeedbackPacket,
-	PsFeedbackMessageType,
-	type FeedbackPacketDump,
-	FIXED_HEADER_LENGTH,
-} from './FeedbackPacket';
+	RtcpPacketType,
+	isRtcp,
+	COMMON_HEADER_LENGTH,
+	type RtcpPacketDump,
+} from './RtcpPacket';
+import { FEEDBACK_HEADER_LENGTH } from './AnyFeedbackPacket';
+import {
+	AnyPayloadSpecificFeedbackPacket,
+	PayloadSpecificFeedbackMessageType,
+} from './AnyPayloadSpecificFeedbackPacket';
 
 /**
  * RTCP PLI packet info dump.
- *
- * @category RTCP
  */
-export type PliPacketDump = FeedbackPacketDump;
+export type PliPacketDump = RtcpPacketDump & {
+	/**
+	 * Feedback message type.
+	 */
+	messageType: PayloadSpecificFeedbackMessageType;
+	/**
+	 * SSRC of the packet sender.
+	 */
+	senderSsrc: number;
+	/**
+	 * SSRC of the media source.
+	 */
+	mediaSsrc: number;
+};
 
 /**
- * RTCP PLI packet (RTCP Payload Specific Feedback).
+ * RTCP Picture Loss Indication (PLI) packet (PSFB 206, FMT 1).
  *
  * ```text
  *  0                   1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |V=2|P|  FMT=1  |  PT=PSFB=206  |          length=2             |
+ * |V=2|P|  FMT=1  |  PT=PSFB=206  |           Length=2            |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |                  SSRC of packet sender                        |
+ * |                     SSRC of packet sender                     |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |                  SSRC of media source                         |
+ * |                      SSRC of media source                     |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
  *
- * @category RTCP
+ * @remarks
+ * - PLI has no FCI, so the length of the packet (excluding padding) is
+ *   always 12 bytes.
  *
  * @see
  * - [RFC 4585 section 6.3.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.3.1)
  */
-export class PliPacket extends FeedbackPacket {
+export class PliPacket extends AnyPayloadSpecificFeedbackPacket {
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTCP PLI
-	 *   packet will be created.
+	 * Parse a RTCP PLI packet.
+	 *
+	 * @param buffer - Buffer holding the packet. Its `byteLength` is the maximum
+	 *   length the packet can take and it can be greater than the length of the
+	 *   packet, which is given by its Length field.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid RTCP PLI packet.
+	 * - `TypeError` if the buffer does not contain a valid RTCP PLI packet.
 	 */
-	constructor(view?: DataView) {
-		super(RtcpPacketType.PSFB, PsFeedbackMessageType.PLI, view);
-
-		if (!this.view) {
-			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
-
-			// Write version, packet type and feedback message type.
-			this.writeFixedHeader();
-
-			return;
+	static parse(buffer: Uint8Array): PliPacket {
+		if (!isRtcp(buffer)) {
+			throw new TypeError('not a RTCP packet');
 		}
 
-		// Position relative to the DataView byte offset.
-		let pos = 0;
+		const packet = new PliPacket(buffer);
 
-		// Move to padding.
-		pos += FIXED_HEADER_LENGTH;
+		packet.parseCommonHeader(RtcpPacketType.PSFB);
+		packet.#validate();
 
-		pos += this.padding;
+		return packet;
+	}
 
-		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength) {
-			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
-			);
-		}
+	/**
+	 * Create a RTCP PLI packet with both SSRCs set to 0.
+	 *
+	 * @param buffer - Buffer for the packet. Its `byteLength` is the maximum
+	 *   length the packet can take.
+	 *
+	 * @throws
+	 * - `TypeError` if `buffer.byteLength` is lower than 12 bytes.
+	 */
+	static factory(buffer: Uint8Array): PliPacket {
+		const packet = new PliPacket(buffer);
+
+		packet.initializeHeader(
+			RtcpPacketType.PSFB,
+			PayloadSpecificFeedbackMessageType.PLI,
+			FEEDBACK_HEADER_LENGTH
+		);
+
+		// Set SSRC of packet sender and SSRC of media source to 0.
+		buffer.fill(0, COMMON_HEADER_LENGTH, FEEDBACK_HEADER_LENGTH);
+
+		return packet;
+	}
+
+	private constructor(buffer: Uint8Array) {
+		super(buffer);
 	}
 
 	/**
 	 * Dump RTCP PLI packet info.
 	 */
 	override dump(): PliPacketDump {
-		return super.dump();
+		return {
+			...super.dump(),
+			messageType: this.getMessageType(),
+			senderSsrc: this.getSenderSsrc(),
+			mediaSsrc: this.getMediaSsrc(),
+		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number {
-		if (!this.needsSerialization()) {
-			return this.view.byteLength;
+	clone(buffer: Uint8Array): PliPacket {
+		const clonedPacket = new PliPacket(buffer);
+
+		this.cloneInto(clonedPacket);
+
+		return clonedPacket;
+	}
+
+	#validate(): void {
+		if (this.getMessageType() !== PayloadSpecificFeedbackMessageType.PLI) {
+			throw new TypeError('not a RTCP PLI packet');
 		}
 
-		const packetLength = FIXED_HEADER_LENGTH + this.padding;
+		// Length of the packet excluding padding.
+		const contentLength = this.getLength() - this.getPadding();
 
-		return packetLength;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
-		const view = this.serializeBase(buffer, byteOffset);
-
-		// Nothing else to do.
-
-		// Update DataView.
-		this.view = view;
-
-		this.setSerializationNeeded(false);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	clone(
-		buffer?: ArrayBufferLike,
-		byteOffset?: number,
-		serializationBuffer?: ArrayBufferLike,
-		serializationByteOffset?: number
-	): PliPacket {
-		const view = this.cloneInternal(
-			buffer,
-			byteOffset,
-			serializationBuffer,
-			serializationByteOffset
-		);
-
-		return new PliPacket(view);
+		// PLI has no FCI.
+		if (contentLength !== FEEDBACK_HEADER_LENGTH) {
+			throw new TypeError(
+				`packet length (${contentLength} bytes, excluding padding) must be ${FEEDBACK_HEADER_LENGTH} bytes`
+			);
+		}
 	}
 }

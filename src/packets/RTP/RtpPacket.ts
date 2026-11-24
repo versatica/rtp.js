@@ -1,70 +1,217 @@
-import { RTP_VERSION, Packet, type PacketDump } from '../Packet';
+import { Serializable, type SerializableDump } from '../common/Serializable';
 import {
-	RtpExtensionType,
-	type RtpExtensionMapping,
+	ExtensionType,
+	type ExtensionsForm,
+	type ExtensionMapping,
 	type SsrcAudioLevelExtension,
 	type VideoOrientationExtension,
-} from './rtpExtensions';
+	type AbsCaptureTimeExtension,
+	type PlayoutDelayExtension,
+} from './extensions';
 import {
-	clone,
-	padTo4Bytes,
-	numberToDataView,
-	dataViewToString,
-	stringToDataView,
-} from '../../utils/helpers';
+	type DependencyDescriptorExtension,
+	type DependencyDescriptorMandatoryFields,
+	type DependencyDescriptorStructure,
+	type DependencyDescriptorContext,
+	readDependencyDescriptor,
+	readDependencyDescriptorMandatoryFields,
+	writeDependencyDescriptor,
+} from './dependencyDescriptor';
+import {
+	isUnsignedInteger,
+	isUnsignedInteger8,
+	isUnsignedInteger16,
+	isUnsignedInteger24,
+	isUnsignedInteger32,
+	isSignedInteger32,
+} from '../../utils/numbers';
+import { padTo4Bytes } from '../../utils/buffers';
 import {
 	readBitInDataView,
 	writeBitInDataView,
 	readBitsInDataView,
 	writeBitsInDataView,
-} from '../../utils/bitOps';
-import {
-	read3BytesInDataView,
-	write3BytesInDataView,
-} from '../../utils/byteOps';
+} from '../../utils/bits';
+import { read3BytesInDataView, write3BytesInDataView } from '../../utils/bytes';
 
+/**
+ * Minimum length (in bytes) of the RTP fixed header (without CSRC fields).
+ */
 const FIXED_HEADER_LENGTH = 12;
 
 /**
- * RTP packet info dump.
- *
- * @category RTP
+ * Header extension id announcing One-Byte extensions.
  */
-export type RtpPacketDump = PacketDump & {
+const ONE_BYTE_EXTENSIONS_ID = 0xbede;
+
+/**
+ * Header extension id announcing Two-Byte extensions (the 4 lowest bits are
+ * "appbits" and can have any value).
+ */
+const TWO_BYTE_EXTENSIONS_ID = 0b0001000000000000;
+
+/**
+ * Length (in bytes) of the original sequence number added by RTX at the
+ * beginning of the payload.
+ */
+const RTX_OVERHEAD = 2;
+
+const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
+
+/**
+ * RTP packet info dump.
+ */
+export type RtpPacketDump = SerializableDump & {
+	/**
+	 * Payload type.
+	 */
 	payloadType: number;
+	/**
+	 * Sequence number.
+	 */
 	sequenceNumber: number;
+	/**
+	 * Timestamp.
+	 */
 	timestamp: number;
+	/**
+	 * SSRC.
+	 */
 	ssrc: number;
+	/**
+	 * CSRCs.
+	 */
 	csrcs: number[];
+	/**
+	 * Marker bit.
+	 */
 	marker: boolean;
+	/**
+	 * Id of the header extension (the "defined by profile" field), if the
+	 * packet has a header extension.
+	 */
 	headerExtensionId?: number;
-	extensions: { id: number; length: number }[];
+	/**
+	 * Form of the extensions in the packet.
+	 */
+	extensionsForm: ExtensionsForm;
+	/**
+	 * Id and length (in bytes) of each extension in the packet.
+	 */
+	extensions: {
+		/**
+		 * Extension id.
+		 */
+		id: number;
+		/**
+		 * Extension length (in bytes).
+		 */
+		length: number;
+	}[];
+	/**
+	 * Value of the {@link ExtensionType.MID} extension.
+	 */
 	midExt?: string;
+	/**
+	 * Value of the {@link ExtensionType.RTP_STREAM_ID} extension.
+	 */
 	ridExt?: string;
-	repairedRidExt?: string;
+	/**
+	 * Value of the {@link ExtensionType.REPAIRED_RTP_STREAM_ID} extension.
+	 */
+	rridExt?: string;
+	/**
+	 * Value of the {@link ExtensionType.ABS_SEND_TIME} extension.
+	 */
 	absSendTimeExt?: number;
-	transportWideSeqNumberExt?: number;
+	/**
+	 * Value of the {@link ExtensionType.TRANSPORT_WIDE_CC_01} extension.
+	 */
+	transportWideCc01Ext?: number;
+	/**
+	 * Value of the {@link ExtensionType.SSRC_AUDIO_LEVEL} extension.
+	 */
 	ssrcAudioLevelExt?: SsrcAudioLevelExtension;
+	/**
+	 * Value of the {@link ExtensionType.VIDEO_ORIENTATION} extension.
+	 */
 	videoOrientationExt?: VideoOrientationExtension;
-	transmissionOffsetExt?: number;
+	/**
+	 * Value of the {@link ExtensionType.ABS_CAPTURE_TIME} extension.
+	 */
+	absCaptureTimeExt?: AbsCaptureTimeExtension;
+	/**
+	 * Value of the {@link ExtensionType.PLAYOUT_DELAY} extension.
+	 */
+	playoutDelayExt?: PlayoutDelayExtension;
+	/**
+	 * Value of the {@link ExtensionType.DEPENDENCY_DESCRIPTOR} extension: the
+	 * whole Dependency Descriptor if a context is given in
+	 * {@link RtpPacketDumpOptions}, otherwise just its mandatory fields.
+	 */
+	dependencyDescriptorExt?:
+		DependencyDescriptorExtension | DependencyDescriptorMandatoryFields;
+	/**
+	 * Length (in bytes) of the payload.
+	 */
 	payloadLength: number;
+	/**
+	 * Padding (in bytes) at the end of the packet.
+	 */
+	padding: number;
 };
 
 /**
- * Whether the given buffer view could be a valid RTP packet or not.
- *
- * @category RTP
+ * Options for {@link RtpPacket.dump}.
  */
-export function isRtp(view: DataView): boolean {
-	const firstByte = view.getUint8(0);
+export type RtpPacketDumpOptions = {
+	/**
+	 * Context of the stream (SSRC) the packet belongs to, needed to dump the
+	 * whole {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP extension. It must
+	 * be the same context the application passes to
+	 * {@link RtpPacket.getDependencyDescriptorExtension} for the packets of that
+	 * stream, since most descriptors can only be read with the template
+	 * dependency structure carried by a previous one. If not given, just the
+	 * mandatory fields of the descriptor are dumped.
+	 *
+	 * @remarks
+	 * - The context is not modified.
+	 */
+	dependencyDescriptorContext?: DependencyDescriptorContext;
+};
+
+/**
+ * Whether the given buffer could be a valid RTP packet or not.
+ *
+ * @remarks
+ * - RTCP packets also match, so the caller should first verify whether the
+ *   given buffer is a RTCP packet.
+ *
+ * @param buffer - Buffer holding the packet.
+ * @param packetLength - Exact length of the packet. If not given,
+ *   `buffer.byteLength` is used.
+ */
+export function isRtp(
+	buffer: Uint8Array,
+	packetLength: number = buffer.byteLength
+): boolean {
+	if (
+		!isUnsignedInteger(packetLength) ||
+		packetLength > buffer.byteLength ||
+		packetLength < FIXED_HEADER_LENGTH
+	) {
+		return false;
+	}
+
+	const firstByte = buffer[0]!;
 
 	return (
-		view.byteLength >= FIXED_HEADER_LENGTH &&
-		// DOC: https://tools.ietf.org/html/draft-ietf-avtcore-rfc5764-mux-fixes
+		// @see RFC 7983.
 		firstByte > 127 &&
 		firstByte < 192 &&
 		// RTP Version must be 2.
-		firstByte >> 6 === RTP_VERSION
+		firstByte >> 6 === 2
 	);
 }
 
@@ -91,249 +238,95 @@ export function isRtp(view: DataView): boolean {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
  *
- * @category RTP
+ * @remarks
+ * - Every modification is applied in place within the buffer of the packet,
+ *   so it's always serialized. Modifications that need more bytes throw if
+ *   the buffer has no space for them, in which case the packet is not
+ *   modified.
  *
  * @see
  * - [RFC 3550 section 5.1](https://datatracker.ietf.org/doc/html/rfc3550#section-5.1)
- * - [RFC 5285 section 4](https://datatracker.ietf.org/doc/html/rfc5285#section-4)
+ * - [RFC 8285](https://datatracker.ietf.org/doc/html/rfc8285)
  */
-export class RtpPacket extends Packet {
-	// CSRCs.
-	#csrcs: number[] = [];
-	// Header extension id.
-	#headerExtensionId?: number;
-	// Buffer view holding the header extension value. Only if One-Byte or Two-Bytes
-	// extensions are used.
-	#headerExtensionView?: DataView;
-	// One-Byte or Two-Bytes extensions indexed by id.
-	readonly #extensions: Map<number, DataView> = new Map();
+export class RtpPacket extends Serializable {
+	// Form of the extensions in the packet, or form that will be used once an
+	// extension is added.
+	#extensionsForm: ExtensionsForm = 'one-byte';
 	// Mapping of RTP extension types and their corresponding RTP extension ids.
-	#extensionMapping: RtpExtensionMapping = {};
-	// Buffer view holding the entire RTP payload.
-	#payloadView: DataView;
+	#extensionMapping: ExtensionMapping = {};
+	// One-Byte or Two-Byte extensions. Key is the extension id and value is the
+	// offset (in bytes) from the beginning of the header extension value to the
+	// beginning of the extension.
+	readonly #extensions: Map<number, number> = new Map();
 
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTP packet
-	 *   (with just the minimal fixed header) will be created.
+	 * Parse a RTP packet.
+	 *
+	 * @param buffer - Buffer holding the packet. Its `byteLength` is the maximum
+	 *   length the packet can take.
+	 * @param packetLength - Exact length of the packet. If not given,
+	 *   `buffer.byteLength` is used.
 	 *
 	 * @throws
-	 * - If `view` is given and it does not contain a valid RTP packet.
+	 * - `TypeError` if `packetLength` is greater than `buffer.byteLength` or if
+	 *   the buffer does not contain a valid RTP packet.
 	 */
-	constructor(view?: DataView) {
-		super(view);
-
-		if (!this.view) {
-			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
-
-			// Set version.
-			this.setVersion();
-
-			// Set empty payload.
-			this.#payloadView = new DataView(
-				this.view.buffer,
-				this.view.byteOffset + FIXED_HEADER_LENGTH,
-				0
+	static parse(
+		buffer: Uint8Array,
+		packetLength: number = buffer.byteLength
+	): RtpPacket {
+		if (packetLength > buffer.byteLength) {
+			throw new TypeError(
+				`packetLength (${packetLength} bytes) cannot be greater than buffer length (${buffer.byteLength} bytes)`
 			);
-
-			return;
 		}
 
-		if (!isRtp(this.view)) {
+		if (!isRtp(buffer, packetLength)) {
 			throw new TypeError('not a RTP packet');
 		}
 
-		// Position relative to the DataView byte offset.
-		let pos = 0;
+		const packet = new RtpPacket(buffer);
 
-		// Move to CSRC field.
-		pos += FIXED_HEADER_LENGTH;
+		packet.setLength(packetLength);
+		packet.#validate();
 
-		let csrcCount = this.getCsrcCount();
+		return packet;
+	}
 
-		while (csrcCount-- > 0) {
-			const csrc = this.view.getUint32(pos);
-
-			this.#csrcs.push(csrc);
-
-			pos += 4;
+	/**
+	 * Create a RTP packet with just the fixed header.
+	 *
+	 * @param buffer - Buffer for the packet. Its `byteLength` is the maximum
+	 *   length the packet can take.
+	 *
+	 * @throws
+	 * - `TypeError` if `buffer.byteLength` is lower than the length of the
+	 *   fixed header.
+	 */
+	static factory(buffer: Uint8Array): RtpPacket {
+		if (buffer.byteLength < FIXED_HEADER_LENGTH) {
+			throw new TypeError('no space for fixed header');
 		}
 
-		// Parse header extension.
-		const hasHeaderExtension = this.hasHeaderExtensionBit();
+		const packet = new RtpPacket(buffer);
 
-		let headerExtensionView: DataView | undefined;
+		buffer.fill(0, 0, FIXED_HEADER_LENGTH);
+		// Set version 2.
+		writeBitsInDataView(packet.getView(), 0, 0b11000000, 2);
 
-		if (hasHeaderExtension) {
-			// NOTE: This will throw RangeError if there is no space in the buffer.
-			this.#headerExtensionId = this.view.getUint16(pos);
+		return packet;
+	}
 
-			pos += 2;
+	private constructor(buffer: Uint8Array) {
+		super(buffer);
 
-			const headerExtensionLength = this.view.getUint16(pos) * 4;
-
-			pos += 2;
-
-			headerExtensionView = new DataView(
-				this.view.buffer,
-				this.view.byteOffset + pos,
-				headerExtensionLength
-			);
-
-			pos += headerExtensionLength;
-		}
-
-		// Parse One-Byte or Two-Bytes extensions.
-		if (headerExtensionView && this.hasOneByteExtensions()) {
-			let extPos = 0;
-
-			// One-Byte extensions cannot have length 0.
-			while (extPos < headerExtensionView.byteLength) {
-				const extId = readBitsInDataView({
-					view: headerExtensionView,
-					pos: extPos,
-					mask: 0xf0,
-				});
-
-				const extLength =
-					readBitsInDataView({
-						view: headerExtensionView,
-						pos: extPos,
-						mask: 0x0f,
-					}) + 1;
-
-				// id=15 in One-Byte extensions means "stop parsing here".
-				if (extId === 15) {
-					break;
-				}
-
-				// Valid extension extId.
-				if (extId !== 0) {
-					if (extPos + 1 + extLength > headerExtensionView.byteLength) {
-						throw new RangeError(
-							'not enough space for the announced One-Byte extension value'
-						);
-					}
-
-					// Store the One-Byte extension element in the map.
-					this.#extensions.set(
-						extId,
-						new DataView(
-							headerExtensionView.buffer,
-							headerExtensionView.byteOffset + extPos + 1,
-							extLength
-						)
-					);
-
-					extPos += 1 + extLength;
-				}
-				// id=0 means alignment.
-				else {
-					++extPos;
-				}
-
-				// Counting padding bytes.
-				while (
-					extPos < headerExtensionView.byteLength &&
-					headerExtensionView.getUint8(extPos) === 0
-				) {
-					++extPos;
-				}
-			}
-		} else if (headerExtensionView && this.hasTwoBytesExtensions()) {
-			let extPos = 0;
-
-			// Two-Byte extensions can have length 0.
-			while (extPos + 1 < headerExtensionView.byteLength) {
-				const extId = headerExtensionView.getUint8(extPos);
-				const extLength = headerExtensionView.getUint8(extPos + 1);
-
-				// Valid extension id.
-				if (extId !== 0) {
-					if (extPos + 2 + extLength > headerExtensionView.byteLength) {
-						throw new RangeError(
-							'not enough space for the announced Two-Bytes extension value'
-						);
-					}
-
-					// Store the Two-Bytes extension element in the map.
-					this.#extensions.set(
-						extId,
-						new DataView(
-							headerExtensionView.buffer,
-							headerExtensionView.byteOffset + extPos + 2,
-							extLength
-						)
-					);
-
-					extPos += 2 + extLength;
-				}
-				// id=0 means alignment.
-				else {
-					++extPos;
-				}
-
-				// Counting padding bytes.
-				while (
-					extPos < headerExtensionView.byteLength &&
-					headerExtensionView.getUint8(extPos) === 0
-				) {
-					++extPos;
-				}
-			}
-		}
-		// In case there is an extension header which doesn't contain One-Byte or
-		// Two-Bytes extensions, and only in that case, keep the header extension
-		// value in a member.
-		else if (hasHeaderExtension) {
-			this.#headerExtensionView = headerExtensionView;
-		}
-
-		// Get padding.
-		if (this.hasPaddingBit()) {
-			// NOTE: This will throw RangeError if there is no space in the view.
-			this.padding = this.view.getUint8(this.view.byteLength - 1);
-		}
-
-		// Get payload.
-		const payloadLength = this.view.byteLength - pos - this.padding;
-
-		if (payloadLength < 0) {
-			throw new RangeError(
-				`announced padding (${
-					this.padding
-				} bytes) is bigger than available space for payload (${
-					this.view.byteLength - pos
-				} bytes)`
-			);
-		}
-
-		this.#payloadView = new DataView(
-			this.view.buffer,
-			this.view.byteOffset + pos,
-			payloadLength
-		);
-
-		pos += payloadLength + this.padding;
-
-		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength) {
-			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
-			);
-		}
+		this.setLength(FIXED_HEADER_LENGTH);
 	}
 
 	/**
 	 * Dump RTP packet info.
 	 */
-	override dump(): RtpPacketDump {
-		const extensions = Array.from(this.#extensions).map(([extId, extView]) => {
-			return {
-				id: extId,
-				length: extView.byteLength,
-			};
-		});
-
+	override dump(options?: RtpPacketDumpOptions): RtpPacketDump {
 		return {
 			...super.dump(),
 			payloadType: this.getPayloadType(),
@@ -342,330 +335,45 @@ export class RtpPacket extends Packet {
 			ssrc: this.getSsrc(),
 			csrcs: this.getCsrcs(),
 			marker: this.getMarker(),
-			headerExtensionId: this.#headerExtensionId,
-			extensions: extensions,
+			headerExtensionId: this.#hasHeaderExtensionBit()
+				? this.getView().getUint16(this.#getHeaderExtensionOffset())
+				: undefined,
+			extensionsForm: this.#extensionsForm,
+			extensions: Array.from(this.getExtensions()).map(([id, value]) => ({
+				id,
+				length: value.byteLength,
+			})),
 			midExt: this.getMidExtension(),
 			ridExt: this.getRidExtension(),
-			repairedRidExt: this.getRepairedRidExtension(),
+			rridExt: this.getRridExtension(),
 			absSendTimeExt: this.getAbsSendTimeExtension(),
-			transportWideSeqNumberExt: this.getTransportWideSeqNumberExtension(),
+			transportWideCc01Ext: this.getTransportWideCc01Extension(),
 			ssrcAudioLevelExt: this.getSsrcAudioLevelExtension(),
 			videoOrientationExt: this.getVideoOrientationExtension(),
-			transmissionOffsetExt: this.getTransmissionOffsetExtension(),
-			payloadLength: this.getPayload().byteLength,
+			absCaptureTimeExt: this.getAbsCaptureTimeExtension(),
+			playoutDelayExt: this.getPlayoutDelayExtension(),
+			dependencyDescriptorExt: this.#dumpDependencyDescriptorExtension(
+				options?.dependencyDescriptorContext
+			),
+			payloadLength: this.#getPayloadLength(),
+			padding: this.getPadding(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number {
-		// NOTE: Here, even if serialization is not needed, we cannot bypass full
-		// length computation since the original and unmodified parsed packet
-		// may have useless padding octets in extensions, octets that we ignore
-		// when computing packet length and when serializing the packet.
+	clone(buffer: Uint8Array): RtpPacket {
+		const clonedPacket = new RtpPacket(buffer);
 
-		let packetLength = 0;
+		this.cloneInto(clonedPacket);
 
-		packetLength += FIXED_HEADER_LENGTH;
+		clonedPacket.#extensionsForm = this.#extensionsForm;
+		clonedPacket.#extensionMapping = { ...this.#extensionMapping };
 
-		// Add space for CSRC values.
-		packetLength += this.#csrcs.length * 4;
-
-		// Add space for the header extension.
-		if (this.hasHeaderExtensionBit()) {
-			// Add space for header extension id/length fields.
-			packetLength += 4;
-
-			// If the packet has One-Byte or Two-Bytes extensions, compute the size of
-			// the extensions map. Otherwise read the header extension length in the
-			// buffer.
-			if (this.#extensions.size > 0 && this.hasOneByteExtensions()) {
-				for (const [extId, extView] of this.#extensions) {
-					if (extId > 0 && extId < 15) {
-						// Add space for extension id/length fields.
-						packetLength += 1 + extView.byteLength;
-					}
-				}
-
-				// May need to add padding.
-				packetLength = padTo4Bytes(packetLength);
-			} else if (this.#extensions.size > 0 && this.hasTwoBytesExtensions()) {
-				for (const [extId, extView] of this.#extensions) {
-					if (extId > 0 && extId < 256) {
-						// Add space for extension id/length fields.
-						packetLength += 2 + extView.byteLength;
-					}
-				}
-
-				// May need to add padding.
-				packetLength = padTo4Bytes(packetLength);
-			}
-			// Otherwise read the length of the header extension value.
-			else if (this.#headerExtensionView) {
-				packetLength += this.#headerExtensionView.byteLength;
-			}
+		for (const [id, offset] of this.#extensions) {
+			clonedPacket.#extensions.set(id, offset);
 		}
-
-		// Add space for payload.
-		packetLength += this.#payloadView.byteLength;
-
-		// Add space for padding.
-		packetLength += this.padding;
-
-		return packetLength;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
-		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
-
-		// Create new DataView with new buffer.
-		const view = new DataView(
-			bufferData.buffer,
-			bufferData.byteOffset,
-			bufferData.byteLength
-		);
-		const uint8Array = new Uint8Array(
-			view.buffer,
-			view.byteOffset,
-			view.byteLength
-		);
-
-		// Position relative to the DataView byte offset.
-		let pos = 0;
-
-		// Copy the fixed header into the new buffer.
-		uint8Array.set(
-			new Uint8Array(
-				this.view.buffer,
-				this.view.byteOffset,
-				FIXED_HEADER_LENGTH
-			),
-			pos
-		);
-
-		// Move to CSRCs.
-		pos += FIXED_HEADER_LENGTH;
-
-		// NOTE: Before writing the CSRCs we must store the header extension value
-		// (if any) because otherwise we are writing on top of it.
-		if (this.#headerExtensionView) {
-			this.#headerExtensionView = clone<DataView>(this.#headerExtensionView);
-		}
-
-		// Write CSRCs.
-		for (const csrc of this.#csrcs) {
-			view.setUint32(pos, csrc);
-
-			pos += 4;
-		}
-
-		// Write header extension.
-		if (this.hasHeaderExtensionBit()) {
-			view.setUint16(pos, this.#headerExtensionId!);
-
-			// Move to the header extension length field.
-			pos += 2;
-
-			const extLengthPos = pos;
-
-			// Move to the header extension value.
-			pos += 2;
-
-			let extLength = 0;
-
-			if (this.#extensions.size > 0 && this.hasOneByteExtensions()) {
-				for (const [extId, extView] of this.#extensions) {
-					if (extId <= 0 || extId >= 15) {
-						this.#extensions.delete(extId);
-
-						continue;
-					}
-
-					if (extView.byteLength === 0) {
-						throw new TypeError(
-							'cannot serialize extensions with length 0 in One-Byte mode'
-						);
-					} else if (extView.byteLength > 16) {
-						throw new RangeError(
-							'cannot serialize extensions with length > 16 in One-Byte mode'
-						);
-					}
-
-					writeBitsInDataView({
-						view: view,
-						pos: pos,
-						mask: 0xf0,
-						value: extId,
-					});
-					writeBitsInDataView({
-						view: view,
-						pos: pos,
-						mask: 0x0f,
-						value: extView.byteLength - 1,
-					});
-
-					pos += 1;
-					extLength += 1;
-
-					uint8Array.set(
-						new Uint8Array(
-							extView.buffer,
-							extView.byteOffset,
-							extView.byteLength
-						),
-						pos
-					);
-
-					pos += extView.byteLength;
-					extLength += extView.byteLength;
-				}
-
-				// May need to add padding.
-				pos = padTo4Bytes(pos);
-				extLength = padTo4Bytes(extLength);
-
-				// Write header extension length.
-				view.setUint16(extLengthPos, extLength / 4);
-			} else if (this.#extensions.size > 0 && this.hasTwoBytesExtensions()) {
-				for (const [extId, extView] of this.#extensions) {
-					if (extId <= 0 || extId >= 256) {
-						this.#extensions.delete(extId);
-
-						continue;
-					}
-
-					if (extView.byteLength > 255) {
-						throw new RangeError(
-							'cannot serialize extensions with length > 255 in Two-Bytes mode'
-						);
-					}
-
-					view.setUint8(pos, extId);
-
-					pos += 1;
-					extLength += 1;
-
-					view.setUint8(pos, extView.byteLength);
-
-					pos += 1;
-					extLength += 1;
-
-					uint8Array.set(
-						new Uint8Array(
-							extView.buffer,
-							extView.byteOffset,
-							extView.byteLength
-						),
-						pos
-					);
-
-					pos += extView.byteLength;
-					extLength += extView.byteLength;
-				}
-
-				// May need to add padding.
-				pos = padTo4Bytes(pos);
-				extLength = padTo4Bytes(extLength);
-
-				// Write header extension length.
-				view.setUint16(extLengthPos, extLength / 4);
-			}
-			// Extension header doesn't contain One-Byte or Two-Bytes extensions so
-			// honor the original header extension value (if any).
-			else if (this.#headerExtensionView) {
-				extLength = this.#headerExtensionView.byteLength;
-
-				// Write header extension value.
-				uint8Array.set(
-					new Uint8Array(
-						this.#headerExtensionView.buffer,
-						this.#headerExtensionView.byteOffset,
-						this.#headerExtensionView.byteLength
-					),
-					pos
-				);
-
-				pos += this.#headerExtensionView.byteLength;
-
-				// Write header extension length.
-				view.setUint16(extLengthPos, extLength / 4);
-			}
-		}
-
-		// Write payload.
-		uint8Array.set(
-			new Uint8Array(
-				this.#payloadView.buffer,
-				this.#payloadView.byteOffset,
-				this.#payloadView.byteLength
-			),
-			pos
-		);
-
-		// Create new payload DataView.
-		const payloadView = new DataView(
-			view.buffer,
-			view.byteOffset + pos,
-			this.#payloadView.byteLength
-		);
-
-		pos += payloadView.byteLength;
-
-		// Write padding.
-		if (this.padding > 0) {
-			if (this.padding > 255) {
-				throw new TypeError(
-					`padding (${this.padding} bytes) cannot be higher than 255`
-				);
-			}
-
-			view.setUint8(pos + this.padding - 1, this.padding);
-
-			pos += this.padding;
-		}
-
-		// Assert that current position is equal or less than new buffer length.
-		// NOTE: Don't be strict matching resulting length since we may have
-		// discarded/reduced some padding/alignment octets in the extensions
-		// during the process.
-		if (pos > view.byteLength) {
-			throw new RangeError(
-				`filled length (${pos} bytes) is bigger than the available buffer size (${view.byteLength} bytes)`
-			);
-		}
-
-		// Update DataView.
-		this.view = view;
-
-		// Update payload DataView.
-		this.#payloadView = payloadView;
-
-		this.setSerializationNeeded(false);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	clone(
-		buffer?: ArrayBufferLike,
-		byteOffset?: number,
-		serializationBuffer?: ArrayBufferLike,
-		serializationByteOffset?: number
-	): RtpPacket {
-		const view = this.cloneInternal(
-			buffer,
-			byteOffset,
-			serializationBuffer,
-			serializationByteOffset
-		);
-
-		const clonedPacket = new RtpPacket(view);
-
-		clonedPacket.setExtensionMapping(this.getExtensionMapping());
 
 		return clonedPacket;
 	}
@@ -674,230 +382,385 @@ export class RtpPacket extends Packet {
 	 * Get the RTP payload type.
 	 */
 	getPayloadType(): number {
-		return readBitsInDataView({ view: this.view, pos: 1, mask: 0b01111111 });
+		return readBitsInDataView(this.getView(), 1, 0b01111111);
 	}
 
 	/**
 	 * Set the RTP payload type.
+	 *
+	 * @throws
+	 * - `TypeError` if `payloadType` is not an integer between 0 and 127.
 	 */
 	setPayloadType(payloadType: number): void {
-		writeBitsInDataView({
-			view: this.view,
-			pos: 1,
-			mask: 0b01111111,
-			value: payloadType,
-		});
+		if (!isUnsignedInteger(payloadType, 127)) {
+			throw new TypeError(
+				`payloadType (${payloadType}) must be an integer between 0 and 127`
+			);
+		}
+
+		writeBitsInDataView(this.getView(), 1, 0b01111111, payloadType);
 	}
 
 	/**
 	 * Get the RTP sequence number.
 	 */
 	getSequenceNumber(): number {
-		return this.view.getUint16(2);
+		return this.getView().getUint16(2);
 	}
 
 	/**
 	 * Set the RTP sequence number.
+	 *
+	 * @throws
+	 * - `TypeError` if `sequenceNumber` is not an integer between 0 and 65535.
 	 */
 	setSequenceNumber(sequenceNumber: number): void {
-		this.view.setUint16(2, sequenceNumber);
+		if (!isUnsignedInteger16(sequenceNumber)) {
+			throw new TypeError(
+				`sequenceNumber (${sequenceNumber}) must be an integer between 0 and 65535`
+			);
+		}
+
+		this.getView().setUint16(2, sequenceNumber);
 	}
 
 	/**
 	 * Get the RTP timestamp.
 	 */
 	getTimestamp(): number {
-		return this.view.getUint32(4);
+		return this.getView().getUint32(4);
 	}
 
 	/**
 	 * Set the RTP timestamp.
+	 *
+	 * @throws
+	 * - `TypeError` if `timestamp` is not an integer between 0 and 4294967295.
 	 */
 	setTimestamp(timestamp: number): void {
-		this.view.setUint32(4, timestamp);
+		if (!isUnsignedInteger32(timestamp)) {
+			throw new TypeError(
+				`timestamp (${timestamp}) must be an integer between 0 and 4294967295`
+			);
+		}
+
+		this.getView().setUint32(4, timestamp);
 	}
 
 	/**
 	 * Get the RTP SSRC.
 	 */
 	getSsrc(): number {
-		return this.view.getUint32(8);
+		return this.getView().getUint32(8);
 	}
 
 	/**
 	 * Set the RTP SSRC.
+	 *
+	 * @throws
+	 * - `TypeError` if `ssrc` is not an integer between 0 and 4294967295.
 	 */
 	setSsrc(ssrc: number): void {
-		this.view.setUint32(8, ssrc);
-	}
+		if (!isUnsignedInteger32(ssrc)) {
+			throw new TypeError(
+				`ssrc (${ssrc}) must be an integer between 0 and 4294967295`
+			);
+		}
 
-	/**
-	 * Get the RTP CSRC values.
-	 */
-	getCsrcs(): number[] {
-		return Array.from(this.#csrcs);
-	}
-
-	/**
-	 * Set the RTP CSRC values. If `csrcs` is not given (or if it's an empty
-	 * array) CSRC field will be removed from the RTP packet.
-	 *
-	 * @remarks
-	 * - Serialization is needed after calling this method.
-	 */
-	setCsrcs(csrcs: number[] = []): void {
-		this.#csrcs = Array.from(csrcs);
-
-		// Update CSRC count.
-		this.setCsrcCount(this.#csrcs.length);
-
-		this.setSerializationNeeded(true);
+		this.getView().setUint32(8, ssrc);
 	}
 
 	/**
 	 * Get the RTP marker flag.
 	 */
 	getMarker(): boolean {
-		return readBitInDataView({ view: this.view, pos: 1, bit: 7 });
+		return readBitInDataView(this.getView(), 1, 7);
 	}
 
 	/**
 	 * Set the RTP marker flag.
 	 */
 	setMarker(flag: boolean): void {
-		writeBitInDataView({ view: this.view, pos: 1, bit: 7, flag });
+		writeBitInDataView(this.getView(), 1, 7, flag);
 	}
 
 	/**
-	 * Whether One-Byte extensions (as per RFC 5285) are enabled.
+	 * Get the RTP CSRC values.
 	 */
-	hasOneByteExtensions(): boolean {
-		return this.#headerExtensionId === 0xbede;
-	}
+	getCsrcs(): number[] {
+		const view = this.getView();
+		const csrcs: number[] = [];
 
-	/**
-	 * Whether Two-Bytes extensions (as per RFC 5285) are enabled.
-	 */
-	hasTwoBytesExtensions(): boolean {
-		return this.#headerExtensionId !== undefined
-			? (this.#headerExtensionId & 0b1111111111110000) === 0b0001000000000000
-			: false;
-	}
-
-	/**
-	 * Enable One-Byte extensions (RFC 5285).
-	 *
-	 * @remarks
-	 * - Serialization maybe needed after calling this method.
-	 */
-	enableOneByteExtensions(): void {
-		if (this.hasOneByteExtensions()) {
-			return;
+		for (let idx = 0; idx < this.#getCsrcCount(); ++idx) {
+			csrcs.push(view.getUint32(FIXED_HEADER_LENGTH + idx * 4));
 		}
 
-		this.#headerExtensionId = 0xbede;
-		this.#headerExtensionView = undefined;
-
-		this.setSerializationNeeded(true);
+		return csrcs;
 	}
 
 	/**
-	 * Enable Two-Bytes extensions (RFC 5285).
+	 * Set the RTP CSRC values. If `csrcs` is not given (or if it's an empty
+	 * array) CSRC field will be removed from the RTP packet.
 	 *
-	 * @remarks
-	 * - Serialization maybe needed after calling this method.
+	 * @throws
+	 * - `TypeError` if more than 15 CSRC values are given.
+	 * - `TypeError` if some CSRC value is not an integer between 0 and
+	 *   4294967295.
+	 * - `TypeError` if the buffer has no space for the given CSRC values.
 	 */
-	enableTwoBytesExtensions(): void {
-		if (this.hasTwoBytesExtensions()) {
-			return;
+	setCsrcs(csrcs: number[] = []): void {
+		if (csrcs.length > 15) {
+			throw new TypeError(
+				`cannot set more than 15 CSRC values (${csrcs.length} given)`
+			);
 		}
 
-		this.#headerExtensionId = 0b0001000000000000;
-		this.#headerExtensionView = undefined;
-
-		this.setSerializationNeeded(true);
-	}
-
-	/**
-	 * Get a map with all the extensions indexed by their extension id (RFC 5285).
-	 */
-	getExtensions(): Map<number, DataView> {
-		return new Map(this.#extensions);
-	}
-
-	/**
-	 * Get the value of the extension with given id (RFC 5285).
-	 */
-	getExtension(id: number): DataView | undefined {
-		return this.#extensions.get(id);
-	}
-
-	/**
-	 * Set the value of the extension with given id (RFC 5285).
-	 *
-	 * @remarks
-	 * - Serialization is needed after calling this method.
-	 */
-	setExtension(id: number, value: DataView): void {
-		// Update header extension bit if needed.
-		if (this.#extensions.size === 0) {
-			this.setHeaderExtensionBit(true);
-
-			// If neither One-Byte nor Two-Bytes modes are enabled, force One-Byte.
-			if (!this.hasOneByteExtensions() && !this.hasTwoBytesExtensions()) {
-				this.enableOneByteExtensions();
+		for (const csrc of csrcs) {
+			if (!isUnsignedInteger32(csrc)) {
+				throw new TypeError(
+					`CSRC (${csrc}) must be an integer between 0 and 4294967295`
+				);
 			}
 		}
 
-		this.#extensions.set(id, value);
+		const previousCsrcCount = this.#getCsrcCount();
 
-		this.setSerializationNeeded(true);
+		this.#moveTail(
+			FIXED_HEADER_LENGTH + previousCsrcCount * 4,
+			(csrcs.length - previousCsrcCount) * 4
+		);
+
+		const view = this.getView();
+
+		for (const [idx, csrc] of csrcs.entries()) {
+			view.setUint32(FIXED_HEADER_LENGTH + idx * 4, csrc);
+		}
+
+		writeBitsInDataView(view, 0, 0b00001111, csrcs.length);
 	}
 
 	/**
-	 * Delete the extension with given id (RFC 5285).
+	 * Get the padding (in bytes) at the end of the packet.
+	 */
+	getPadding(): number {
+		if (!this.#hasPaddingBit()) {
+			return 0;
+		}
+
+		return this.getView().getUint8(this.getLength() - 1);
+	}
+
+	/**
+	 * Set the padding (in bytes) at the end of the packet. Padding bytes are
+	 * filled with zeros except the last one, which holds the padding length.
 	 *
 	 * @remarks
-	 * - Serialization maybe needed after calling this method.
+	 * - If the given padding is equal to the current one, nothing is done.
+	 *
+	 * @throws
+	 * - `TypeError` if `padding` is not an integer between 0 and 255.
+	 * - `TypeError` if the buffer has no space for the given padding.
 	 */
-	deleteExtension(id: number): void {
-		if (!this.#extensions.delete(id)) {
+	setPadding(padding: number): void {
+		if (!isUnsignedInteger8(padding)) {
+			throw new TypeError(
+				`padding (${padding}) must be an integer between 0 and 255`
+			);
+		}
+
+		const previousPadding = this.getPadding();
+
+		if (padding === previousPadding) {
 			return;
 		}
 
-		// Update header extension bit if needed.
-		if (this.#extensions.size === 0) {
-			this.setHeaderExtensionBit(false);
-		}
+		this.setLength(this.getLength() - previousPadding + padding);
 
-		this.setSerializationNeeded(true);
+		this.#writePadding(padding);
 	}
 
 	/**
-	 * Clear all extensions (RFC 5285).
+	 * Pad the packet total length to 4 bytes by modifying padding bytes. It
+	 * removes existing padding and adds up to 3 bytes of padding if needed.
+	 *
+	 * @throws
+	 * - `TypeError` if the buffer has no space for the needed padding.
+	 */
+	padTo4Bytes(): void {
+		const previousLength = this.getLength();
+		const notPaddedLength = previousLength - this.getPadding();
+		const paddedLength = padTo4Bytes(notPaddedLength);
+
+		if (paddedLength === previousLength) {
+			return;
+		}
+
+		this.setLength(paddedLength);
+
+		this.#writePadding(paddedLength - notPaddedLength);
+	}
+
+	/**
+	 * Get the form of the extensions in the packet, or the form that will be
+	 * used once an extension is added. Default is `'one-byte'`.
+	 */
+	getExtensionsForm(): ExtensionsForm {
+		return this.#extensionsForm;
+	}
+
+	/**
+	 * Set the form of the extensions. If the packet has extensions, they are
+	 * rewritten with the given form.
+	 *
+	 * @throws
+	 * - `TypeError` if some existing extension cannot be represented with the
+	 *   given form (for example, an extension with id greater than 14 or with
+	 *   length greater than 16 bytes in One-Byte extensions).
+	 * - `TypeError` if the buffer has no space for the rewritten extensions.
+	 */
+	setExtensionsForm(form: ExtensionsForm): void {
+		if (form === this.#extensionsForm) {
+			return;
+		}
+
+		if (this.#extensions.size > 0) {
+			this.#writeExtensions(this.#collectExtensions(), form);
+		}
+		// A One-Byte or Two-Byte header extension without extensions must also
+		// announce the new form. Its value is filled with zeros (padding) since
+		// it may contain bytes that are ignored with the current form (those
+		// after an id 15 in One-Byte extensions or a trailing byte in Two-Byte
+		// extensions) but not with the new one.
+		else if (this.#hasHeaderExtensionBit()) {
+			const view = this.getView();
+			const headerExtensionOffset = this.#getHeaderExtensionOffset();
+			const headerExtensionId = view.getUint16(headerExtensionOffset);
+
+			if (
+				headerExtensionId === ONE_BYTE_EXTENSIONS_ID ||
+				(headerExtensionId & 0b1111111111110000) === TWO_BYTE_EXTENSIONS_ID
+			) {
+				switch (form) {
+					case 'one-byte': {
+						view.setUint16(headerExtensionOffset, ONE_BYTE_EXTENSIONS_ID);
+
+						break;
+					}
+
+					case 'two-byte': {
+						view.setUint16(headerExtensionOffset, TWO_BYTE_EXTENSIONS_ID);
+
+						break;
+					}
+				}
+
+				this.getBuffer().fill(
+					0,
+					headerExtensionOffset + 4,
+					headerExtensionOffset + this.#getHeaderExtensionLength()
+				);
+			}
+		}
+
+		this.#extensionsForm = form;
+	}
+
+	/**
+	 * Get a map with all the extensions indexed by their extension id.
 	 *
 	 * @remarks
-	 * - Serialization maybe needed after calling this method.
+	 * - Each value is a view over the buffer of the packet (no bytes are
+	 *   copied).
+	 */
+	getExtensions(): Map<number, Uint8Array> {
+		return new Map(this.#collectExtensions());
+	}
+
+	/**
+	 * Get the value of the extension with given id.
+	 *
+	 * @remarks
+	 * - The returned value is a view over the buffer of the packet (no bytes
+	 *   are copied).
+	 */
+	getExtension(id: number): Uint8Array | undefined {
+		const extension = this.#findExtension(id);
+
+		if (!extension) {
+			return undefined;
+		}
+
+		return this.getBuffer().subarray(
+			extension.pos,
+			extension.pos + extension.length
+		);
+	}
+
+	/**
+	 * Set the value of the extension with given id. The given value is copied
+	 * into the packet.
+	 *
+	 * @remarks
+	 * - If the packet has a header extension that doesn't contain One-Byte or
+	 *   Two-Byte extensions, it's replaced.
+	 *
+	 * @throws
+	 * - `TypeError` if the given id or value length cannot be represented with
+	 *   the current extensions form.
+	 * - `TypeError` if the buffer has no space for the extension.
+	 */
+	setExtension(id: number, value: Uint8Array): void {
+		this.#assertExtension(id, value.byteLength, this.#extensionsForm);
+
+		const extension = this.#findExtension(id);
+
+		// Same length, so just overwrite the value.
+		if (extension?.length === value.byteLength) {
+			this.getBuffer().set(value, extension.pos);
+
+			return;
+		}
+
+		const extensions = this.#collectExtensions().filter(
+			([extId]) => extId !== id
+		);
+
+		extensions.push([id, value]);
+
+		this.#writeExtensions(extensions, this.#extensionsForm);
+	}
+
+	/**
+	 * Delete the extension with given id.
+	 */
+	deleteExtension(id: number): void {
+		if (!this.#extensions.has(id)) {
+			return;
+		}
+
+		this.#writeExtensions(
+			this.#collectExtensions().filter(([extId]) => extId !== id),
+			this.#extensionsForm
+		);
+	}
+
+	/**
+	 * Delete all extensions.
 	 */
 	clearExtensions(): void {
 		if (this.#extensions.size === 0) {
 			return;
 		}
 
-		this.#extensions.clear();
-
-		// Update header extension bit.
-		this.setHeaderExtensionBit(false);
-
-		this.setSerializationNeeded(true);
+		this.#writeExtensions([], this.#extensionsForm);
 	}
 
 	/**
 	 * Get RTP extension mapping (association of RTP extension types and their
 	 * numeric ids in this RTP packet).
 	 */
-	getExtensionMapping(): RtpExtensionMapping {
-		return clone(this.#extensionMapping);
+	getExtensionMapping(): ExtensionMapping {
+		return { ...this.#extensionMapping };
 	}
 
 	/**
@@ -905,351 +768,604 @@ export class RtpPacket extends Packet {
 	 * numeric ids in this RTP packet).
 	 *
 	 * @remarks
-	 * - Calling this method is needed before using other methods that read or
-	 *   write specific RTP extensions.
+	 * - Calling this method is needed before using methods that read or write
+	 *   specific RTP extensions.
+	 * - Ids above 14 can only be written with Two-Byte extensions, which is
+	 *   checked when the extension is written.
+	 *
+	 * @throws
+	 * - `TypeError` if some id is not an integer between 1 and 255, in which
+	 *   case the extension mapping is not modified.
 	 */
-	setExtensionMapping(extensionMapping: RtpExtensionMapping): void {
-		this.#extensionMapping = clone(extensionMapping);
+	setExtensionMapping(extensionMapping: ExtensionMapping): void {
+		for (const [type, id] of Object.entries(extensionMapping)) {
+			if (id !== undefined && (id === 0 || !isUnsignedInteger8(id))) {
+				throw new TypeError(
+					`invalid id ${id} of extension type ${ExtensionType[Number(type)]} (must be 1..255)`
+				);
+			}
+		}
+
+		this.#extensionMapping = { ...extensionMapping };
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.MID} RTP extension.
+	 * Read the value of the {@link ExtensionType.MID} RTP extension.
 	 */
 	getMidExtension(): string | undefined {
-		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.MID]!
-		);
-
-		if (!view) {
-			return;
-		}
-
-		return dataViewToString(view);
+		return this.#readStringExtension(ExtensionType.MID);
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.MID} RTP extension.
+	 * Set the value of the {@link ExtensionType.MID} RTP extension. If not
+	 * given (or if it's an empty string), the extension is deleted.
+	 *
+	 * @throws
+	 * - `Error` if the extension type is not in the extension mapping.
+	 * - Same as {@link setExtension}.
 	 */
 	setMidExtension(mid?: string): void {
-		const extId = this.#extensionMapping[RtpExtensionType.MID];
-
-		if (!extId) {
-			return;
-		}
-
-		if (mid) {
-			this.setExtension(extId, stringToDataView(mid));
-		} else {
-			this.deleteExtension(extId);
-		}
+		this.#writeMappedExtension(
+			ExtensionType.MID,
+			mid ? textEncoder.encode(mid) : undefined
+		);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.RTP_STREAM_ID} RTP
+	 * Read the value of the {@link ExtensionType.RTP_STREAM_ID} RTP
 	 * extension.
 	 */
 	getRidExtension(): string | undefined {
-		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.RTP_STREAM_ID]!
-		);
-
-		if (!view) {
-			return;
-		}
-
-		return dataViewToString(view);
+		return this.#readStringExtension(ExtensionType.RTP_STREAM_ID);
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.RTP_STREAM_ID} RTP
-	 * extension.
+	 * Set the value of the {@link ExtensionType.RTP_STREAM_ID} RTP
+	 * extension. If not given (or if it's an empty string), the extension is
+	 * deleted.
+	 *
+	 * @throws
+	 * - `Error` if the extension type is not in the extension mapping.
+	 * - Same as {@link setExtension}.
 	 */
 	setRidExtension(rid?: string): void {
-		const extId = this.#extensionMapping[RtpExtensionType.RTP_STREAM_ID];
-
-		if (!extId) {
-			return;
-		}
-
-		if (rid) {
-			this.setExtension(extId, stringToDataView(rid));
-		} else {
-			this.deleteExtension(extId);
-		}
-	}
-
-	/**
-	 * Read the value of the {@link RtpExtensionType.RTP_REPAIRED_STREAM_ID} RTP
-	 * extension.
-	 */
-	getRepairedRidExtension(): string | undefined {
-		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.RTP_REPAIRED_STREAM_ID]!
+		this.#writeMappedExtension(
+			ExtensionType.RTP_STREAM_ID,
+			rid ? textEncoder.encode(rid) : undefined
 		);
-
-		if (!view) {
-			return;
-		}
-
-		return dataViewToString(view);
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.RTP_REPAIRED_STREAM_ID} RTP
+	 * Read the value of the {@link ExtensionType.REPAIRED_RTP_STREAM_ID} RTP
 	 * extension.
 	 */
-	setRepairedRidExtension(rrid?: string): void {
-		const extId =
-			this.#extensionMapping[RtpExtensionType.RTP_REPAIRED_STREAM_ID];
-
-		if (!extId) {
-			return;
-		}
-
-		if (rrid) {
-			this.setExtension(extId, stringToDataView(rrid));
-		} else {
-			this.deleteExtension(extId);
-		}
+	getRridExtension(): string | undefined {
+		return this.#readStringExtension(ExtensionType.REPAIRED_RTP_STREAM_ID);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.ABS_SEND_TIME} RTP
-	 * extension.
+	 * Set the value of the {@link ExtensionType.REPAIRED_RTP_STREAM_ID} RTP
+	 * extension. If not given (or if it's an empty string), the extension is
+	 * deleted.
 	 *
-	 * @remarks
-	 * - Returned value is "Absolute Send Time" format. See
-	 *   {@link timeMsToAbsSendTime}.
+	 * @throws
+	 * - `Error` if the extension type is not in the extension mapping.
+	 * - Same as {@link setExtension}.
+	 */
+	setRridExtension(rrid?: string): void {
+		this.#writeMappedExtension(
+			ExtensionType.REPAIRED_RTP_STREAM_ID,
+			rrid ? textEncoder.encode(rrid) : undefined
+		);
+	}
+
+	/**
+	 * Read the value of the {@link ExtensionType.ABS_SEND_TIME} RTP
+	 * extension, which is the raw 3 bytes unsigned integer stored in it.
+	 *
+	 * @see
+	 * - {@link utils!absSendTimeToTimeUs} to convert it into microseconds.
 	 */
 	getAbsSendTimeExtension(): number | undefined {
-		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.ABS_SEND_TIME]!
-		);
+		const extension = this.#findMappedExtension(ExtensionType.ABS_SEND_TIME);
 
-		if (!view) {
-			return;
+		if (extension?.length !== 3) {
+			return undefined;
 		}
 
-		return read3BytesInDataView({ view, pos: 0 });
+		return read3BytesInDataView(this.getView(), extension.pos);
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.ABS_SEND_TIME} RTP
-	 * extension.
+	 * Set the value of the {@link ExtensionType.ABS_SEND_TIME} RTP
+	 * extension, which is the raw 3 bytes unsigned integer stored in it. If not
+	 * given, the extension is deleted.
 	 *
-	 * @remarks
-	 * - Given `absSendTime` must be in "Absolute Send Time" format. See
-	 *   {@link timeMsToAbsSendTime}.
+	 * @throws
+	 * - `Error` if the extension type is not in the extension mapping.
+	 * - `TypeError` if `absSendTime` is not an integer between 0 and 16777215.
+	 * - Same as {@link setExtension}.
+	 *
+	 * @see
+	 * - {@link utils!timeUsToAbsSendTime} to convert microseconds into it.
 	 */
 	setAbsSendTimeExtension(absSendTime?: number): void {
-		const extId = this.#extensionMapping[RtpExtensionType.ABS_SEND_TIME];
-
-		if (!extId) {
-			return;
-		}
+		let value: Uint8Array | undefined;
 
 		if (absSendTime !== undefined) {
-			const view = new DataView(new ArrayBuffer(3));
+			if (!isUnsignedInteger24(absSendTime)) {
+				throw new TypeError(
+					`absSendTime (${absSendTime}) must be an integer between 0 and 16777215`
+				);
+			}
 
-			write3BytesInDataView({ view, pos: 0, value: absSendTime });
+			value = new Uint8Array(3);
 
-			this.setExtension(extId, view);
-		} else {
-			this.deleteExtension(extId);
+			write3BytesInDataView(new DataView(value.buffer), 0, absSendTime);
 		}
+
+		this.#writeMappedExtension(ExtensionType.ABS_SEND_TIME, value);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER}
-	 * RTP extension.
+	 * Read the value of the {@link ExtensionType.TRANSPORT_WIDE_CC_01} RTP
+	 * extension.
 	 */
-	getTransportWideSeqNumberExtension(): number | undefined {
-		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER]!
+	getTransportWideCc01Extension(): number | undefined {
+		const extension = this.#findMappedExtension(
+			ExtensionType.TRANSPORT_WIDE_CC_01
 		);
 
-		if (!view) {
-			return;
+		if (extension?.length !== 2) {
+			return undefined;
 		}
 
-		return view.getUint16(0);
+		return this.getView().getUint16(extension.pos);
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER}
-	 * RTP extension.
+	 * Set the value of the {@link ExtensionType.TRANSPORT_WIDE_CC_01} RTP
+	 * extension. If not given, the extension is deleted.
+	 *
+	 * @throws
+	 * - `Error` if the extension type is not in the extension mapping.
+	 * - `TypeError` if `sequenceNumber` is not an integer between 0 and 65535.
+	 * - Same as {@link setExtension}.
 	 */
-	setTransportWideSeqNumberExtension(sequenceNumber?: number): void {
-		const extId =
-			this.#extensionMapping[RtpExtensionType.TRANSPORT_WIDE_SEQ_NUMBER];
-
-		if (!extId) {
-			return;
-		}
+	setTransportWideCc01Extension(sequenceNumber?: number): void {
+		let value: Uint8Array | undefined;
 
 		if (sequenceNumber !== undefined) {
-			this.setExtension(extId, numberToDataView(sequenceNumber));
-		} else {
-			this.deleteExtension(extId);
+			if (!isUnsignedInteger16(sequenceNumber)) {
+				throw new TypeError(
+					`sequenceNumber (${sequenceNumber}) must be an integer between 0 and 65535`
+				);
+			}
+
+			value = new Uint8Array(2);
+
+			new DataView(value.buffer).setUint16(0, sequenceNumber);
 		}
+
+		this.#writeMappedExtension(ExtensionType.TRANSPORT_WIDE_CC_01, value);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.SSRC_AUDIO_LEVEL} RTP
+	 * Read the value of the {@link ExtensionType.SSRC_AUDIO_LEVEL} RTP
 	 * extension.
 	 */
 	getSsrcAudioLevelExtension(): SsrcAudioLevelExtension | undefined {
-		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.SSRC_AUDIO_LEVEL]!
-		);
+		const extension = this.#findMappedExtension(ExtensionType.SSRC_AUDIO_LEVEL);
 
-		if (!view) {
-			return;
+		if (extension?.length !== 1) {
+			return undefined;
 		}
 
-		const voice = readBitInDataView({ view, pos: 0, bit: 7 });
-		const volume = readBitsInDataView({ view, pos: 0, mask: 0b01111111 });
+		const view = this.getView();
 
-		return { volume, voice };
+		return {
+			volume: readBitsInDataView(view, extension.pos, 0b01111111),
+			voice: readBitInDataView(view, extension.pos, 7),
+		};
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.SSRC_AUDIO_LEVEL} RTP
-	 * extension.
+	 * Set the value of the {@link ExtensionType.SSRC_AUDIO_LEVEL} RTP
+	 * extension. If not given, the extension is deleted.
+	 *
+	 * @throws
+	 * - `Error` if the extension type is not in the extension mapping.
+	 * - `TypeError` if `volume` is not an integer between 0 and 127.
+	 * - Same as {@link setExtension}.
 	 */
 	setSsrcAudioLevelExtension(ssrcAudioLevel?: SsrcAudioLevelExtension): void {
-		const extId = this.#extensionMapping[RtpExtensionType.SSRC_AUDIO_LEVEL];
-
-		if (!extId) {
-			return;
-		}
+		let value: Uint8Array | undefined;
 
 		if (ssrcAudioLevel) {
-			const view = new DataView(new ArrayBuffer(1));
+			if (!isUnsignedInteger(ssrcAudioLevel.volume, 127)) {
+				throw new TypeError(
+					`volume (${ssrcAudioLevel.volume}) must be an integer between 0 and 127`
+				);
+			}
 
-			writeBitInDataView({ view, pos: 0, bit: 7, flag: ssrcAudioLevel.voice });
-			writeBitsInDataView({
-				view,
-				pos: 0,
-				mask: 0b01111111,
-				value: ssrcAudioLevel.volume,
-			});
+			value = new Uint8Array(1);
 
-			this.setExtension(extId, view);
-		} else {
-			this.deleteExtension(extId);
+			const view = new DataView(value.buffer);
+
+			writeBitInDataView(view, 0, 7, ssrcAudioLevel.voice);
+			writeBitsInDataView(view, 0, 0b01111111, ssrcAudioLevel.volume);
 		}
+
+		this.#writeMappedExtension(ExtensionType.SSRC_AUDIO_LEVEL, value);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.VIDEO_ORIENTATION} RTP
+	 * Read the value of the {@link ExtensionType.VIDEO_ORIENTATION} RTP
 	 * extension.
 	 */
 	getVideoOrientationExtension(): VideoOrientationExtension | undefined {
-		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.VIDEO_ORIENTATION]!
+		const extension = this.#findMappedExtension(
+			ExtensionType.VIDEO_ORIENTATION
 		);
 
-		if (!view) {
-			return;
+		if (extension?.length !== 1) {
+			return undefined;
 		}
 
-		const camera = readBitInDataView({ view, pos: 0, bit: 3 });
-		const flip = readBitInDataView({ view, pos: 0, bit: 2 });
-		const rotation = readBitsInDataView({ view, pos: 0, mask: 0b00000011 });
+		const view = this.getView();
 
-		return { camera, flip, rotation };
+		return {
+			camera: readBitInDataView(view, extension.pos, 3),
+			flip: readBitInDataView(view, extension.pos, 2),
+			rotation: (readBitsInDataView(view, extension.pos, 0b00000011) * 90) as
+				0 | 90 | 180 | 270,
+		};
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.VIDEO_ORIENTATION} RTP
-	 * extension.
+	 * Set the value of the {@link ExtensionType.VIDEO_ORIENTATION} RTP
+	 * extension. If not given, the extension is deleted.
+	 *
+	 * @throws
+	 * - `Error` if the extension type is not in the extension mapping.
+	 * - `TypeError` if `rotation` is not 0, 90, 180 or 270.
+	 * - Same as {@link setExtension}.
 	 */
 	setVideoOrientationExtension(
 		videoOrientation?: VideoOrientationExtension
 	): void {
-		const extId = this.#extensionMapping[RtpExtensionType.VIDEO_ORIENTATION];
-
-		if (!extId) {
-			return;
-		}
+		let value: Uint8Array | undefined;
 
 		if (videoOrientation) {
-			const view = new DataView(new ArrayBuffer(1));
+			const { camera, flip, rotation } = videoOrientation;
 
-			writeBitInDataView({
-				view,
-				pos: 0,
-				bit: 3,
-				flag: videoOrientation.camera,
-			});
-			writeBitInDataView({ view, pos: 0, bit: 2, flag: videoOrientation.flip });
-			writeBitsInDataView({
-				view,
-				pos: 0,
-				mask: 0b00000011,
-				value: videoOrientation.rotation,
-			});
+			if (![0, 90, 180, 270].includes(rotation)) {
+				throw new TypeError(`rotation (${rotation}) must be 0, 90, 180 or 270`);
+			}
 
-			this.setExtension(extId, view);
-		} else {
-			this.deleteExtension(extId);
+			value = new Uint8Array(1);
+
+			const view = new DataView(value.buffer);
+
+			writeBitInDataView(view, 0, 3, camera);
+			writeBitInDataView(view, 0, 2, flip);
+			writeBitsInDataView(view, 0, 0b00000011, rotation / 90);
 		}
+
+		this.#writeMappedExtension(ExtensionType.VIDEO_ORIENTATION, value);
 	}
 
 	/**
-	 * Read the value of the {@link RtpExtensionType.TOFFSET} RTP extension.
+	 * Read the value of the {@link ExtensionType.ABS_CAPTURE_TIME} RTP
+	 * extension.
 	 */
-	getTransmissionOffsetExtension(): number | undefined {
-		const view = this.getExtension(
-			this.#extensionMapping[RtpExtensionType.TOFFSET]!
-		);
+	getAbsCaptureTimeExtension(): AbsCaptureTimeExtension | undefined {
+		const extension = this.#findMappedExtension(ExtensionType.ABS_CAPTURE_TIME);
 
-		if (!view) {
-			return;
+		// Extension value can be 8 or 16 bytes depending on whether it contains
+		// estimated capture clock offset or not.
+		if (extension?.length !== 8 && extension?.length !== 16) {
+			return undefined;
 		}
 
-		return read3BytesInDataView({ view, pos: 0 });
+		const view = this.getView();
+		const { pos } = extension;
+
+		return {
+			absCaptureTimestamp: {
+				seconds: view.getUint32(pos),
+				fractions: view.getUint32(pos + 4),
+			},
+			estimatedCaptureClockOffset:
+				extension.length === 16
+					? {
+							seconds: view.getInt32(pos + 8),
+							fractions: view.getUint32(pos + 12),
+						}
+					: undefined,
+		};
 	}
 
 	/**
-	 * Set the value of the {@link RtpExtensionType.TOFFSET} RTP extension.
+	 * Set the value of the {@link ExtensionType.ABS_CAPTURE_TIME} RTP
+	 * extension. If not given, the extension is deleted.
+	 *
+	 * @throws
+	 * - `Error` if the extension type is not in the extension mapping.
+	 * - `TypeError` if some `seconds` or `fractions` value is out of range
+	 *   (`seconds` of `estimatedCaptureClockOffset` is a signed 32 bits integer
+	 *   and the others are unsigned 32 bits integers).
+	 * - Same as {@link setExtension}.
 	 */
-	setTransmissionOffsetExtension(offset?: number): void {
-		const extId = this.#extensionMapping[RtpExtensionType.TOFFSET];
+	setAbsCaptureTimeExtension(absCaptureTime?: AbsCaptureTimeExtension): void {
+		let value: Uint8Array | undefined;
 
-		if (!extId) {
-			return;
+		if (absCaptureTime) {
+			const { absCaptureTimestamp, estimatedCaptureClockOffset } =
+				absCaptureTime;
+
+			if (
+				!isUnsignedInteger32(absCaptureTimestamp.seconds) ||
+				!isUnsignedInteger32(absCaptureTimestamp.fractions)
+			) {
+				throw new TypeError(
+					'absCaptureTimestamp seconds and fractions must be integers between 0 and 4294967295'
+				);
+			}
+
+			if (
+				estimatedCaptureClockOffset &&
+				(!isSignedInteger32(estimatedCaptureClockOffset.seconds) ||
+					!isUnsignedInteger32(estimatedCaptureClockOffset.fractions))
+			) {
+				throw new TypeError(
+					'estimatedCaptureClockOffset seconds must be an integer between -2147483648 and 2147483647 and fractions an integer between 0 and 4294967295'
+				);
+			}
+
+			value = new Uint8Array(estimatedCaptureClockOffset ? 16 : 8);
+
+			const view = new DataView(value.buffer);
+
+			view.setUint32(0, absCaptureTimestamp.seconds);
+			view.setUint32(4, absCaptureTimestamp.fractions);
+
+			if (estimatedCaptureClockOffset) {
+				view.setInt32(8, estimatedCaptureClockOffset.seconds);
+				view.setUint32(12, estimatedCaptureClockOffset.fractions);
+			}
 		}
 
-		if (offset !== undefined) {
-			const view = new DataView(new ArrayBuffer(3));
-
-			write3BytesInDataView({ view, pos: 0, value: offset });
-
-			this.setExtension(extId, view);
-		} else {
-			this.deleteExtension(extId);
-		}
+		this.#writeMappedExtension(ExtensionType.ABS_CAPTURE_TIME, value);
 	}
 
 	/**
-	 * Get the packet payload.
+	 * Read the value of the {@link ExtensionType.PLAYOUT_DELAY} RTP
+	 * extension.
 	 */
-	getPayload(): DataView {
-		return this.#payloadView;
+	getPlayoutDelayExtension(): PlayoutDelayExtension | undefined {
+		const extension = this.#findMappedExtension(ExtensionType.PLAYOUT_DELAY);
+
+		if (extension?.length !== 3) {
+			return undefined;
+		}
+
+		const value = read3BytesInDataView(this.getView(), extension.pos);
+
+		return {
+			minDelay: value >> 12,
+			maxDelay: value & 0xfff,
+		};
 	}
 
 	/**
-	 * Set the packet payload.
+	 * Set the value of the {@link ExtensionType.PLAYOUT_DELAY} RTP
+	 * extension. If not given, the extension is deleted.
+	 *
+	 * @throws
+	 * - `Error` if the extension type is not in the extension mapping.
+	 * - `TypeError` if `minDelay` or `maxDelay` is not an integer between 0 and
+	 *   4095.
+	 * - Same as {@link setExtension}.
+	 */
+	setPlayoutDelayExtension(playoutDelay?: PlayoutDelayExtension): void {
+		let value: Uint8Array | undefined;
+
+		if (playoutDelay) {
+			const { minDelay, maxDelay } = playoutDelay;
+
+			for (const delay of [minDelay, maxDelay]) {
+				if (!isUnsignedInteger(delay, 0xfff)) {
+					throw new TypeError(
+						`delay (${delay}) must be an integer between 0 and 4095`
+					);
+				}
+			}
+
+			value = new Uint8Array(3);
+
+			write3BytesInDataView(
+				new DataView(value.buffer),
+				0,
+				(minDelay << 12) | maxDelay
+			);
+		}
+
+		this.#writeMappedExtension(ExtensionType.PLAYOUT_DELAY, value);
+	}
+
+	/**
+	 * Read the value of the {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP
+	 * extension.
+	 *
+	 * @param context - Context of the stream (SSRC) the packet belongs to. The
+	 *   application must create one per stream and pass that same context
+	 *   every time it reads the descriptor of a packet of that stream, since
+	 *   most descriptors can only be read with the template dependency
+	 *   structure carried by a previous one (in the first packet of the last
+	 *   key frame). The context is updated with the template dependency
+	 *   structure and the active decode targets carried by the descriptor (if
+	 *   any).
+	 *
+	 * @returns `undefined` if the extension is not present or is malformed. If
+	 *   the template dependency structure of the frame is unknown, only the
+	 *   mandatory fields are given.
+	 */
+	getDependencyDescriptorExtension(
+		context: DependencyDescriptorContext
+	): DependencyDescriptorExtension | undefined {
+		const id = this.#getMappedExtensionId(ExtensionType.DEPENDENCY_DESCRIPTOR);
+		const value = id === undefined ? undefined : this.getExtension(id);
+
+		if (!value) {
+			return undefined;
+		}
+
+		return readDependencyDescriptor(value, context, /* updateContext */ true);
+	}
+
+	/**
+	 * Set the value of the {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP
+	 * extension. If `descriptor` is not given, the extension is deleted.
+	 *
+	 * @param descriptor - Dependency Descriptor. Its `frameDependencies` must
+	 *   be given. If its `attachedStructure` is given, `structure` is written
+	 *   in the extension, which is only allowed in the first packet of the
+	 *   frame (`startOfFrame`).
+	 * @param structure - Template dependency structure in use. Required if
+	 *   `descriptor` is given.
+	 * @param activeChainsBitmask - Bitmask of the active chains (bit i is chain
+	 *   i). The chain diffs of inactive chains are written as 0. By default all
+	 *   chains are active.
+	 *
+	 * @throws
+	 * - `Error` if the extension type is not in the extension mapping.
+	 * - `TypeError` if `structure` is not given, if the descriptor or the
+	 *   structure is not valid or if the descriptor cannot be represented.
+	 * - Same as {@link setExtension}.
+	 */
+	setDependencyDescriptorExtension(
+		descriptor?: Omit<DependencyDescriptorExtension, 'isKeyFrame'>,
+		structure?: DependencyDescriptorStructure,
+		activeChainsBitmask: number = 0xffffffff
+	): void {
+		let value: Uint8Array | undefined;
+
+		if (descriptor) {
+			if (!structure) {
+				throw new TypeError('structure must be given');
+			}
+
+			value = writeDependencyDescriptor(
+				descriptor,
+				structure,
+				activeChainsBitmask
+			);
+		}
+
+		this.#writeMappedExtension(ExtensionType.DEPENDENCY_DESCRIPTOR, value);
+	}
+
+	/**
+	 * Get the packet payload (excluding padding).
 	 *
 	 * @remarks
-	 * - Serialization is needed after calling this method.
+	 * - The returned value is a view over the buffer of the packet (no bytes
+	 *   are copied).
 	 */
-	setPayload(view: DataView): void {
-		this.#payloadView = view;
+	getPayload(): Uint8Array {
+		const payloadOffset = this.#getPayloadOffset();
 
-		this.setSerializationNeeded(true);
+		return this.getBuffer().subarray(
+			payloadOffset,
+			payloadOffset + this.#getPayloadLength()
+		);
+	}
+
+	/**
+	 * Set the packet payload. The given payload is copied into the packet.
+	 *
+	 * @remarks
+	 * - This method removes existing padding (if any).
+	 * - Given `payload` can be a view over the buffer of the packet.
+	 *
+	 * @throws
+	 * - `TypeError` if the buffer has no space for the given payload.
+	 */
+	setPayload(payload: Uint8Array): void {
+		const payloadOffset = this.#getPayloadOffset();
+
+		this.setLength(payloadOffset + payload.byteLength);
+
+		this.#setPaddingBit(false);
+
+		this.getBuffer().set(payload, payloadOffset);
+	}
+
+	/**
+	 * Remove the packet payload.
+	 *
+	 * @remarks
+	 * - This method removes existing padding (if any).
+	 */
+	removePayload(): void {
+		this.setLength(this.#getPayloadOffset());
+
+		this.#setPaddingBit(false);
+	}
+
+	/**
+	 * Shift the content of the payload `delta` bytes after `payloadOffset`. A
+	 * positive `delta` inserts `delta` bytes at `payloadOffset` (whose content
+	 * is not defined) and a negative `delta` removes `-delta` bytes at
+	 * `payloadOffset`.
+	 *
+	 * @remarks
+	 * - This method removes existing padding (if any).
+	 *
+	 * @throws
+	 * - `TypeError` if `payloadOffset` is not an unsigned integer or `delta` is
+	 *   not an integer.
+	 * - `TypeError` if `payloadOffset` is not lower than the payload length.
+	 * - `TypeError` if negative `delta` is greater than the payload length after
+	 *   `payloadOffset`.
+	 * - `TypeError` if the buffer has no space for the shifted payload.
+	 */
+	shiftPayload(payloadOffset: number, delta: number): void {
+		if (!isUnsignedInteger(payloadOffset)) {
+			throw new TypeError(
+				`payloadOffset (${payloadOffset}) must be an unsigned integer`
+			);
+		} else if (!Number.isInteger(delta)) {
+			throw new TypeError(`delta (${delta}) must be an integer`);
+		}
+
+		if (delta === 0) {
+			return;
+		}
+
+		const payloadLength = this.#getPayloadLength();
+
+		if (payloadOffset >= payloadLength) {
+			throw new TypeError(
+				`payloadOffset (${payloadOffset}) is not lower than payload length (${payloadLength})`
+			);
+		} else if (delta < 0 && -delta > payloadLength - payloadOffset) {
+			throw new TypeError(`negative delta (${delta}) too big`);
+		}
+
+		this.#assertAvailableLength(this.getLength() - this.getPadding() + delta);
+
+		// Remove padding (if any).
+		this.setPadding(0);
+
+		const pos = this.#getPayloadOffset() + payloadOffset;
+
+		if (delta > 0) {
+			this.#moveTail(pos, delta);
+		} else {
+			this.#moveTail(pos - delta, delta);
+		}
 	}
 
 	/**
@@ -1260,46 +1376,43 @@ export class RtpPacket extends Packet {
 	 * @param sequenceNumber - The RTX sequence number.
 	 *
 	 * @remarks
-	 * - Serialization is needed after calling this method.
+	 * - This method removes existing padding (if any).
+	 *
+	 * @throws
+	 * - `TypeError` if `payloadType`, `ssrc` or `sequenceNumber` are out of
+	 *   range (see {@link setPayloadType}, {@link setSsrc} and
+	 *   {@link setSequenceNumber}), in which case the packet is not modified.
+	 * - `TypeError` if the buffer has no space for the original sequence number
+	 *   in the payload.
 	 */
 	rtxEncode(payloadType: number, ssrc: number, sequenceNumber: number): void {
-		// Rewrite the payload type.
-		this.setPayloadType(payloadType);
+		if (
+			!isUnsignedInteger(payloadType, 127) ||
+			!isUnsignedInteger32(ssrc) ||
+			!isUnsignedInteger16(sequenceNumber)
+		) {
+			throw new TypeError(
+				`invalid payloadType (${payloadType}), ssrc (${ssrc}) or sequenceNumber (${sequenceNumber})`
+			);
+		}
 
-		// Rewrite the SSRC.
-		this.setSsrc(ssrc);
-
-		const payloadView = new DataView(
-			new ArrayBuffer(2 + this.#payloadView.byteLength)
-		);
-		const payloadUint8Array = new Uint8Array(
-			payloadView.buffer,
-			payloadView.byteOffset,
-			payloadView.byteLength
-		);
-
-		// Write the original sequence number at the begining of the new payload.
-		payloadView.setUint16(0, this.getSequenceNumber());
-
-		// Copy the original payload after the sequence number.
-		payloadUint8Array.set(
-			new Uint8Array(
-				this.#payloadView.buffer,
-				this.#payloadView.byteOffset,
-				this.#payloadView.byteLength
-			),
-			2
+		this.#assertAvailableLength(
+			this.getLength() - this.getPadding() + RTX_OVERHEAD
 		);
 
-		this.#payloadView = payloadView;
-
-		// Rewrite the sequence number.
-		this.setSequenceNumber(sequenceNumber);
-
-		// Remove padding.
+		// Remove padding (if any).
 		this.setPadding(0);
 
-		this.setSerializationNeeded(true);
+		const payloadOffset = this.#getPayloadOffset();
+
+		this.#moveTail(payloadOffset, RTX_OVERHEAD);
+
+		// Write the original sequence number at the beginning of the payload.
+		this.getView().setUint16(payloadOffset, this.getSequenceNumber());
+
+		this.setPayloadType(payloadType);
+		this.setSsrc(ssrc);
+		this.setSequenceNumber(sequenceNumber);
 	}
 
 	/**
@@ -1308,59 +1421,567 @@ export class RtpPacket extends Packet {
 	 * @param payloadType - The original payload type.
 	 * @param ssrc - The original SSRC.
 	 *
+	 * @returns `false` if the payload is too short to contain the original
+	 *   sequence number, in which case the packet is not modified.
+	 *
 	 * @remarks
-	 * - Serialization is needed after calling this method.
+	 * - This method removes existing padding (if any).
 	 *
 	 * @throws
-	 * - If payload length is less than 2 bytes, so RTX decode is not possible.
+	 * - `TypeError` if `payloadType` or `ssrc` are out of range (see
+	 *   {@link setPayloadType} and {@link setSsrc}), in which case the packet is
+	 *   not modified.
 	 */
-	rtxDecode(payloadType: number, ssrc: number): void {
-		if (this.#payloadView.byteLength < 2) {
-			throw new RangeError(
-				'payload length must be greater or equal than 2 bytes'
+	rtxDecode(payloadType: number, ssrc: number): boolean {
+		if (!isUnsignedInteger(payloadType, 127) || !isUnsignedInteger32(ssrc)) {
+			throw new TypeError(
+				`invalid payloadType (${payloadType}) or ssrc (${ssrc})`
 			);
 		}
 
-		// Rewrite the payload type.
-		this.setPayloadType(payloadType);
+		// NOTE: libwebrtc sends some RTX packets with no payload when the stream
+		// is started. Just ignore them.
+		if (this.#getPayloadLength() < RTX_OVERHEAD) {
+			return false;
+		}
 
-		// Rewrite the SSRC.
+		const payloadOffset = this.#getPayloadOffset();
+
+		this.setPayloadType(payloadType);
+		this.setSequenceNumber(this.getView().getUint16(payloadOffset));
 		this.setSsrc(ssrc);
 
-		// Rewrite the sequence number.
-		const sequenceNumber = this.#payloadView.getUint16(0);
-
-		this.setSequenceNumber(sequenceNumber);
-
-		// Reduce the payload.
-		this.setPayload(
-			new DataView(this.#payloadView.buffer, this.#payloadView.byteOffset + 2)
-		);
-
-		// Remove padding.
+		// Remove padding (if any).
 		this.setPadding(0);
 
-		this.setSerializationNeeded(true);
+		this.#moveTail(payloadOffset + RTX_OVERHEAD, -RTX_OVERHEAD);
+
+		return true;
 	}
 
-	private hasHeaderExtensionBit(): boolean {
-		return readBitInDataView({ view: this.view, pos: 0, bit: 4 });
+	#validate(): void {
+		const view = this.getView();
+		const length = this.getLength();
+
+		let pos = FIXED_HEADER_LENGTH + this.#getCsrcCount() * 4;
+
+		if (length < pos) {
+			throw new TypeError('not enough space for the announced CSRC list');
+		}
+
+		if (this.#hasHeaderExtensionBit()) {
+			if (length < pos + 4) {
+				throw new TypeError(
+					'not enough space for the announced header extension'
+				);
+			}
+
+			const headerExtensionId = view.getUint16(pos);
+			const headerExtensionValueLength = view.getUint16(pos + 2) * 4;
+
+			pos += 4;
+
+			if (length < pos + headerExtensionValueLength) {
+				throw new TypeError(
+					'not enough space for the announced header extension value'
+				);
+			}
+
+			if (headerExtensionId === ONE_BYTE_EXTENSIONS_ID) {
+				this.#extensionsForm = 'one-byte';
+				this.#parseOneByteExtensions(pos, headerExtensionValueLength);
+			} else if (
+				(headerExtensionId & 0b1111111111110000) ===
+				TWO_BYTE_EXTENSIONS_ID
+			) {
+				this.#extensionsForm = 'two-byte';
+				this.#parseTwoByteExtensions(pos, headerExtensionValueLength);
+			}
+
+			pos += headerExtensionValueLength;
+		}
+
+		if (this.#hasPaddingBit()) {
+			const padding = view.getUint8(length - 1);
+
+			if (padding === 0) {
+				throw new TypeError('padding byte cannot be 0');
+			} else if (padding > length - pos) {
+				throw new TypeError(
+					`announced padding (${padding} bytes) is bigger than available space for payload and padding (${length - pos} bytes)`
+				);
+			}
+		}
 	}
 
-	private setHeaderExtensionBit(flag: boolean): void {
-		writeBitInDataView({ view: this.view, pos: 0, bit: 4, flag });
+	#parseOneByteExtensions(valuePos: number, valueLength: number): void {
+		const view = this.getView();
+		const end = valuePos + valueLength;
+
+		let pos = valuePos;
+
+		// One-Byte extensions cannot have length 0.
+		while (pos < end) {
+			const id = readBitsInDataView(view, pos, 0xf0);
+			// NOTE: In One-Byte extensions, announced value must be incremented
+			// by 1.
+			const len = readBitsInDataView(view, pos, 0x0f) + 1;
+
+			// id=0 means alignment.
+			if (id === 0) {
+				++pos;
+			}
+			// id=15 in One-Byte extensions means "stop parsing here".
+			else if (id === 15) {
+				break;
+			}
+			// Valid extension id.
+			else {
+				if (pos + 1 + len > end) {
+					throw new TypeError(
+						`not enough space for the announced value of the One-Byte extension with id ${id}`
+					);
+				}
+
+				this.#extensions.set(id, pos - valuePos);
+
+				pos += 1 + len;
+			}
+
+			// Counting padding bytes.
+			while (pos < end && view.getUint8(pos) === 0) {
+				++pos;
+			}
+		}
 	}
 
-	private getCsrcCount(): number {
-		return this.view.getUint8(0) & 0x0f;
+	#parseTwoByteExtensions(valuePos: number, valueLength: number): void {
+		const view = this.getView();
+		const end = valuePos + valueLength;
+
+		let pos = valuePos;
+
+		// Two-Byte extensions can have length 0.
+		while (pos + 1 < end) {
+			const id = view.getUint8(pos);
+			const len = view.getUint8(pos + 1);
+
+			// id=0 means alignment.
+			if (id === 0) {
+				++pos;
+			}
+			// Valid extension id.
+			else {
+				if (pos + 2 + len > end) {
+					throw new TypeError(
+						`not enough space for the announced value of the Two-Byte extension with id ${id}`
+					);
+				}
+
+				this.#extensions.set(id, pos - valuePos);
+
+				pos += 2 + len;
+			}
+
+			// Counting padding bytes.
+			while (pos < end && view.getUint8(pos) === 0) {
+				++pos;
+			}
+		}
 	}
 
-	private setCsrcCount(count: number): void {
-		writeBitsInDataView({
-			view: this.view,
-			pos: 0,
-			mask: 0b00001111,
-			value: count,
-		});
+	#getCsrcCount(): number {
+		return readBitsInDataView(this.getView(), 0, 0b00001111);
+	}
+
+	#hasHeaderExtensionBit(): boolean {
+		return readBitInDataView(this.getView(), 0, 4);
+	}
+
+	#setHeaderExtensionBit(flag: boolean): void {
+		writeBitInDataView(this.getView(), 0, 4, flag);
+	}
+
+	#hasPaddingBit(): boolean {
+		return readBitInDataView(this.getView(), 0, 5);
+	}
+
+	#setPaddingBit(flag: boolean): void {
+		writeBitInDataView(this.getView(), 0, 5, flag);
+	}
+
+	/**
+	 * Position where the header extension (if any) begins.
+	 */
+	#getHeaderExtensionOffset(): number {
+		return FIXED_HEADER_LENGTH + this.#getCsrcCount() * 4;
+	}
+
+	/**
+	 * Length of the header extension including the id & length four-octet, or
+	 * 0 if there is no header extension.
+	 */
+	#getHeaderExtensionLength(): number {
+		if (!this.#hasHeaderExtensionBit()) {
+			return 0;
+		}
+
+		return (
+			4 + this.getView().getUint16(this.#getHeaderExtensionOffset() + 2) * 4
+		);
+	}
+
+	/**
+	 * Position where the payload (if any) begins.
+	 */
+	#getPayloadOffset(): number {
+		return this.#getHeaderExtensionOffset() + this.#getHeaderExtensionLength();
+	}
+
+	#getPayloadLength(): number {
+		return this.getLength() - this.#getPayloadOffset() - this.getPadding();
+	}
+
+	/**
+	 * Write padding bit and padding bytes assuming that the length of the packet
+	 * already includes the given padding.
+	 */
+	#writePadding(padding: number): void {
+		if (padding === 0) {
+			this.#setPaddingBit(false);
+
+			return;
+		}
+
+		this.#setPaddingBit(true);
+		this.fillPadding(padding);
+		this.getView().setUint8(this.getLength() - 1, padding);
+	}
+
+	/**
+	 * @throws
+	 * - `TypeError` if the given length is greater than the buffer length.
+	 */
+	#assertAvailableLength(length: number): void {
+		if (length > this.getBufferLength()) {
+			throw new TypeError(
+				`length (${length} bytes) is larger than buffer length (${this.getBufferLength()} bytes)`
+			);
+		}
+	}
+
+	/**
+	 * Move the bytes from `pos` to the end of the packet `delta` bytes and
+	 * update the length of the packet.
+	 *
+	 * @throws
+	 * - `TypeError` if the buffer has no space for it, in which case nothing
+	 *   changes.
+	 */
+	#moveTail(pos: number, delta: number): void {
+		if (delta === 0) {
+			return;
+		}
+
+		const length = this.getLength();
+
+		if (delta > 0) {
+			// NOTE: This throws if there is no space in the buffer.
+			this.setLength(length + delta);
+			this.getBuffer().copyWithin(pos + delta, pos, length);
+		} else {
+			this.getBuffer().copyWithin(pos + delta, pos, length);
+			this.setLength(length + delta);
+		}
+	}
+
+	/**
+	 * Position and length of the value of the extension with given id.
+	 */
+	#findExtension(id: number): { pos: number; length: number } | undefined {
+		const offset = this.#extensions.get(id);
+
+		if (offset === undefined) {
+			return undefined;
+		}
+
+		const view = this.getView();
+		const pos = this.#getHeaderExtensionOffset() + 4 + offset;
+
+		switch (this.#extensionsForm) {
+			case 'one-byte': {
+				return {
+					pos: pos + 1,
+					length: readBitsInDataView(view, pos, 0x0f) + 1,
+				};
+			}
+
+			case 'two-byte': {
+				return { pos: pos + 2, length: view.getUint8(pos + 1) };
+			}
+		}
+	}
+
+	/**
+	 * Extensions (id and value).
+	 *
+	 * @remarks
+	 * - Each value is a view over the buffer of the packet.
+	 * - If an id is repeated in the packet, its last value is taken.
+	 */
+	#collectExtensions(): [number, Uint8Array][] {
+		const buffer = this.getBuffer();
+		const extensions: [number, Uint8Array][] = [];
+
+		for (const id of this.#extensions.keys()) {
+			const { pos, length } = this.#findExtension(id)!;
+
+			extensions.push([id, buffer.subarray(pos, pos + length)]);
+		}
+
+		return extensions;
+	}
+
+	/**
+	 * Rewrite the header extension with the given extensions using the given
+	 * form, or remove it if no extensions are given.
+	 *
+	 * @throws
+	 * - `TypeError` if some extension cannot be represented with the given
+	 *   form or if the buffer has no space for the extensions, in which case
+	 *   nothing changes.
+	 */
+	#writeExtensions(
+		extensions: [number, Uint8Array][],
+		form: ExtensionsForm
+	): void {
+		const headerExtensionOffset = this.#getHeaderExtensionOffset();
+		const previousHeaderExtensionLength = this.#getHeaderExtensionLength();
+
+		if (extensions.length === 0) {
+			this.#moveTail(
+				headerExtensionOffset + previousHeaderExtensionLength,
+				-previousHeaderExtensionLength
+			);
+			this.#setHeaderExtensionBit(false);
+			this.#extensions.clear();
+
+			return;
+		}
+
+		const view = this.getView();
+		let extensionHeaderLength: number;
+		let headerExtensionId: number;
+
+		switch (form) {
+			case 'one-byte': {
+				extensionHeaderLength = 1;
+				headerExtensionId = ONE_BYTE_EXTENSIONS_ID;
+
+				break;
+			}
+
+			case 'two-byte': {
+				extensionHeaderLength = 2;
+				headerExtensionId = TWO_BYTE_EXTENSIONS_ID;
+
+				// If the packet already has Two-Byte extensions, keep the header
+				// extension id (its appbits).
+				if (this.#hasHeaderExtensionBit()) {
+					const previousHeaderExtensionId = view.getUint16(
+						headerExtensionOffset
+					);
+
+					if (
+						(previousHeaderExtensionId & 0b1111111111110000) ===
+						TWO_BYTE_EXTENSIONS_ID
+					) {
+						headerExtensionId = previousHeaderExtensionId;
+					}
+				}
+
+				break;
+			}
+		}
+
+		let extensionsLength = 0;
+
+		for (const [id, value] of extensions) {
+			this.#assertExtension(id, value.byteLength, form);
+
+			extensionsLength += extensionHeaderLength + value.byteLength;
+		}
+
+		const headerExtensionValueLength = padTo4Bytes(extensionsLength);
+
+		// NOTE: Values are views over the area that is going to be rewritten, so
+		// they must be copied first. `slice()` is not used since it doesn't copy
+		// if the buffer of the packet is a Node.js Buffer.
+		const values = extensions.map(
+			([id, value]) => [id, new Uint8Array(value)] as const
+		);
+
+		// NOTE: This throws if there is no space in the buffer.
+		this.#moveTail(
+			headerExtensionOffset + previousHeaderExtensionLength,
+			4 + headerExtensionValueLength - previousHeaderExtensionLength
+		);
+
+		this.#setHeaderExtensionBit(true);
+
+		view.setUint16(headerExtensionOffset, headerExtensionId);
+		view.setUint16(headerExtensionOffset + 2, headerExtensionValueLength / 4);
+
+		const buffer = this.getBuffer();
+		const valuePos = headerExtensionOffset + 4;
+		let pos = valuePos;
+
+		this.#extensions.clear();
+
+		for (const [id, value] of values) {
+			this.#extensions.set(id, pos - valuePos);
+
+			switch (form) {
+				case 'one-byte': {
+					writeBitsInDataView(view, pos, 0xf0, id);
+					writeBitsInDataView(view, pos, 0x0f, value.byteLength - 1);
+
+					break;
+				}
+
+				case 'two-byte': {
+					view.setUint8(pos, id);
+					view.setUint8(pos + 1, value.byteLength);
+
+					break;
+				}
+			}
+
+			buffer.set(value, pos + extensionHeaderLength);
+
+			pos += extensionHeaderLength + value.byteLength;
+		}
+
+		buffer.fill(0, pos, valuePos + headerExtensionValueLength);
+	}
+
+	/**
+	 * @throws
+	 * - `TypeError` if the given extension id or value length cannot be
+	 *   represented with the given form.
+	 */
+	#assertExtension(id: number, length: number, form: ExtensionsForm): void {
+		switch (form) {
+			case 'one-byte': {
+				if (!Number.isInteger(id) || id < 1 || id > 14) {
+					throw new TypeError(
+						`invalid extension id ${id} in One-Byte extensions (must be 1..14)`
+					);
+				} else if (length < 1 || length > 16) {
+					throw new TypeError(
+						`invalid length ${length} of extension with id ${id} in One-Byte extensions (must be 1..16)`
+					);
+				}
+
+				break;
+			}
+
+			case 'two-byte': {
+				if (!isUnsignedInteger8(id) || id === 0) {
+					throw new TypeError(
+						`invalid extension id ${id} in Two-Byte extensions (must be 1..255)`
+					);
+				} else if (length > 255) {
+					throw new TypeError(
+						`invalid length ${length} of extension with id ${id} in Two-Byte extensions (must be 0..255)`
+					);
+				}
+
+				break;
+			}
+		}
+	}
+
+	#getMappedExtensionId(type: ExtensionType): number | undefined {
+		return this.#extensionMapping[type];
+	}
+
+	#findMappedExtension(
+		type: ExtensionType
+	): { pos: number; length: number } | undefined {
+		const id = this.#getMappedExtensionId(type);
+
+		if (id === undefined) {
+			return undefined;
+		}
+
+		return this.#findExtension(id);
+	}
+
+	#readStringExtension(type: ExtensionType): string | undefined {
+		const extension = this.#findMappedExtension(type);
+
+		if (!extension || extension.length === 0) {
+			return undefined;
+		}
+
+		return textDecoder.decode(
+			this.getBuffer().subarray(extension.pos, extension.pos + extension.length)
+		);
+	}
+
+	/**
+	 * Set or delete (if `value` is not given) the extension mapped to given
+	 * type.
+	 *
+	 * @throws
+	 * - `Error` if the extension type is not in the extension mapping.
+	 */
+	#writeMappedExtension(
+		type: ExtensionType,
+		value: Uint8Array | undefined
+	): void {
+		const id = this.#getMappedExtensionId(type);
+
+		if (id === undefined) {
+			throw new Error(
+				`extension type ${ExtensionType[type]} is not in the extension mapping`
+			);
+		}
+
+		if (value) {
+			this.setExtension(id, value);
+		} else {
+			this.deleteExtension(id);
+		}
+	}
+
+	/**
+	 * Dump the {@link ExtensionType.DEPENDENCY_DESCRIPTOR} RTP extension: the
+	 * whole descriptor if a context is given (which is not modified), or just
+	 * its mandatory fields otherwise.
+	 */
+	#dumpDependencyDescriptorExtension(
+		context: DependencyDescriptorContext | undefined
+	):
+		| DependencyDescriptorExtension
+		| DependencyDescriptorMandatoryFields
+		| undefined {
+		const id = this.#getMappedExtensionId(ExtensionType.DEPENDENCY_DESCRIPTOR);
+		const value = id === undefined ? undefined : this.getExtension(id);
+
+		if (!value) {
+			return undefined;
+		}
+
+		if (context) {
+			return readDependencyDescriptor(
+				value,
+				context,
+				/* updateContext */ false
+			);
+		}
+
+		return readDependencyDescriptorMandatoryFields(value);
 	}
 }

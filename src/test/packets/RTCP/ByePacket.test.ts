@@ -1,264 +1,430 @@
-import { ByePacket, type ByePacketDump } from '../../../packets/RTCP/ByePacket';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { areDataViewsEqual } from '../../../utils/helpers';
+import { ByePacket } from '../../../packets/RTCP/ByePacket';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
+import {
+	factoryBuffer,
+	serializeBuffer,
+	cloneBuffer,
+	resetBuffers,
+} from '../../testHelpers';
 
-const byePacketDump: ByePacketDump = {
-	byteLength: 44,
-	padding: 0,
-	packetType: RtcpPacketType.BYE,
-	count: 2,
-	ssrcs: [0x624276e0, 0x2624670e],
-	reason: 'Hasta la vista! œæ€å∫',
-};
+beforeEach(resetBuffers);
 
-const array = new Uint8Array([
-	0x82,
-	0xcb,
-	0x00,
-	0x0a, // Type: 203 (BYE), Count: 2, Length: 10
-	0x62,
-	0x42,
-	0x76,
-	0xe0, // SSRC: 0x624276e0
-	0x26,
-	0x24,
-	0x67,
-	0x0e, // SSRC: 0x2624670e
-	0x1c,
-	0x48,
-	0x61,
-	0x73, // Length: 28, Text: "Hasta la vista! œæ€å∫"
-	0x74,
-	0x61,
-	0x20,
-	0x6c,
-	0x61,
-	0x20,
-	0x76,
-	0x69,
-	0x73,
-	0x74,
-	0x61,
-	0x21,
-	0x20,
-	0xc5,
-	0x93,
-	0xc3,
-	0xa6,
-	0xe2,
-	0x82,
-	0xac,
-	0xc3,
-	0xa5,
-	0xe2,
-	0x88,
-	0xab,
-	0x00,
-	0x00,
-	0x00, // Reason padding (3 bytes)
-]);
+describe('RTCP BYE Packet', () => {
+	test('ByePacket.parse() succeeds', () => {
+		// prettier-ignore
+		const buffer = new Uint8Array([
+			// V=2, P=0, SC=3, PT:203, Length: 5
+			0b10000011, 0xcb, 0x00, 0x05,
+			// SSRC 1: 1111111
+			0x00, 0x10, 0xf4, 0x47,
+			// SSRC 2: 2222222
+			0x00, 0x21, 0xe8, 0x8e,
+			// SSRC 3: 12345678
+			0x00, 0xbc, 0x61, 0x4e,
+			// Reason length: 6, Reason: "foo"
+			0x06, 0x66, 0x6f, 0x6f,
+			// Reason: "bar", 1 byte of padding
+			0x62, 0x61, 0x72, 0x00,
+		]);
+		const packet = ByePacket.parse(buffer);
+		const expected: ExpectedRtcpPacket = {
+			buffer: buffer,
+			bufferLength: buffer.byteLength,
+			length: 24,
+			packetType: RtcpPacketType.BYE,
+			hasPadding: false,
+			padding: 0,
+		};
 
-const view = new DataView(array.buffer, array.byteOffset, array.byteLength);
+		checkRtcpPacket(packet, expected);
 
-describe('parse RTCP BYE packet', () => {
-	test('buffer view is RTCP', () => {
-		expect(isRtcp(view)).toBe(true);
-	});
+		expect(packet.getSsrcs()).toEqual([1111111, 2222222, 12345678]);
+		expect(packet.getReason()).toBe('foobar');
+		// Check padding bytes.
+		expect(packet.getBuffer()[packet.getLength() - 1]).toBe(0);
+		expect(packet.getBuffer()[packet.getLength() - 2]).toBe('r'.charCodeAt(0));
 
-	test('packet processing succeeds', () => {
-		const packet = new ByePacket(view);
+		// No space to add more ssrcs.
+		expect(() => packet.addSsrc(3333)).toThrow(TypeError);
+		// No space for a reason larger than the current one.
+		expect(() => packet.setReason('lolololo')).toThrow(TypeError);
 
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.dump()).toEqual(byePacketDump);
-		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		/* Serialize it. */
 
-		packet.serialize();
+		packet.serialize(serializeBuffer);
 
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.dump()).toEqual(byePacketDump);
-		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		buffer.fill(0xff);
 
-		const clonedPacket = packet.clone();
-
-		expect(clonedPacket.needsSerialization()).toBe(false);
-		expect(clonedPacket.dump()).toEqual(byePacketDump);
-		expect(areDataViewsEqual(clonedPacket.getView(), view)).toBe(true);
-	});
-});
-
-describe('create RTCP BYE packet', () => {
-	const packet = new ByePacket();
-
-	test('packet view is RTCP', () => {
-		expect(isRtcp(packet.getView())).toBe(true);
-	});
-
-	test('packet processing succeeds', () => {
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.dump()).toEqual({
-			...byePacketDump,
-			byteLength: 4,
-			count: 0,
-			ssrcs: [],
-			reason: undefined,
+		checkRtcpPacket(packet, {
+			...expected,
+			buffer: serializeBuffer,
+			bufferLength: serializeBuffer.byteLength,
 		});
 
-		// Fill optional fields so serialization should be needed.
-		packet.setSsrcs(byePacketDump.ssrcs);
-		packet.setReason(byePacketDump.reason);
+		expect(packet.getSsrcs()).toEqual([1111111, 2222222, 12345678]);
+		expect(packet.getReason()).toBe('foobar');
+		// Check padding bytes.
+		expect(packet.getBuffer()[packet.getLength() - 1]).toBe(0);
+		expect(packet.getBuffer()[packet.getLength() - 2]).toBe('r'.charCodeAt(0));
 
-		expect(packet.needsSerialization()).toBe(true);
-		expect(packet.dump()).toEqual(byePacketDump);
-		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		/* Clone it. */
 
-		packet.serialize();
+		const clonedPacket = packet.clone(cloneBuffer);
 
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.dump()).toEqual(byePacketDump);
-		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		serializeBuffer.fill(0xff);
 
-		const clonedPacket = packet.clone();
+		checkRtcpPacket(clonedPacket, {
+			...expected,
+			buffer: cloneBuffer,
+			bufferLength: cloneBuffer.byteLength,
+		});
 
-		expect(clonedPacket.needsSerialization()).toBe(false);
-		expect(clonedPacket.dump()).toEqual(byePacketDump);
-		expect(areDataViewsEqual(clonedPacket.getView(), view)).toBe(true);
-	});
-});
+		expect(clonedPacket.getSsrcs()).toEqual([1111111, 2222222, 12345678]);
+		expect(clonedPacket.getReason()).toBe('foobar');
+		// Check padding bytes.
+		expect(clonedPacket.getBuffer()[clonedPacket.getLength() - 1]).toBe(0);
+		expect(clonedPacket.getBuffer()[clonedPacket.getLength() - 2]).toBe(
+			'r'.charCodeAt(0)
+		);
 
-describe('parse RTCP BYE packet with padding', () => {
-	const byePacketDump2: ByePacketDump = {
-		byteLength: 24,
-		padding: 4,
-		packetType: RtcpPacketType.BYE,
-		count: 0,
-		ssrcs: [],
-		reason: 'Hasta la vista',
-	};
+		/* Modify it. */
 
-	const array2 = new Uint8Array([
-		0xa0,
-		0xcb,
-		0x00,
-		0x05, // Padding, Type: 203 (BYE), Count: 0, Length: 5
-		0x0e,
-		0x48,
-		0x61,
-		0x73, // Length: 14, Text: "Hasta la vista"
-		0x74,
-		0x61,
-		0x20,
-		0x6c,
-		0x61,
-		0x20,
-		0x76,
-		0x69,
-		0x73,
-		0x74,
-		0x61,
-		0x00,
-		0x00,
-		0x00,
-		0x00,
-		0x04, // Padding (4 bytes)
-	]);
+		clonedPacket.addSsrc(3333);
 
-	const view2 = new DataView(
-		array2.buffer,
-		array2.byteOffset,
-		array2.byteLength
-	);
+		checkRtcpPacket(clonedPacket, {
+			...expected,
+			buffer: cloneBuffer,
+			bufferLength: cloneBuffer.byteLength,
+			length: 28,
+		});
 
-	const packet = new ByePacket(view2);
+		expect(clonedPacket.getSsrcs()).toEqual([1111111, 2222222, 12345678, 3333]);
+		expect(clonedPacket.getReason()).toBe('foobar');
+		// Check padding bytes.
+		expect(clonedPacket.getBuffer()[clonedPacket.getLength() - 1]).toBe(0);
+		expect(clonedPacket.getBuffer()[clonedPacket.getLength() - 2]).toBe(
+			'r'.charCodeAt(0)
+		);
 
-	test('buffer view is RTCP', () => {
-		expect(isRtcp(view2)).toBe(true);
-	});
+		clonedPacket.setReason('');
 
-	test('packet processing succeeds', () => {
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.dump()).toEqual(byePacketDump2);
-		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
+		checkRtcpPacket(clonedPacket, {
+			...expected,
+			buffer: cloneBuffer,
+			bufferLength: cloneBuffer.byteLength,
+			length: 20,
+		});
 
-		packet.serialize();
+		expect(clonedPacket.getSsrcs()).toEqual([1111111, 2222222, 12345678, 3333]);
+		expect(clonedPacket.getReason()).toBeUndefined();
 
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.dump()).toEqual(byePacketDump2);
-		expect(areDataViewsEqual(packet.getView(), view2)).toBe(true);
+		clonedPacket.setReason('abcde');
 
-		const clonedPacket = packet.clone();
+		checkRtcpPacket(clonedPacket, {
+			...expected,
+			buffer: cloneBuffer,
+			bufferLength: cloneBuffer.byteLength,
+			length: 28,
+		});
 
-		expect(clonedPacket.needsSerialization()).toBe(false);
-		expect(clonedPacket.dump()).toEqual(byePacketDump2);
-		expect(areDataViewsEqual(clonedPacket.getView(), view2)).toBe(true);
-	});
-});
-
-describe('parse RTCP BYE packet without reason', () => {
-	const byePacketDump3: ByePacketDump = {
-		byteLength: 16,
-		padding: 4,
-		packetType: RtcpPacketType.BYE,
-		count: 2,
-		ssrcs: [0x624276e0, 0x2624670e],
-		reason: undefined,
-	};
-
-	const array3 = new Uint8Array([
-		0xa2,
-		0xcb,
-		0x00,
-		0x03, // Padding, Type: 203 (BYE), Count: 2, Length: 3
-		0x62,
-		0x42,
-		0x76,
-		0xe0, // SSRC: 0x624276e0
-		0x26,
-		0x24,
-		0x67,
-		0x0e, // SSRC: 0x2624670e
-		0x00,
-		0x00,
-		0x00,
-		0x04, // Padding (4 bytes)
-	]);
-
-	const view3 = new DataView(
-		array3.buffer,
-		array3.byteOffset,
-		array3.byteLength
-	);
-
-	const packet = new ByePacket(view3);
-
-	test('buffer view is RTCP', () => {
-		expect(isRtcp(view3)).toBe(true);
+		expect(clonedPacket.getSsrcs()).toEqual([1111111, 2222222, 12345678, 3333]);
+		expect(clonedPacket.getReason()).toBe('abcde');
+		// Check padding bytes.
+		expect(clonedPacket.getBuffer()[clonedPacket.getLength() - 1]).toBe(0);
+		expect(clonedPacket.getBuffer()[clonedPacket.getLength() - 2]).toBe(0);
+		expect(clonedPacket.getBuffer()[clonedPacket.getLength() - 3]).toBe(
+			'e'.charCodeAt(0)
+		);
 	});
 
-	test('packet processing succeeds', () => {
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.dump()).toEqual(byePacketDump3);
-		expect(areDataViewsEqual(packet.getView(), view3)).toBe(true);
+	test('ByePacket.parse() with padding succeeds', () => {
+		// prettier-ignore
+		const buffer = new Uint8Array([
+			// V=2, P=1, SC=1, PT:203, Length: 4
+			0b10100001, 0xcb, 0x00, 0x04,
+			// SSRC 1: 1111
+			0x00, 0x00, 0x04, 0x57,
+			// Reason length: 3, Reason: "abc"
+			0x03, 0x61, 0x62, 0x63,
+			// Padding: 8 bytes
+			0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x08,
+		]);
+		const packet = ByePacket.parse(buffer);
+		const expected: ExpectedRtcpPacket = {
+			buffer: buffer,
+			bufferLength: buffer.byteLength,
+			length: 20,
+			packetType: RtcpPacketType.BYE,
+			hasPadding: true,
+			padding: 8,
+		};
 
-		packet.serialize();
+		checkRtcpPacket(packet, expected);
 
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.dump()).toEqual(byePacketDump3);
-		expect(areDataViewsEqual(packet.getView(), view3)).toBe(true);
+		expect(packet.getSsrcs()).toEqual([1111]);
+		expect(packet.getReason()).toBe('abc');
 
-		const clonedPacket = packet.clone();
+		/* Modify it (it removes the padding). */
 
-		expect(clonedPacket.needsSerialization()).toBe(false);
-		expect(clonedPacket.dump()).toEqual(byePacketDump3);
-		expect(areDataViewsEqual(clonedPacket.getView(), view3)).toBe(true);
+		packet.addSsrc(2222);
+
+		checkRtcpPacket(packet, {
+			...expected,
+			length: 16,
+			hasPadding: false,
+			padding: 0,
+		});
+
+		expect(packet.getSsrcs()).toEqual([1111, 2222]);
+		expect(packet.getReason()).toBe('abc');
 	});
-});
 
-describe('parse invalid RTCP BYE packet', () => {
-	test('parsing a buffer view which length does not fit the indicated count throws', () => {
-		// Parse the first 8 bytes of the buffer, indicating 1 SSRC and holding no
-		// SSRC at all.
-		const view4 = new DataView(array.buffer, array.byteOffset, 8);
+	test('ByePacket.parse() with padding and byePacket.setReason() succeeds', () => {
+		// prettier-ignore
+		const buffer = new Uint8Array([
+			// V=2, P=1, SC=1, PT:203, Length: 3
+			0b10100001, 0xcb, 0x00, 0x03,
+			// SSRC 1: 1111
+			0x00, 0x00, 0x04, 0x57,
+			// Padding: 8 bytes
+			0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x08,
+		]);
+		const packet = ByePacket.parse(buffer);
+		const expected: ExpectedRtcpPacket = {
+			buffer: buffer,
+			bufferLength: buffer.byteLength,
+			length: 16,
+			packetType: RtcpPacketType.BYE,
+			hasPadding: true,
+			padding: 8,
+		};
 
-		expect(() => new ByePacket(view4)).toThrow(RangeError);
+		checkRtcpPacket(packet, expected);
+
+		expect(packet.getSsrcs()).toEqual([1111]);
+		expect(packet.getReason()).toBeUndefined();
+
+		/* Modify it (it removes the padding). */
+
+		packet.setReason('abc');
+
+		checkRtcpPacket(packet, {
+			...expected,
+			length: 12,
+			hasPadding: false,
+			padding: 0,
+		});
+
+		expect(packet.getSsrcs()).toEqual([1111]);
+		expect(packet.getReason()).toBe('abc');
+	});
+
+	test('ByePacket.parse() fails', () => {
+		// Length field should be 5 (24 bytes).
+		// prettier-ignore
+		const buffer1 = new Uint8Array([
+			// V=2, P=0, SC=3, PT:203, Length: 6
+			0b10000011, 0xcb, 0x00, 0x06,
+			// SSRC 1: 1111111
+			0x00, 0x10, 0xf4, 0x47,
+			// SSRC 2: 2222222
+			0x00, 0x21, 0xe8, 0x8e,
+			// SSRC 3: 12345678
+			0x00, 0xbc, 0x61, 0x4e,
+			// Reason length: 6, Reason: "foo"
+			0x06, 0x66, 0x6f, 0x6f,
+			// Reason: "bar", 1 byte of padding
+			0x62, 0x61, 0x72, 0x00,
+		]);
+
+		expect(() => ByePacket.parse(buffer1)).toThrow(TypeError);
+
+		// SC should be 3 instead of 4 (first byte should be 0b10000011). So the
+		// parser ends reading a wrong value of the Reason length field and fails.
+		// prettier-ignore
+		const buffer2 = new Uint8Array([
+			// V=2, P=0, SC=4, PT:203, Length: 5
+			0b10000100, 0xcb, 0x00, 0x05,
+			// SSRC 1: 1111111
+			0x00, 0x10, 0xf4, 0x47,
+			// SSRC 2: 2222222
+			0x00, 0x21, 0xe8, 0x8e,
+			// SSRC 3: 12345678
+			0x00, 0xbc, 0x61, 0x4e,
+			// Reason length: 6, Reason: "foo"
+			0x06, 0x66, 0x6f, 0x6f,
+			// Reason: "bar", 1 byte of padding
+			0x62, 0x61, 0x72, 0x00,
+		]);
+
+		expect(() => ByePacket.parse(buffer2)).toThrow(TypeError);
+
+		// parse() called with less buffer length than needed.
+		// prettier-ignore
+		const buffer3 = new Uint8Array([
+			// V=2, P=0, SC=3, PT:203, Length: 5
+			0b10000011, 0xcb, 0x00, 0x05,
+			// SSRC 1: 1111111
+			0x00, 0x10, 0xf4, 0x47,
+			// SSRC 2: 2222222
+			0x00, 0x21, 0xe8, 0x8e,
+			// SSRC 3: 12345678
+			0x00, 0xbc, 0x61, 0x4e,
+			// Reason length: 6, Reason: "foo"
+			0x06, 0x66, 0x6f, 0x6f,
+			// Reason: "bar", 1 byte of padding
+			0x62, 0x61, 0x72, 0x00,
+		]);
+
+		expect(() =>
+			ByePacket.parse(buffer3.subarray(0, buffer3.byteLength - 1))
+		).toThrow(TypeError);
+
+		// Length field should be 2 (12 bytes) since the packet must end right
+		// after the padded Reason, but it announces 4 extra bytes.
+		// prettier-ignore
+		const buffer4 = new Uint8Array([
+			// V=2, P=0, SC=1, PT:203, Length: 3
+			0b10000001, 0xcb, 0x00, 0x03,
+			// SSRC 1: 1111
+			0x00, 0x00, 0x04, 0x57,
+			// Reason length: 1, Reason: "a", 2 bytes of padding
+			0x01, 0x61, 0x00, 0x00,
+			// 4 extra bytes
+			0x11, 0x22, 0x33, 0x44,
+		]);
+
+		expect(() => ByePacket.parse(buffer4)).toThrow(TypeError);
+
+		// Padding bytes of the Reason must be zero.
+		// prettier-ignore
+		const buffer5 = new Uint8Array([
+			// V=2, P=0, SC=1, PT:203, Length: 2
+			0b10000001, 0xcb, 0x00, 0x02,
+			// SSRC 1: 1111
+			0x00, 0x00, 0x04, 0x57,
+			// Reason length: 1, Reason: "a", 2 bytes of padding (one not zero)
+			0x01, 0x61, 0x00, 0x01,
+		]);
+
+		expect(() => ByePacket.parse(buffer5)).toThrow(TypeError);
+	});
+
+	test('ByePacket.factory() succeeds', () => {
+		const packet = ByePacket.factory(factoryBuffer);
+		const expected: ExpectedRtcpPacket = {
+			buffer: factoryBuffer,
+			bufferLength: factoryBuffer.byteLength,
+			length: 4,
+			packetType: RtcpPacketType.BYE,
+			hasPadding: false,
+			padding: 0,
+		};
+
+		checkRtcpPacket(packet, expected);
+
+		expect(packet.getSsrcs()).toEqual([]);
+		expect(packet.getReason()).toBeUndefined();
+
+		/* Modify it. */
+
+		packet.addSsrc(1111);
+		packet.addSsrc(2222);
+		// Reason string is 25 bytes, so padded(1 + 25) is needed = 28 bytes.
+		packet.setReason("amazing reason, isn't it?");
+		packet.addSsrc(3333);
+
+		checkRtcpPacket(packet, {
+			...expected,
+			length: 4 + 4 + 4 + 4 + 28,
+		});
+
+		expect(packet.getSsrcs()).toEqual([1111, 2222, 3333]);
+		expect(packet.getReason()).toBe("amazing reason, isn't it?");
+		// Check padding bytes.
+		expect(packet.getBuffer()[packet.getLength() - 1]).toBe(0);
+		expect(packet.getBuffer()[packet.getLength() - 2]).toBe(0);
+		expect(packet.getBuffer()[packet.getLength() - 3]).toBe('?'.charCodeAt(0));
+
+		/* Serialize it. */
+
+		packet.serialize(serializeBuffer);
+
+		factoryBuffer.fill(0xff);
+
+		checkRtcpPacket(packet, {
+			...expected,
+			buffer: serializeBuffer,
+			bufferLength: serializeBuffer.byteLength,
+			length: 4 + 4 + 4 + 4 + 28,
+		});
+
+		expect(packet.getSsrcs()).toEqual([1111, 2222, 3333]);
+		expect(packet.getReason()).toBe("amazing reason, isn't it?");
+		// Check padding bytes.
+		expect(packet.getBuffer()[packet.getLength() - 1]).toBe(0);
+		expect(packet.getBuffer()[packet.getLength() - 2]).toBe(0);
+		expect(packet.getBuffer()[packet.getLength() - 3]).toBe('?'.charCodeAt(0));
+
+		/* Clone it. */
+
+		const clonedPacket = packet.clone(cloneBuffer);
+
+		serializeBuffer.fill(0xff);
+
+		checkRtcpPacket(clonedPacket, {
+			...expected,
+			buffer: cloneBuffer,
+			bufferLength: cloneBuffer.byteLength,
+			length: 4 + 4 + 4 + 4 + 28,
+		});
+
+		expect(clonedPacket.getSsrcs()).toEqual([1111, 2222, 3333]);
+		expect(clonedPacket.getReason()).toBe("amazing reason, isn't it?");
+		// Check padding bytes.
+		expect(clonedPacket.getBuffer()[clonedPacket.getLength() - 1]).toBe(0);
+		expect(clonedPacket.getBuffer()[clonedPacket.getLength() - 2]).toBe(0);
+		expect(clonedPacket.getBuffer()[clonedPacket.getLength() - 3]).toBe(
+			'?'.charCodeAt(0)
+		);
+	});
+
+	test('byePacket.addSsrc() and byePacket.setSsrcs() fail with more than 31 SSRCs', () => {
+		const packet = ByePacket.factory(factoryBuffer);
+		const ssrcs = Array.from({ length: 31 }, (_, idx) => idx + 1);
+
+		packet.setSsrcs(ssrcs);
+
+		expect(packet.getSsrcs()).toEqual(ssrcs);
+		expect(() => packet.addSsrc(32)).toThrow(TypeError);
+		expect(() => packet.setSsrcs([...ssrcs, 32])).toThrow(TypeError);
+		expect(packet.getSsrcs()).toEqual(ssrcs);
+		expect(packet.getLength()).toBe(4 + 31 * 4);
+	});
+
+	test('byePacket.getReason() keeps a leading byte order mark', () => {
+		// prettier-ignore
+		const buffer = new Uint8Array([
+			// V=2, P=0, SC=1, PT:203, Length: 2
+			0b10000001, 0xcb, 0x00, 0x02,
+			// SSRC 1: 1
+			0x00, 0x00, 0x00, 0x01,
+			// Reason length: 3, Reason: U+FEFF (byte order mark)
+			0x03, 0xef, 0xbb, 0xbf,
+		]);
+		const packet = ByePacket.parse(buffer);
+
+		expect(packet.getReason()).toBe(String.fromCharCode(0xfeff));
+
+		// Writing it back gives the same bytes.
+		const packet2 = ByePacket.factory(factoryBuffer);
+
+		packet2.addSsrc(1);
+		packet2.setReason(packet.getReason());
+
+		expect(Array.from(packet2.getBuffer())).toEqual(Array.from(buffer));
 	});
 });

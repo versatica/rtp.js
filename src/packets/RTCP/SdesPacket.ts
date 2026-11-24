@@ -1,553 +1,527 @@
 import {
 	RtcpPacket,
 	RtcpPacketType,
-	type RtcpPacketDump,
+	isRtcp,
 	COMMON_HEADER_LENGTH,
+	type RtcpPacketDump,
 } from './RtcpPacket';
-import { Serializable, type SerializableDump } from '../Serializable';
-import {
-	padTo4Bytes,
-	dataViewToString,
-	stringToUint8Array,
-	getStringByteLength,
-} from '../../utils/helpers';
-
-// SSRC (4 bytes) + null type (1 byte) + padding (3 bytes).
-const SDES_CHUNK_MIN_LENGTH = 8;
+import { isUnsignedInteger8, isUnsignedInteger32 } from '../../utils/numbers';
+import { padTo4Bytes } from '../../utils/buffers';
 
 /**
- * SDES Chunk Item types.
- *
- * @category RTCP
+ * Maximum number of chunks in a SDES packet (the SC field has 5 bits).
+ */
+const MAX_CHUNKS = 31;
+
+/**
+ * Maximum length (in bytes) of the text of a SDES item.
+ */
+const MAX_ITEM_TEXT_LENGTH = 255;
+
+const textEncoder = new TextEncoder();
+// NOTE: `ignoreBOM` keeps a leading byte order mark in the decoded text, so
+// valid UTF-8 is written back byte by byte as it was.
+const textDecoder = new TextDecoder('utf-8', { ignoreBOM: true });
+
+/**
+ * SDES item type.
  */
 export enum SdesItemType {
 	/**
-	 * Canonical End-Point Identifier SDES Item.
+	 * Canonical End-Point Identifier.
 	 */
 	CNAME = 1,
 	/**
-	 * User Name SDES Item.
+	 * User Name.
 	 */
 	NAME = 2,
 	/**
-	 * Electronic Mail Address SDES Item.
+	 * Electronic Mail Address.
 	 */
 	EMAIL = 3,
 	/**
-	 * Phone Number SDES Item.
+	 * Phone Number.
 	 */
 	PHONE = 4,
 	/**
-	 * Geographic User Location SDES Item.
+	 * Geographic User Location.
 	 */
 	LOC = 5,
 	/**
-	 * Application or Tool Name SDES Item.
+	 * Application or Tool Name.
 	 */
 	TOOL = 6,
 	/**
-	 * Notice/Status SDES Item.
+	 * Notice/Status.
 	 */
 	NOTE = 7,
 	/**
-	 * Private Extensions SDES Item.
+	 * Private Extensions.
 	 */
 	PRIV = 8,
 }
 
 /**
- * RTCP SDES packet info dump.
- *
- * @category RTCP
+ * SDES item.
  */
-export type SdesPacketDump = RtcpPacketDump & {
-	chunks: SdesChunkDump[];
+export type SdesItem = {
+	/**
+	 * Item type. In a parsed packet it may not be a member of
+	 * {@link SdesItemType}.
+	 */
+	type: SdesItemType;
+	/**
+	 * Item text (UTF-8).
+	 */
+	text: string;
 };
 
 /**
- * SDES Chunk dump.
- *
- * @category RTCP
+ * SDES chunk.
  */
-export type SdesChunkDump = SerializableDump & {
+export type SdesChunk = {
+	/**
+	 * SSRC/CSRC of the chunk.
+	 */
 	ssrc: number;
-	items: { type: SdesItemType; text: string }[];
+	/**
+	 * Items of the chunk.
+	 */
+	items: SdesItem[];
+};
+
+/**
+ * RTCP SDES packet info dump.
+ */
+export type SdesPacketDump = RtcpPacketDump & {
+	/**
+	 * SDES chunks.
+	 */
+	chunks: SdesChunk[];
+};
+
+/**
+ * SDES chunk whose item texts are already encoded.
+ */
+type EncodedSdesChunk = {
+	ssrc: number;
+	items: { type: SdesItemType; text: Uint8Array }[];
 };
 
 /**
  * RTCP SDES packet.
  *
  * ```text
- *         0                   1                   2                   3
- *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * header |V=2|P|    SC   |  PT=SDES=202  |             length            |
- *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
- * chunk  |                          SSRC/CSRC_1                          |
- *   1    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                           SDES items                          |
- *        |                              ...                              |
- *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
- * chunk  |                          SSRC/CSRC_2                          |
- *   2    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                           SDES items                          |
- *        |                              ...                              |
- *        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |V=2|P|    SC   |  PT=SDES=202  |             Length            |
+ * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * |                          SSRC/CSRC_1                          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                           SDES items                          |
+ * |                              ...                              |
+ * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * |                          SSRC/CSRC_2                          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                           SDES items                          |
+ * |                              ...                              |
+ * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  * ```
  *
- * @category RTCP
+ * - Source count (SC) (5 bits): The number of SSRC/CSRC chunks contained in
+ *   this SDES packet.
+ * - Chunk: A SSRC/CSRC identifier followed by a list of zero or more items.
+ *   Each chunk starts on a 32-bit boundary.
+ *
+ * Each SDES item:
+ *
+ * ```text
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |     Type      |    Length     |         Text               ...
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * ```
+ *
+ * - Type (8 bits): Item type.
+ * - Length (8 bits): Number of bytes of the text.
+ * - Text (variable length): Item text, with no padding.
+ *
+ * The list of items in each chunk is terminated by a null octet (which is
+ * interpreted as an item type of 0), followed by null octets to pad the chunk
+ * until the next 32-bit boundary.
+ *
+ * @remarks
+ * - The text of every item is decoded as UTF-8, so the prefix of the PRIV
+ *   item is not interpreted.
+ * - Every modification is applied in place within the buffer of the packet,
+ *   so it's always serialized. Modifications that need more bytes throw if
+ *   the buffer has no space for them, in which case the packet is not
+ *   modified.
  *
  * @see
  * - [RFC 3550 section 6.5](https://datatracker.ietf.org/doc/html/rfc3550#section-6.5)
  */
 export class SdesPacket extends RtcpPacket {
-	// SDES Chunks.
-	#chunks: SdesChunk[] = [];
-
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTCP SDES
-	 *   packet will be created.
+	 * Parse a RTCP SDES packet.
+	 *
+	 * @param buffer - Buffer holding the packet. Its `byteLength` is the maximum
+	 *   length the packet can take and it can be greater than the length of the
+	 *   packet, which is given by its Length field.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid RTCP SDES packet.
+	 * - `TypeError` if the buffer does not contain a valid RTCP SDES packet.
 	 */
-	constructor(view?: DataView) {
-		super(RtcpPacketType.SDES, view);
-
-		if (!this.view) {
-			this.view = new DataView(new ArrayBuffer(COMMON_HEADER_LENGTH));
-
-			// Write version and packet type.
-			this.writeCommonHeader();
-
-			return;
+	static parse(buffer: Uint8Array): SdesPacket {
+		if (!isRtcp(buffer)) {
+			throw new TypeError('not a RTCP packet');
 		}
 
-		// Position relative to the DataView byte offset.
-		let pos = 0;
+		const packet = new SdesPacket(buffer);
 
-		// Move to chunks.
-		pos += COMMON_HEADER_LENGTH;
+		packet.parseCommonHeader(RtcpPacketType.SDES);
+		packet.#validate();
 
-		let count = this.getCount();
-
-		while (count-- > 0) {
-			const chunkPos = pos;
-			let chunkLength = 0;
-
-			// First 4 bytes contain the chunk's ssrc.
-			pos += 4;
-			chunkLength += 4;
-
-			// Read the length of all items in this chunk until we find an item with
-			// type 0.
-			while (pos < this.view.byteLength - this.padding) {
-				const itemType = this.view.getUint8(pos);
-
-				++pos;
-				++chunkLength;
-
-				// Item type 0 means padding (to both indicate end of items and also
-				// beginning of padding).
-				if (itemType === 0) {
-					// Read up to 3 more additional null octests.
-					let additionalNumNullOctets = 0;
-
-					while (
-						pos < this.view.byteLength - this.padding &&
-						additionalNumNullOctets < 3 &&
-						this.view.getUint8(pos) === 0
-					) {
-						++pos;
-						++chunkLength;
-						++additionalNumNullOctets;
-					}
-
-					break;
-				}
-
-				const itemLength = this.view.getUint8(pos);
-
-				++pos;
-				++chunkLength;
-
-				pos += itemLength;
-				chunkLength += itemLength;
-			}
-
-			const chunkView = new DataView(
-				this.view.buffer,
-				this.view.byteOffset + chunkPos,
-				chunkLength
-			);
-
-			const chunk = new SdesChunk(chunkView);
-
-			this.#chunks.push(chunk);
-		}
-
-		if (this.#chunks.length !== this.getCount()) {
-			throw new RangeError(
-				`num of parsed SDES Chunks (${
-					this.#chunks.length
-				}) doesn't match RTCP count field ({${this.getCount()}})`
-			);
-		}
-
-		pos += this.padding;
-
-		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength) {
-			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
-			);
-		}
+		return packet;
 	}
 
 	/**
-	 * Dump Receiver Report packet info.
+	 * Create a RTCP SDES packet with no chunks.
+	 *
+	 * @param buffer - Buffer for the packet. Its `byteLength` is the maximum
+	 *   length the packet can take.
+	 *
+	 * @throws
+	 * - `TypeError` if `buffer.byteLength` is lower than the length of the
+	 *   Common Header.
+	 */
+	static factory(buffer: Uint8Array): SdesPacket {
+		const packet = new SdesPacket(buffer);
+
+		packet.initializeHeader(RtcpPacketType.SDES, 0, COMMON_HEADER_LENGTH);
+
+		return packet;
+	}
+
+	/**
+	 * Length (in bytes) of a RTCP SDES packet carrying the given chunks.
+	 *
+	 * @param chunksLength - Sum of what {@link computeChunkLengthFor} returns
+	 *   for each chunk the packet will carry.
+	 *
+	 * @internal
+	 */
+	static computeLengthFor(chunksLength: number): number {
+		// The chunks go right after the Common Header, and each one is already
+		// padded to 4 bytes.
+		return COMMON_HEADER_LENGTH + chunksLength;
+	}
+
+	/**
+	 * Length (in bytes) of a chunk carrying items with texts of the given
+	 * lengths, padding included.
+	 *
+	 * @param itemTextLengths - Length (in bytes) of the UTF-8 encoded text of
+	 *   each item.
+	 *
+	 * @internal
+	 */
+	static computeChunkLengthFor(itemTextLengths: number[]): number {
+		// The SSRC/CSRC (4 bytes).
+		let length = 4;
+
+		// Each item takes its type and length (1 byte each) and its text.
+		for (const itemTextLength of itemTextLengths) {
+			length += 2 + itemTextLength;
+		}
+
+		// The null octet that terminates the list of items, and the padding up to
+		// the next 32-bit boundary.
+		return padTo4Bytes(length + 1);
+	}
+
+	private constructor(buffer: Uint8Array) {
+		super(buffer);
+	}
+
+	/**
+	 * Dump RTCP SDES packet info.
 	 */
 	override dump(): SdesPacketDump {
 		return {
 			...super.dump(),
-			chunks: this.#chunks.map(chunk => chunk.dump()),
+			chunks: this.getChunks(),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number {
-		if (!this.needsSerialization()) {
-			return this.view.byteLength;
-		}
+	clone(buffer: Uint8Array): SdesPacket {
+		const clonedPacket = new SdesPacket(buffer);
 
-		const packetLength =
-			COMMON_HEADER_LENGTH +
-			this.#chunks.reduce((sum, chunk) => sum + chunk.getByteLength(), 0) +
-			this.padding;
+		this.cloneInto(clonedPacket);
 
-		return packetLength;
+		return clonedPacket;
 	}
 
 	/**
-	 * @inheritDoc
+	 * Get the number of chunks (value of the SC field).
 	 */
-	override needsSerialization(): boolean {
-		return (
-			super.needsSerialization() ||
-			this.#chunks.some(chunk => chunk.needsSerialization())
-		);
+	getChunksCount(): number {
+		return this.getCount();
 	}
 
 	/**
-	 * @inheritDoc
-	 */
-	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
-		const view = this.serializeBase(buffer, byteOffset);
-
-		// Position relative to the DataView byte offset.
-		let pos = 0;
-
-		// Move to chunks.
-		pos += COMMON_HEADER_LENGTH;
-
-		// Write chunks.
-		for (const chunk of this.#chunks) {
-			chunk.serialize(view.buffer, view.byteOffset + pos);
-
-			pos += chunk.getByteLength();
-		}
-
-		pos += this.padding;
-
-		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength) {
-			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
-			);
-		}
-
-		// Update DataView.
-		this.view = view;
-
-		this.setSerializationNeeded(false);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	clone(
-		buffer?: ArrayBufferLike,
-		byteOffset?: number,
-		serializationBuffer?: ArrayBufferLike,
-		serializationByteOffset?: number
-	): SdesPacket {
-		const view = this.cloneInternal(
-			buffer,
-			byteOffset,
-			serializationBuffer,
-			serializationByteOffset
-		);
-
-		return new SdesPacket(view);
-	}
-
-	/**
-	 * Get SDES Chunks.
+	 * Get the chunks.
 	 */
 	getChunks(): SdesChunk[] {
-		return Array.from(this.#chunks);
-	}
+		const view = this.getView();
+		const buffer = this.getBuffer();
+		const chunksCount = this.getChunksCount();
+		const chunks: SdesChunk[] = [];
 
-	/**
-	 * Set SDES Chunks.
-	 *
-	 * @remarks
-	 * - Serialization is needed after calling this method.
-	 */
-	setChunks(chunks: SdesChunk[]): void {
-		this.#chunks = Array.from(chunks);
+		let pos = COMMON_HEADER_LENGTH;
 
-		// Update RTCP count.
-		this.setCount(this.#chunks.length);
+		for (let chunkIdx = 0; chunkIdx < chunksCount; ++chunkIdx) {
+			const chunk: SdesChunk = { ssrc: view.getUint32(pos), items: [] };
 
-		this.setSerializationNeeded(true);
-	}
+			pos += 4;
 
-	/**
-	 * Add SDES Chunk.
-	 *
-	 * @remarks
-	 * - Serialization is needed after calling this method.
-	 */
-	addChunk(chunk: SdesChunk): void {
-		this.#chunks.push(chunk);
+			while (view.getUint8(pos) !== 0) {
+				const textLength = view.getUint8(pos + 1);
 
-		// Update RTCP count.
-		this.setCount(this.#chunks.length);
+				chunk.items.push({
+					type: view.getUint8(pos),
+					text: textDecoder.decode(
+						buffer.subarray(pos + 2, pos + 2 + textLength)
+					),
+				});
 
-		this.setSerializationNeeded(true);
-	}
-}
-
-/**
- * SDES Chunk.
- *
- * @category RTCP
- */
-export class SdesChunk extends Serializable {
-	// SDES Items indexed by type with text as value.
-	#items: { type: SdesItemType; text: string }[] = [];
-
-	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTCP SDES
-	 *   Chunk will be created.
-	 */
-	constructor(view?: DataView) {
-		super(view);
-
-		if (!this.view) {
-			this.view = new DataView(new ArrayBuffer(SDES_CHUNK_MIN_LENGTH));
-
-			return;
-		}
-
-		if (this.view.byteLength < SDES_CHUNK_MIN_LENGTH) {
-			throw new TypeError('wrong byte length for a SDES Chunk');
-		} else if (this.view.byteLength % 4 !== 0) {
-			throw new RangeError(
-				`SDES Chunk length must be multiple of 4 bytes but it is ${this.view.byteLength} bytes`
-			);
-		}
-
-		// Position relative to the DataView byte offset.
-		let pos = 0;
-
-		// Move to items.
-		pos += 4;
-
-		while (pos < this.view.byteLength) {
-			const itemType = this.view.getUint8(pos);
-
-			// NOTE: Don't increase pos here since we don't want it increased if 0.
-
-			// Item type 0 means padding.
-			if (itemType === 0) {
-				break;
+				pos += 2 + textLength;
 			}
 
-			// So increase it here.
-			++pos;
+			chunks.push(chunk);
 
-			const itemLength = this.view.getUint8(pos);
+			// The null octet and the padding until the next 32-bit boundary.
+			pos = padTo4Bytes(pos + 1);
+		}
 
-			++pos;
+		return chunks;
+	}
 
-			const itemView = new DataView(
-				this.view.buffer,
-				this.view.byteOffset + pos,
-				itemLength
+	/**
+	 * Set the chunks. If `chunks` is not given (or if it's an empty array) all
+	 * chunks are removed.
+	 *
+	 * @remarks
+	 * - This method removes existing padding (if any).
+	 *
+	 * @throws
+	 * - `TypeError` if more than 31 chunks are given.
+	 * - `TypeError` if some chunk is not valid (see {@link addChunk}).
+	 * - `TypeError` if the buffer has no space for the given chunks.
+	 */
+	setChunks(chunks: SdesChunk[] = []): void {
+		if (chunks.length > MAX_CHUNKS) {
+			throw new TypeError(
+				`cannot set more than ${MAX_CHUNKS} chunks (${chunks.length} given)`
 			);
-
-			pos += itemLength;
-
-			this.#items.push({ type: itemType, text: dataViewToString(itemView) });
 		}
 
-		// There must be a null octet at the end of the items and up to 3 more null
-		// octets to pad the chunk to 4 bytes.
-		const numNullOctets = this.view.byteLength - pos;
+		const encodedChunks = chunks.map(chunk => this.#encodeChunk(chunk));
+		let chunksLength = 0;
 
-		if (numNullOctets < 1 || numNullOctets > 4) {
-			throw new RangeError(
-				`SDES Chunk has wrong number of null octests at the end (${numNullOctets} null octets)`
-			);
+		for (const encodedChunk of encodedChunks) {
+			chunksLength += this.#computeEncodedChunkLength(encodedChunk);
 		}
+
+		// NOTE: This throws if there is no space in the buffer.
+		this.setBodyLength(chunksLength);
+
+		let pos = COMMON_HEADER_LENGTH;
+
+		for (const encodedChunk of encodedChunks) {
+			pos = this.#writeChunk(pos, encodedChunk);
+		}
+
+		this.setCount(chunks.length);
 	}
 
 	/**
-	 * Dump SDES Chunk info.
+	 * Add a chunk at the end of the packet.
+	 *
+	 * @remarks
+	 * - This method removes existing padding (if any).
+	 *
+	 * @throws
+	 * - `TypeError` if the packet already has 31 chunks.
+	 * - `TypeError` if `ssrc` is not an integer between 0 and 4294967295.
+	 * - `TypeError` if the type of some item is not an integer between 1 and
+	 *   255.
+	 * - `TypeError` if the UTF-8 encoded text of some item is longer than 255
+	 *   bytes.
+	 * - `TypeError` if the buffer has no space for the chunk.
 	 */
-	override dump(): SdesChunkDump {
-		return {
-			...super.dump(),
-			ssrc: this.getSsrc(),
-			items: this.getItems(),
-		};
-	}
+	addChunk(chunk: SdesChunk): void {
+		const chunksCount = this.getChunksCount();
 
-	/**
-	 * @inheritDoc
-	 */
-	getByteLength(): number {
-		if (!this.needsSerialization()) {
-			return this.view.byteLength;
+		if (chunksCount === MAX_CHUNKS) {
+			throw new TypeError(`cannot add more than ${MAX_CHUNKS} chunks`);
 		}
 
-		// SSRC (4 bytes).
-		let chunkLength = 4;
+		const encodedChunk = this.#encodeChunk(chunk);
+		// The packet (excluding padding) ends right after the last chunk.
+		const pos = this.getLength() - this.getPadding();
 
-		chunkLength += this.#items.reduce((sum, { text }) => {
-			// Item type field + item length field + text length.
-			return sum + 2 + getStringByteLength(text);
-		}, 0);
-
-		// The list of items in each chunk MUST be terminated by one or more null
-		// octets, so add a byte to hold a null byte.
-		++chunkLength;
-
-		// Each chunk must be padded to 4 bytes.
-		chunkLength = padTo4Bytes(chunkLength);
-
-		return chunkLength;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
-		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
-
-		// Create new DataView with new buffer.
-		const view = new DataView(
-			bufferData.buffer,
-			bufferData.byteOffset,
-			bufferData.byteLength
-		);
-		const uint8Array = new Uint8Array(
-			view.buffer,
-			view.byteOffset,
-			view.byteLength
+		// NOTE: This throws if there is no space in the buffer.
+		this.setBodyLength(
+			this.getBodyLength() + this.#computeEncodedChunkLength(encodedChunk)
 		);
 
-		let pos = 0;
+		this.#writeChunk(pos, encodedChunk);
 
-		// Copy the SSRC.
-		view.setUint32(pos, this.getSsrc());
+		this.setCount(chunksCount + 1);
+	}
 
-		// Move to items.
+	#validate(): void {
+		const view = this.getView();
+		// Length of the packet excluding padding.
+		const contentLength = this.getLength() - this.getPadding();
+		const chunksCount = this.getChunksCount();
+
+		let pos = COMMON_HEADER_LENGTH;
+
+		for (let chunkIdx = 0; chunkIdx < chunksCount; ++chunkIdx) {
+			// SSRC/CSRC of the chunk.
+			if (pos + 4 > contentLength) {
+				throw new TypeError(`no space for SSRC/CSRC of chunk ${chunkIdx}`);
+			}
+
+			pos += 4;
+
+			// Items until the null octet that terminates the list.
+			while (true) {
+				if (pos >= contentLength) {
+					throw new TypeError(
+						`missing null octet terminating the items of chunk ${chunkIdx}`
+					);
+				}
+
+				if (view.getUint8(pos) === 0) {
+					break;
+				}
+
+				if (pos + 2 > contentLength) {
+					throw new TypeError(`no space for item header in chunk ${chunkIdx}`);
+				}
+
+				const textLength = view.getUint8(pos + 1);
+
+				if (pos + 2 + textLength > contentLength) {
+					throw new TypeError(
+						`item length (${textLength} bytes) exceeds the packet length in chunk ${chunkIdx}`
+					);
+				}
+
+				pos += 2 + textLength;
+			}
+
+			// The null octet and the padding until the next 32-bit boundary.
+			const chunkEndPos = padTo4Bytes(pos + 1);
+
+			if (chunkEndPos > contentLength) {
+				throw new TypeError(`no space for padding of chunk ${chunkIdx}`);
+			}
+
+			for (; pos < chunkEndPos; ++pos) {
+				if (view.getUint8(pos) !== 0) {
+					throw new TypeError(`non null octet in padding of chunk ${chunkIdx}`);
+				}
+			}
+		}
+
+		// The packet (excluding padding) must end right after the last chunk.
+		if (pos !== contentLength) {
+			throw new TypeError(
+				`packet length (${contentLength} bytes, excluding padding) does not end right after the last chunk (${pos} bytes)`
+			);
+		}
+	}
+
+	/**
+	 * Validate the given chunk and encode the texts of its items.
+	 *
+	 * @throws
+	 * - `TypeError` if `ssrc` is not an integer between 0 and 4294967295.
+	 * - `TypeError` if the type of some item is not an integer between 1 and
+	 *   255.
+	 * - `TypeError` if the UTF-8 encoded text of some item is longer than 255
+	 *   bytes.
+	 */
+	#encodeChunk(chunk: SdesChunk): EncodedSdesChunk {
+		if (!isUnsignedInteger32(chunk.ssrc)) {
+			throw new TypeError(
+				`ssrc (${chunk.ssrc}) must be an integer between 0 and 4294967295`
+			);
+		}
+
+		const items = chunk.items.map(({ type, text }) => {
+			// An item type of 0 terminates the list of items, so it's not valid.
+			if (!isUnsignedInteger8(type) || (type as number) === 0) {
+				throw new TypeError(
+					`item type (${type}) must be an integer between 1 and 255`
+				);
+			}
+
+			const encodedText = textEncoder.encode(text);
+
+			if (encodedText.byteLength > MAX_ITEM_TEXT_LENGTH) {
+				throw new TypeError(
+					`item text length (${encodedText.byteLength} bytes) cannot be greater than ${MAX_ITEM_TEXT_LENGTH} bytes`
+				);
+			}
+
+			return { type, text: encodedText };
+		});
+
+		return { ssrc: chunk.ssrc, items };
+	}
+
+	#computeEncodedChunkLength(encodedChunk: EncodedSdesChunk): number {
+		return SdesPacket.computeChunkLengthFor(
+			encodedChunk.items.map(item => item.text.byteLength)
+		);
+	}
+
+	/**
+	 * Write the given chunk at the given position, including the null octet
+	 * that terminates its list of items and its padding.
+	 *
+	 * @returns Position where the chunk ends.
+	 */
+	#writeChunk(pos: number, encodedChunk: EncodedSdesChunk): number {
+		const view = this.getView();
+		const buffer = this.getBuffer();
+		const chunkEndPos = pos + this.#computeEncodedChunkLength(encodedChunk);
+
+		view.setUint32(pos, encodedChunk.ssrc);
+
 		pos += 4;
 
-		for (const { type, text } of this.#items) {
-			const itemUint8Array = stringToUint8Array(text);
-
+		for (const { type, text } of encodedChunk.items) {
 			view.setUint8(pos, type);
-			view.setUint8(pos + 1, itemUint8Array.byteLength);
+			view.setUint8(pos + 1, text.byteLength);
+			buffer.set(text, pos + 2);
 
-			pos += 2;
-
-			uint8Array.set(itemUint8Array, pos);
-
-			pos += itemUint8Array.byteLength;
+			pos += 2 + text.byteLength;
 		}
 
-		// NOTE: No need to care about chunk padding since the obtained buffer
-		// has the proper size (multiple of 4 bytes) and is filled with zeroes.
+		// The null octet that terminates the list of items and the padding.
+		buffer.fill(0, pos, chunkEndPos);
 
-		// Update DataView.
-		this.view = view;
-
-		this.setSerializationNeeded(false);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	clone(
-		buffer?: ArrayBufferLike,
-		byteOffset?: number,
-		serializationBuffer?: ArrayBufferLike,
-		serializationByteOffset?: number
-	): SdesChunk {
-		const view = this.cloneInternal(
-			buffer,
-			byteOffset,
-			serializationBuffer,
-			serializationByteOffset
-		);
-
-		return new SdesChunk(view);
-	}
-
-	/**
-	 * Get SDES Chunk SSRC.
-	 */
-	getSsrc(): number {
-		return this.view.getUint32(0);
-	}
-
-	/**
-	 * Set SDES Chunk SSRC.
-	 */
-	setSsrc(ssrc: number): void {
-		this.view.setUint32(0, ssrc);
-
-		this.setSerializationNeeded(true);
-	}
-
-	/**
-	 * Get SDES Items.
-	 */
-	getItems(): { type: SdesItemType; text: string }[] {
-		return Array.from(this.#items);
-	}
-
-	/**
-	 * Set SDES Items.
-	 */
-	setItems(items: { type: SdesItemType; text: string }[]): void {
-		this.#items = Array.from(items);
-
-		this.setSerializationNeeded(true);
-	}
-
-	/**
-	 * Add SDES Item.
-	 */
-	addItem(type: SdesItemType, text: string): void {
-		this.#items.push({ type, text });
-
-		this.setSerializationNeeded(true);
+		return chunkEndPos;
 	}
 }

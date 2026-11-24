@@ -1,87 +1,191 @@
-import { PliPacket, type PliPacketDump } from '../../../packets/RTCP/PliPacket';
-import { PsFeedbackMessageType } from '../../../packets/RTCP/FeedbackPacket';
-import { isRtcp, RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { areDataViewsEqual } from '../../../utils/helpers';
+import { PliPacket } from '../../../packets/RTCP/PliPacket';
+import { PayloadSpecificFeedbackMessageType } from '../../../packets/RTCP/AnyPayloadSpecificFeedbackPacket';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
+import { areBuffersEqual } from '../../../utils/buffers';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
+import {
+	factoryBuffer,
+	serializeBuffer,
+	cloneBuffer,
+	resetBuffers,
+} from '../../testHelpers';
 
-const pliPacketDump: PliPacketDump = {
-	byteLength: 12,
-	padding: 0,
-	packetType: RtcpPacketType.PSFB,
-	count: 1, // Used to indicate FMT, so 1 for PLI.
-	messageType: PsFeedbackMessageType.PLI,
-	senderSsrc: 0x00003344,
-	mediaSsrc: 0x55667788,
-};
+beforeEach(resetBuffers);
 
-const array = new Uint8Array([
-	0x81,
-	0xce,
-	0x00,
-	0x02, // FMT: 1 (PLI), Type: 206 (PSFB), Length: 2
-	0x00,
-	0x00,
-	0x33,
-	0x44, // Sender SSRC: 0x00003344
-	0x55,
-	0x66,
-	0x77,
-	0x88, // Media SSRC: 0x55667788
-]);
+describe('RTCP PLI Packet', () => {
+	test('PliPacket.parse() succeeds', () => {
+		function checkFields(packet: PliPacket): void {
+			expect(packet.getMessageType()).toBe(
+				PayloadSpecificFeedbackMessageType.PLI
+			);
+			expect(packet.getSenderSsrc()).toBe(0x12345678);
+			expect(packet.getMediaSsrc()).toBe(0x23456789);
+		}
 
-const view = new DataView(array.buffer, array.byteOffset, array.byteLength);
+		// prettier-ignore
+		const buffer = new Uint8Array([
+			// V=2, P=0, FMT=1, PT:206, Length: 2
+			0b10000001, 0xce, 0x00, 0x02,
+			// SSRC of packet sender: 0x12345678
+			0x12, 0x34, 0x56, 0x78,
+			// SSRC of media source: 0x23456789
+			0x23, 0x45, 0x67, 0x89,
+		]);
+		const packet = PliPacket.parse(buffer);
+		const expected: ExpectedRtcpPacket = {
+			buffer: buffer,
+			bufferLength: buffer.byteLength,
+			length: 12,
+			packetType: RtcpPacketType.PSFB,
+			hasPadding: false,
+			padding: 0,
+		};
 
-describe('parse RTCP PLI packet', () => {
-	test('buffer view is RTCP', () => {
-		expect(isRtcp(view)).toBe(true);
+		checkRtcpPacket(packet, expected);
+
+		checkFields(packet);
+
+		/* Serialize it. */
+
+		packet.serialize(serializeBuffer);
+
+		buffer.fill(0xff);
+
+		checkRtcpPacket(packet, {
+			...expected,
+			buffer: serializeBuffer,
+			bufferLength: serializeBuffer.byteLength,
+		});
+
+		checkFields(packet);
+
+		/* Clone it. */
+
+		const clonedPacket = packet.clone(cloneBuffer);
+
+		serializeBuffer.fill(0xff);
+
+		checkRtcpPacket(clonedPacket, {
+			...expected,
+			buffer: cloneBuffer,
+			bufferLength: cloneBuffer.byteLength,
+		});
+
+		checkFields(clonedPacket);
 	});
 
-	test('packet processing succeeds', () => {
-		const packet = new PliPacket(view);
+	test('PliPacket.parse() with padding succeeds', () => {
+		// prettier-ignore
+		const buffer = new Uint8Array([
+			// V=2, P=1, FMT=1, PT:206, Length: 3
+			0b10100001, 0xce, 0x00, 0x03,
+			// Sender SSRC: 1111
+			0x00, 0x00, 0x04, 0x57,
+			// Media SSRC: 2222
+			0x00, 0x00, 0x08, 0xae,
+			// Padding: 4 bytes
+			0x00, 0x00, 0x00, 0x04,
+		]);
+		const packet = PliPacket.parse(buffer);
 
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.dump()).toEqual(pliPacketDump);
-		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		checkRtcpPacket(packet, {
+			buffer: buffer,
+			bufferLength: buffer.byteLength,
+			length: 16,
+			packetType: RtcpPacketType.PSFB,
+			hasPadding: true,
+			padding: 4,
+		});
 
-		packet.serialize();
-
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.dump()).toEqual(pliPacketDump);
-		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
-
-		const clonedPacket = packet.clone();
-
-		expect(clonedPacket.needsSerialization()).toBe(false);
-		expect(clonedPacket.dump()).toEqual(pliPacketDump);
-		expect(areDataViewsEqual(clonedPacket.getView(), view)).toBe(true);
+		expect(packet.getSenderSsrc()).toBe(1111);
+		expect(packet.getMediaSsrc()).toBe(2222);
 	});
-});
 
-describe('create RTCP PLI packet', () => {
-	const packet = new PliPacket();
+	test('PliPacket.parse() fails', () => {
+		// No space for the SSRC of media source.
+		// prettier-ignore
+		const buffer1 = new Uint8Array([
+			// V=2, P=0, FMT=1, PT:206, Length: 1
+			0b10000001, 0xce, 0x00, 0x01,
+			// SSRC of packet sender: 0x12345678
+			0x12, 0x34, 0x56, 0x78,
+		]);
 
-	test('packet view is RTCP', () => {
-		expect(isRtcp(packet.getView())).toBe(true);
+		expect(() => PliPacket.parse(buffer1)).toThrow(TypeError);
+
+		// Length field must be 2 since PLI has no Feedback Control Information
+		// (FCI).
+		// prettier-ignore
+		const buffer2 = new Uint8Array([
+			// V=2, P=0, FMT=1, PT:206, Length: 3
+			0b10000001, 0xce, 0x00, 0x03,
+			// SSRC of packet sender: 0x12345678
+			0x12, 0x34, 0x56, 0x78,
+			// SSRC of media source: 0x23456789
+			0x23, 0x45, 0x67, 0x89,
+			// 4 extra bytes
+			0x00, 0x00, 0x00, 0x00,
+		]);
+
+		expect(() => PliPacket.parse(buffer2)).toThrow(TypeError);
+
+		// Wrong message type (FMT 4, FIR).
+		// prettier-ignore
+		const buffer3 = new Uint8Array([
+			// V=2, P=0, FMT=4, PT:206, Length: 2
+			0b10000100, 0xce, 0x00, 0x02,
+			// SSRC of packet sender: 0x12345678
+			0x12, 0x34, 0x56, 0x78,
+			// SSRC of media source: 0x23456789
+			0x23, 0x45, 0x67, 0x89,
+		]);
+
+		expect(() => PliPacket.parse(buffer3)).toThrow(TypeError);
 	});
 
-	test('packet processing succeeds', () => {
-		// No optional fields in this packet so serialization is never needed.
-		packet.setSenderSsrc(pliPacketDump.senderSsrc);
-		packet.setMediaSsrc(pliPacketDump.mediaSsrc);
+	test('PliPacket.factory() succeeds', () => {
+		// prettier-ignore
+		const expectedBuffer = new Uint8Array([
+			// V=2, P=0, FMT=1, PT:206, Length: 2
+			0b10000001, 0xce, 0x00, 0x02,
+			// SSRC of packet sender: 0x12345678
+			0x12, 0x34, 0x56, 0x78,
+			// SSRC of media source: 0x23456789
+			0x23, 0x45, 0x67, 0x89,
+		]);
 
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.dump()).toEqual(pliPacketDump);
-		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		// Dirty the buffer to check that factory() writes zeros in the feedback
+		// header.
+		factoryBuffer.fill(0xff);
 
-		packet.serialize();
+		const packet = PliPacket.factory(factoryBuffer);
 
-		expect(packet.needsSerialization()).toBe(false);
-		expect(packet.dump()).toEqual(pliPacketDump);
-		expect(areDataViewsEqual(packet.getView(), view)).toBe(true);
+		checkRtcpPacket(packet, {
+			buffer: factoryBuffer,
+			bufferLength: factoryBuffer.byteLength,
+			length: 12,
+			packetType: RtcpPacketType.PSFB,
+			hasPadding: false,
+			padding: 0,
+		});
 
-		const clonedPacket = packet.clone();
+		expect(packet.getMessageType()).toBe(
+			PayloadSpecificFeedbackMessageType.PLI
+		);
+		expect(packet.getSenderSsrc()).toBe(0);
+		expect(packet.getMediaSsrc()).toBe(0);
 
-		expect(clonedPacket.needsSerialization()).toBe(false);
-		expect(clonedPacket.dump()).toEqual(pliPacketDump);
-		expect(areDataViewsEqual(clonedPacket.getView(), view)).toBe(true);
+		/* Modify it. */
+
+		packet.setSenderSsrc(0x12345678);
+		packet.setMediaSsrc(0x23456789);
+
+		expect(areBuffersEqual(packet.getBuffer(), expectedBuffer)).toBe(true);
+	});
+
+	test('PliPacket.factory() throws if the buffer is too small', () => {
+		expect(() => PliPacket.factory(factoryBuffer.subarray(0, 11))).toThrow(
+			TypeError
+		);
 	});
 });

@@ -2,6 +2,7 @@
 
 [![][npm-shield-rtp.js]][npm-rtp.js]
 [![][github-actions-shield-rtp.js]][github-actions-rtp.js]
+[![][github-actions-shield-rtp.js-npm-publish]][github-actions-rtp.js-npm-publish]
 [![][github-actions-shield-docs]][github-actions-docs]
 
 RTP stack for Node.js and browser written in TypeScript. **rtp.js** provides with an API to parse, generate and modify RTP and RTCP packets.
@@ -16,83 +17,48 @@ npm install rtp.js
 
 - [API documentation](https://versatica.github.io/rtp.js)
 
-- All RTP and RTCP classes, types and packet related helpers are exported by the `packets` module:
+- RTP packets and RTP extensions are exported by the `packets/RTP` module:
+
+  ```ts
+  import { isRtp, RtpPacket, ExtensionType } from 'rtp.js/packets/RTP';
+
+  if (isRtp(buffer)) {
+    const rtpPacket = RtpPacket.parse(buffer);
+
+    rtpPacket.setExtensionMapping({ [ExtensionType.MID]: 1 });
+
+    const mid = rtpPacket.getMidExtension();
+  }
+  ```
+
+- RTCP packets are exported by the `packets/RTCP` module:
 
   ```ts
   import {
-  	isRtp,
-  	isRtcp,
-  	RtpPacket,
-  	CompoundPacket,
-  	ReceiverReportPacket,
-  	SenderReportPacket,
-  	ReceptionReport,
-  	ByePacket,
-  	SdesPacket,
-  	NackPacket,
-  	SrReqPacket,
-  	EcnPacket,
-  	PliPacket,
-  	SliPacket,
-  	RpsiPacket,
-  	XrPacket,
-  	ExtendedJitterReportsPacket,
-  	GenericPacket,
-  	// etc.
-  } from 'rtp.js/packets';
+    isRtcp,
+    ReceiverReportPacket,
+    SenderReportPacket,
+    SdesPacket,
+    ByePacket,
+    // [...]
+  } from 'rtp.js/packets/RTCP';
 
-  const rtpPacket = new RtpPacket();
+  const byePacket = ByePacket.factory(new Uint8Array(1500));
+
+  byePacket.addSsrc(1234);
+  byePacket.setReason('bye bye');
   ```
 
-- The `utils` module exports some generic helpers and utilities:
-
-  ```ts
-  import {
-  	padTo4Bytes,
-  	nodeBufferToDataView,
-  	dataViewToNodeBuffer,
-  	nodeBufferToArrayBuffer,
-  	arrayBufferToNodeBuffer,
-  	numericArrayToDataView,
-  	numberToDataView,
-  	dataViewToString,
-  	arrayBufferToString,
-  	stringToDataView,
-  	getStringByteLength,
-  	// etc.
-  } from 'rtp.js/utils';
-
-  const view = stringToDataView('fooœæ€ñ#¢∞Ω©bar');
-  ```
-
-- CommonJS is also supported:
-
-  ```ts
-  const { RtpPacket /* etc. */ } = require('rtp.js/packets');
-  const { padTo4Bytes /* etc. */ } = require('rtp.js/utils');
-  ```
-
-- Single entry point ("main" or "module" entries in `package.json`) is also supported for backwards compatibility:
-
-  ```ts
-  // Using ESM:
-  import { packets as rtpJsPackets, utils as rtpJsUtils } from 'rtp.js';
-
-  // Using CommonJS:
-  const { packets: rtpJsPackets, utils: rtpJsUtils } = require('rtp.js');
-
-  const { RtpPacket /* etc. */ } = rtpJsPackets;
-  const { padTo4Bytes /* etc. */ } = rtpJsUtils;
-  ```
+- Every packet lives within the `Uint8Array` given to `parse()` or `factory()` and every modification is applied in place within it, so `getBuffer()` always returns the serialized packet.
+- In Node.js a `Buffer` can be given instead, since it's a `Uint8Array`.
 
 ## Note about TypeScript
 
-**rtp.js** is written in TypeScript with `module: NodeNext`, meaning that TypeScript projects that want to import **rtp.js** using its exposed entry points ("rtp.js/packets" and "rtp.js/utils") must have `moduleResolution` set to "node16", 'NodeNext" or "bundler" in their `tsconfig.json` file.
+**rtp.js** exposes its entry points via the `exports` field of its `package.json` file, so TypeScript projects importing them must have `moduleResolution` set to "node16", "NodeNext" or "bundler" in their `tsconfig.json` file.
 
-## Authors
+## Author
 
 - Iñaki Baz Castillo [[website](https://inakibaz.me)|[github](https://github.com/ibc/)]
-- José Luis Millán [[github](https://github.com/jmillan/)]
 
 ## License
 
@@ -102,5 +68,7 @@ npm install rtp.js
 [npm-rtp.js]: https://npmjs.org/package/rtp.js
 [github-actions-shield-rtp.js]: https://github.com/versatica/rtp.js/actions/workflows/rtp.js.yaml/badge.svg?branch=master
 [github-actions-rtp.js]: https://github.com/versatica/rtp.js/actions/workflows/rtp.js.yaml?query=branch%3Amaster
+[github-actions-shield-rtp.js-npm-publish]: https://github.com/versatica/rtp.js/actions/workflows/rtp.js-npm-publish.yaml/badge.svg
+[github-actions-rtp.js-npm-publish]: https://github.com/versatica/rtp.js/actions/workflows/rtp.js-npm-publish.yaml
 [github-actions-shield-docs]: https://github.com/versatica/rtp.js/actions/workflows/docs.yaml/badge.svg?branch=master
 [github-actions-docs]: https://github.com/versatica/rtp.js/actions/workflows/docs.yaml?query=branch%3Amaster

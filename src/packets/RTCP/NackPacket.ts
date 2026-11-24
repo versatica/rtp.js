@@ -1,93 +1,154 @@
-import { RtcpPacketType } from './RtcpPacket';
 import {
-	FeedbackPacket,
-	RtpFeedbackMessageType,
-	type FeedbackPacketDump,
-	FIXED_HEADER_LENGTH,
-} from './FeedbackPacket';
-import { readBit, writeBit } from '../../utils/bitOps';
+	RtcpPacketType,
+	isRtcp,
+	COMMON_HEADER_LENGTH,
+	type RtcpPacketDump,
+} from './RtcpPacket';
+import { FEEDBACK_HEADER_LENGTH } from './AnyFeedbackPacket';
+import {
+	AnyTransportLayerFeedbackPacket,
+	TransportLayerFeedbackMessageType,
+} from './AnyTransportLayerFeedbackPacket';
+import { isUnsignedInteger16 } from '../../utils/numbers';
 
 /**
- * RTCP NACK packet info dump.
- *
- * @category RTCP
+ * Length (in bytes) of a NACK item.
  */
-export type NackPacketDump = FeedbackPacketDump & {
-	items: { pid: number; bitmask: number }[];
+const NACK_ITEM_LENGTH = 4;
+
+/**
+ * NACK item.
+ */
+export type NackItem = {
+	/**
+	 * Packet ID (PID): The RTP sequence number of a lost packet.
+	 */
+	pid: number;
+	/**
+	 * Bitmask of following lost packets (BLP): Bit i set to 1 means that the
+	 * packet with sequence number PID + i + 1 is also lost.
+	 */
+	bitmask: number;
 };
 
 /**
- * RTCP NACK packet (RTCP Transport Layer Feedback).
+ * RTCP NACK packet info dump.
+ */
+export type NackPacketDump = RtcpPacketDump & {
+	/**
+	 * Feedback message type.
+	 */
+	messageType: TransportLayerFeedbackMessageType;
+	/**
+	 * SSRC of the packet sender.
+	 */
+	senderSsrc: number;
+	/**
+	 * SSRC of the media source.
+	 */
+	mediaSsrc: number;
+	/**
+	 * NACK items.
+	 */
+	items: NackItem[];
+};
+
+/**
+ * RTCP Generic NACK packet (RTPFB 205, FMT 1).
  *
  * ```text
  *  0                   1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |V=2|P|  FMT=1  |  PT=RTPFB=205 |          length               |
+ * |V=2|P|  FMT=1  |  PT=RTPFB=205 |             Length            |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |                  SSRC of packet sender                        |
+ * |                     SSRC of packet sender                     |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |                  SSRC of media source                         |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |            PID                |             BLP               |
+ * |                      SSRC of media source                     |
+ * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+ * |              PID              |              BLP              |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * :                              ...                              :
- * +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
  * ```
  *
- * @category RTCP
+ * - Packet ID (PID) (16 bits): The RTP sequence number of a lost packet.
+ * - Bitmask of following lost packets (BLP) (16 bits): Bit i set to 1 means
+ *   that the packet with sequence number PID + i + 1 is also lost.
+ *
+ * @remarks
+ * - The Feedback Control Information (FCI) must contain at least one item.
+ * - Every modification is applied in place within the buffer of the packet,
+ *   so it's always serialized. Modifications that need more bytes throw if
+ *   the buffer has no space for them, in which case the packet is not
+ *   modified.
  *
  * @see
  * - [RFC 4585 section 6.2.1](https://datatracker.ietf.org/doc/html/rfc4585#section-6.2.1)
  */
-export class NackPacket extends FeedbackPacket {
-	#items: { pid: number; bitmask: number }[] = [];
-
+export class NackPacket extends AnyTransportLayerFeedbackPacket {
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTCP NACK
-	 *   packet will be created.
+	 * Parse a RTCP NACK packet.
+	 *
+	 * @param buffer - Buffer holding the packet. Its `byteLength` is the maximum
+	 *   length the packet can take and it can be greater than the length of the
+	 *   packet, which is given by its Length field.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid RTCP NACK packet.
+	 * - `TypeError` if the buffer does not contain a valid RTCP NACK packet.
 	 */
-	constructor(view?: DataView) {
-		super(RtcpPacketType.RTPFB, RtpFeedbackMessageType.NACK, view);
-
-		if (!this.view) {
-			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
-
-			// Write version, packet type and feedback message type.
-			this.writeFixedHeader();
-
-			return;
+	static parse(buffer: Uint8Array): NackPacket {
+		if (!isRtcp(buffer)) {
+			throw new TypeError('not a RTCP packet');
 		}
 
-		// Position relative to the DataView byte offset.
-		let pos = 0;
+		const packet = new NackPacket(buffer);
 
-		// Move to items.
-		pos += FIXED_HEADER_LENGTH;
+		packet.parseCommonHeader(RtcpPacketType.RTPFB);
+		packet.#validate();
 
-		while (pos < this.view.byteLength - this.padding) {
-			const pid = this.view.getUint16(pos);
+		return packet;
+	}
 
-			pos += 2;
+	/**
+	 * Create a RTCP NACK packet with both SSRCs set to 0 and no items.
+	 *
+	 * @param buffer - Buffer for the packet. Its `byteLength` is the maximum
+	 *   length the packet can take.
+	 *
+	 * @remarks
+	 * - At least one item must be added before sending the packet.
+	 *
+	 * @throws
+	 * - `TypeError` if `buffer.byteLength` is lower than 12 bytes.
+	 */
+	static factory(buffer: Uint8Array): NackPacket {
+		const packet = new NackPacket(buffer);
 
-			const bitmask = this.view.getUint16(pos);
+		packet.initializeHeader(
+			RtcpPacketType.RTPFB,
+			TransportLayerFeedbackMessageType.NACK,
+			FEEDBACK_HEADER_LENGTH
+		);
 
-			pos += 2;
+		// Set SSRC of packet sender and SSRC of media source to 0.
+		buffer.fill(0, COMMON_HEADER_LENGTH, FEEDBACK_HEADER_LENGTH);
 
-			this.#items.push({ pid, bitmask });
-		}
+		return packet;
+	}
 
-		pos += this.padding;
+	/**
+	 * Length (in bytes) of a RTCP NACK packet with the given number of items.
+	 *
+	 * @internal
+	 */
+	static computeLengthFor(numItems: number): number {
+		// The items go right after the feedback header, and each one is a
+		// multiple of 4 bytes, so the packet never needs padding.
+		return FEEDBACK_HEADER_LENGTH + numItems * NACK_ITEM_LENGTH;
+	}
 
-		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength) {
-			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
-			);
-		}
+	private constructor(buffer: Uint8Array) {
+		super(buffer);
 	}
 
 	/**
@@ -96,6 +157,9 @@ export class NackPacket extends FeedbackPacket {
 	override dump(): NackPacketDump {
 		return {
 			...super.dump(),
+			messageType: this.getMessageType(),
+			senderSsrc: this.getSenderSsrc(),
+			mediaSsrc: this.getMediaSsrc(),
 			items: this.getItems(),
 		};
 	}
@@ -103,158 +167,141 @@ export class NackPacket extends FeedbackPacket {
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number {
-		if (!this.needsSerialization()) {
-			return this.view.byteLength;
-		}
+	clone(buffer: Uint8Array): NackPacket {
+		const clonedPacket = new NackPacket(buffer);
 
-		const packetLength =
-			FIXED_HEADER_LENGTH + this.#items.length * 4 + this.padding;
+		this.cloneInto(clonedPacket);
 
-		return packetLength;
+		return clonedPacket;
 	}
 
 	/**
-	 * @inheritDoc
+	 * Get the number of items.
 	 */
-	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
-		const view = this.serializeBase(buffer, byteOffset);
-
-		// Position relative to the DataView byte offset.
-		let pos = 0;
-
-		// Move to items.
-		pos += FIXED_HEADER_LENGTH;
-
-		// Write items.
-		for (const { pid, bitmask } of this.#items) {
-			view.setUint16(pos, pid);
-
-			pos += 2;
-
-			view.setUint16(pos, bitmask);
-
-			pos += 2;
-		}
-
-		pos += this.padding;
-
-		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength) {
-			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
-			);
-		}
-
-		// Update DataView.
-		this.view = view;
-
-		this.setSerializationNeeded(false);
+	getItemsCount(): number {
+		return (
+			(this.getLength() - this.getPadding() - FEEDBACK_HEADER_LENGTH) /
+			NACK_ITEM_LENGTH
+		);
 	}
 
 	/**
-	 * @inheritDoc
+	 * Get the items.
 	 */
-	clone(
-		buffer?: ArrayBufferLike,
-		byteOffset?: number,
-		serializationBuffer?: ArrayBufferLike,
-		serializationByteOffset?: number
-	): NackPacket {
-		const view = this.cloneInternal(
-			buffer,
-			byteOffset,
-			serializationBuffer,
-			serializationByteOffset
+	getItems(): NackItem[] {
+		const view = this.getView();
+		const itemsCount = this.getItemsCount();
+		const items: NackItem[] = [];
+
+		for (let idx = 0; idx < itemsCount; ++idx) {
+			const pos = FEEDBACK_HEADER_LENGTH + idx * NACK_ITEM_LENGTH;
+
+			items.push({
+				pid: view.getUint16(pos),
+				bitmask: view.getUint16(pos + 2),
+			});
+		}
+
+		return items;
+	}
+
+	/**
+	 * Set the items. If `items` is not given (or if it's an empty array) all
+	 * items are removed.
+	 *
+	 * @remarks
+	 * - This method removes existing padding (if any).
+	 * - At least one item must exist before sending the packet.
+	 *
+	 * @throws
+	 * - `TypeError` if `pid` or `bitmask` of some item is not an integer between
+	 *   0 and 65535.
+	 * - `TypeError` if the buffer has no space for the given items.
+	 */
+	setItems(items: NackItem[] = []): void {
+		for (const item of items) {
+			this.#assertItem(item);
+		}
+
+		// NOTE: This throws if there is no space in the buffer.
+		this.setBodyLength(
+			FEEDBACK_HEADER_LENGTH -
+				COMMON_HEADER_LENGTH +
+				items.length * NACK_ITEM_LENGTH
 		);
 
-		return new NackPacket(view);
-	}
-
-	/**
-	 * Get NACK items.
-	 *
-	 * @remarks
-	 * - Use {@link parseNackItem} to parse returned NACK items.
-	 */
-	getItems(): { pid: number; bitmask: number }[] {
-		return Array.from(this.#items);
-	}
-
-	/**
-	 * Set NACK items.
-	 *
-	 * @remarks
-	 * - Use {@link createNackItem} to create NACK items.
-	 * - Serialization is needed after calling this method.
-	 */
-	setItems(items: { pid: number; bitmask: number }[]): void {
-		this.#items = Array.from(items);
-
-		this.setSerializationNeeded(true);
-	}
-
-	/**
-	 * Add NACK item value.
-	 *
-	 * @remarks
-	 * - Use {@link createNackItem} to create the NACK item.
-	 * - Serialization is needed after calling this method.
-	 */
-	addItem(pid: number, bitmask: number): void {
-		this.#items.push({ pid, bitmask });
-
-		this.setSerializationNeeded(true);
-	}
-}
-
-/**
- * Parse a NACK item. It returns an array with RTP sequence numbers that are
- * included in the item (lost packets).
- *
- * @category RTCP
- */
-export function parseNackItem(pid: number, bitmask: number): number[] {
-	const seqs: number[] = [pid];
-
-	for (let i = 0; i <= 15; ++i) {
-		if (readBit({ value: bitmask, bit: i })) {
-			seqs.push(pid + i + 1);
+		for (const [idx, item] of items.entries()) {
+			this.#writeItem(FEEDBACK_HEADER_LENGTH + idx * NACK_ITEM_LENGTH, item);
 		}
 	}
 
-	return seqs;
-}
+	/**
+	 * Add an item at the end of the packet.
+	 *
+	 * @remarks
+	 * - This method removes existing padding (if any).
+	 *
+	 * @throws
+	 * - `TypeError` if `pid` or `bitmask` is not an integer between 0 and
+	 *   65535.
+	 * - `TypeError` if the buffer has no space for the item.
+	 */
+	addItem(item: NackItem): void {
+		this.#assertItem(item);
 
-/**
- * Create a NACK item.
- *
- * @param seqs - RTP sequence number of lost packets. As per NACK rules, there
- *   can be up to 17 seq numbers and max diff between lowest and highest must
- *   be 17.
- *
- * @category RTCP
- */
-export function createNackItem(seqs: number[]): {
-	pid: number;
-	bitmask: number;
-} {
-	const orderedSeqs = [...seqs].sort();
-	const pid = orderedSeqs[0]!;
-	let bitmask: number = 0;
+		const pos =
+			FEEDBACK_HEADER_LENGTH + this.getItemsCount() * NACK_ITEM_LENGTH;
 
-	for (let i = 1; i < orderedSeqs.length; ++i) {
-		const seq = orderedSeqs[i]!;
-		const diff = (seq + 65536 - pid) % 65536;
+		// NOTE: This throws if there is no space in the buffer.
+		this.setBodyLength(pos + NACK_ITEM_LENGTH - COMMON_HEADER_LENGTH);
 
-		if (diff > 16) {
-			throw new RangeError(
-				'cannot create a NACK bitmask with given seq numbers'
+		this.#writeItem(pos, item);
+	}
+
+	#validate(): void {
+		if (this.getMessageType() !== TransportLayerFeedbackMessageType.NACK) {
+			throw new TypeError('not a RTCP NACK packet');
+		}
+
+		// Length of the packet excluding padding.
+		const contentLength = this.getLength() - this.getPadding();
+
+		// The Feedback Control Information (FCI) must contain at least one item.
+		if (contentLength < FEEDBACK_HEADER_LENGTH + NACK_ITEM_LENGTH) {
+			throw new TypeError('no space for feedback header and at least one item');
+		}
+		// The Feedback Control Information (FCI) must contain whole items.
+		else if (
+			(contentLength - FEEDBACK_HEADER_LENGTH) % NACK_ITEM_LENGTH !==
+			0
+		) {
+			throw new TypeError(
+				`Feedback Control Information length (${contentLength - FEEDBACK_HEADER_LENGTH} bytes) is not multiple of ${NACK_ITEM_LENGTH}`
 			);
 		}
-
-		bitmask = writeBit({ value: bitmask, bit: diff - 1, flag: true });
 	}
 
-	return { pid, bitmask };
+	/**
+	 * @throws
+	 * - `TypeError` if `pid` or `bitmask` is not an integer between 0 and
+	 *   65535.
+	 */
+	#assertItem(item: NackItem): void {
+		if (!isUnsignedInteger16(item.pid)) {
+			throw new TypeError(
+				`pid (${item.pid}) must be an integer between 0 and 65535`
+			);
+		} else if (!isUnsignedInteger16(item.bitmask)) {
+			throw new TypeError(
+				`bitmask (${item.bitmask}) must be an integer between 0 and 65535`
+			);
+		}
+	}
+
+	#writeItem(pos: number, item: NackItem): void {
+		const view = this.getView();
+
+		view.setUint16(pos, item.pid);
+		view.setUint16(pos + 2, item.bitmask);
+	}
 }

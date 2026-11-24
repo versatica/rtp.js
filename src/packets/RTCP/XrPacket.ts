@@ -1,362 +1,416 @@
 import {
-	ExtendedReport,
-	ExtendedReportType,
-	type ExtendedReportDump,
-	getExtendedReportType,
-	getExtendedReportLength,
-} from './extendedReports/ExtendedReport';
-import { LrleExtendedReport } from './extendedReports/LrleExtendedReport';
-import { DrleExtendedReport } from './extendedReports/DrleExtendedReport';
-import { PrtExtendedReport } from './extendedReports/PrtExtendedReport';
-import { RrtExtendedReport } from './extendedReports/RrtExtendedReport';
-import { DlrrExtendedReport } from './extendedReports/DlrrExtendedReport';
-import { SsExtendedReport } from './extendedReports/SsExtendedReport';
-import { VmExtendedReport } from './extendedReports/VmExtendedReport';
-import { EcnExtendedReport } from './extendedReports/EcnExtendedReport';
-import { GenericExtendedReport } from './extendedReports/GenericExtendedReport';
-import {
 	RtcpPacket,
 	RtcpPacketType,
-	type RtcpPacketDump,
+	isRtcp,
 	COMMON_HEADER_LENGTH,
+	type RtcpPacketDump,
 } from './RtcpPacket';
+import {
+	ExtendedReportBlockType,
+	isExtendedReport,
+	type ExtendedReport,
+	type ExtendedReportDump,
+} from './ExtendedReport';
+import { RrtExtendedReport } from './extendedReports/RrtExtendedReport';
+import { DlrrExtendedReport } from './extendedReports/DlrrExtendedReport';
+import { UnknownExtendedReport } from './extendedReports/UnknownExtendedReport';
+import { isUnsignedInteger32 } from '../../utils/numbers';
 
-// Common RTCP header length + 4 (SSRC of packet sender).
-const FIXED_HEADER_LENGTH = COMMON_HEADER_LENGTH + 4;
+/**
+ * Length (in bytes) of the XR header, RTCP Common Header included.
+ */
+const XR_HEADER_LENGTH = 8;
 
 /**
  * RTCP XR packet info dump.
- *
- * @category RTCP
  */
 export type XrPacketDump = RtcpPacketDump & {
+	/**
+	 * SSRC of the originator of the packet.
+	 */
 	ssrc: number;
-	reports: ExtendedReportDump[];
+	/**
+	 * Extended Report blocks.
+	 */
+	extendedReports: ExtendedReportDump[];
 };
 
 /**
- * RTCP XR packet.
+ * RTCP Extended Reports (XR) packet (207).
  *
  * ```text
- *         0                   1                   2                   3
- *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * header |V=2|P|reserved |   PT=XR=207   |             length            |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *        |                              SSRC                             |
- *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * report :                         report blocks                         :
- * blocks +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |V=2|P|reserved |   PT=XR=207   |             length            |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                              SSRC                             |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * :                         report blocks                         :
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ```
  *
- * @category RTCP
+ * - Reserved (5 bits): Must be set to zero and must be ignored by the
+ *   receiver.
+ * - Packet type (8 bits): 207.
+ * - SSRC (32 bits): The synchronization source identifier for the originator
+ *   of this XR packet.
+ * - Report blocks (variable length): Zero or more Extended Report blocks.
+ *
+ * @remarks
+ * - Extended Report blocks with an unknown or not implemented block type are
+ *   kept as {@link UnknownExtendedReport} and parsing continues with the next
+ *   block.
  *
  * @see
  * - [RFC 3611 section 2](https://datatracker.ietf.org/doc/html/rfc3611#section-2)
  */
 export class XrPacket extends RtcpPacket {
-	// Extended Reports.
-	#reports: ExtendedReport[] = [];
+	// Extended Report blocks.
+	#extendedReports: ExtendedReport[] = [];
 
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTCP XR packet
-	 *   will be created.
+	 * Parse a RTCP XR packet.
+	 *
+	 * @param buffer - Buffer holding the packet. Its `byteLength` is the maximum
+	 *   length the packet can take and it can be greater than the length of the
+	 *   packet, which is given by its Length field.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid RTCP XR packet.
+	 * - `TypeError` if the buffer does not contain a valid RTCP XR packet.
 	 */
-	constructor(view?: DataView) {
-		super(RtcpPacketType.XR, view);
-
-		if (!this.view) {
-			this.view = new DataView(new ArrayBuffer(FIXED_HEADER_LENGTH));
-
-			// Write version and packet type.
-			this.writeCommonHeader();
-
-			return;
+	static parse(buffer: Uint8Array): XrPacket {
+		if (!isRtcp(buffer)) {
+			throw new TypeError('not a RTCP packet');
 		}
 
-		// Position relative to the DataView byte offset.
-		let pos = 0;
+		const packet = new XrPacket(buffer);
 
-		// Move to Extended Reports.
-		pos += FIXED_HEADER_LENGTH;
+		packet.parseCommonHeader(RtcpPacketType.XR);
+		packet.#parseExtendedReports();
 
-		while (pos < this.view.byteLength - this.padding) {
-			const remainingView = new DataView(
-				this.view.buffer,
-				this.view.byteOffset + pos,
-				this.view.byteLength - this.padding - pos
-			);
-
-			const reportType = getExtendedReportType(remainingView);
-			const reportLength = getExtendedReportLength(remainingView);
-
-			const reportView = new DataView(
-				this.view.buffer,
-				this.view.byteOffset + pos,
-				reportLength
-			);
-
-			let report: ExtendedReport;
-
-			switch (reportType) {
-				case ExtendedReportType.LRLE: {
-					report = new LrleExtendedReport(reportView);
-
-					break;
-				}
-
-				case ExtendedReportType.DRLE: {
-					report = new DrleExtendedReport(reportView);
-
-					break;
-				}
-
-				case ExtendedReportType.PRT: {
-					report = new PrtExtendedReport(reportView);
-
-					break;
-				}
-
-				case ExtendedReportType.RRT: {
-					report = new RrtExtendedReport(reportView);
-
-					break;
-				}
-
-				case ExtendedReportType.DLRR: {
-					report = new DlrrExtendedReport(reportView);
-
-					break;
-				}
-
-				case ExtendedReportType.SS: {
-					report = new SsExtendedReport(reportView);
-
-					break;
-				}
-
-				case ExtendedReportType.VM: {
-					report = new VmExtendedReport(reportView);
-
-					break;
-				}
-
-				case ExtendedReportType.ECN: {
-					report = new EcnExtendedReport(reportView);
-
-					break;
-				}
-
-				default: {
-					report = new GenericExtendedReport(reportView);
-				}
-			}
-
-			pos += reportLength;
-
-			this.#reports.push(report);
-		}
-
-		pos += this.padding;
-
-		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength) {
-			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
-			);
-		}
+		return packet;
 	}
 
 	/**
-	 * Dump XR packet info.
+	 * Create a RTCP XR packet with SSRC set to 0 and no Extended Report blocks.
+	 *
+	 * @param buffer - Buffer for the packet. Its `byteLength` is the maximum
+	 *   length the packet can take.
+	 *
+	 * @throws
+	 * - `TypeError` if `buffer.byteLength` is lower than 8 bytes.
+	 */
+	static factory(buffer: Uint8Array): XrPacket {
+		const packet = new XrPacket(buffer);
+
+		packet.initializeHeader(RtcpPacketType.XR, 0, XR_HEADER_LENGTH);
+
+		// Set SSRC to 0.
+		buffer.fill(0, COMMON_HEADER_LENGTH, XR_HEADER_LENGTH);
+
+		return packet;
+	}
+
+	/**
+	 * Length (in bytes) of a RTCP XR packet carrying Extended Report blocks
+	 * whose lengths sum `extendedReportsLength`.
+	 *
+	 * @internal
+	 */
+	static computeLengthFor(extendedReportsLength: number): number {
+		// The Extended Report blocks go right after the XR header, and each one
+		// is a multiple of 4 bytes, so the packet never needs padding.
+		return XR_HEADER_LENGTH + extendedReportsLength;
+	}
+
+	private constructor(buffer: Uint8Array) {
+		super(buffer);
+	}
+
+	/**
+	 * Dump RTCP XR packet info.
 	 */
 	override dump(): XrPacketDump {
 		return {
 			...super.dump(),
 			ssrc: this.getSsrc(),
-			reports: this.#reports.map(report => report.dump()),
+			extendedReports: this.#extendedReports.map(extendedReport =>
+				extendedReport.dump()
+			),
 		};
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number {
-		if (!this.needsSerialization()) {
-			return this.view.byteLength;
-		}
+	clone(buffer: Uint8Array): XrPacket {
+		const clonedPacket = new XrPacket(buffer);
 
-		const packetLength =
-			FIXED_HEADER_LENGTH +
-			this.#reports.reduce((sum, report) => sum + report.getByteLength(), 0) +
-			this.padding;
+		// NOTE: No byte is copied here. The XR header and the padding are copied
+		// below and each Extended Report block copies its own bytes.
+		this.cloneInto(clonedPacket, /* copyBytes */ false);
 
-		return packetLength;
-	}
+		const packetBuffer = this.getBuffer();
+		const byteOffset = packetBuffer.byteOffset;
+		const clonedPacketBuffer = clonedPacket.getBuffer();
+		// The Extended Report blocks fill the packet (excluding padding).
+		const contentLength = this.getLength() - this.getPadding();
 
-	/**
-	 * @inheritDoc
-	 */
-	override needsSerialization(): boolean {
-		return (
-			super.needsSerialization() ||
-			this.#reports.some(report => report.needsSerialization())
-		);
-	}
+		// Copy the XR header.
+		clonedPacketBuffer.set(packetBuffer.subarray(0, XR_HEADER_LENGTH));
 
-	/**
-	 * @inheritDoc
-	 */
-	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
-		const view = this.serializeBase(buffer, byteOffset);
-		const uint8Array = new Uint8Array(
-			view.buffer,
-			view.byteOffset,
-			view.byteLength
-		);
+		// Copy the padding (if any).
+		clonedPacketBuffer.set(packetBuffer.subarray(contentLength), contentLength);
 
-		// Position relative to the DataView byte offset.
-		let pos = 0;
+		// Each Extended Report block goes at the same position within the cloned
+		// packet.
+		for (const extendedReport of this.#extendedReports) {
+			const extendedReportBuffer = extendedReport.getBuffer();
+			const pos = extendedReportBuffer.byteOffset - byteOffset;
 
-		// Move to the fixed header fields after the common header.
-		pos += COMMON_HEADER_LENGTH;
-
-		// Copy the rest of the fixed header into the new buffer.
-		uint8Array.set(
-			new Uint8Array(
-				this.view.buffer,
-				this.view.byteOffset + pos,
-				FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH
-			),
-			pos
-		);
-
-		// Move to Reception Reports.
-		pos += FIXED_HEADER_LENGTH - COMMON_HEADER_LENGTH;
-
-		// Write Reception Reports.
-		for (const report of this.#reports) {
-			// Serialize the report into the current position.
-			report.serialize(view.buffer, view.byteOffset + pos);
-
-			pos += report.getByteLength();
-		}
-
-		pos += this.padding;
-
-		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength) {
-			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+			clonedPacket.#extendedReports.push(
+				extendedReport.clone(
+					clonedPacketBuffer.subarray(
+						pos,
+						pos + extendedReportBuffer.byteLength
+					)
+				)
 			);
 		}
 
-		// Update DataView.
-		this.view = view;
-
-		this.setSerializationNeeded(false);
+		return clonedPacket;
 	}
 
 	/**
-	 * @inheritDoc
-	 */
-	clone(
-		buffer?: ArrayBufferLike,
-		byteOffset?: number,
-		serializationBuffer?: ArrayBufferLike,
-		serializationByteOffset?: number
-	): XrPacket {
-		const view = this.cloneInternal(
-			buffer,
-			byteOffset,
-			serializationBuffer,
-			serializationByteOffset
-		);
-
-		return new XrPacket(view);
-	}
-
-	/**
-	 * Get sender SSRC.
+	 * Get the SSRC of the originator of this XR packet.
 	 */
 	getSsrc(): number {
-		return this.view.getUint32(4);
+		return this.getView().getUint32(4);
 	}
 
 	/**
-	 * Set sender SSRC.
+	 * Set the SSRC of the originator of this XR packet.
+	 *
+	 * @throws
+	 * - `TypeError` if `ssrc` is not an integer between 0 and 4294967295.
 	 */
 	setSsrc(ssrc: number): void {
-		this.view.setUint32(4, ssrc);
+		if (!isUnsignedInteger32(ssrc)) {
+			throw new TypeError(
+				`ssrc (${ssrc}) must be an integer between 0 and 4294967295`
+			);
+		}
+
+		this.getView().setUint32(4, ssrc);
 	}
 
 	/**
-	 * Get Extended Reports.
+	 * Get the Extended Report blocks.
 	 *
 	 * @remarks
-	 * - The returned value is an array of {@link ExtendedReport}, which is an
-	 *   abstract class.
-	 * - By inspecting {@link ExtendedReport.getReportType} we can cast each
-	 *   extended report to its specific class.
+	 * - The returned array is a copy, but the Extended Report blocks in it are
+	 *   the ones in the packet, so modifying them modifies the packet.
+	 */
+	getExtendedReports(): ExtendedReport[] {
+		return this.#extendedReports.slice();
+	}
+
+	/**
+	 * Get the first Extended Report block of the given class.
 	 *
 	 * @example
 	 * ```ts
-	 * import { packets } from 'rtp.js';
-	 * const { XrPacket, ExtendedReportType, LrleExtendedReport } = packets;
-	 *
-	 * const packet = new XrPacket(view);
-	 *
-	 * for (const extendedReport of packet.getReports())
-	 * {
-	 *   switch (extendedReport.getReportType())
-	 *   {
-	 *     case ExtendedReportType.LRLE:
-	 *     {
-	 *       const lrleExtendedReport = extendedReport as LrleExtendedReport;
-	 *
-	 *       console.log(lrleExtendedReport.getThinning());
-	 *
-	 *       break;
-	 *     }
-	 *
-	 *     // etc.
-	 *   }
-	 * }
+	 * const dlrrExtendedReport = xrPacket.getFirstExtendedReportOfType(
+	 *   DlrrExtendedReport
+	 * );
 	 * ```
 	 */
-	getReports(): ExtendedReport[] {
-		return Array.from(this.#reports);
+	getFirstExtendedReportOfType<T extends ExtendedReport>(type: {
+		prototype: T;
+	}): T | undefined {
+		for (const extendedReport of this.#extendedReports) {
+			if (extendedReport.constructor === type) {
+				return extendedReport as T;
+			}
+		}
+
+		return undefined;
 	}
 
 	/**
-	 * Set Extended Reports.
+	 * Clone the given Extended Report block into the buffer of the packet,
+	 * after the existing ones.
 	 *
 	 * @remarks
-	 * - Serialization is needed after calling this method.
+	 * - This method removes existing padding (if any).
+	 *
+	 * @throws
+	 * - `Error` if some Extended Report block is being built in place within
+	 *   the packet (see {@link needsConsolidation}).
+	 * - `TypeError` if the buffer of the given Extended Report block shares
+	 *   memory with the position where it would be cloned (in the free space of
+	 *   the buffer of the packet), in which case nothing changes.
+	 * - `TypeError` if the buffer has no space for the Extended Report block,
+	 *   in which case nothing changes.
 	 */
-	setReports(reports: ExtendedReport[]): void {
-		this.#reports = Array.from(reports);
+	addExtendedReport(extendedReport: ExtendedReport): void {
+		this.assertDoesNotNeedConsolidation();
 
-		// NOTE: Do not update RTCP count since XR packets do not have that field.
+		const bodyLength = this.getBodyLength();
+		const extendedReportBuffer = extendedReport.getBuffer();
+		const extendedReportLength = extendedReportBuffer.byteLength;
+		// The Extended Report block goes right after the last one.
+		const pos = COMMON_HEADER_LENGTH + bodyLength;
+		const view = this.getView();
+		const byteOffset = view.byteOffset + pos;
 
-		this.setSerializationNeeded(true);
+		// NOTE: Checked before changing anything, since the clone below would
+		// throw once the length of the packet has been updated.
+		if (
+			extendedReportBuffer.buffer === view.buffer &&
+			byteOffset <
+				extendedReportBuffer.byteOffset + extendedReport.getBufferLength() &&
+			extendedReportBuffer.byteOffset < byteOffset + extendedReportLength
+		) {
+			throw new TypeError(
+				'buffer of given Extended Report block shares memory with the position where it would be cloned'
+			);
+		}
+
+		// NOTE: This throws if there is no space in the buffer.
+		this.setBodyLength(bodyLength + extendedReportLength);
+
+		this.#extendedReports.push(
+			extendedReport.clone(
+				this.getBuffer().subarray(pos, pos + extendedReportLength)
+			)
+		);
 	}
 
 	/**
-	 * Add Extended Report.
+	 * Build an Extended Report block of the given class within the free space
+	 * of the buffer of the packet. The application can modify it and the
+	 * changes are written in the buffer of the packet. Once completed, the
+	 * application must call {@link consolidate} on it so the packet adds it,
+	 * or {@link discard} so the packet is left as it was, except that its
+	 * padding (if any) is removed.
+	 *
+	 * @param type - Class of the Extended Report block, whose `factory()` is
+	 *   used to create it.
 	 *
 	 * @remarks
-	 * - Serialization is needed after calling this method.
+	 * - This method removes existing padding (if any).
+	 * - Meanwhile, {@link getLength} of the packet does not include the length
+	 *   of the Extended Report block.
+	 *
+	 * @throws
+	 * - `Error` if some Extended Report block is being built in place within
+	 *   the packet (see {@link needsConsolidation}).
+	 * - `TypeError` if the buffer has no space for the Extended Report block.
+	 *
+	 * @example
+	 * ```ts
+	 * const dlrrExtendedReport =
+	 *   xrPacket.buildExtendedReportInPlace(DlrrExtendedReport);
+	 *
+	 * dlrrExtendedReport.addSubBlock({ ... });
+	 * dlrrExtendedReport.consolidate();
+	 * ```
 	 */
-	addReport(report: ExtendedReport): void {
-		this.#reports.push(report);
+	buildExtendedReportInPlace<T extends ExtendedReport>(type: {
+		factory(buffer: Uint8Array): T;
+	}): T {
+		this.assertDoesNotNeedConsolidation();
 
-		// Update RTCP count.
-		// NOTE: Do not update RTCP count since XR packets do not have that field.
+		const bodyLength = this.getBodyLength();
 
-		this.setSerializationNeeded(true);
+		// Remove padding (if any) so the new Extended Report block goes right
+		// after the last one.
+		// NOTE: This doesn't throw since the length doesn't grow.
+		this.setBodyLength(bodyLength);
+
+		const view = this.getView();
+		const pos = COMMON_HEADER_LENGTH + bodyLength;
+		// The free space of the buffer is the potential buffer of the Extended
+		// Report block.
+		const extendedReport = type.factory(
+			new Uint8Array(view.buffer, view.byteOffset + pos, view.byteLength - pos)
+		);
+
+		this.handleInPlaceItem(extendedReport, consolidatedExtendedReport => {
+			// NOTE: This throws if there is no space in the buffer.
+			this.setBodyLength(
+				this.getBodyLength() + consolidatedExtendedReport.getLength()
+			);
+
+			this.#extendedReports.push(consolidatedExtendedReport);
+		});
+
+		return extendedReport;
+	}
+
+	protected override setBuffer(buffer: Uint8Array): void {
+		for (const extendedReport of this.#extendedReports) {
+			this.setItemBuffer(extendedReport, buffer);
+		}
+
+		super.setBuffer(buffer);
+	}
+
+	#parseExtendedReports(): void {
+		// Length of the packet excluding padding.
+		const contentLength = this.getLength() - this.getPadding();
+
+		if (contentLength < XR_HEADER_LENGTH) {
+			throw new TypeError(
+				`packet length (${contentLength} bytes, excluding padding) is lower than ${XR_HEADER_LENGTH} bytes`
+			);
+		}
+
+		const buffer = this.getBuffer();
+		let pos = XR_HEADER_LENGTH;
+
+		// Extended Report blocks must fill the whole packet (excluding padding).
+		while (pos < contentLength) {
+			// The remaining length in the packet (excluding padding) is the
+			// potential buffer of the Extended Report block.
+			const remainingBuffer = buffer.subarray(pos, contentLength);
+
+			if (!isExtendedReport(remainingBuffer)) {
+				throw new TypeError('not a RTCP XR Extended Report block');
+			}
+
+			const extendedReportLength =
+				((remainingBuffer[2]! << 8) + remainingBuffer[3]! + 1) * 4;
+			// The buffer of the Extended Report block is its exact length.
+			const extendedReportBuffer = remainingBuffer.subarray(
+				0,
+				extendedReportLength
+			);
+			let extendedReport: ExtendedReport;
+
+			switch (remainingBuffer[0]) {
+				case ExtendedReportBlockType.RRT: {
+					extendedReport = RrtExtendedReport.parse(extendedReportBuffer);
+
+					break;
+				}
+
+				case ExtendedReportBlockType.DLRR: {
+					extendedReport = DlrrExtendedReport.parse(extendedReportBuffer);
+
+					break;
+				}
+
+				default: {
+					extendedReport = UnknownExtendedReport.parse(extendedReportBuffer);
+				}
+			}
+
+			this.#extendedReports.push(extendedReport);
+
+			pos += extendedReport.getLength();
+		}
 	}
 }

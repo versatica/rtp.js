@@ -1,204 +1,205 @@
-import { Packet } from '../Packet';
-import type { PacketDump } from '../Packet';
+import { Serializable, type SerializableDump } from '../common/Serializable';
 import {
-	isRtcp,
 	RtcpPacketType,
-	RtcpPacket,
+	isRtcp,
+	COMMON_HEADER_LENGTH,
+	type RtcpPacket,
 	type RtcpPacketDump,
-	getRtcpPacketType,
-	getRtcpLength,
 } from './RtcpPacket';
-import { ReceiverReportPacket } from './ReceiverReportPacket';
+import { TransportLayerFeedbackMessageType } from './AnyTransportLayerFeedbackPacket';
+import { PayloadSpecificFeedbackMessageType } from './AnyPayloadSpecificFeedbackPacket';
 import { SenderReportPacket } from './SenderReportPacket';
-import { ByePacket } from './ByePacket';
+import { ReceiverReportPacket } from './ReceiverReportPacket';
 import { SdesPacket } from './SdesPacket';
-import {
-	RtpFeedbackMessageType,
-	PsFeedbackMessageType,
-	getRtcpFeedbackMessageType,
-} from './FeedbackPacket';
+import { ByePacket } from './ByePacket';
 import { NackPacket } from './NackPacket';
-import { SrReqPacket } from './SrReqPacket';
-import { EcnPacket } from './EcnPacket';
+import { TransportWideCcPacket } from './TransportWideCcPacket';
+import { UnknownTransportLayerFeedbackPacket } from './UnknownTransportLayerFeedbackPacket';
 import { PliPacket } from './PliPacket';
-import { SliPacket } from './SliPacket';
-import { RpsiPacket } from './RpsiPacket';
-import { GenericFeedbackPacket } from './GenericFeedbackPacket';
+import { FirPacket } from './FirPacket';
+import { RembPacket } from './RembPacket';
+import { UnknownPayloadSpecificFeedbackPacket } from './UnknownPayloadSpecificFeedbackPacket';
 import { XrPacket } from './XrPacket';
-import { ExtendedJitterReportsPacket } from './ExtendedJitterReportsPacket';
-import { GenericPacket } from './GenericPacket';
+import { UnknownPacket } from './UnknownPacket';
+import { readBits } from '../../utils/bits';
 
 /**
  * RTCP Compound packet info dump.
- *
- * @category RTCP
  */
-export type CompoundPacketDump = PacketDump & {
+export type CompoundPacketDump = SerializableDump & {
+	/**
+	 * Dump of each RTCP packet in the compound packet.
+	 */
 	packets: RtcpPacketDump[];
 };
 
 /**
- * RTCP Compound packet.
+ * Parse the RTCP packet in the given buffer, whose `byteLength` is the exact
+ * length of the packet, with the class of its packet type (and message type).
  *
- * @category RTCP
+ * @throws
+ * - `TypeError` if the buffer does not contain a valid RTCP packet.
+ */
+function parsePacket(buffer: Uint8Array): RtcpPacket {
+	const packetType: RtcpPacketType = buffer[1]!;
+
+	switch (packetType) {
+		case RtcpPacketType.SR: {
+			return SenderReportPacket.parse(buffer);
+		}
+
+		case RtcpPacketType.RR: {
+			return ReceiverReportPacket.parse(buffer);
+		}
+
+		case RtcpPacketType.SDES: {
+			return SdesPacket.parse(buffer);
+		}
+
+		case RtcpPacketType.BYE: {
+			return ByePacket.parse(buffer);
+		}
+
+		case RtcpPacketType.RTPFB: {
+			// The FMT field tells the type of the feedback message.
+			const messageType: TransportLayerFeedbackMessageType = readBits(
+				buffer[0]!,
+				0b00011111
+			);
+
+			switch (messageType) {
+				case TransportLayerFeedbackMessageType.NACK: {
+					return NackPacket.parse(buffer);
+				}
+
+				case TransportLayerFeedbackMessageType.TCC: {
+					return TransportWideCcPacket.parse(buffer);
+				}
+
+				default: {
+					return UnknownTransportLayerFeedbackPacket.parse(buffer);
+				}
+			}
+		}
+
+		case RtcpPacketType.PSFB: {
+			// The FMT field tells the type of the feedback message.
+			const messageType: PayloadSpecificFeedbackMessageType = readBits(
+				buffer[0]!,
+				0b00011111
+			);
+
+			switch (messageType) {
+				case PayloadSpecificFeedbackMessageType.PLI: {
+					return PliPacket.parse(buffer);
+				}
+
+				case PayloadSpecificFeedbackMessageType.FIR: {
+					return FirPacket.parse(buffer);
+				}
+
+				case PayloadSpecificFeedbackMessageType.AFB: {
+					return RembPacket.isRemb(buffer)
+						? RembPacket.parse(buffer)
+						: UnknownPayloadSpecificFeedbackPacket.parse(buffer);
+				}
+
+				default: {
+					return UnknownPayloadSpecificFeedbackPacket.parse(buffer);
+				}
+			}
+		}
+
+		case RtcpPacketType.XR: {
+			return XrPacket.parse(buffer);
+		}
+
+		default: {
+			return UnknownPacket.parse(buffer);
+		}
+	}
+}
+
+/**
+ * RTCP Compound packet: a sequence of RTCP packets in the same buffer.
  *
  * @see
- * - [RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)
+ * - [RFC 3550 section 6.1](https://datatracker.ietf.org/doc/html/rfc3550#section-6.1)
  */
-export class CompoundPacket extends Packet {
+export class CompoundPacket extends Serializable {
 	// RTCP packets.
 	#packets: RtcpPacket[] = [];
 
 	/**
-	 * @param view - If given it will be parsed. Otherwise an empty RTCP Compound
-	 *   packet will be created.
+	 * Parse a RTCP Compound packet.
+	 *
+	 * @param buffer - Buffer holding the compound packet. Its `byteLength` must
+	 *   be the exact length of the compound packet.
 	 *
 	 * @throws
-	 * - If given `view` does not contain a valid RTCP Compound packet.
+	 * - `TypeError` if the buffer does not contain a valid RTCP Compound packet.
 	 */
-	constructor(view?: DataView) {
-		super(view);
-
-		if (this.view && !isRtcp(this.view)) {
-			throw new TypeError('not a RTCP compound packet');
+	static parse(buffer: Uint8Array): CompoundPacket {
+		if (!isRtcp(buffer)) {
+			throw new TypeError('not a RTCP Compound packet');
 		}
 
-		if (!this.view) {
-			this.view = new DataView(new ArrayBuffer(0));
-
-			return;
-		}
-
-		// Position relative to the DataView byte offset.
+		const compoundPacket = new CompoundPacket(buffer);
 		let pos = 0;
 
-		// Parse all RTCP packets.
-		while (pos < this.view.byteLength) {
-			const remainingView = new DataView(
-				this.view.buffer,
-				this.view.byteOffset + pos,
-				this.view.byteLength - pos
-			);
+		while (pos < buffer.byteLength) {
+			// The remaining length in the buffer is the potential buffer of the
+			// current packet.
+			const remainingBuffer = buffer.subarray(pos);
 
-			const packetLength = getRtcpLength(remainingView);
-
-			const packetView = new DataView(
-				this.view.buffer,
-				this.view.byteOffset + pos,
-				packetLength
-			);
-
-			let packet: RtcpPacket;
-
-			switch (getRtcpPacketType(remainingView)) {
-				case RtcpPacketType.RR: {
-					packet = new ReceiverReportPacket(packetView);
-
-					break;
-				}
-
-				case RtcpPacketType.SR: {
-					packet = new SenderReportPacket(packetView);
-
-					break;
-				}
-
-				case RtcpPacketType.BYE: {
-					packet = new ByePacket(packetView);
-
-					break;
-				}
-
-				case RtcpPacketType.SDES: {
-					packet = new SdesPacket(packetView);
-
-					break;
-				}
-
-				case RtcpPacketType.RTPFB: {
-					switch (getRtcpFeedbackMessageType(packetView)) {
-						case RtpFeedbackMessageType.NACK: {
-							packet = new NackPacket(packetView);
-
-							break;
-						}
-
-						case RtpFeedbackMessageType.SR_REQ: {
-							packet = new SrReqPacket(packetView);
-
-							break;
-						}
-
-						case RtpFeedbackMessageType.ECN: {
-							packet = new EcnPacket(packetView);
-
-							break;
-						}
-
-						default: {
-							packet = new GenericFeedbackPacket(packetView);
-						}
-					}
-
-					break;
-				}
-
-				case RtcpPacketType.PSFB: {
-					switch (getRtcpFeedbackMessageType(packetView)) {
-						case PsFeedbackMessageType.PLI: {
-							packet = new PliPacket(packetView);
-
-							break;
-						}
-
-						case PsFeedbackMessageType.SLI: {
-							packet = new SliPacket(packetView);
-
-							break;
-						}
-
-						case PsFeedbackMessageType.RPSI: {
-							packet = new RpsiPacket(packetView);
-
-							break;
-						}
-
-						default: {
-							packet = new GenericFeedbackPacket(packetView);
-						}
-					}
-
-					break;
-				}
-
-				case RtcpPacketType.XR: {
-					packet = new XrPacket(packetView);
-
-					break;
-				}
-
-				case RtcpPacketType.IJ: {
-					packet = new ExtendedJitterReportsPacket(packetView);
-
-					break;
-				}
-
-				default: {
-					packet = new GenericPacket(packetView);
-				}
+			if (!isRtcp(remainingBuffer)) {
+				throw new TypeError('not a RTCP packet');
 			}
 
-			pos += packetLength;
+			const packetLength =
+				((remainingBuffer[2]! << 8) + remainingBuffer[3]! + 1) * 4;
 
-			this.#packets.push(packet);
+			if (packetLength > remainingBuffer.byteLength) {
+				throw new TypeError(
+					`no space for announced RTCP packet length (${packetLength} bytes)`
+				);
+			}
+
+			// The buffer of the packet is its exact length.
+			const packet = parsePacket(remainingBuffer.subarray(0, packetLength));
+
+			compoundPacket.#packets.push(packet);
+
+			pos += packet.getLength();
 		}
 
-		// Ensure that view length and parsed length match.
-		if (pos !== this.view.byteLength) {
-			throw new RangeError(
-				`parsed length (${pos} bytes) does not match view length (${this.view.byteLength} bytes)`
-			);
+		compoundPacket.setLength(pos);
+
+		return compoundPacket;
+	}
+
+	/**
+	 * Create a RTCP Compound packet without RTCP packets, so its length is 0
+	 * until a packet is added.
+	 *
+	 * @param buffer - Buffer for the compound packet. Its `byteLength` is the
+	 *   maximum length the compound packet can take.
+	 *
+	 * @throws
+	 * - `TypeError` if `buffer.byteLength` is lower than the RTCP Common Header
+	 *   length (4 bytes).
+	 */
+	static factory(buffer: Uint8Array): CompoundPacket {
+		// No space for a single packet.
+		if (buffer.byteLength < COMMON_HEADER_LENGTH) {
+			throw new TypeError('buffer too small');
 		}
+
+		return new CompoundPacket(buffer);
+	}
+
+	private constructor(buffer: Uint8Array) {
+		super(buffer);
 	}
 
 	/**
@@ -214,160 +215,176 @@ export class CompoundPacket extends Packet {
 	/**
 	 * @inheritDoc
 	 */
-	getByteLength(): number {
-		if (!this.needsSerialization()) {
-			return this.view.byteLength;
-		}
+	clone(buffer: Uint8Array): CompoundPacket {
+		const clonedCompoundPacket = new CompoundPacket(buffer);
 
-		const packetLength = this.#packets.reduce(
-			(sum, packet) => sum + packet.getByteLength(),
-			0
-		);
+		// NOTE: No byte is copied here. Each packet copies its own bytes, and the
+		// packets fill the whole compound packet.
+		this.cloneInto(clonedCompoundPacket, /* copyBytes */ false);
 
-		return packetLength;
-	}
+		const byteOffset = this.getBuffer().byteOffset;
+		const clonedCompoundPacketBuffer = clonedCompoundPacket.getBuffer();
 
-	/**
-	 * Not implemented in RTCP Compound packet.
-	 *
-	 * @hidden
-	 */
-	override getPadding(): number {
-		return 0;
-	}
-
-	/**
-	 * Not implemented in RTCP Compound packet.
-	 *
-	 * @hidden
-	 */
-	override padTo4Bytes(): void {
-		throw new Error('method not implemented in RTCP CompoundPacket');
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	override needsSerialization(): boolean {
-		return (
-			super.needsSerialization() ||
-			this.#packets.some(packet => packet.needsSerialization())
-		);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	serialize(buffer?: ArrayBufferLike, byteOffset?: number): void {
-		const bufferData = this.getSerializationBuffer(buffer, byteOffset);
-
-		// Create new DataView with new buffer.
-		const view = new DataView(
-			bufferData.buffer,
-			bufferData.byteOffset,
-			bufferData.byteLength
-		);
-
-		// Position relative to the DataView byte offset.
-		let pos = 0;
-
+		// Each packet goes at the same position within the cloned compound packet.
 		for (const packet of this.#packets) {
-			packet.serialize(view.buffer, view.byteOffset + pos);
+			const packetBuffer = packet.getBuffer();
+			const pos = packetBuffer.byteOffset - byteOffset;
 
-			pos += packet.getByteLength();
-		}
-
-		// Assert that current position is equal than new buffer length.
-		if (pos !== view.byteLength) {
-			throw new RangeError(
-				`filled length (${pos} bytes) is different than the available buffer size (${view.byteLength} bytes)`
+			clonedCompoundPacket.#packets.push(
+				packet.clone(
+					clonedCompoundPacketBuffer.subarray(
+						pos,
+						pos + packetBuffer.byteLength
+					)
+				)
 			);
 		}
 
-		// Update DataView.
-		this.view = view;
-
-		this.setSerializationNeeded(false);
+		return clonedCompoundPacket;
 	}
 
 	/**
-	 * @inheritDoc
-	 */
-	clone(
-		buffer?: ArrayBufferLike,
-		byteOffset?: number,
-		serializationBuffer?: ArrayBufferLike,
-		serializationByteOffset?: number
-	): CompoundPacket {
-		const view = this.cloneInternal(
-			buffer,
-			byteOffset,
-			serializationBuffer,
-			serializationByteOffset
-		);
-
-		return new CompoundPacket(view);
-	}
-
-	/**
-	 * Return the {@link RtcpPacket} entries in this RTCP Compound packet.
+	 * Get the RTCP packets.
 	 *
 	 * @remarks
-	 * - The returned value is an array of {@link RtcpPacket}, which is an
-	 *   abstract class.
-	 * - By inspecting {@link RtcpPacket.getPacketType} we can cast each packet
-	 *   to its specific class.
+	 * - The returned array is a copy, but the packets in it are the ones in the
+	 *   compound packet, so modifying them modifies the compound packet.
+	 * - The packets must not be modified in a way that changes their length,
+	 *   since the compound packet doesn't track it and would contain stale
+	 *   bytes between packets.
+	 */
+	getPackets(): RtcpPacket[] {
+		return this.#packets.slice();
+	}
+
+	/**
+	 * Get the first RTCP packet of the given class.
 	 *
 	 * @example
 	 * ```ts
-	 * import { packets } from 'rtp.js';
-	 * const { CompoundPacket, RtcpPacketType, SdesPacket } = packets;
-	 *
-	 * const compoundPacket = new CompoundPacket(view);
-	 *
-	 * for (const packet of compoundPacket.getPackets())
-	 * {
-	 *   switch (packet.getPacketType())
-	 *   {
-	 *     case RtcpPacketType.SDES:
-	 *     {
-	 *       const sdesPacket = packet as SdesPacket;
-	 *
-	 *       console.log(sdesPacket.getChunks());
-	 *
-	 *       break;
-	 *     }
-	 *
-	 *     // etc.
-	 *   }
-	 * }
+	 * const senderReportPacket =
+	 *   compoundPacket.getFirstPacketOfType(SenderReportPacket);
 	 * ```
 	 */
-	getPackets(): RtcpPacket[] {
-		return Array.from(this.#packets);
+	getFirstPacketOfType<T extends RtcpPacket>(type: {
+		prototype: T;
+	}): T | undefined {
+		for (const packet of this.#packets) {
+			if (packet.constructor === type) {
+				return packet as T;
+			}
+		}
+
+		return undefined;
 	}
 
 	/**
-	 * Set the {@link RtcpPacket} entries in this RTCP Compound packet.
+	 * Clone the given RTCP packet into the buffer of the compound packet, after
+	 * the existing ones.
 	 *
-	 * @remarks
-	 * - Serialization is needed after calling this method.
-	 */
-	setPackets(packets: RtcpPacket[]): void {
-		this.#packets = Array.from(packets);
-
-		this.setSerializationNeeded(true);
-	}
-
-	/**
-	 * Add a new {@link RtcpPacket} at the end of this RTCP Compound packet.
-	 *
-	 * @remarks
-	 * - Serialization is needed after calling this method.
+	 * @throws
+	 * - `Error` if some packet is being built in place within the compound
+	 *   packet, or within the given packet (see {@link needsConsolidation}).
+	 * - `TypeError` if the buffer of the given packet shares memory with the
+	 *   position where it would be cloned (in the free space of the buffer of
+	 *   the compound packet), in which case nothing changes.
+	 * - `TypeError` if the buffer has no space for the packet, in which case
+	 *   nothing changes.
 	 */
 	addPacket(packet: RtcpPacket): void {
-		this.#packets.push(packet);
+		this.assertDoesNotNeedConsolidation();
 
-		this.setSerializationNeeded(true);
+		// NOTE: Checked before changing anything, since the clone below would
+		// throw once the length of the compound packet has been updated.
+		if (packet.needsConsolidation()) {
+			throw new Error(
+				'given packet needs consolidation of some item being built in place'
+			);
+		}
+
+		const previousLength = this.getLength();
+		const packetBuffer = packet.getBuffer();
+		const packetLength = packetBuffer.byteLength;
+		const view = this.getView();
+		const byteOffset = view.byteOffset + previousLength;
+
+		// NOTE: Checked before changing anything, since the clone below would
+		// throw once the length of the compound packet has been updated.
+		if (
+			packetBuffer.buffer === view.buffer &&
+			byteOffset < packetBuffer.byteOffset + packet.getBufferLength() &&
+			packetBuffer.byteOffset < byteOffset + packetLength
+		) {
+			throw new TypeError(
+				'buffer of given packet shares memory with the position where it would be cloned'
+			);
+		}
+
+		// NOTE: This throws if there is no space in the buffer.
+		this.setLength(previousLength + packetLength);
+
+		this.#packets.push(
+			packet.clone(
+				this.getBuffer().subarray(previousLength, previousLength + packetLength)
+			)
+		);
+	}
+
+	/**
+	 * Build a RTCP packet of the given class within the free space of the buffer
+	 * of the compound packet. The application can modify it and the changes are
+	 * written in the buffer of the compound packet. Once completed, the
+	 * application must call {@link consolidate} on it so the compound packet
+	 * adds it, or {@link discard} so the compound packet is left as it was.
+	 *
+	 * @param type - Class of the RTCP packet, whose `factory()` is used to
+	 *   create it.
+	 *
+	 * @remarks
+	 * - Meanwhile, {@link getLength} of the compound packet does not include the
+	 *   length of the packet.
+	 *
+	 * @throws
+	 * - `Error` if some packet is being built in place within the compound
+	 *   packet (see {@link needsConsolidation}).
+	 * - `TypeError` if the buffer has no space for the packet.
+	 *
+	 * @example
+	 * ```ts
+	 * const byePacket = compoundPacket.buildPacketInPlace(ByePacket);
+	 *
+	 * byePacket.addSsrc(1234);
+	 * byePacket.consolidate();
+	 * ```
+	 */
+	buildPacketInPlace<T extends RtcpPacket>(type: {
+		factory(buffer: Uint8Array): T;
+	}): T {
+		this.assertDoesNotNeedConsolidation();
+
+		const view = this.getView();
+		// The new packet goes after the other packets in the compound packet.
+		const pos = this.getLength();
+		// The free space of the buffer is the potential buffer of the packet.
+		const packet = type.factory(
+			new Uint8Array(view.buffer, view.byteOffset + pos, view.byteLength - pos)
+		);
+
+		this.handleInPlaceItem(packet, consolidatedPacket => {
+			// NOTE: This throws if there is no space in the buffer.
+			this.setLength(this.getLength() + consolidatedPacket.getLength());
+
+			this.#packets.push(consolidatedPacket);
+		});
+
+		return packet;
+	}
+
+	protected override setBuffer(buffer: Uint8Array): void {
+		for (const packet of this.#packets) {
+			this.setItemBuffer(packet, buffer);
+		}
+
+		super.setBuffer(buffer);
 	}
 }
