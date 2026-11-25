@@ -10,6 +10,7 @@
 		"url": "git+https://github.com/versatica/rtp.js.git"
 	},
 	"exports": {
+		"./package.json": "./package.json",
 		"./packets/RTP": {
 			"typedoc": "./src/packets/RTP/public.ts",
 			"types": "./lib/packets/RTP/public.d.ts",
@@ -31,10 +32,10 @@
 			"default": "./lib/utils/public.js"
 		}
 	},
+	"sideEffects": false,
 	"files": [
 		"LICENSE",
 		"README.md",
-		"npm-scripts.mjs",
 		"lib"
 	],
 	"keywords": [

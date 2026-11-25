@@ -2,8 +2,10 @@
  * This is the configuration for Typedoc.
  *
  * NOTE: We don't set entryPoints because we make Typedoc rely on the "typedoc"
- * entries in "exports" in package.json. Note that those "typedoc" entries must
- * be located before "import", otherwise Typedoc will read the "import" ones.
+ * entries in "exports" in package.json. Those "typedoc" entries must be
+ * located before "types", otherwise Typedoc reads the "types" ones (the built
+ * .d.ts files in lib) and, if lib is not built, those modules are missing in
+ * the docs.
  */
 
 /** @type {Partial<import('typedoc').TypeDocOptions>} */
