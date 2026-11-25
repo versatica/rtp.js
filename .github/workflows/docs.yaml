@@ -66,7 +66,8 @@ jobs:
           path: docs/
 
       # NOTE: Remove the retries (keep a single `actions/deploy-pages` step with
-      # `id: deployment`) once this is fixed:
+      # `id: deployment` and set `environment.url` back to
+      # `${{ steps.deployment.outputs.page_url }}`) once this is fixed:
       # https://github.com/actions/deploy-pages/issues/451
       #
       # `actions/deploy-pages` looks the artifact up right after
