@@ -1,21 +1,42 @@
-/* Remove ugly square in bottom-right corner when scroll shows up. */
-*::-webkit-scrollbar {
-	width: 0px;
-}
-
-/* Add margin after code. */
+/**
+ * Add margin after code.
+ */
 .tsd-comment {
 	margin-bottom: 2em;
 }
 
-/* Avoid word wrapping when code doesn't fit into avaiable width. */
+/**
+ * Avoid word wrapping when code doesn't fit into avaiable width.
+ * Useful for packet diagrams.
+ */
 .tsd-comment > pre {
 	white-space: pre;
-	overflow: scroll;
+	overflow-x: auto;
 }
 
-/* Remove ugly border radius in code. */
-.tsd-comment > pre,
-.tsd-comment > code {
+/**
+ * Remove ugly border radius in code.
+ */
+.tsd-comment pre,
+.tsd-comment code {
 	border-radius: 0px;
+}
+
+/**
+ * Label the menu trigger (only shown by TypeDoc in mobile) so users know the
+ * API is there.
+ */
+#tsd-toolbar-menu-trigger {
+	width: auto;
+	padding: 0 0.5rem;
+}
+
+#tsd-toolbar-menu-trigger svg {
+	vertical-align: middle;
+}
+
+#tsd-toolbar-menu-trigger::after {
+	content: 'API';
+	margin-left: 0.4em;
+	font-weight: bold;
 }
