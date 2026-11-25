@@ -22,7 +22,12 @@ npm install rtp.js
 - RTP packets and RTP extensions are exported by the `packets/RTP` module:
 
   ```ts
-  import { isRtp, RtpPacket, ExtensionType } from 'rtp.js/packets/RTP';
+  import {
+    isRtp,
+    RtpPacket,
+    ExtensionType,
+    // [...]
+  } from 'rtp.js/packets/RTP';
 
   if (isRtp(buffer)) {
     const rtpPacket = RtpPacket.parse(buffer);
@@ -51,12 +56,12 @@ npm install rtp.js
   byePacket.setReason('bye bye');
   ```
 
-- Every packet lives within the `Uint8Array` given to `parse()` or `factory()` and every modification is applied in place within it, so `getBuffer()` always returns the serialized packet.
+- Every packet lives within the `Uint8Array` given to `parse()` or `factory()` and every modification is applied in place within it, so `packet.getBuffer()` always returns the serialized packet.
 - In Node.js a `Buffer` can be given instead, since it's a `Uint8Array`.
 
 ## Note about TypeScript
 
-**rtp.js** exposes its entry points via the `exports` field of its `package.json` file, so TypeScript projects importing them must have `moduleResolution` set to "node16", "NodeNext" or "bundler" in their `tsconfig.json` file.
+**rtp.js** exposes its entry points via the `exports` field of its `package.json` file, so TypeScript projects importing them must have `moduleResolution` set to "node16", "NodeNext" or "bundler". CommonJS projects also need TypeScript >= 5.8 and `module` set to "node20" or "NodeNext".
 
 ## Author
 
