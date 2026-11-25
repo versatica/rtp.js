@@ -3,14 +3,14 @@ import {
 	isRtcp,
 	COMMON_HEADER_LENGTH,
 	type RtcpPacketDump,
-} from './RtcpPacket';
+} from './RtcpPacket.js';
 import {
 	AnyReportPacket,
 	REPORT_LENGTH,
 	type ReceptionReport,
-} from './AnyReportPacket';
-import { isUnsignedInteger32 } from '../../utils/numbers';
-import type { Ntp } from '../../utils/types';
+} from './AnyReportPacket.js';
+import { isUnsignedInteger32 } from '../../utils/numbers.js';
+import type { Ntp } from '../../utils/types.js';
 
 /**
  * Length (in bytes) of the fixed header that precedes the reception report

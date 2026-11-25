@@ -1,4 +1,4 @@
-import type { Ntp } from './types';
+import type { Ntp } from './types.js';
 
 /**
  * NTP fractional unit.

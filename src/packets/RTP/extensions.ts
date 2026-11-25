@@ -1,4 +1,4 @@
-import type { Ntp } from '../../utils/types';
+import type { Ntp } from '../../utils/types.js';
 
 /**
  * One-Byte and Two-Byte header forms of extensions (RFC 8285).

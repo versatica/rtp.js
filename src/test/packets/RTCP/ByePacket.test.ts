@@ -1,12 +1,12 @@
-import { ByePacket } from '../../../packets/RTCP/ByePacket';
-import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
+import { ByePacket } from '../../../packets/RTCP/ByePacket.js';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.js';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon.js';
 import {
 	factoryBuffer,
 	serializeBuffer,
 	cloneBuffer,
 	resetBuffers,
-} from '../../testHelpers';
+} from '../../testHelpers.js';
 
 beforeEach(resetBuffers);
 

@@ -1,13 +1,13 @@
-import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket';
-import type { ReceptionReport } from '../../../packets/RTCP/AnyReportPacket';
-import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
+import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket.js';
+import type { ReceptionReport } from '../../../packets/RTCP/AnyReportPacket.js';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.js';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon.js';
 import {
 	factoryBuffer,
 	serializeBuffer,
 	cloneBuffer,
 	resetBuffers,
-} from '../../testHelpers';
+} from '../../testHelpers.js';
 
 beforeEach(resetBuffers);
 

@@ -9,7 +9,7 @@ import {
 	toggleBitInDataView,
 	readBitsInDataView,
 	writeBitsInDataView,
-} from '../../utils/bits';
+} from '../../utils/bits.js';
 
 let view: DataView;
 

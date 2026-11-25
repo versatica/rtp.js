@@ -1,14 +1,14 @@
-import { TransportWideCcPacket } from '../../../packets/RTCP/TransportWideCcPacket';
-import { TransportLayerFeedbackMessageType } from '../../../packets/RTCP/AnyTransportLayerFeedbackPacket';
-import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { areBuffersEqual, padTo4Bytes } from '../../../utils/buffers';
-import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
+import { TransportWideCcPacket } from '../../../packets/RTCP/TransportWideCcPacket.js';
+import { TransportLayerFeedbackMessageType } from '../../../packets/RTCP/AnyTransportLayerFeedbackPacket.js';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.js';
+import { areBuffersEqual, padTo4Bytes } from '../../../utils/buffers.js';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon.js';
 import {
 	factoryBuffer,
 	serializeBuffer,
 	cloneBuffer,
 	resetBuffers,
-} from '../../testHelpers';
+} from '../../testHelpers.js';
 
 beforeEach(resetBuffers);
 

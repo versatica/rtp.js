@@ -13,6 +13,8 @@ RTP stack for Node.js and browser written in TypeScript. **rtp.js** provides wit
 npm install rtp.js
 ```
 
+**rtp.js** is an ES module. In Node.js it requires version 22.12 or later, which also allows loading it with `require()` from CommonJS code. In the browser it works through any bundler (webpack, Rollup, esbuild, Vite, etc.) with no extra configuration.
+
 ## Usage
 
 - [API documentation](https://versatica.github.io/rtp.js)

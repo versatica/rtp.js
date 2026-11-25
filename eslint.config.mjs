@@ -1,3 +1,4 @@
+import { builtinModules } from 'node:module';
 import eslint from '@eslint/js';
 import tsEslint from 'typescript-eslint';
 import jestEslint from 'eslint-plugin-jest';
@@ -151,6 +152,44 @@ const config = tsEslint.config(
 			],
 			'@typescript-eslint/no-inferrable-types': 0,
 			'@typescript-eslint/restrict-template-expressions': 0,
+		},
+	},
+	{
+		name: '.ts library files',
+		files: ['src/**/*.ts'],
+		ignores: ['src/test/**/*.ts'],
+		rules: {
+			// NOTE: The library must also work in the browser, so Node.js and Jest
+			// globals and Node.js modules are disallowed (except in tests).
+			'no-restricted-globals': [
+				2,
+				'Buffer',
+				'process',
+				'global',
+				'require',
+				'module',
+				'exports',
+				'__dirname',
+				'__filename',
+				'setImmediate',
+				'clearImmediate',
+				'describe',
+				'test',
+				'it',
+				'expect',
+				'beforeEach',
+				'afterEach',
+				'beforeAll',
+				'afterAll',
+				'jest',
+			],
+			'no-restricted-imports': [
+				2,
+				{
+					paths: builtinModules.filter(name => name !== 'events'),
+					patterns: [{ group: ['node:*'] }],
+				},
+			],
 		},
 	},
 	{

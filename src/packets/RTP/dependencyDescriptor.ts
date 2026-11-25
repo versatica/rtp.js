@@ -1,10 +1,10 @@
-import { BitstreamReader } from '../../utils/BitstreamReader';
-import { BitBufferWriter } from '../../utils/BitBufferWriter';
+import { BitstreamReader } from '../../utils/BitstreamReader.js';
+import { BitBufferWriter } from '../../utils/BitBufferWriter.js';
 import {
 	isUnsignedInteger,
 	isUnsignedInteger16,
 	isUnsignedInteger32,
-} from '../../utils/numbers';
+} from '../../utils/numbers.js';
 
 /**
  * Length (in bytes) of the mandatory descriptor fields.

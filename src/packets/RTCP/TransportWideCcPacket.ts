@@ -3,17 +3,20 @@ import {
 	isRtcp,
 	COMMON_HEADER_LENGTH,
 	type RtcpPacketDump,
-} from './RtcpPacket';
+} from './RtcpPacket.js';
 import {
 	AnyTransportLayerFeedbackPacket,
 	TransportLayerFeedbackMessageType,
-} from './AnyTransportLayerFeedbackPacket';
-import { isUnsignedInteger8, isUnsignedInteger16 } from '../../utils/numbers';
-import { padTo4Bytes } from '../../utils/buffers';
+} from './AnyTransportLayerFeedbackPacket.js';
+import {
+	isUnsignedInteger8,
+	isUnsignedInteger16,
+} from '../../utils/numbers.js';
+import { padTo4Bytes } from '../../utils/buffers.js';
 import {
 	readSigned3BytesInDataView,
 	write3BytesInDataView,
-} from '../../utils/bytes';
+} from '../../utils/bytes.js';
 
 /**
  * Receive deltas are expressed in multiples of this (in microseconds).

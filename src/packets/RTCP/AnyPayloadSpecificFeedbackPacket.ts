@@ -1,4 +1,4 @@
-import { AnyFeedbackPacket } from './AnyFeedbackPacket';
+import { AnyFeedbackPacket } from './AnyFeedbackPacket.js';
 
 /**
  * RTCP Payload-Specific Feedback message type (FMT field).

@@ -1,4 +1,4 @@
-import { RtcpPacket, isRtcp, type RtcpPacketDump } from './RtcpPacket';
+import { RtcpPacket, isRtcp, type RtcpPacketDump } from './RtcpPacket.js';
 
 /**
  * RTCP Unknown packet info dump.

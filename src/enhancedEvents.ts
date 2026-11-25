@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Logger } from './Logger';
+import { Logger } from './Logger.js';
 // NOTE: In Node.js `events` is always the native module, even if the npm
 // `events` package (in `dependencies`) is installed. Bundlers for the browser
 // resolve it to that npm package instead.

@@ -4,8 +4,8 @@ import {
 	EXTENDED_REPORT_HEADER_LENGTH,
 	isExtendedReport,
 	type ExtendedReportDump,
-} from '../ExtendedReport';
-import { isUnsignedInteger32 } from '../../../utils/numbers';
+} from '../ExtendedReport.js';
+import { isUnsignedInteger32 } from '../../../utils/numbers.js';
 
 /**
  * Length (in bytes) of a DLRR sub-block.

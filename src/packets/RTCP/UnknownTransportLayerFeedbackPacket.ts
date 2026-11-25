@@ -1,9 +1,9 @@
-import { RtcpPacketType, isRtcp, type RtcpPacketDump } from './RtcpPacket';
-import { FEEDBACK_HEADER_LENGTH } from './AnyFeedbackPacket';
+import { RtcpPacketType, isRtcp, type RtcpPacketDump } from './RtcpPacket.js';
+import { FEEDBACK_HEADER_LENGTH } from './AnyFeedbackPacket.js';
 import {
 	AnyTransportLayerFeedbackPacket,
 	type TransportLayerFeedbackMessageType,
-} from './AnyTransportLayerFeedbackPacket';
+} from './AnyTransportLayerFeedbackPacket.js';
 
 /**
  * RTCP Unknown Transport Layer Feedback packet info dump.

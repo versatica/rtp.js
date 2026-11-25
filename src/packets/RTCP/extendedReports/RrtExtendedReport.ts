@@ -4,9 +4,9 @@ import {
 	EXTENDED_REPORT_HEADER_LENGTH,
 	isExtendedReport,
 	type ExtendedReportDump,
-} from '../ExtendedReport';
-import type { Ntp } from '../../../utils/types';
-import { isUnsignedInteger32 } from '../../../utils/numbers';
+} from '../ExtendedReport.js';
+import type { Ntp } from '../../../utils/types.js';
+import { isUnsignedInteger32 } from '../../../utils/numbers.js';
 
 /**
  * Length (in bytes) of the Receiver Reference Time Report Block.

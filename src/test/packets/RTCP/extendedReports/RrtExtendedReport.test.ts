@@ -1,16 +1,16 @@
-import { RrtExtendedReport } from '../../../../packets/RTCP/extendedReports/RrtExtendedReport';
-import { ExtendedReportBlockType } from '../../../../packets/RTCP/ExtendedReport';
-import { areBuffersEqual } from '../../../../utils/buffers';
+import { RrtExtendedReport } from '../../../../packets/RTCP/extendedReports/RrtExtendedReport.js';
+import { ExtendedReportBlockType } from '../../../../packets/RTCP/ExtendedReport.js';
+import { areBuffersEqual } from '../../../../utils/buffers.js';
 import {
 	checkRtcpExtendedReport,
 	type ExpectedRtcpExtendedReport,
-} from '../rtcpCommon';
+} from '../rtcpCommon.js';
 import {
 	factoryBuffer,
 	serializeBuffer,
 	cloneBuffer,
 	resetBuffers,
-} from '../../../testHelpers';
+} from '../../../testHelpers.js';
 
 beforeEach(resetBuffers);
 

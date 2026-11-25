@@ -1,6 +1,6 @@
-import { RtpPacket, isRtp } from '../../../packets/RTP/RtpPacket';
-import { areBuffersEqual } from '../../../utils/buffers';
-import { throwBuffer } from '../../testHelpers';
+import { RtpPacket, isRtp } from '../../../packets/RTP/RtpPacket.js';
+import { areBuffersEqual } from '../../../utils/buffers.js';
+import { throwBuffer } from '../../testHelpers.js';
 
 export type ExpectedRtpPacket = {
 	buffer: Uint8Array;

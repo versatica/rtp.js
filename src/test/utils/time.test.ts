@@ -9,7 +9,7 @@ import {
 	absSendTimeToTimeUs,
 	timeUsToQ32x32,
 	q32x32ToTimeUs,
-} from '../../utils/time';
+} from '../../utils/time.js';
 
 // Middle 32 bits of the given NTP timestamp.
 function toCompactNtp(seconds: number, fractions: number): number {

@@ -1,13 +1,13 @@
-import { RtpPacket, isRtp } from '../../../packets/RTP/RtpPacket';
-import { ExtensionType } from '../../../packets/RTP/extensions';
-import { checkRtpPacket, type ExpectedRtpPacket } from './rtpCommon';
+import { RtpPacket, isRtp } from '../../../packets/RTP/RtpPacket.js';
+import { ExtensionType } from '../../../packets/RTP/extensions.js';
+import { checkRtpPacket, type ExpectedRtpPacket } from './rtpCommon.js';
 import {
 	factoryBuffer,
 	serializeBuffer,
 	cloneBuffer,
 	dataBuffer,
 	resetBuffers,
-} from '../../testHelpers';
+} from '../../testHelpers.js';
 
 const textEncoder = new TextEncoder();
 

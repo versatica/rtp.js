@@ -3,12 +3,12 @@ import {
 	isRtcp,
 	COMMON_HEADER_LENGTH,
 	type RtcpPacketDump,
-} from './RtcpPacket';
-import { FEEDBACK_HEADER_LENGTH } from './AnyFeedbackPacket';
+} from './RtcpPacket.js';
+import { FEEDBACK_HEADER_LENGTH } from './AnyFeedbackPacket.js';
 import {
 	AnyPayloadSpecificFeedbackPacket,
 	PayloadSpecificFeedbackMessageType,
-} from './AnyPayloadSpecificFeedbackPacket';
+} from './AnyPayloadSpecificFeedbackPacket.js';
 
 /**
  * RTCP PLI packet info dump.
