@@ -1,20 +1,20 @@
-import { XrPacket } from '../../../packets/RTCP/XrPacket';
+import { XrPacket } from '../../../packets/RTCP/XrPacket.js';
 import {
 	ExtendedReportBlockType,
 	type ExtendedReport,
-} from '../../../packets/RTCP/ExtendedReport';
-import { RrtExtendedReport } from '../../../packets/RTCP/extendedReports/RrtExtendedReport';
-import { DlrrExtendedReport } from '../../../packets/RTCP/extendedReports/DlrrExtendedReport';
-import { UnknownExtendedReport } from '../../../packets/RTCP/extendedReports/UnknownExtendedReport';
-import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { areBuffersEqual } from '../../../utils/buffers';
-import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
+} from '../../../packets/RTCP/ExtendedReport.js';
+import { RrtExtendedReport } from '../../../packets/RTCP/extendedReports/RrtExtendedReport.js';
+import { DlrrExtendedReport } from '../../../packets/RTCP/extendedReports/DlrrExtendedReport.js';
+import { UnknownExtendedReport } from '../../../packets/RTCP/extendedReports/UnknownExtendedReport.js';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.js';
+import { areBuffersEqual } from '../../../utils/buffers.js';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon.js';
 import {
 	factoryBuffer,
 	serializeBuffer,
 	cloneBuffer,
 	resetBuffers,
-} from '../../testHelpers';
+} from '../../testHelpers.js';
 
 beforeEach(resetBuffers);
 

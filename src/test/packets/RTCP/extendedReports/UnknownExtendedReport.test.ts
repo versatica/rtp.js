@@ -1,14 +1,14 @@
-import { UnknownExtendedReport } from '../../../../packets/RTCP/extendedReports/UnknownExtendedReport';
-import type { ExtendedReportBlockType } from '../../../../packets/RTCP/ExtendedReport';
+import { UnknownExtendedReport } from '../../../../packets/RTCP/extendedReports/UnknownExtendedReport.js';
+import type { ExtendedReportBlockType } from '../../../../packets/RTCP/ExtendedReport.js';
 import {
 	checkRtcpExtendedReport,
 	type ExpectedRtcpExtendedReport,
-} from '../rtcpCommon';
+} from '../rtcpCommon.js';
 import {
 	serializeBuffer,
 	cloneBuffer,
 	resetBuffers,
-} from '../../../testHelpers';
+} from '../../../testHelpers.js';
 
 beforeEach(resetBuffers);
 

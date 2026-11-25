@@ -1,27 +1,27 @@
-import { Serializable, type SerializableDump } from '../common/Serializable';
+import { Serializable, type SerializableDump } from '../common/Serializable.js';
 import {
 	RtcpPacketType,
 	isRtcp,
 	COMMON_HEADER_LENGTH,
 	type RtcpPacket,
 	type RtcpPacketDump,
-} from './RtcpPacket';
-import { TransportLayerFeedbackMessageType } from './AnyTransportLayerFeedbackPacket';
-import { PayloadSpecificFeedbackMessageType } from './AnyPayloadSpecificFeedbackPacket';
-import { SenderReportPacket } from './SenderReportPacket';
-import { ReceiverReportPacket } from './ReceiverReportPacket';
-import { SdesPacket } from './SdesPacket';
-import { ByePacket } from './ByePacket';
-import { NackPacket } from './NackPacket';
-import { TransportWideCcPacket } from './TransportWideCcPacket';
-import { UnknownTransportLayerFeedbackPacket } from './UnknownTransportLayerFeedbackPacket';
-import { PliPacket } from './PliPacket';
-import { FirPacket } from './FirPacket';
-import { RembPacket } from './RembPacket';
-import { UnknownPayloadSpecificFeedbackPacket } from './UnknownPayloadSpecificFeedbackPacket';
-import { XrPacket } from './XrPacket';
-import { UnknownPacket } from './UnknownPacket';
-import { readBits } from '../../utils/bits';
+} from './RtcpPacket.js';
+import { TransportLayerFeedbackMessageType } from './AnyTransportLayerFeedbackPacket.js';
+import { PayloadSpecificFeedbackMessageType } from './AnyPayloadSpecificFeedbackPacket.js';
+import { SenderReportPacket } from './SenderReportPacket.js';
+import { ReceiverReportPacket } from './ReceiverReportPacket.js';
+import { SdesPacket } from './SdesPacket.js';
+import { ByePacket } from './ByePacket.js';
+import { NackPacket } from './NackPacket.js';
+import { TransportWideCcPacket } from './TransportWideCcPacket.js';
+import { UnknownTransportLayerFeedbackPacket } from './UnknownTransportLayerFeedbackPacket.js';
+import { PliPacket } from './PliPacket.js';
+import { FirPacket } from './FirPacket.js';
+import { RembPacket } from './RembPacket.js';
+import { UnknownPayloadSpecificFeedbackPacket } from './UnknownPayloadSpecificFeedbackPacket.js';
+import { XrPacket } from './XrPacket.js';
+import { UnknownPacket } from './UnknownPacket.js';
+import { readBits } from '../../utils/bits.js';
 
 /**
  * RTCP Compound packet info dump.

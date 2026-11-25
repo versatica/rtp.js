@@ -1,4 +1,4 @@
-import { BitstreamReader } from '../../utils/BitstreamReader';
+import { BitstreamReader } from '../../utils/BitstreamReader.js';
 
 describe('BitstreamReader', () => {
 	test('bitstreamReader.invalidate() makes every later read fail', () => {

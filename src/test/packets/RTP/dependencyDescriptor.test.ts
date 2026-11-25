@@ -7,11 +7,11 @@ import {
 	getDependencyDescriptorDecodeTargetLayers,
 	readDependencyDescriptor,
 	writeDependencyDescriptor,
-} from '../../../packets/RTP/dependencyDescriptor';
-import { RtpPacket } from '../../../packets/RTP/RtpPacket';
-import { ExtensionType } from '../../../packets/RTP/extensions';
-import { writeBit } from '../../../utils/bits';
-import { factoryBuffer, resetBuffers } from '../../testHelpers';
+} from '../../../packets/RTP/dependencyDescriptor.js';
+import { RtpPacket } from '../../../packets/RTP/RtpPacket.js';
+import { ExtensionType } from '../../../packets/RTP/extensions.js';
+import { writeBit } from '../../../utils/bits.js';
+import { factoryBuffer, resetBuffers } from '../../testHelpers.js';
 
 const { NOT_PRESENT, DISCARDABLE, SWITCH, REQUIRED } =
 	DependencyDescriptorDecodeTargetIndication;

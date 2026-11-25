@@ -3,14 +3,17 @@ import {
 	isRtcp,
 	COMMON_HEADER_LENGTH,
 	type RtcpPacketDump,
-} from './RtcpPacket';
-import { FEEDBACK_HEADER_LENGTH } from './AnyFeedbackPacket';
+} from './RtcpPacket.js';
+import { FEEDBACK_HEADER_LENGTH } from './AnyFeedbackPacket.js';
 import {
 	AnyPayloadSpecificFeedbackPacket,
 	PayloadSpecificFeedbackMessageType,
-} from './AnyPayloadSpecificFeedbackPacket';
-import { isUnsignedInteger8, isUnsignedInteger32 } from '../../utils/numbers';
-import { write3BytesInDataView } from '../../utils/bytes';
+} from './AnyPayloadSpecificFeedbackPacket.js';
+import {
+	isUnsignedInteger8,
+	isUnsignedInteger32,
+} from '../../utils/numbers.js';
+import { write3BytesInDataView } from '../../utils/bytes.js';
 
 /**
  * Length (in bytes) of a FIR item.

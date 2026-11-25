@@ -2,16 +2,16 @@ import {
 	SdesPacket,
 	SdesItemType,
 	type SdesChunk,
-} from '../../../packets/RTCP/SdesPacket';
-import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { areBuffersEqual } from '../../../utils/buffers';
-import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
+} from '../../../packets/RTCP/SdesPacket.js';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.js';
+import { areBuffersEqual } from '../../../utils/buffers.js';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon.js';
 import {
 	factoryBuffer,
 	serializeBuffer,
 	cloneBuffer,
 	resetBuffers,
-} from '../../testHelpers';
+} from '../../testHelpers.js';
 
 // Maximum number of chunks in a SDES packet (the SC field has 5 bits).
 const MAX_CHUNKS = 31;

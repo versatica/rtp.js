@@ -12,6 +12,7 @@
 		"declarationMap": true,
 		"declarationDir": "lib",
 		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
 		"allowUnreachableCode": false,
 		"allowUnusedLabels": false,
 		"noFallthroughCasesInSwitch": true,

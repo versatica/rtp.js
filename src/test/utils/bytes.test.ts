@@ -3,7 +3,7 @@ import {
 	write3BytesInDataView,
 	readSigned3BytesInDataView,
 	writeSigned3BytesInDataView,
-} from '../../utils/bytes';
+} from '../../utils/bytes.js';
 
 let view: DataView;
 

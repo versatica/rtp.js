@@ -1,9 +1,9 @@
-import { RtcpPacketType, isRtcp, type RtcpPacketDump } from './RtcpPacket';
+import { RtcpPacketType, isRtcp, type RtcpPacketDump } from './RtcpPacket.js';
 import {
 	AnyReportPacket,
 	REPORT_LENGTH,
 	type ReceptionReport,
-} from './AnyReportPacket';
+} from './AnyReportPacket.js';
 
 /**
  * Length (in bytes) of the fixed header that precedes the reception report

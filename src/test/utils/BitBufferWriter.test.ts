@@ -1,5 +1,5 @@
-import { BitBufferWriter } from '../../utils/BitBufferWriter';
-import { BitstreamReader } from '../../utils/BitstreamReader';
+import { BitBufferWriter } from '../../utils/BitBufferWriter.js';
+import { BitstreamReader } from '../../utils/BitstreamReader.js';
 
 describe('BitBufferWriter', () => {
 	test('bitBufferWriter.writeNonSymmetric() writes the same number of bits when the number of values is a power of 2', () => {

@@ -2,14 +2,14 @@ import {
 	type RtcpPacket,
 	type RtcpPacketType,
 	isRtcp,
-} from '../../../packets/RTCP/RtcpPacket';
+} from '../../../packets/RTCP/RtcpPacket.js';
 import type {
 	ExtendedReport,
 	ExtendedReportBlockType,
-} from '../../../packets/RTCP/ExtendedReport';
-import type { CompoundPacket } from '../../../packets/RTCP/CompoundPacket';
-import { areBuffersEqual } from '../../../utils/buffers';
-import { throwBuffer } from '../../testHelpers';
+} from '../../../packets/RTCP/ExtendedReport.js';
+import type { CompoundPacket } from '../../../packets/RTCP/CompoundPacket.js';
+import { areBuffersEqual } from '../../../utils/buffers.js';
+import { throwBuffer } from '../../testHelpers.js';
 
 export type ExpectedRtcpCompoundPacket = {
 	buffer: Uint8Array;

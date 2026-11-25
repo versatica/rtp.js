@@ -1,9 +1,12 @@
-import { RtcpPacket, COMMON_HEADER_LENGTH } from './RtcpPacket';
-import { isUnsignedInteger8, isUnsignedInteger32 } from '../../utils/numbers';
+import { RtcpPacket, COMMON_HEADER_LENGTH } from './RtcpPacket.js';
+import {
+	isUnsignedInteger8,
+	isUnsignedInteger32,
+} from '../../utils/numbers.js';
 import {
 	readSigned3BytesInDataView,
 	writeSigned3BytesInDataView,
-} from '../../utils/bytes';
+} from '../../utils/bytes.js';
 
 /**
  * Length (in bytes) of a reception report block.

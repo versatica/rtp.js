@@ -1,6 +1,6 @@
-import { Serializable, type SerializableDump } from '../common/Serializable';
-import { isUnsignedInteger, isUnsignedInteger8 } from '../../utils/numbers';
-import { padTo4Bytes } from '../../utils/buffers';
+import { Serializable, type SerializableDump } from '../common/Serializable.js';
+import { isUnsignedInteger, isUnsignedInteger8 } from '../../utils/numbers.js';
+import { padTo4Bytes } from '../../utils/buffers.js';
 
 /**
  * Length (in bytes) of the Extended Report block header.

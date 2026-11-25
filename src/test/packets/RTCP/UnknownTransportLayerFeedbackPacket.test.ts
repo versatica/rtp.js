@@ -1,7 +1,11 @@
-import { UnknownTransportLayerFeedbackPacket } from '../../../packets/RTCP/UnknownTransportLayerFeedbackPacket';
-import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
-import { serializeBuffer, cloneBuffer, resetBuffers } from '../../testHelpers';
+import { UnknownTransportLayerFeedbackPacket } from '../../../packets/RTCP/UnknownTransportLayerFeedbackPacket.js';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.js';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon.js';
+import {
+	serializeBuffer,
+	cloneBuffer,
+	resetBuffers,
+} from '../../testHelpers.js';
 
 beforeEach(resetBuffers);
 

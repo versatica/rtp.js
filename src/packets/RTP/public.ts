@@ -35,7 +35,7 @@ export {
 	type RtpPacketDumpOptions,
 	isRtp,
 	RtpPacket,
-} from './RtpPacket';
+} from './RtpPacket.js';
 
 export {
 	type ExtensionsForm,
@@ -46,7 +46,7 @@ export {
 	type PlayoutDelayExtension,
 	type AbsCaptureTimeExtension,
 	extensionUriToType,
-} from './extensions';
+} from './extensions.js';
 
 export {
 	DependencyDescriptorDecodeTargetIndication,
@@ -58,4 +58,4 @@ export {
 	type DependencyDescriptorDecodeTargetLayer,
 	getDependencyDescriptorDecodeTargetLayers,
 	DependencyDescriptorContext,
-} from './dependencyDescriptor';
+} from './dependencyDescriptor.js';

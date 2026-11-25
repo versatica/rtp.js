@@ -4,17 +4,17 @@ import {
 	isRtcp,
 	COMMON_HEADER_LENGTH,
 	type RtcpPacketDump,
-} from './RtcpPacket';
+} from './RtcpPacket.js';
 import {
 	ExtendedReportBlockType,
 	isExtendedReport,
 	type ExtendedReport,
 	type ExtendedReportDump,
-} from './ExtendedReport';
-import { RrtExtendedReport } from './extendedReports/RrtExtendedReport';
-import { DlrrExtendedReport } from './extendedReports/DlrrExtendedReport';
-import { UnknownExtendedReport } from './extendedReports/UnknownExtendedReport';
-import { isUnsignedInteger32 } from '../../utils/numbers';
+} from './ExtendedReport.js';
+import { RrtExtendedReport } from './extendedReports/RrtExtendedReport.js';
+import { DlrrExtendedReport } from './extendedReports/DlrrExtendedReport.js';
+import { UnknownExtendedReport } from './extendedReports/UnknownExtendedReport.js';
+import { isUnsignedInteger32 } from '../../utils/numbers.js';
 
 /**
  * Length (in bytes) of the XR header, RTCP Common Header included.

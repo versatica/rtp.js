@@ -4,9 +4,12 @@ import {
 	isRtcp,
 	COMMON_HEADER_LENGTH,
 	type RtcpPacketDump,
-} from './RtcpPacket';
-import { isUnsignedInteger8, isUnsignedInteger32 } from '../../utils/numbers';
-import { padTo4Bytes } from '../../utils/buffers';
+} from './RtcpPacket.js';
+import {
+	isUnsignedInteger8,
+	isUnsignedInteger32,
+} from '../../utils/numbers.js';
+import { padTo4Bytes } from '../../utils/buffers.js';
 
 /**
  * Maximum number of chunks in a SDES packet (the SC field has 5 bits).

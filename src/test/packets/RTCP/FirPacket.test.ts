@@ -1,14 +1,14 @@
-import { FirPacket } from '../../../packets/RTCP/FirPacket';
-import { PayloadSpecificFeedbackMessageType } from '../../../packets/RTCP/AnyPayloadSpecificFeedbackPacket';
-import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { areBuffersEqual } from '../../../utils/buffers';
-import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
+import { FirPacket } from '../../../packets/RTCP/FirPacket.js';
+import { PayloadSpecificFeedbackMessageType } from '../../../packets/RTCP/AnyPayloadSpecificFeedbackPacket.js';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.js';
+import { areBuffersEqual } from '../../../utils/buffers.js';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon.js';
 import {
 	factoryBuffer,
 	serializeBuffer,
 	cloneBuffer,
 	resetBuffers,
-} from '../../testHelpers';
+} from '../../testHelpers.js';
 
 beforeEach(resetBuffers);
 

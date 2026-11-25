@@ -221,13 +221,17 @@ function format() {
 function test({ args = '' } = {}) {
 	logInfo('test()');
 
-	executeCmd(`jest --silent false --detectOpenHandles ${args}`);
+	executeCmd(`jest --silent false --detectOpenHandles ${args}`, {
+		env: { NODE_OPTIONS: '--experimental-vm-modules' },
+	});
 }
 
 function coverage({ args = '' } = {}) {
 	logInfo('coverage()');
 
-	executeCmd(`jest --coverage ${args}`);
+	executeCmd(`jest --coverage ${args}`, {
+		env: { NODE_OPTIONS: '--experimental-vm-modules' },
+	});
 	executeCmd('open-cli coverage/lcov-report/index.html');
 }
 
@@ -374,11 +378,14 @@ function checkDocs() {
 	executeCmd('typedoc --emit none');
 }
 
-function executeCmd(command) {
+function executeCmd(command, { env = {} } = {}) {
 	logInfo(`executeCmd(): ${command}`);
 
 	try {
-		execSync(command, { stdio: ['ignore', process.stdout, process.stderr] });
+		execSync(command, {
+			stdio: ['ignore', process.stdout, process.stderr],
+			env: { ...process.env, ...env },
+		});
 	} catch (error) {
 		logError(`executeCmd() failed, exiting: ${error}`);
 
@@ -387,11 +394,11 @@ function executeCmd(command) {
 }
 
 // eslint-disable-next-line no-unused-vars
-function executeInteractiveCmd(command) {
+function executeInteractiveCmd(command, { env = {} } = {}) {
 	logInfo(`executeInteractiveCmd(): ${command}`);
 
 	try {
-		execSync(command, { stdio: 'inherit', env: process.env });
+		execSync(command, { stdio: 'inherit', env: { ...process.env, ...env } });
 	} catch (error) {
 		logError(`executeInteractiveCmd() failed, exiting: ${error}`);
 

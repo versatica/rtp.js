@@ -1,8 +1,12 @@
-import { UnknownPayloadSpecificFeedbackPacket } from '../../../packets/RTCP/UnknownPayloadSpecificFeedbackPacket';
-import { PayloadSpecificFeedbackMessageType } from '../../../packets/RTCP/AnyPayloadSpecificFeedbackPacket';
-import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon';
-import { serializeBuffer, cloneBuffer, resetBuffers } from '../../testHelpers';
+import { UnknownPayloadSpecificFeedbackPacket } from '../../../packets/RTCP/UnknownPayloadSpecificFeedbackPacket.js';
+import { PayloadSpecificFeedbackMessageType } from '../../../packets/RTCP/AnyPayloadSpecificFeedbackPacket.js';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.js';
+import { checkRtcpPacket, type ExpectedRtcpPacket } from './rtcpCommon.js';
+import {
+	serializeBuffer,
+	cloneBuffer,
+	resetBuffers,
+} from '../../testHelpers.js';
 
 beforeEach(resetBuffers);
 

@@ -3,18 +3,18 @@ import {
 	isRtcp,
 	COMMON_HEADER_LENGTH,
 	type RtcpPacketDump,
-} from './RtcpPacket';
-import { FEEDBACK_HEADER_LENGTH } from './AnyFeedbackPacket';
+} from './RtcpPacket.js';
+import { FEEDBACK_HEADER_LENGTH } from './AnyFeedbackPacket.js';
 import {
 	AnyPayloadSpecificFeedbackPacket,
 	PayloadSpecificFeedbackMessageType,
-} from './AnyPayloadSpecificFeedbackPacket';
-import { isUnsignedInteger, isUnsignedInteger32 } from '../../utils/numbers';
+} from './AnyPayloadSpecificFeedbackPacket.js';
+import { isUnsignedInteger, isUnsignedInteger32 } from '../../utils/numbers.js';
 import {
 	readBit,
 	readBitsInDataView,
 	writeBitsInDataView,
-} from '../../utils/bits';
+} from '../../utils/bits.js';
 
 /**
  * Value of the Unique identifier field ('R' 'E' 'M' 'B').

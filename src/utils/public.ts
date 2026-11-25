@@ -20,7 +20,7 @@
  * @packageDocumentation
  */
 
-export { type Ntp } from './types';
+export { type Ntp } from './types.js';
 
 export {
 	timeUsToNtp,
@@ -33,4 +33,4 @@ export {
 	absSendTimeToTimeUs,
 	timeUsToQ32x32,
 	q32x32ToTimeUs,
-} from './time';
+} from './time.js';

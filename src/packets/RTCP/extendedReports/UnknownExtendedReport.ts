@@ -2,7 +2,7 @@ import {
 	ExtendedReport,
 	isExtendedReport,
 	type ExtendedReportDump,
-} from '../ExtendedReport';
+} from '../ExtendedReport.js';
 
 /**
  * RTCP XR Unknown Extended Report block info dump.

@@ -1,4 +1,4 @@
-import { Serializable, type SerializableDump } from '../common/Serializable';
+import { Serializable, type SerializableDump } from '../common/Serializable.js';
 import {
 	ExtensionType,
 	type ExtensionsForm,
@@ -7,7 +7,7 @@ import {
 	type VideoOrientationExtension,
 	type AbsCaptureTimeExtension,
 	type PlayoutDelayExtension,
-} from './extensions';
+} from './extensions.js';
 import {
 	type DependencyDescriptorExtension,
 	type DependencyDescriptorMandatoryFields,
@@ -16,7 +16,7 @@ import {
 	readDependencyDescriptor,
 	readDependencyDescriptorMandatoryFields,
 	writeDependencyDescriptor,
-} from './dependencyDescriptor';
+} from './dependencyDescriptor.js';
 import {
 	isUnsignedInteger,
 	isUnsignedInteger8,
@@ -24,15 +24,18 @@ import {
 	isUnsignedInteger24,
 	isUnsignedInteger32,
 	isSignedInteger32,
-} from '../../utils/numbers';
-import { padTo4Bytes } from '../../utils/buffers';
+} from '../../utils/numbers.js';
+import { padTo4Bytes } from '../../utils/buffers.js';
 import {
 	readBitInDataView,
 	writeBitInDataView,
 	readBitsInDataView,
 	writeBitsInDataView,
-} from '../../utils/bits';
-import { read3BytesInDataView, write3BytesInDataView } from '../../utils/bytes';
+} from '../../utils/bits.js';
+import {
+	read3BytesInDataView,
+	write3BytesInDataView,
+} from '../../utils/bytes.js';
 
 /**
  * Minimum length (in bytes) of the RTP fixed header (without CSRC fields).

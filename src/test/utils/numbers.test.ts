@@ -5,7 +5,7 @@ import {
 	isUnsignedInteger24,
 	isUnsignedInteger32,
 	isSignedInteger32,
-} from '../../utils/numbers';
+} from '../../utils/numbers.js';
 
 test('isUnsignedInteger()', () => {
 	expect(isUnsignedInteger(0)).toBe(true);

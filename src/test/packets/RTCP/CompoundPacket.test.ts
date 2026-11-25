@@ -1,31 +1,31 @@
-import { CompoundPacket } from '../../../packets/RTCP/CompoundPacket';
-import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket';
-import { ByePacket } from '../../../packets/RTCP/ByePacket';
-import { UnknownPacket } from '../../../packets/RTCP/UnknownPacket';
-import { SdesPacket, SdesItemType } from '../../../packets/RTCP/SdesPacket';
-import { ReceiverReportPacket } from '../../../packets/RTCP/ReceiverReportPacket';
-import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket';
-import { NackPacket } from '../../../packets/RTCP/NackPacket';
-import { PliPacket } from '../../../packets/RTCP/PliPacket';
-import { FirPacket } from '../../../packets/RTCP/FirPacket';
-import { RembPacket } from '../../../packets/RTCP/RembPacket';
-import { TransportWideCcPacket } from '../../../packets/RTCP/TransportWideCcPacket';
-import { UnknownPayloadSpecificFeedbackPacket } from '../../../packets/RTCP/UnknownPayloadSpecificFeedbackPacket';
-import { TransportLayerFeedbackMessageType } from '../../../packets/RTCP/AnyTransportLayerFeedbackPacket';
-import { PayloadSpecificFeedbackMessageType } from '../../../packets/RTCP/AnyPayloadSpecificFeedbackPacket';
-import { XrPacket } from '../../../packets/RTCP/XrPacket';
-import { ExtendedReportBlockType } from '../../../packets/RTCP/ExtendedReport';
-import { RrtExtendedReport } from '../../../packets/RTCP/extendedReports/RrtExtendedReport';
-import { DlrrExtendedReport } from '../../../packets/RTCP/extendedReports/DlrrExtendedReport';
-import type { Serializable } from '../../../packets/common/Serializable';
-import { areBuffersEqual } from '../../../utils/buffers';
-import { checkRtcpCompoundPacket, checkRtcpPacket } from './rtcpCommon';
+import { CompoundPacket } from '../../../packets/RTCP/CompoundPacket.js';
+import { RtcpPacketType } from '../../../packets/RTCP/RtcpPacket.js';
+import { ByePacket } from '../../../packets/RTCP/ByePacket.js';
+import { UnknownPacket } from '../../../packets/RTCP/UnknownPacket.js';
+import { SdesPacket, SdesItemType } from '../../../packets/RTCP/SdesPacket.js';
+import { ReceiverReportPacket } from '../../../packets/RTCP/ReceiverReportPacket.js';
+import { SenderReportPacket } from '../../../packets/RTCP/SenderReportPacket.js';
+import { NackPacket } from '../../../packets/RTCP/NackPacket.js';
+import { PliPacket } from '../../../packets/RTCP/PliPacket.js';
+import { FirPacket } from '../../../packets/RTCP/FirPacket.js';
+import { RembPacket } from '../../../packets/RTCP/RembPacket.js';
+import { TransportWideCcPacket } from '../../../packets/RTCP/TransportWideCcPacket.js';
+import { UnknownPayloadSpecificFeedbackPacket } from '../../../packets/RTCP/UnknownPayloadSpecificFeedbackPacket.js';
+import { TransportLayerFeedbackMessageType } from '../../../packets/RTCP/AnyTransportLayerFeedbackPacket.js';
+import { PayloadSpecificFeedbackMessageType } from '../../../packets/RTCP/AnyPayloadSpecificFeedbackPacket.js';
+import { XrPacket } from '../../../packets/RTCP/XrPacket.js';
+import { ExtendedReportBlockType } from '../../../packets/RTCP/ExtendedReport.js';
+import { RrtExtendedReport } from '../../../packets/RTCP/extendedReports/RrtExtendedReport.js';
+import { DlrrExtendedReport } from '../../../packets/RTCP/extendedReports/DlrrExtendedReport.js';
+import type { Serializable } from '../../../packets/common/Serializable.js';
+import { areBuffersEqual } from '../../../utils/buffers.js';
+import { checkRtcpCompoundPacket, checkRtcpPacket } from './rtcpCommon.js';
 import {
 	factoryBuffer,
 	serializeBuffer,
 	cloneBuffer,
 	resetBuffers,
-} from '../../testHelpers';
+} from '../../testHelpers.js';
 
 beforeEach(resetBuffers);
 

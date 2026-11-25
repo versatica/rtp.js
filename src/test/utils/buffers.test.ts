@@ -1,4 +1,4 @@
-import { padTo4Bytes, areBuffersEqual } from '../../utils/buffers';
+import { padTo4Bytes, areBuffersEqual } from '../../utils/buffers.js';
 
 test('padTo4Bytes()', () => {
 	expect(padTo4Bytes(0)).toBe(0);

@@ -5,6 +5,7 @@
 	"author": "Iñaki Baz Castillo <ibc@aliax.net> (https://inakibaz.me)",
 	"homepage": "https://github.com/versatica/rtp.js",
 	"license": "ISC",
+	"type": "module",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/versatica/rtp.js.git"
@@ -45,7 +46,7 @@
 		"nodejs"
 	],
 	"engines": {
-		"node": ">=22"
+		"node": ">=22.12"
 	},
 	"scripts": {
 		"prepare": "node npm-scripts.mjs prepare",

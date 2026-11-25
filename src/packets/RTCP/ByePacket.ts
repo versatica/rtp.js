@@ -4,9 +4,9 @@ import {
 	isRtcp,
 	COMMON_HEADER_LENGTH,
 	type RtcpPacketDump,
-} from './RtcpPacket';
-import { isUnsignedInteger32 } from '../../utils/numbers';
-import { padTo4Bytes } from '../../utils/buffers';
+} from './RtcpPacket.js';
+import { isUnsignedInteger32 } from '../../utils/numbers.js';
+import { padTo4Bytes } from '../../utils/buffers.js';
 
 /**
  * Maximum number of SSRC/CSRC values (the Count field has 5 bits).

@@ -1,5 +1,5 @@
-import { RtcpPacket } from './RtcpPacket';
-import { isUnsignedInteger32 } from '../../utils/numbers';
+import { RtcpPacket } from './RtcpPacket.js';
+import { isUnsignedInteger32 } from '../../utils/numbers.js';
 
 /**
  * Length (in bytes) of the common header of every feedback packet, RTCP

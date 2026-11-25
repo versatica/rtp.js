@@ -1,12 +1,12 @@
-import { Serializable, type SerializableDump } from '../common/Serializable';
-import { isUnsignedInteger } from '../../utils/numbers';
-import { padTo4Bytes } from '../../utils/buffers';
+import { Serializable, type SerializableDump } from '../common/Serializable.js';
+import { isUnsignedInteger } from '../../utils/numbers.js';
+import { padTo4Bytes } from '../../utils/buffers.js';
 import {
 	readBitInDataView,
 	writeBitInDataView,
 	readBitsInDataView,
 	writeBitsInDataView,
-} from '../../utils/bits';
+} from '../../utils/bits.js';
 
 /**
  * Length (in bytes) of the RTCP Common Header.
