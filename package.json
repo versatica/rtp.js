@@ -10,11 +10,6 @@
 		"url": "git+https://github.com/versatica/rtp.js.git"
 	},
 	"exports": {
-		"./packets/common": {
-			"typedoc": "./src/packets/common/public.ts",
-			"types": "./lib/packets/common/public.d.ts",
-			"default": "./lib/packets/common/public.js"
-		},
 		"./packets/RTP": {
 			"typedoc": "./src/packets/RTP/public.ts",
 			"types": "./lib/packets/RTP/public.d.ts",
@@ -24,6 +19,11 @@
 			"typedoc": "./src/packets/RTCP/public.ts",
 			"types": "./lib/packets/RTCP/public.d.ts",
 			"default": "./lib/packets/RTCP/public.js"
+		},
+		"./packets/common": {
+			"typedoc": "./src/packets/common/public.ts",
+			"types": "./lib/packets/common/public.d.ts",
+			"default": "./lib/packets/common/public.js"
 		},
 		"./utils": {
 			"typedoc": "./src/utils/public.ts",

@@ -21,6 +21,8 @@ const config = {
 	treatWarningsAsErrors: true,
 	cacheBust: true,
 	categorizeByGroup: false,
+	sort: ['kind', 'source-order'],
+	sortEntryPoints: false,
 	searchInComments: true,
 	readme: 'README.md',
 	projectDocuments: ['README.md', 'LICENSE.md'],
