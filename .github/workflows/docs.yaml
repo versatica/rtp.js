@@ -67,16 +67,22 @@ jobs:
 
       # NOTE: Remove the retries (keep a single `actions/deploy-pages` step with
       # `id: deployment` and set `environment.url` back to
-      # `${{ steps.deployment.outputs.page_url }}`) once this is fixed:
-      # https://github.com/actions/deploy-pages/issues/451
+      # `${{ steps.deployment.outputs.page_url }}`) once both of these are fixed:
+      # - https://github.com/actions/deploy-pages/issues/451
+      # - https://github.com/actions/deploy-pages/issues/418
       #
-      # `actions/deploy-pages` looks the artifact up right after
+      # In #451, `actions/deploy-pages` looks the artifact up right after
       # `actions/upload-pages-artifact` finalizes it, and the artifact listing
       # may not include it yet ("No artifacts named "github-pages" were found
       # for this workflow run"). The lag is usually a few seconds but has been
-      # seen at ~46 seconds. Re-running the job does not help (it uploads a
-      # second artifact and then fails with "Multiple artifacts named
-      # "github-pages""), so retry the deploy step itself.
+      # seen at ~46 seconds.
+      #
+      # In #418, the artifact is found but the Pages API intermittently fails to
+      # create the deployment ("Failed to create deployment (status: 500)").
+      #
+      # Re-running the job does not help (it uploads a second artifact and then
+      # fails with "Multiple artifacts named "github-pages""), so retry the
+      # deploy step itself.
       - name: Deploy docs to GitHub Pages (attempt 1)
         id: deployment_1
         continue-on-error: true
