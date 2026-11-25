@@ -1366,7 +1366,7 @@ export class RtpPacket extends Serializable {
 			throw new TypeError(`negative delta (${delta}) too big`);
 		}
 
-		this.#assertAvailableLength(this.getLength() - this.getPadding() + delta);
+		this.#assertFitsInBuffer(this.getLength() - this.getPadding() + delta);
 
 		// Remove padding (if any).
 		this.setPadding(0);
@@ -1408,7 +1408,7 @@ export class RtpPacket extends Serializable {
 			);
 		}
 
-		this.#assertAvailableLength(
+		this.#assertFitsInBuffer(
 			this.getLength() - this.getPadding() + RTX_OVERHEAD
 		);
 
@@ -1674,7 +1674,7 @@ export class RtpPacket extends Serializable {
 	 * @throws
 	 * - `TypeError` if the given length is greater than the buffer length.
 	 */
-	#assertAvailableLength(length: number): void {
+	#assertFitsInBuffer(length: number): void {
 		if (length > this.getBufferLength()) {
 			throw new TypeError(
 				`length (${length} bytes) is larger than buffer length (${this.getBufferLength()} bytes)`
