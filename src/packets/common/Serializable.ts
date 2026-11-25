@@ -97,9 +97,11 @@ export abstract class Serializable {
 	}
 
 	/**
-	 * Current available length (in bytes) of the serializable.
+	 * Length (in bytes) of the free space of the buffer, after the current
+	 * content of the serializable. It's what the serializable can still grow
+	 * within its buffer.
 	 */
-	getAvailableLength(): number {
+	getAvailableBufferLength(): number {
 		return this.#buffer.byteLength - this.#length;
 	}
 

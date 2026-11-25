@@ -669,6 +669,9 @@ export class RtpPacket extends Serializable {
 	 * Get a map with all the extensions indexed by their extension id.
 	 *
 	 * @remarks
+	 * - This is raw access to the extensions, by id and regardless of the
+	 *   extension mapping. Values are given as they are in the packet, without
+	 *   interpreting or checking them.
 	 * - Each value is a view over the buffer of the packet (no bytes are
 	 *   copied).
 	 */
@@ -680,6 +683,10 @@ export class RtpPacket extends Serializable {
 	 * Get the value of the extension with given id.
 	 *
 	 * @remarks
+	 * - This is raw access to the extension, by id and regardless of the
+	 *   extension mapping. The value is given as it is in the packet, without
+	 *   interpreting or checking it. Known extensions are better read with
+	 *   their specific getters.
 	 * - The returned value is a view over the buffer of the packet (no bytes
 	 *   are copied).
 	 */
@@ -701,6 +708,11 @@ export class RtpPacket extends Serializable {
 	 * into the packet.
 	 *
 	 * @remarks
+	 * - This is raw access to the extension, by id and regardless of the
+	 *   extension mapping. The value is written as given, without checking that
+	 *   it's valid for the extension type mapped to that id (if any), and it
+	 *   replaces the existing value of that id. Known extensions are better
+	 *   written with their specific setters.
 	 * - If the packet has a header extension that doesn't contain One-Byte or
 	 *   Two-Byte extensions, it's replaced.
 	 *

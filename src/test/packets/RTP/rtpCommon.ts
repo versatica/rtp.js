@@ -54,7 +54,7 @@ export function checkRtpPacket(
 	expect(packet.getBufferLength()).toBe(expected.bufferLength);
 	expect(packet.getLength()).not.toBe(0);
 	expect(packet.getLength()).toBe(expected.length);
-	expect(packet.getAvailableLength()).toBe(
+	expect(packet.getAvailableBufferLength()).toBe(
 		packet.getBufferLength() - packet.getLength()
 	);
 	expect(firstByte >> 6).toBe(2);

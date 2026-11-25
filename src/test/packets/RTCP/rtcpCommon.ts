@@ -48,7 +48,7 @@ export function checkRtcpCompoundPacket(
 	expect(compoundPacket.getBufferLength()).toBe(expected.bufferLength);
 	expect(compoundPacket.getLength()).not.toBe(0);
 	expect(compoundPacket.getLength()).toBe(expected.length);
-	expect(compoundPacket.getAvailableLength()).toBe(
+	expect(compoundPacket.getAvailableBufferLength()).toBe(
 		compoundPacket.getBufferLength() - compoundPacket.getLength()
 	);
 	expect(compoundPacket.getLength() % 4).toBe(0);
@@ -91,7 +91,7 @@ export function checkRtcpPacket(
 	expect(packet.getLength()).not.toBe(0);
 	expect(packet.getLength()).toBe(expected.length);
 	expect((view.getUint16(2) + 1) * 4).toBe(expected.length);
-	expect(packet.getAvailableLength()).toBe(
+	expect(packet.getAvailableBufferLength()).toBe(
 		packet.getBufferLength() - packet.getLength()
 	);
 	expect(packet.getLength() % 4).toBe(0);
@@ -137,7 +137,7 @@ export function checkRtcpExtendedReport(
 	expect(extendedReport.getLength()).not.toBe(0);
 	expect(extendedReport.getLength()).toBe(expected.length);
 	expect((view.getUint16(2) + 1) * 4).toBe(expected.length);
-	expect(extendedReport.getAvailableLength()).toBe(
+	expect(extendedReport.getAvailableBufferLength()).toBe(
 		extendedReport.getBufferLength() - extendedReport.getLength()
 	);
 	expect(extendedReport.getLength() % 4).toBe(0);
